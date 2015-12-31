@@ -1,0 +1,48 @@
+#+TITLE: README for rebox layer
+#+AUTHOR: Christian E. Hopps
+#+EMAIL: chopps@gmail.com
+#+STARTUP: indent
+
+
+#+TITLE: Rebox layer
+#+HTML_HEAD_EXTRA: <link rel="stylesheet" type="text/css" href="../../../css/readtheorg.css" />
+
+* Table of Contents                                         :TOC_4_org:noexport:
+ - [[Installation][Installation]]
+ - [[Commands][Commands]]
+ - [[Configuration][Configuration]]
+   - [[Minor Mode][Minor Mode]]
+     - [[Optional filladapt][Optional filladapt]]
+   - [[Example configuration][Example configuration]]
+
+* Installation
+* Commands
+
+| Keybinding | Command            |
+|------------+--------------------|
+| SPC c b    | rebox-dwim         |
+| SPC c B    | rebox-dwim-no-fill |
+
+* Configuration
+Rebox has some basic templates setup, so that one can simply define a loop to
+use to loop through the styles. One can also configure ones own templates. The
+description of how to do this is beyond the scope of this readme. See the info
+file on rebox.
+
+** Minor Mode
+If you use the minor rebox-mode your boxed comments will auto-fill
+
+- auto-fill boxes
+- hype filladapt
+- S-return rebox-newline
+- kill/yank within the box
+- move boxes with space/backspace center with M-c
+
+*** Optional filladapt
+(require 'filladapt)
+(setq filladapt-mode t)
+
+** Example configuration
+#+BEGIN_SRC emacs-lisp
+  (setq 'rebox-style-loop '(77 74 75 76 70))
+#+END_SRC
