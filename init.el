@@ -1,6 +1,4 @@
 ;; -*- mode: emacs-lisp -*-
-;; This file is loaded by Spacemacs at startup.
-;; It must be stored in your home directory.
 
 (defun dotspacemacs/layers ()
   "Configuration Layers declaration.
@@ -26,21 +24,24 @@ values."
      auto-completion
      ;; better-defaults
 
+     rebox
+     gtags
+
      ;; Langs
      c-c++
      emacs-lisp
-     erlang
+     ;; erlang
      git
-     go
+     ;; go
      html
-     java
-     javascript
+     ;; java
+     ;; javascript
      latex
-     lua
-     markdown
-     php
+     ;; lua
+     ;; markdown
+     ;; php
      python
-     ruby
+     ;; ruby
      shell-scripts
      yaml
 
@@ -66,7 +67,7 @@ values."
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages '()
    ;; A list of packages and/or extensions that will not be install and loaded.
-   dotspacemacs-excluded-packages '()
+   dotspacemacs-excluded-packages '(evil-org)
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
    ;; are declared in a layer which is not a member of
    ;; the list `dotspacemacs-configuration-layers'. (default t)
@@ -99,7 +100,7 @@ values."
    ;; unchanged. (default 'vim)
    dotspacemacs-editing-style 'hybrid
    ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
-   dotspacemacs-verbose-loading nil
+   dotspacemacs-verbose-loading t
    ;; Specify the startup banner. Default value is `official', it displays
    ;; the official spacemacs logo. An integer value is the index of text
    ;; banner, `random' chooses a random text banner in `core/banners'
@@ -117,13 +118,13 @@ values."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(spacemacs-dark
+   dotspacemacs-themes '(misterioso
+                         spacemacs-dark
                          spacemacs-light
                          ;; solarized-light
                          solarized-dark
                          leuven
                          monokai
-                         misterioso
                          zenburn
                          )
    ;; If non nil the cursor color matches the state color in GUI Emacs.
@@ -256,85 +257,393 @@ values."
 
    ;; Allow for adding to use package configuration.
    use-package-inject-hooks t
-   ))
+   )
+  )
 
 (defun dotspacemacs/user-init ()
   "Initialization function for user code.
 It is called immediately after `dotspacemacs/init'.  You are free to put almost any
-user code here.  The exception is org related code, which should be placed in
-`dotspacemacs/user-config'."
+user code here.  The exception is org related code, which should be placed in `dotspacemacs/user-config'."
+
+  ;; =========
+  ;; User-init
+  ;; =========
+
+  (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp"))
+  (require 'iterm-custom-keys)
+  (require 'generic-lisp)
+  (require 'generic-mode-hooks)
+
+  (auto-insert-mode)
+
+
   (setq
    debug-init-msg t
    dropbox-directory "~/Dropbox"
-   org-directory "~/org")
-
-  (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp"))
-
-  (defun chopps-add-local-keys (&optional frame)
-    (let ((keymap function-key-map))    ; was local-function-key-map
-      (message "adding keys")
-      ;; ;; These are apparently the xterm defaults (there are others for mod combos)
-      (define-key keymap "\e[1;2A" [S-up])
-      (define-key keymap "\e[1;2B" [S-down])
-      (define-key keymap "\e[1;2C" [S-right])
-      (define-key keymap "\e[1;2D" [S-left])
-
-      (define-key keymap "\e[1;3A" [M-up])
-      (define-key keymap "\e[1;3B" [M-down])
-      (define-key keymap "\e[1;3C" [M-right])
-      (define-key keymap "\e[1;3D" [M-left])
-
-      (define-key keymap "\e[1;9A" [M-up])
-      (define-key keymap "\e[1;9B" [M-down])
-      (define-key keymap "\e[1;9C" [M-right])
-      (define-key keymap "\e[1;9D" [M-left])
-
-      (define-key keymap "\e[1;5A" [C-up])
-      (define-key keymap "\e[1;5B" [C-down])
-      (define-key keymap "\e[1;5C" [C-right])
-      (define-key keymap "\e[1;5D" [C-left])
-
-      (define-key keymap "\e[1;6A" [C-S-up])
-      (define-key keymap "\e[1;6B" [C-S-down])
-      (define-key keymap "\e[1;6C" [C-S-right])
-      (define-key keymap "\e[1;6D" [C-S-left])
-
-      (define-key keymap "\e[1;4A" [M-S-up])
-      (define-key keymap "\e[1;4B" [M-S-down])
-      (define-key keymap "\e[1;4C" [M-S-right])
-      (define-key keymap "\e[1;4D" [M-S-left])
-
-      (define-key keymap "\e[1;10A" [M-S-up])
-      (define-key keymap "\e[1;10B" [M-S-down])
-      (define-key keymap "\e[1;10C" [M-S-right])
-      (define-key keymap "\e[1;10D" [M-S-left])
-
-      (define-key keymap (kbd "ESC \" 5 R") '[S-return])
-      (define-key keymap (kbd "ESC \" 5 r") '[C-return])
-      (define-key keymap (kbd "ESC \" 2 R") '[C-S-return])
-      (define-key keymap (kbd "ESC \" 5 ;") '[?\C-\;])
-      (define-key keymap (kbd "ESC \" 5 :") '[?\C-\:])
-      (define-key keymap (kbd "ESC \" 5 ,") '[?\C-\,])
-      (define-key keymap (kbd "ESC \" 5 .") '[?\C-\.])
-      (define-key keymap (kbd "ESC \" 5 >") '[?\C-\>])
-      (define-key keymap (kbd "ESC \" 5 <") '[?\C-\<])
-      (define-key keymap (kbd "ESC \" 5 /") '[?\C-\/])
-      (define-key keymap (kbd "ESC \" 5 ?") '[?\C-\?])
-      (define-key keymap (kbd "ESC \" 5 \'") '[?\C-\'])
-      (define-key keymap (kbd "ESC \" 5 \"") '[?\C-\"])
-      (define-key keymap (kbd "ESC \" 5 |") '[?\C-|])
-      (define-key keymap (kbd "ESC \" 5 \\") '[?\C-\\])
-
-      (define-key keymap (kbd "ESC \" 5 t") '[C-tab])
-      (define-key keymap (kbd "ESC \" 5 T") '[C-backtab])
+   evil-search-wrap nil
+   evil-want-C-i-jump nil
+   evil-esc-delay 0.001
+   org-directory "~/org"
+   org-agenda-files '("~/org")
+   org-protocol-default-template-key "t"
+   org2blog/wp-shortcode-langs-map '(("emacs-lisp" . "lisp") ("sh" . "bash")))
 
 
-      (define-key isearch-mode-map [remap isearch-delete-char] 'isearch-del-char)))
 
-  (chopps-add-local-keys)
+  ;; =======
+  ;; Display
+  ;; =======
+
+  ;; (setq fci-rule-character ?\u2509)
+  (setq fci-rule-character ?\u250A)
+  (setq fci-rule-character-color "#121212")
+  ;; (setq fci-rule-color "#222222")
+
+  ;; =================================
+  ;; Global Key Bindings and Registers
+  ;; =================================
+
+  (fold-section "Keybindings"
+                (define-key isearch-mode-map [remap isearch-delete-char] 'isearch-del-char)
+
+                (global-set-key (kbd "M-Q") 'rebox-dwim)
+
+                ;; Find emacs source
+                (global-set-key (kbd "C-h C-l") 'find-library)
+                (global-set-key (kbd "C-h C-f") 'find-function)
+                (global-set-key (kbd "C-h C-k") 'find-function-on-key)
+                (global-set-key (kbd "C-h C-v") 'find-variable)
+
+
+                (evil-leader/set-key
+                  "oa" 'org-agenda
+                  ;; "og" 'helm-org-agenda-files-headings
+                  ;; "oo" 'org-clock-out
+                  "oc" 'org-capture
+                  "oC" 'helm-org-capture-templates ;requires templates to be defined.
+                  "ol" 'org-store-link)
+                )
+  (fold-section "Registers (files)"
+                ;; (set-register ?E `(file . ,emacs-init-source))
+                (progn
+                  (set-register ?W `(file . ,(concat org-directory "/work.org")))
+                  (set-register ?N `(file . ,(concat org-directory "/notes.org")))
+                  (set-register ?I `(file . ,(concat org-directory "/ietf.org")))
+                  (set-register ?S `(file . ,(concat org-directory "/status.org")))
+                  (set-register ?P `(file . ,(concat dropbox-directory "/ts-pass.gpg")))
+                  ))
+
+  ;; =================
+  ;; Programming Modes
+  ;; =================
+
+  (spacemacs|use-package-add-hook rebox2
+    :post-init
+    (progn
+      (setq rebox-style-loop '(81 82 83))
+      (add-hook 'all-prog-mode-hook 'rebox-mode)
+      )
+    )
+  (spacemacs|use-package-add-hook flycheck
+    :post-config
+    (progn
+      (flycheck-define-checker python-pycheckers
+                               "A python syntax and style checker using flake8 and pylint."
+                               :command ("pycheckers.sh"
+                                         (config-file "-8" flycheck-flake8rc)
+                                         (config-file "-r" flycheck-pylintrc)
+                                         source-inplace)
+                               :error-patterns
+                               ((error line-start
+                                       (file-name) ":" line ":" (optional column ":") " "
+                                       (message "E" (one-or-more digit) (zero-or-more not-newline))
+                                       line-end)
+                                (warning line-start
+                                         (file-name) ":" line ":" (optional column ":") " "
+                                         (message (or "F"            ; Pyflakes in Flake8 >= 2.0
+                                                      "W"            ; Pyflakes in Flake8 < 2.0
+                                                      "C")           ; McCabe in Flake >= 2.0
+                                                  (one-or-more digit) (zero-or-more not-newline))
+                                         line-end)
+                                (info line-start
+                                      (file-name) ":" line ":" (optional column ":") " "
+                                      (message (or "N"              ; pep8-naming in Flake8 >= 2.0
+                                                   "R")             ; re-factor from python.
+                                               (one-or-more digit) (zero-or-more not-newline))
+                                      line-end)
+                                )
+                               :modes python-mode)
+      ;; (add-hook 'after-init-hook 'global-flycheck-mode)
+      ))
+  (spacemacs|use-package-add-hook cc-mode
+    :post-init
+    (setq c-font-lock-extra-types
+          (quote
+           ("FILE"
+            "\\sw+_st" "\\sw+_t" "\\sw+type" ; procket types
+            "\\(u_?\\)?int\\(8\\|16\\|32\\|64\\)_t" "ushort" "uchar"
+            "bool" "boolean")))
+
+    :post-config
+    (progn
+      ;; (modify-syntax-entry ?_ "w" awk-mode-syntax-table)
+      (modify-syntax-entry ?_ "w" c-mode-syntax-table)
+      (modify-syntax-entry ?_ "w" objc-mode-syntax-table)
+      (modify-syntax-entry ?_ "w" c++-mode-syntax-table)
+      ;; (modify-syntax-entry ?_ "w" java-mode-syntax-table)
+      ;; (modify-syntax-entry ?_ "w" objc-mode-syntax-table)
+      (add-hook 'c-mode-common-hook
+                (function (lambda ()
+                            (if (string= (shell-command-to-string "uname -s") "NetBSD\n")
+                                (c-set-style "KNF")
+                              (c-set-style "Procket")
+                              (setq indent-tabs-mode nil))
+                            (c-toggle-auto-hungry-state 1)
+                            (setq fill-column 80)
+                            (flyspell-prog-mode)
+                            )))
+
+      (c-add-style
+       "KNF"
+       '((indent-tabs-mode . t)
+         (c-basic-offset . 8)
+         (c-comment-only-line-offset . 0)
+         (c-label-minimum-indentation . 0)
+         (c-tab-always-indent    . t)
+         (c-hanging-semi&comma-criteria (lambda () 'stop))
+         (c-hanging-braces-alist . ((class-open) (class-close) (defun-open)
+                                    (defun-close) (inline-open) (inline-close)
+                                    (brace-list-open) (brace-list-close)
+                                    (brace-list-intro) (brace-list-entry)
+                                    (block-open) (block-close) (substatement-open)
+                                    (statement-case-open) (extern-lang-open)
+                                    (extern-lang-close)))
+         (c-hanging-colons-alist     . ((access-label)
+                                        (case-label)
+                                        (label)
+                                        (member-init-intro)
+                                        (inher-intro)))
+                                        ;   (c-cleanup-list             . (scope-operator
+                                        ;                                 empty-defun-braces
+                                        ;                                 defun-close-semi))
+         (c-offsets-alist . ((string                . -1000)
+                             (c                     . c-lineup-C-comments)
+                             (defun-open            . 0)
+                             (defun-close           . 0)
+                             (defun-block-intro     . +)
+                             (func-decl-cont        . 0)
+                                        ; above is ansi        (func-decl-cont        . 0)
+                             (knr-argdecl-intro     . 0)
+                             (knr-argdecl           . 0)
+                             (topmost-intro         . 0)
+                             (topmost-intro-cont    . 0)
+                             (block-open            . 0)
+                             (block-close           . 0)
+                             (brace-list-open       . 0)
+                             (brace-list-close      . 0)
+                             (brace-list-intro      . +)
+                             (brace-list-entry      . 0)
+                             (statement             . 0)
+                             (statement-cont        . 4)
+                             (statement-block-intro . +)
+                             (statement-case-intro  . +)
+                             (statement-case-open   . 0)
+                             (substatement          . +)
+                             (substatement-open     . 0)
+                             (case-label            . 0)
+                             (label                 . -)
+                             (do-while-closure      . 0)
+                             (else-clause           . 0)
+                             (comment-intro         . c-lineup-comment)
+                             (arglist-intro         . 4)
+                             (arglist-cont          . 0)
+                             (arglist-cont-nonempty . 4)
+                             (arglist-close         . 4)
+                             (cpp-macro             . -1000)
+                             ))))
+
+      (c-add-style
+       "Procket"
+       '((c-basic-offset . 4)
+         (c-comment-only-line-offset . 0)
+         (c-label-minimum-indentation . 0)
+         (c-tab-always-indent    . t)
+         (c-hanging-semi&comma-criteria (lambda () 'stop))
+         (c-hanging-braces-alist . ((class-open) (class-close) (defun-open)
+                                    (defun-close) (inline-open) (inline-close)
+                                    (brace-list-open) (brace-list-close)
+                                    (brace-list-intro) (brace-list-entry)
+                                    (block-open) (block-close) (substatement-open)
+                                    (statement-case-open) (extern-lang-open)
+                                    (extern-lang-close)))
+         (c-hanging-colons-alist     . ((access-label)
+                                        (case-label)
+                                        (label)
+                                        (member-init-intro)
+                                        (inher-intro)))
+                                        ;   (c-cleanup-list             . (scope-operator
+                                        ;                                 empty-defun-braces
+                                        ;                                 defun-close-semi))
+         (c-offsets-alist . ((string                . -1000)
+                             (c                     . c-lineup-C-comments)
+                             (defun-open            . 0)
+                             (defun-close           . 0)
+                             (defun-block-intro     . +)
+                             (func-decl-cont        . 0)
+                                        ; above is ansi        (func-decl-cont        . 0)
+                             (knr-argdecl-intro     . 0)
+                             (knr-argdecl           . 0)
+                             (topmost-intro         . 0)
+                             (topmost-intro-cont    . 0)
+                             (block-open            . 0)
+                             (block-close           . 0)
+                             (brace-list-open       . 0)
+                             (brace-list-close      . 0)
+                             (brace-list-intro      . +)
+                             (brace-list-entry      . 0)
+                             (statement             . 0)
+                             (statement-cont        . c-lineup-math)
+                             (statement-block-intro . +)
+                             (statement-case-intro  . +)
+                             (statement-case-open   . 0)
+                             (substatement          . +)
+                             (substatement-open     . 0)
+                             (case-label            . 0)
+                             (label                 . -)
+                             (do-while-closure      . 0)
+                             (else-clause           . 0)
+                             (comment-intro         . c-lineup-comment)
+                             (arglist-intro         . 4)
+                             (arglist-cont          . 0)
+                             (arglist-cont-nonempty . c-lineup-arglist)
+                             (arglist-close         . 4)
+                             (cpp-macro             . -1000)
+                             ))))
+      ))
+  (spacemacs|use-package-add-hook python
+    :post-init
+    (progn
+      ;; (use-package flymake-pyfixers
+      ;;             :commands (pyfixer:ignore-current-line pyfixer:fix-current-line pyfixer:fix-all-errors))
+      ;; (setq pytest-global-name "py.test"
+      ;;      pytest-cmd-flags "-x --doctest-module"))
+
+      ;;       (setq nose-project-root-files '("setup.py" ".hg" ".git" ".svn")))
+
+      ;; (when (not (setq python-check-command (executable-find "pycheckers.sh")))
+      ;;  (setq python-check-command "flake8"))
+
+      (setq
+       python-fill-docstring-style 'symmetric
+       python-fill-string-function 'my-python-fill-string-function)
+
+      (defun my-python-fill-comment-function (&optional justify)
+        (let ((fill-column 80))
+          (python-fill-comment justify)))
+
+      (defun my-python-mode-hook ()
+        (message "Python mode hook")
+
+        ;; (elpy-mode)
+        ;; (pyenv-mode)
+
+        (require 'flymake-pyfixers)
+        (setq comment-column 60)
+        (setq fill-column 120)
+        (highlight-indentation-mode -1)
+
+        (flyspell-prog-mode)
+        (flycheck-mode t)
+        (flycheck-select-checker 'python-pycheckers)
+        (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
+
+        (set (make-local-variable 'rebox-style-loop) '(73 74 75 71))
+
+        (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
+
+        (message "Python mode hook done"))
+      (add-hook 'python-mode-hook 'my-python-mode-hook))
+    :post-config
+    (progn
+      ;; (define-key python-mode-map (kbd "M-n") 'flycheck-next-error)
+      ;; (define-key python-mode-map (kbd "M-p") 'flycheck-previous-error)
+      ;; (define-key python-mode-map (kbd "C-c Ta") 'nosetests-all)
+      ;; (define-key python-mode-map (kbd "C-c Tm") 'nosetests-module)
+      ;; (define-key python-mode-map (kbd "C-c To") 'nosetests-one)
+      ;; (define-key python-mode-map (kbd "C-c Tpa") 'nosetests-pdb-all)
+      ;; (define-key python-mode-map (kbd "C-c Tpm") 'nosetests-pdb-module)
+      ;; (define-key python-mode-map (kbd "C-c Tpo") 'nosetests-pdb-one)
+      ;; (define-key python-mode-map (kbd "C-c ta") 'pytest-all)
+      ;; (define-key python-mode-map (kbd "C-c tm") 'pytest-module)
+      ;; (define-key python-mode-map (kbd "C-c to") 'pytest-one)
+      ;; (define-key python-mode-map (kbd "C-c td") 'pytest-directory)
+      ;; (define-key python-mode-map (kbd "C-c tpa") 'pytest-pdb-all)
+      ;; (define-key python-mode-map (kbd "C-c tpm") 'pytest-pdb-module)
+      ;; (define-key python-mode-map (kbd "C-c tpo") 'pytest-pdb-one)
+      ;; (define-key python-mode-map (kbd "C-c M-\\") 'pyfixer:ignore-current-line)
+      ;; (define-key python-mode-map (kbd "C-c C-\\") 'pyfixer:fix-current-line)
+      ;; (define-key python-mode-map (kbd "C-c C-M-\\") 'pyfixer:fix-all-errors)
+      ;; (define-key python-mode-map (kbd "C-c 8") 'pyfixer:fix-all-errors)
+      ;; (bind-key "C-c C-h" 'pylookup-lookup python-mode-map)
+
+      ;; Elpy config
+      ;; (define-key elpy-mode-map (kbd "C-c C-n") 'next-error)
+      ;; (define-key elpy-mode-map (kbd "C-c C-p") 'previous-error)
+      ;; (elpy-use-ipython)
+      ;; (elpy-clean-modeline)
+
+      ;; Python config
+
+      ;; Consider _ a part of words for python
+      (modify-syntax-entry ?_ "w" python-mode-syntax-table)
+      ;; (define-key global-map (kbd "C-c o") 'iedit-mode)
+
+      ;; (if (file-exists-p "/usr/local/bin/python"  )
+      ;; (setenv "PYMACS_PYTHON" "/usr/local/bin/python"))
+
+      (defun python-sort-import-list ()
+        "Split an single import lines with multiple module imports into separate lines sort results"
+        (interactive)
+        (if (not (use-region-p))
+            (error "No region defined"))
+        (let* ((start (region-beginning))
+               (end (region-end))
+               (value 0)
+               found)
+          (save-excursion
+            (let* (modlist impstart impend bigstr)
+              (setq modlist '())
+              (goto-char start)
+              (when (re-search-forward "^import \\([[:alnum:]_,\\. ]+\\)$" end t)
+                (setq impstart (match-beginning 0))
+                (setq impend (match-end 0))
+                (setq modlist (append modlist (mapcar 's-trim (s-split "," (match-string 1)))))
+                (while (setq found (re-search-forward "^import \\([[:alnum:]_,\\. ]+\\)$" end t))
+                  (setq impend (match-end 0))
+                  (setq modlist (append modlist (mapcar 's-trim (s-split "," (match-string 1))))))
+                (setq modlist (sort modlist 's-less?))
+                (setq modlist (mapcar (lambda (x) (concat "import " x)) modlist))
+                (setq bigstr (s-join "\n" modlist))
+                (save-restriction
+                  (narrow-to-region impstart impend)
+                  (delete-region impstart impend)
+                  (goto-char impstart)
+                  (insert bigstr)))))))
+      )
+    )
+
+  ;; =====
+  ;; Email
+  ;; =====
+
   (spacemacs|use-package-add-hook mu4e
     :post-init
     (progn
+      (defcustom mu4e-spam-folder "/chopps.org/spam-train"
+        "Folder for spam email"
+        :type '(string :tag "Folder name")
+        :group 'mu4e-folders)
+
       (setq mu4e-maildir "~/Maildir"
             ;; Updating
             ;; mu4e-pre-hook-count 0
@@ -587,67 +896,67 @@ user code here.  The exception is org related code, which should be placed in
 
       (require 'mu4e-context)
       (setq mu4e-contexts `( ,(make-mu4e-context
-                :name "chopps.org"
-                :enter-func (lambda () (mu4e-message "Home"))
-                ;; no leave-func
-                :match-func (lambda (msg)
-                              (and msg (string-match "/chopps.org/.*" (mu4e-message-field msg :maildir))))
-                :vars '((user-mail-address  . "chopps@chopps.org")
-                        ;; mu4e
-                        (mu4e-sent-folder   . "/chopps.org/Sent Messages")
-                        (mu4e-trash-folder  . "/chopps.org/Deleted Messages")
-                        (mu4e-drafts-folder . "/chopps.org/Drafts")
-                        (mu4e-sent-messages-behavior   . sent)
-                        ;; smtp
-                        (smtpmail-starttls-credentials . '(("smtp.chopps.org" 9005 nil nil)))
-                        (smtpmail-default-smtp-server  . "smtp.chopps.org")
-                        (smtpmail-smtp-server          . "smtp.chopps.org")
-                        ;; smtpmail-local-domain?
-                        ;; smtpmail-sendto-domain?
-                        (smtpmail-smtp-service         . 9005)))
-              ,(make-mu4e-context
-                :name "dev.terastrm.net"
-                :enter-func (lambda () (mu4e-message "Work"))
-                ;; no leave-func
-                :match-func (lambda (msg)
-                              (and msg (string-match "/terastrm.net/.*" (mu4e-message-field msg :maildir))))
-                :vars '(
-                        ;; about me
-                        (user-mail-address  . "chopps@dev.terastrm.net")
-                        ;; mu4e
-                        (mu4e-sent-folder   . "/terastrm.net/Sent Messages")
-                        (mu4e-trash-folder  . "/terastrm.net/Deleted Messages")
-                        (mu4e-drafts-folder . "/terastrm.net/Drafts")
-                        (mu4e-sent-messages-behavior   . sent)
-                        ;; smtp
-                        (smtpmail-starttls-credentials . '(("smtp.dev.terastrm.net" 587 nil nil)))
-                        (smtpmail-default-smtp-server  . "smtp.dev.terastrm.net")
-                        (smtpmail-smtp-server          . "smtp.dev.terastrm.net")
-                        ;; smtpmail-local-domain?
-                        ;; smtpmail-sendto-domain?
-                        (smtpmail-smtp-service         . 587)))
+                               :name "chopps.org"
+                               :enter-func (lambda () (mu4e-message "Home"))
+                               ;; no leave-func
+                               :match-func (lambda (msg)
+                                             (and msg (string-match "/chopps.org/.*" (mu4e-message-field msg :maildir))))
+                               :vars '((user-mail-address  . "chopps@chopps.org")
+                                       ;; mu4e
+                                       (mu4e-sent-folder   . "/chopps.org/Sent Messages")
+                                       (mu4e-trash-folder  . "/chopps.org/Deleted Messages")
+                                       (mu4e-drafts-folder . "/chopps.org/Drafts")
+                                       (mu4e-sent-messages-behavior   . sent)
+                                       ;; smtp
+                                       (smtpmail-starttls-credentials . '(("smtp.chopps.org" 9005 nil nil)))
+                                       (smtpmail-default-smtp-server  . "smtp.chopps.org")
+                                       (smtpmail-smtp-server          . "smtp.chopps.org")
+                                       ;; smtpmail-local-domain?
+                                       ;; smtpmail-sendto-domain?
+                                       (smtpmail-smtp-service         . 9005)))
+                             ,(make-mu4e-context
+                               :name "dev.terastrm.net"
+                               :enter-func (lambda () (mu4e-message "Work"))
+                               ;; no leave-func
+                               :match-func (lambda (msg)
+                                             (and msg (string-match "/terastrm.net/.*" (mu4e-message-field msg :maildir))))
+                               :vars '(
+                                       ;; about me
+                                       (user-mail-address  . "chopps@dev.terastrm.net")
+                                       ;; mu4e
+                                       (mu4e-sent-folder   . "/terastrm.net/Sent Messages")
+                                       (mu4e-trash-folder  . "/terastrm.net/Deleted Messages")
+                                       (mu4e-drafts-folder . "/terastrm.net/Drafts")
+                                       (mu4e-sent-messages-behavior   . sent)
+                                       ;; smtp
+                                       (smtpmail-starttls-credentials . '(("smtp.dev.terastrm.net" 587 nil nil)))
+                                       (smtpmail-default-smtp-server  . "smtp.dev.terastrm.net")
+                                       (smtpmail-smtp-server          . "smtp.dev.terastrm.net")
+                                       ;; smtpmail-local-domain?
+                                       ;; smtpmail-sendto-domain?
+                                       (smtpmail-smtp-service         . 587)))
 
-              ,(make-mu4e-context
-                :name "gmail.com"
-                :enter-func (lambda () (mu4e-message "Gmail"))
-                ;; no leave-func
-                :match-func (lambda (msg)
-                              (and msg (string-match "/gmail.com/.*" (mu4e-message-field msg :maildir))))
-                :vars '(
-                        ;; about me
-                        (user-mail-address  . "chopps@gmail.com")
-                        ;; mu4e
-                        (mu4e-drafts-folder . "/gmail.com/[Gmail].Drafts")
-                        (mu4e-sent-folder   . "/gmail.com/[Gmail].Sent Mail")
-                        (mu4e-trash-folder  . "/gmail.com/[Gmail].Trash")
-                        (mu4e-sent-messages-behavior   . delete)
-                        ;; smtp
-                        (smtpmail-starttls-credentials . '(("smtp.gmail.com" 587 nil nil)))
-                        (smtpmail-default-smtp-server  . "smtp.gmail.com")
-                        (smtpmail-smtp-server          . "smtp.gmail.com")
-                        ;; smtpmail-local-domain?
-                        ;; smtpmail-sendto-domain?
-                        (smtpmail-smtp-service . 587)))))
+                             ,(make-mu4e-context
+                               :name "gmail.com"
+                               :enter-func (lambda () (mu4e-message "Gmail"))
+                               ;; no leave-func
+                               :match-func (lambda (msg)
+                                             (and msg (string-match "/gmail.com/.*" (mu4e-message-field msg :maildir))))
+                               :vars '(
+                                       ;; about me
+                                       (user-mail-address  . "chopps@gmail.com")
+                                       ;; mu4e
+                                       (mu4e-drafts-folder . "/gmail.com/[Gmail].Drafts")
+                                       (mu4e-sent-folder   . "/gmail.com/[Gmail].Sent Mail")
+                                       (mu4e-trash-folder  . "/gmail.com/[Gmail].Trash")
+                                       (mu4e-sent-messages-behavior   . delete)
+                                       ;; smtp
+                                       (smtpmail-starttls-credentials . '(("smtp.gmail.com" 587 nil nil)))
+                                       (smtpmail-default-smtp-server  . "smtp.gmail.com")
+                                       (smtpmail-smtp-server          . "smtp.gmail.com")
+                                       ;; smtpmail-local-domain?
+                                       ;; smtpmail-sendto-domain?
+                                       (smtpmail-smtp-service . 587)))))
 
       ;; (require 'mu4e-maildirs-extension)
       ;; XXX we need to add this
@@ -666,7 +975,7 @@ user code here.  The exception is org related code, which should be placed in
                               scroll-conservatively 0
                               scroll-up-aggressively .8
                               scroll-down-aggressively .8)
-                            )))
+                             )))
       (add-hook 'mu4e-view-mode-hook
                 (lambda () (setq show-trailing-whitespace nil)))
       ;; (add-hook 'mu4e-compose-pre-hook
@@ -696,14 +1005,19 @@ user code here.  The exception is org related code, which should be placed in
       (setq
        ;; "Date         Flgs   List       From                   Subject
        mu4e-headers-fields (quote (
-                             (:flags          .  5)
-                             (:human-date     . 15)
-                             (:from           . 26)
-                             (:list-or-dir    . 30)
-                             (:thread-subject . nil))))
+                                   (:flags          .  5)
+                                   (:human-date     . 15)
+                                   (:from           . 26)
+                                   (:list-or-dir    . 30)
+                                   (:thread-subject . nil))))
 
       )
     )
+
+  ;; ========
+  ;; Org Mode
+  ;; ========
+
   (spacemacs|use-package-add-hook org
     :post-init
     (progn
@@ -720,6 +1034,7 @@ user code here.  The exception is org related code, which should be placed in
             (message "Org-mode-hook"))
         ;; (org-set-local 'yas/trigger-key [tab])
         ;;(yas-minor-mode)
+
         (turn-on-flyspell)
 
         ;; (define-key yas/keymap [tab] 'yas/next-field-or-maybe-expand)
@@ -979,29 +1294,281 @@ user code here.  The exception is org related code, which should be placed in
       )
     )
 
-  ;; (set-register ?E `(file . ,emacs-init-source))
-  (set-register ?W `(file . ,(concat org-directory "/work.org")))
-  (set-register ?N `(file . ,(concat org-directory "/notes.org")))
-  (set-register ?I `(file . ,(concat org-directory "/ietf.org")))
-  (set-register ?S `(file . ,(concat org-directory "/status.org")))
-  (set-register ?P `(file . ,(concat dropbox-directory "/ts-pass.gpg")))
 
+  ;; ---------------------
+  ;; Auto insert templates
+  ;; ---------------------
+
+  (fold-section "Auto Insert Templates"
+                (defun user-full-name ()
+                  "Christian Hopps")
+
+                (defun my-get-date ()
+                  (concat (format-time-string "%B" (current-time))
+                          " "
+                          (trim-string (format-time-string " %e" (current-time)))
+                          (format-time-string " %Y" (current-time))))
+
+                (setq work-ai-prefix "/.*/\\(?:\\(?:Documents|Dropbox\\)/[Ww]ork\\|chopps/w\\)/.*/")
+
+                (eval-after-load 'autoinsert
+                  '(progn
+
+                     ;;-----------+
+                     ;;      Home
+                     ;;-----------+
+
+                     (define-auto-insert
+                       '("\\.org\\'" . "Home Org mode skeleton")
+                       '("Short description: "
+                         "#+TITLE: " _ \n
+                         > "#+AUTHOR: Christian E. Hopps" \n
+                         > "#+EMAIL: chopps@gmail.com" \n
+                         > "#+STARTUP: indent" \n
+                         > "" \n
+                         ))
+                     (define-auto-insert
+                       '("\\.o2b\\'" . "Home Blog Org mode skeleton")
+                       '("Short description: "
+                         "#+TITLE: " _ \n
+                         > "#+BLOG: hoppsjots.org" \n
+                         > "#+AUTHOR: Christian E. Hopps" \n
+                         > "#+EMAIL: chopps@gmail.com" \n
+                         > "#+CATEGORY: Development" _ \n
+                         > "#+OPTIONS: toc:nil num:nil todo:nil pri:nil tags:nil ^:nil TeX:nil" \n
+                         > "#+STARTUP: indent" \n
+                         > "" \n
+                         ))
+                     (define-auto-insert
+                       '("\\.el\\'" . "Home Lisp comment skeleton")
+                       '("Short description: "
+                         ";;" \n
+                         > ";; " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                         > ";;" \n
+                         > ";; Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps" \n
+                         > ";; All rights reserved." \n
+                         > ";;" \n
+                         > _ ))
+                     (define-auto-insert
+                       '("\\.py\\'" . "# Home python comment skeleton")
+                       '("Short description: "
+                         "# -*- coding: utf-8 -*-"
+                         > "#" \n
+                         > "# " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                         > "#" \n
+                         > "# Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
+                         > "# All rights reserved." \n
+                         > "#" \n
+                         > "# REDISTRIBUTION IN ANY FORM PROHIBITED WITHOUT PRIOR WRITTEN" \n
+                         > "# CONSENT OF THE AUTHOR." \n
+                         > "from __future__ import absolute_import, division, unicode_literals, print_function, nested_scopes" \n
+                         > "" \n
+                         > _ \n
+                         > "" \n
+                         > "__author__ = '" (user-full-name) "'" \n
+                         > "__date__ = '" (my-get-date) "'" \n
+                         > "__version__ = '1.0'" \n
+                         > "__docformat__ = \"restructuredtext en\"" \n
+                         > _ ))
+                     (define-auto-insert
+                       '("\\.sh\'" . "# Home shell comment skeleton")
+                       '("Short description: "
+                         "#!/bin/bash" \n
+                         > "#" \n
+                         > "# " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                         > "#" \n
+                         > "# Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
+                         > "# All rights reserved." \n
+                         > "#" \n
+                         > _ ))
+                     (define-auto-insert
+                       '("\\.\\(pl\\|tcl\\)" . "# Home comment skeleton")
+                       '("Short description: "
+                         "#" \n
+                         > "# " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                         > "#" \n
+                         > "# Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
+                         > "# All rights reserved." \n
+                         > "#" \n
+                         > _ ))
+                     (define-auto-insert
+                       '("\\.rst\\'" . "Home ReST skeleton")
+                       '("Short description: "
+                         ".." \n
+                         > ".. " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                         > ".." \n
+                         > ".. Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
+                         > ".. All rights reserved." \n
+                         > ".." \n
+                         > _ ))
+                     (define-auto-insert
+                       '("\\.\\(h\\|c\\|CC?\\|cc\\|cxx\\|cpp\\|c++\\|m\\)\\'" . "Home C-style skeleton")
+                       '("Short description: "
+                         "/*" \n
+                         > " * " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                         > "*" \n
+                         > "* Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
+                         > "* All rights reserved." \n
+                         > "*" \n
+                         > "* REDISTRIBUTION IN ANY FORM PROHIBITED WITHOUT PRIOR WRITTEN" \n
+                         > "* CONSENT OF THE AUTHOR." \n
+                         > "*/" \n
+                         > _ ))
+
+
+                     ;;-----------+
+                     ;;      Work
+                     ;;-----------+
+
+                     (define-auto-insert
+                       (cons (concat work-ai-prefix "\\.org\\'") "Work org mode skeleton")
+                       '("Short description: "
+                         "#+TITLE: " _ \n
+                         > "#+AUTHOR: Christian E. Hopps" \n
+                         > "#+EMAIL: chopps@gmail.com" \n
+                         > "#+STARTUP: indent" \n
+                         > "" \n
+                         ))
+                     (define-auto-insert
+                       (cons (concat work-ai-prefix "\\.el\\'") "Work Lisp comment skeleton")
+                       '("Short description: "
+                         ";;" \n
+                         > ";; " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                         > ";;" \n
+                         > _
+                         ))
+                     (define-auto-insert
+                       (cons (concat work-ai-prefix "\\.py\\'") "# Work python comment skeleton")
+                       '("Short description: "
+                         "# -*- coding: utf-8 -*-"
+                         > "#" \n
+                         > "# " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                         > "#" \n
+                         > "from __future__ import absolute_import, division, unicode_literals, print_function, nested_scopes" \n
+                         > _ \n
+                         > "__author__ = '" (user-full-name) "'" \n
+                         > "__date__ = '" (my-get-date) "'" \n
+                         > "__version__ = '1.0'" \n
+                         > "__docformat__ = \"restructuredtext en\"" \n
+                         ))
+                     (define-auto-insert
+                       (cons (concat work-ai-prefix "\\.sh\\'") "# Work comment skeleton")
+                       '("Short description: "
+                         "#!/bin/bash" \n
+                         > "#" \n
+                         > "# " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                         > "#" \n
+                         > _ ))
+                     (define-auto-insert
+                       (cons (concat work-ai-prefix "\\.\\(pl\\|tcl\\)\\'") "# Work comment skeleton")
+                       '("Short description: "
+                         "#" \n
+                         > "# " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                         > "#" \n
+                         > _ ))
+                     (define-auto-insert
+                       (cons (concat work-ai-prefix "\\.rst\\'") "Work ReST skeleton")
+                       '("Short description: "
+                         ".." \n
+                         > ".. " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                         > ".." \n
+                         > _ ))
+                     (define-auto-insert
+                       (cons (concat work-ai-prefix "\\.\\(h\\|c\\|CC?\\|cc\\|cxx\\|cpp\\|c++\\|m\\)\\'") "Work C-style skeleton")
+                       '("Short description: "
+                         "/*" \n
+                         > "* " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                         > "*/" \n
+                         > _ ))
+                     )))
   )
 
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
 This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
+
+  (progn
+    (global-hl-line-mode -1)            ; Disable hihglighting of current line.
+
+    ;; fill-column-mode character doesn't work
+    (set-face-inverse-video-p 'vertical-border nil)
+    (set-face-background 'vertical-border (face-background 'default))
+    (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u2999))
+    (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u299A))
+    (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u2503))
+
+    (fold-section "Evil"
+                  (defun evil-undefine ()
+                    (interactive)
+                    (let (evil-mode-map-alist)
+                      (call-interactively (key-binding (this-command-keys)))))
+
+                  (define-key evil-normal-state-map [escape] 'keyboard-quit)
+                  (define-key evil-visual-state-map [escape] 'keyboard-quit)
+                  (define-key evil-normal-state-map (kbd "TAB") 'evil-undefine)
+
+                  ;; Undefine vi keys in all modes.
+                  (let ((undef '("\C-a" "\C-e" "\C-n" "\C-p")))
+                    (while undef
+                      (define-key evil-normal-state-map (car undef) 'evil-undefine)
+                      (define-key evil-visual-state-map (car undef) 'evil-undefine)
+                      (define-key evil-insert-state-map (car undef) 'evil-undefine)
+                      (setq undef (cdr undef))))
+
+                  ;; Undefine vi keys in insert mode.
+                  (let ((undef '("\C-k")))
+                    (while undef
+                      (define-key evil-insert-state-map (car undef) 'evil-undefine)
+                      (setq undef (cdr undef))))
+
+                  ;; Remove RET and SPC from motion map so they can be overridden by various modes
+                  (defun my-move-key (keymap-from keymap-to key)
+                    "Moves key binding from one keymap to another, deleting from the old location. "
+                    (define-key keymap-to key (lookup-key keymap-from key))
+                    (define-key keymap-from key nil))
+                  (my-move-key evil-motion-state-map evil-normal-state-map (kbd "RET"))
+
+                  ;; (my-move-key evil-motion-state-map evil-normal-state-map " ")
+
+                  (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
+                  (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
+                  (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
+                  (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
+                  (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
+
+                  ;; Configure some modes to start in emacs mode.
+                  (dolist (mode '(artist-mode
+                                  gud-minor-mode
+                                  gud-mode
+                                  gud
+                                  pylookup
+                                  pylookup-mode
+                                  ))
+                    (evil-set-initial-state mode 'emacs))
+                  ;; Configure some modes to start in insert mode.
+                  (evil-set-initial-state 'mu4e-compose-mode 'insert)
+                  )
+    )
   )
+
+;; Local Variables:
+;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\)")
+;; End:
+;; eval: (find-and-close-fold "\\((eval-after-load\\|(spacemacs|use\\)")
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(send-mail-function (quote smtpmail-send-it)))
+ '(safe-local-variable-values
+   (quote
+    ((eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\)")))))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
