@@ -67,7 +67,7 @@ values."
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages '()
    ;; A list of packages and/or extensions that will not be install and loaded.
-   dotspacemacs-excluded-packages '(evil-org)
+   dotspacemacs-excluded-packages '(smartparens evil-org)
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
    ;; are declared in a layer which is not a member of
    ;; the list `dotspacemacs-configuration-layers'. (default t)
@@ -253,6 +253,7 @@ values."
    ;; Delete whitespace while saving buffer. Possible values are `all',
    ;; `trailing', `changed' or `nil'. Default is `changed' (cleanup whitespace
    ;; on changed lines) (default 'changed)
+   ;; evil-shift-width 4
    dotspacemacs-whitespace-cleanup 'changed
 
    ;; Allow for adding to use package configuration.
@@ -270,7 +271,8 @@ user code here.  The exception is org related code, which should be placed in `d
   ;; =========
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp"))
-  (require 'iterm-custom-keys)
+  ;;(require 'iterm-custom-keys)
+  (require 'iterm-xterm-extra)
   (require 'generic-lisp)
   (require 'generic-mode-hooks)
 
@@ -282,7 +284,7 @@ user code here.  The exception is org related code, which should be placed in `d
    dropbox-directory "~/Dropbox"
    evil-search-wrap nil
    evil-want-C-i-jump nil
-   evil-esc-delay 0.001
+   ;; evil-esc-delay 0.001
    org-directory "~/org"
    org-agenda-files '("~/org")
    org-protocol-default-template-key "t"
@@ -547,7 +549,7 @@ user code here.  The exception is org related code, which should be placed in `d
         ;; (elpy-mode)
         ;; (pyenv-mode)
 
-        (require 'flymake-pyfixers)
+        ;; (require 'flymake-pyfixers)
         (setq comment-column 60)
         (setq fill-column 120)
         (highlight-indentation-mode -1)
@@ -893,6 +895,10 @@ user code here.  The exception is org related code, which should be placed in `d
       ;; XXX these aren't defined
       ;; (define-key mu4e-headers-mode-map (kbd "C-c c") 'org-mu4e-store-and-capture)
       ;; (define-key mu4e-view-mode-map    (kbd "C-c c") 'org-mu4e-store-and-capture)
+
+      (bind-key (kbd "'") 'mu4e-headers-next 'mu4e-headers-mode-map)
+      (bind-key (kbd "\"") 'mu4e-headers-prev 'mu4e-headers-mode-map)
+      (bind-key (kbd "\"") 'mu4e-view-headers-prev 'mu4e-view-mode-map)
 
       (require 'mu4e-context)
       (setq mu4e-contexts `( ,(make-mu4e-context
@@ -1498,23 +1504,32 @@ layers configuration. You are free to put any user code."
     (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u299A))
     (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u2503))
 
+    (setq-default evil-shift-width 4)
+    (setq
+     evil-shift-round nil
+     evil-search-wrap nil
+     evil-want-C-i-jump nil
+     evil-esc-delay 0.001
+    )
     (fold-section "Evil"
                   (defun evil-undefine ()
                     (interactive)
                     (let (evil-mode-map-alist)
                       (call-interactively (key-binding (this-command-keys)))))
 
-                  (define-key evil-normal-state-map [escape] 'keyboard-quit)
-                  (define-key evil-visual-state-map [escape] 'keyboard-quit)
-                  (define-key evil-normal-state-map (kbd "TAB") 'evil-undefine)
+                  ;; What does this do?
+                  ;; (define-key evil-normal-state-map [escape] 'keyboard-quit)
+                  ;; (define-key evil-visual-state-map [escape] 'keyboard-quit)
+                  ;; (define-key evil-normal-state-map (kbd "TAB") 'evil-undefine)
 
                   ;; Undefine vi keys in all modes.
-                  (let ((undef '("\C-a" "\C-e" "\C-n" "\C-p")))
-                    (while undef
-                      (define-key evil-normal-state-map (car undef) 'evil-undefine)
-                      (define-key evil-visual-state-map (car undef) 'evil-undefine)
-                      (define-key evil-insert-state-map (car undef) 'evil-undefine)
-                      (setq undef (cdr undef))))
+                  ;; Is this screwing us with C-S keys
+                  ;; (let ((undef '("\C-a" "\C-e" "\C-n" "\C-p")))
+                  ;;   (while undef
+                  ;;     (define-key evil-normal-state-map (car undef) 'evil-undefine)
+                  ;;     (define-key evil-visual-state-map (car undef) 'evil-undefine)
+                  ;;     (define-key evil-insert-state-map (car undef) 'evil-undefine)
+                  ;;     (setq undef (cdr undef))))
 
                   ;; Undefine vi keys in insert mode.
                   (let ((undef '("\C-k")))
@@ -1531,11 +1546,12 @@ layers configuration. You are free to put any user code."
 
                   ;; (my-move-key evil-motion-state-map evil-normal-state-map " ")
 
-                  (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
-                  (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
-                  (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
-                  (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
-                  (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
+                  ;; Check what escape does without this.
+                  ;; (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
+                  ;; (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
+                  ;; (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
+                  ;; (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
+                  ;; (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
 
                   ;; Configure some modes to start in emacs mode.
                   (dolist (mode '(artist-mode
@@ -1565,9 +1581,11 @@ layers configuration. You are free to put any user code."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(evil-shift-width 4)
  '(safe-local-variable-values
    (quote
-    ((eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\)")))))
+    ((eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\)"))))
+ '(send-mail-function (quote smtpmail-send-it)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
