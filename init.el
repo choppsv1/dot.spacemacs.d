@@ -23,9 +23,19 @@ values."
      ;; ----------------------------------------------------------------
      auto-completion
      ;; better-defaults
-
-     rebox
+     erc
+     eyebrowse
      gtags
+     (mu4e :variables
+           mu4e-installation-path "/usr/local/share/emacs/site-lisp/mu4e"
+           mu4e-use-maildirs t)
+     osx
+     org
+     rebox
+     spacemacs-layouts
+     spell-checking
+     syntax-checking
+     ;; version-control
 
      ;; Langs
      c-c++
@@ -45,21 +55,6 @@ values."
      shell-scripts
      yaml
 
-     ;; Email
-     (mu4e :variables
-           mu4e-installation-path "/usr/local/share/emacs/site-lisp/mu4e")
-
-     ;; Operating system -- needs to be conditional
-     osx
-
-     org
-     ;; (shell :variables
-     ;;        shell-default-height 30
-     ;;        shell-default-position 'bottom)
-
-     spell-checking
-     syntax-checking
-     ;; version-control
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -111,6 +106,8 @@ values."
    ;; List of items to show in the startup buffer. If nil it is disabled.
    ;; Possible values are: `recents' `bookmarks' `projects'.
    ;; (default '(recents projects))
+   ;; dotspacemacs-scratch-mode 'text-mode
+   dotspacemacs-scratch-mode 'lisp-interaction-mode
    dotspacemacs-startup-lists '(recents projects)
    ;; Number of recent files to show in the startup buffer. Ignored if
    ;; `dotspacemacs-startup-lists' doesn't include `recents'. (default 5)
@@ -634,10 +631,121 @@ user code here.  The exception is org related code, which should be placed in `d
       )
     )
 
-  ;; =====
-  ;; Email
-  ;; =====
+  ;; ==========
+  ;; Messaging
+  ;; ==========
 
+  ;; (spacemacs|use-package-add-hook erc-hl-nicks
+  ;;   :post-init
+  ;;   (setq
+  ;;    erc-hl-nicks-minimum-contrast-ratio 3.5
+  ;;    ;; erc-hl-nicks-color-contrast-strategy 'contrast
+  ;;    ;; erc-hl-nicks-color-contrast-strategy 'invert
+  ;;    erc-hl-nicks-skip-nicks '("gitter"))
+  ;;   )
+
+  (defun launch-irc-gitter ()
+    "Launch irc connection to giter.im"
+    (interactive)
+    (let* ((auth-source-creation-defaults nil)
+           (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
+           (secret (plist-get (nth 0 (auth-source-search
+                                      :type 'netrc
+                                      :max 1
+                                      :host "irc.gitter.im"
+                                      :user "choppsv1"
+                                      :port "6667"
+                                      :create t))
+                              :secret))
+           (password (if (functionp secret)
+                         (funcall secret)
+                       secret)))
+
+      (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1" :password password :full-name "chopps")))
+  (defun launch-irc-netbsd ()
+    "Launch irc connection to netbsd"
+    (interactive)
+    (erc-tls :server "mollari.netbsd.org" :port 7001 :nick "chopps" :full-name "Christian E. Hopps"))
+  (defun launch-irc-freenode ()
+    "Launch irc connection to freenode"
+    (interactive)
+    (let* ((auth-source-creation-defaults nil)
+           (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
+           (secret (plist-get (nth 0 (auth-source-search
+                                      :type 'netrc
+                                      :max 1
+                                      :host "freenode.net"
+                                      :user "chopps"
+                                      :port "6697"
+                                      :create t))
+                              :secret))
+           (password (if (functionp secret)
+                         (funcall secret)
+                       secret)))
+      (erc-tls :server "asimov.freenode.net" :port 6697 :nick "chopps" :password password)))
+  (defun launch-irc-jabber ()
+    "Launch irc connection to netbsd"
+    (interactive)
+    (erc :server "localhost" :port 6667 :nick "chopps" :full-name "Christian E. Hopps"))
+  (defun launch-erc ()
+    "Launch all our connections to IRC"
+    (interactive)
+    (launch-irc-gitter)
+    (launch-irc-freenode)
+    (launch-irc-netbsd)
+    (launch-irc-jabber))
+
+  (evil-leader/set-key
+    "aif" 'launch-irc-freenode)
+  (evil-leader/set-key
+    "aij" 'launch-irc-jabber)
+  (evil-leader/set-key
+    "ain" 'launch-irc-netbsd)
+  (evil-leader/set-key
+    "aig" 'launch-irc-gitter)
+  (evil-leader/set-key
+    "aiL" 'launch-erc)
+
+
+  (spacemacs|use-package-add-hook erc
+    :post-init
+    (progn
+      (setq erc-autojoin-channels-alist
+            '(("irc.gitter.im" "#syl20bnr/spacemacs")
+              ("mollari.netbsd.org" "#NetBSD")))
+
+      (defun bitlbee-netrc-identify ()
+        "Auto-identify for Bitlbee channels using authinfo or netrc.
+
+    The entries that we look for in netrc or authinfo files have
+    their 'port' set to 'bitlbee', their 'login' or 'user' set to
+    the current nickname and 'server' set to the current IRC
+    server's name. A sample value that works for authenticating
+    as user 'keramida' on server 'localhost' is:
+
+    machine localhost port bitlbee login keramida password supersecret"
+
+        (interactive)
+        (when (string= (buffer-name) "&bitlbee")
+          (let* ((auth-source-creation-defaults '((user . "chopps")))
+                 (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
+                 (secret (plist-get (nth 0 (auth-source-search
+                                            :type 'netrc
+                                            :max 1
+                                            :host erc-server
+                                            :user (erc-current-nick)
+                                            :port "6667"
+                                            :create t))
+                                    :secret))
+                 (password (if (functionp secret)
+                               (funcall secret)
+                             secret)))
+            (erc-message "PRIVMSG" (format "%s identify %s"
+                                           (erc-default-target)
+                                           password)))))
+      (add-hook 'erc-join-hook 'bitlbee-netrc-identify)
+      )
+    )
   (spacemacs|use-package-add-hook mu4e
     :post-init
     (progn
@@ -1497,6 +1605,9 @@ layers configuration. You are free to put any user code."
   (progn
     (global-hl-line-mode -1)            ; Disable hihglighting of current line.
 
+    (setq spaceline-window-numbers-unicode nil
+          spaceline-workspace-numbers-unicode nil)
+
     ;; fill-column-mode character doesn't work
     (set-face-inverse-video-p 'vertical-border nil)
     (set-face-background 'vertical-border (face-background 'default))
@@ -1565,6 +1676,10 @@ layers configuration. You are free to put any user code."
                   ;; Configure some modes to start in insert mode.
                   (evil-set-initial-state 'mu4e-compose-mode 'insert)
                   )
+
+    (message "End: %s" inhibit-startup-screen)
+    (if inhibit-startup-screen
+        (quit-window))
     )
   )
 
@@ -1581,10 +1696,45 @@ layers configuration. You are free to put any user code."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(erc-autoaway-idle-seconds 600)
+ '(erc-autojoin-mode t)
+ '(erc-button-mode t)
+ '(erc-fill-mode t)
+ '(erc-hl-nicks-mode t)
+ '(erc-irccontrols-mode t)
+ '(erc-kill-buffer-on-part t)
+ '(erc-kill-queries-on-quit t)
+ '(erc-kill-server-buffer-on-quit t)
+ '(erc-list-mode t)
+ '(erc-log-channels-directory "/Users/chopps/Dropbox/erclogs")
+ '(erc-log-mode t)
+ '(erc-match-mode t)
+ '(erc-menu-mode t)
+ '(erc-move-to-prompt-mode t)
+ '(erc-netsplit-mode t)
+ '(erc-networks-mode t)
+ '(erc-noncommands-mode t)
+ '(erc-pcomplete-mode t)
+ '(erc-prompt (lambda nil (concat "[" (buffer-name) "]")))
+ '(erc-readonly-mode t)
+ '(erc-ring-mode t)
+ '(erc-server-coding-system (quote (utf-8 . utf-8)))
+ '(erc-services-mode t)
+ '(erc-social-graph-dynamic-graph t)
+ '(erc-stamp-mode t)
+ '(erc-track-minor-mode t)
+ '(erc-track-mode t)
+ '(erc-youtube-mode t)
  '(evil-shift-width 4)
  '(safe-local-variable-values
    (quote
-    ((eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\)"))))
+    ((eval progn
+           (require
+            (quote projectile))
+           (puthash
+            (projectile-project-root)
+            "make test" projectile-test-cmd-map))
+     (eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\)"))))
  '(send-mail-function (quote smtpmail-send-it)))
 
 (custom-set-faces
@@ -1593,4 +1743,5 @@ layers configuration. You are free to put any user code."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
- '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil)))))
+ '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil))))
+ '(erc-input-face ((t (:foreground "cornflowerblue")))))
