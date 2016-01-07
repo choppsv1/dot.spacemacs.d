@@ -24,6 +24,7 @@ values."
      auto-completion
      ;; better-defaults
      erc
+     bb-erc
      eyebrowse
      gtags
      (mu4e :variables
@@ -31,6 +32,7 @@ values."
            mu4e-use-maildirs t)
      osx
      org
+     ranger
      rebox
      spacemacs-layouts
      spell-checking
@@ -313,6 +315,13 @@ user code here.  The exception is org related code, which should be placed in `d
                 (global-set-key (kbd "C-h C-k") 'find-function-on-key)
                 (global-set-key (kbd "C-h C-v") 'find-variable)
 
+                (spacemacs/set-leader-keys "W" 'spacemacs/workspaces-micro-state)
+
+                (global-set-key (kbd "C-M-1") 'eyebrowse-switch-to-window-config-1)
+                (global-set-key (kbd "C-M-2") 'eyebrowse-switch-to-window-config-2)
+                (global-set-key (kbd "C-M-3") 'eyebrowse-switch-to-window-config-3)
+                (global-set-key (kbd "C-M-4") 'eyebrowse-switch-to-window-config-4)
+                (global-set-key (kbd "C-M-5") 'eyebrowse-switch-to-window-config-5)
 
                 (evil-leader/set-key
                   "oa" 'org-agenda
@@ -1699,14 +1708,16 @@ layers configuration. You are free to put any user code."
  '(erc-autoaway-idle-seconds 600)
  '(erc-autojoin-mode t)
  '(erc-button-mode t)
+ '(erc-current-nick-highlight-type 'all)
  '(erc-fill-mode t)
  '(erc-hl-nicks-mode t)
+ '(erc-hl-nicks-trim-nick-for-face nil)
  '(erc-irccontrols-mode t)
  '(erc-kill-buffer-on-part t)
  '(erc-kill-queries-on-quit t)
  '(erc-kill-server-buffer-on-quit t)
  '(erc-list-mode t)
- '(erc-log-channels-directory "/Users/chopps/Dropbox/erclogs")
+ '(erc-log-channels-directory "/Users/chopps/Dropbox/erclogs" t)
  '(erc-log-mode t)
  '(erc-match-mode t)
  '(erc-menu-mode t)
@@ -1744,4 +1755,5 @@ layers configuration. You are free to put any user code."
  ;; If there is more than one, they won't work right.
  '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
  '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil))))
- '(erc-input-face ((t (:foreground "cornflowerblue")))))
+ '(erc-input-face ((t (:foreground "cornflowerblue"))))
+ '(evil-search-highlight-persist-highlight-face ((t (:inherit region :background "yellow3" :foreground "black")))))
