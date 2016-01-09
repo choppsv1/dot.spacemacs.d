@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: BLOCK
+# key: block
+# --
+#+BEGIN_${1:$$(upcase yas-text)} ${2:emacs-lisp}
+$0
+#+END_${1:$(upcase yas-text)}

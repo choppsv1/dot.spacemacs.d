@@ -21,7 +21,9 @@ values."
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     auto-completion
+     (auto-completion :variables
+                      auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets")
+
      ;; better-defaults
      erc
      bb-erc
@@ -62,9 +64,9 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages then consider to create a layer, you can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '()
+   dotspacemacs-additional-packages '(mu4e-maildirs-extension)
    ;; A list of packages and/or extensions that will not be install and loaded.
-   dotspacemacs-excluded-packages '(smartparens evil-org)
+   dotspacemacs-excluded-packages '(smartparens) ; evil-org
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
    ;; are declared in a layer which is not a member of
    ;; the list `dotspacemacs-configuration-layers'. (default t)
@@ -555,7 +557,7 @@ user code here.  The exception is org related code, which should be placed in `d
         ;; (elpy-mode)
         ;; (pyenv-mode)
 
-        ;; (require 'flymake-pyfixers)
+        (require 'pyfixers)
         (setq comment-column 60)
         (setq fill-column 120)
         (highlight-indentation-mode -1)
@@ -565,6 +567,7 @@ user code here.  The exception is org related code, which should be placed in `d
         (flycheck-select-checker 'python-pycheckers)
         (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
 
+
         (set (make-local-variable 'rebox-style-loop) '(73 74 75 71))
 
         (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
@@ -573,8 +576,8 @@ user code here.  The exception is org related code, which should be placed in `d
       (add-hook 'python-mode-hook 'my-python-mode-hook))
     :post-config
     (progn
-      ;; (define-key python-mode-map (kbd "M-n") 'flycheck-next-error)
-      ;; (define-key python-mode-map (kbd "M-p") 'flycheck-previous-error)
+      (define-key python-mode-map (kbd "M-n") 'flycheck-next-error)
+      (define-key python-mode-map (kbd "M-p") 'flycheck-previous-error)
       ;; (define-key python-mode-map (kbd "C-c Ta") 'nosetests-all)
       ;; (define-key python-mode-map (kbd "C-c Tm") 'nosetests-module)
       ;; (define-key python-mode-map (kbd "C-c To") 'nosetests-one)
@@ -588,11 +591,20 @@ user code here.  The exception is org related code, which should be placed in `d
       ;; (define-key python-mode-map (kbd "C-c tpa") 'pytest-pdb-all)
       ;; (define-key python-mode-map (kbd "C-c tpm") 'pytest-pdb-module)
       ;; (define-key python-mode-map (kbd "C-c tpo") 'pytest-pdb-one)
+      ;; SPC m e i[gnore]
+      ;; SPC m e f[ix]
       ;; (define-key python-mode-map (kbd "C-c M-\\") 'pyfixer:ignore-current-line)
       ;; (define-key python-mode-map (kbd "C-c C-\\") 'pyfixer:fix-current-line)
       ;; (define-key python-mode-map (kbd "C-c C-M-\\") 'pyfixer:fix-all-errors)
       ;; (define-key python-mode-map (kbd "C-c 8") 'pyfixer:fix-all-errors)
       ;; (bind-key "C-c C-h" 'pylookup-lookup python-mode-map)
+
+      (spacemacs/declare-prefix-for-mode 'python-mode "e" "errors-prefix")
+      (spacemacs/set-leader-keys-for-major-mode 'python-mode "ei" 'pyfixer:ignore-current-line)
+      (spacemacs/set-leader-keys-for-major-mode 'python-mode "ef" 'pyfixer:fix-current-line)
+      (spacemacs/set-leader-keys-for-major-mode 'python-mode "eF" 'pyfixer:fix-all-errors)
+      (spacemacs/set-leader-keys-for-major-mode 'python-mode "en" 'flycheck-next-error)
+      (spacemacs/set-leader-keys-for-major-mode 'python-mode "ep" 'flycheck-prev-error)
 
       ;; Elpy config
       ;; (define-key elpy-mode-map (kbd "C-c C-n") 'next-error)
@@ -838,9 +850,12 @@ user code here.  The exception is org related code, which should be placed in `d
 
 
             ;; Folders -- most setup per account
+            ;; see context below
+
             ;; mu4e-sent-folder   "/chopps.org/Sent Messages"
             ;; mu4e-drafts-folder "/chopps.org/Drafts"
             ;; mu4e-trash-folder  "/chopps.org/Deleted Messages"
+
             mu4e-attachment-dir "~/Downloads"
 
             ;; only complete addresses found in email to one of the below addresses
@@ -1017,69 +1032,69 @@ user code here.  The exception is org related code, which should be placed in `d
       (bind-key (kbd "\"") 'mu4e-headers-prev 'mu4e-headers-mode-map)
       (bind-key (kbd "\"") 'mu4e-view-headers-prev 'mu4e-view-mode-map)
 
-      (require 'mu4e-context)
-      (setq mu4e-contexts `( ,(make-mu4e-context
-                               :name "chopps.org"
-                               :enter-func (lambda () (mu4e-message "Home"))
-                               ;; no leave-func
-                               :match-func (lambda (msg)
-                                             (and msg (string-match "/chopps.org/.*" (mu4e-message-field msg :maildir))))
-                               :vars '((user-mail-address  . "chopps@chopps.org")
-                                       ;; mu4e
-                                       (mu4e-sent-folder   . "/chopps.org/Sent Messages")
-                                       (mu4e-trash-folder  . "/chopps.org/Deleted Messages")
-                                       (mu4e-drafts-folder . "/chopps.org/Drafts")
-                                       (mu4e-sent-messages-behavior   . sent)
-                                       ;; smtp
-                                       (smtpmail-starttls-credentials . '(("smtp.chopps.org" 9005 nil nil)))
-                                       (smtpmail-default-smtp-server  . "smtp.chopps.org")
-                                       (smtpmail-smtp-server          . "smtp.chopps.org")
-                                       ;; smtpmail-local-domain?
-                                       ;; smtpmail-sendto-domain?
-                                       (smtpmail-smtp-service         . 9005)))
-                             ,(make-mu4e-context
-                               :name "dev.terastrm.net"
-                               :enter-func (lambda () (mu4e-message "Work"))
-                               ;; no leave-func
-                               :match-func (lambda (msg)
-                                             (and msg (string-match "/terastrm.net/.*" (mu4e-message-field msg :maildir))))
-                               :vars '(
-                                       ;; about me
-                                       (user-mail-address  . "chopps@dev.terastrm.net")
-                                       ;; mu4e
-                                       (mu4e-sent-folder   . "/terastrm.net/Sent Messages")
-                                       (mu4e-trash-folder  . "/terastrm.net/Deleted Messages")
-                                       (mu4e-drafts-folder . "/terastrm.net/Drafts")
-                                       (mu4e-sent-messages-behavior   . sent)
-                                       ;; smtp
-                                       (smtpmail-starttls-credentials . '(("smtp.dev.terastrm.net" 587 nil nil)))
-                                       (smtpmail-default-smtp-server  . "smtp.dev.terastrm.net")
-                                       (smtpmail-smtp-server          . "smtp.dev.terastrm.net")
-                                       ;; smtpmail-local-domain?
-                                       ;; smtpmail-sendto-domain?
-                                       (smtpmail-smtp-service         . 587)))
+      (when (require 'mu4e-context nil t)
+        (setq mu4e-contexts `( ,(make-mu4e-context
+                                 :name "chopps.org"
+                                 :enter-func (lambda () (mu4e-message "Home"))
+                                 ;; no leave-func
+                                 :match-func (lambda (msg)
+                                               (and msg (string-match "/chopps.org/.*" (mu4e-message-field msg :maildir))))
+                                 :vars '((user-mail-address  . "chopps@chopps.org")
+                                         ;; mu4e
+                                         (mu4e-sent-folder   . "/chopps.org/Sent Messages")
+                                         (mu4e-trash-folder  . "/chopps.org/Deleted Messages")
+                                         (mu4e-drafts-folder . "/chopps.org/Drafts")
+                                         (mu4e-sent-messages-behavior   . sent)
+                                         ;; smtp
+                                         (smtpmail-starttls-credentials . '(("smtp.chopps.org" 9005 nil nil)))
+                                         (smtpmail-default-smtp-server  . "smtp.chopps.org")
+                                         (smtpmail-smtp-server          . "smtp.chopps.org")
+                                         ;; smtpmail-local-domain?
+                                         ;; smtpmail-sendto-domain?
+                                         (smtpmail-smtp-service         . 9005)))
+                               ,(make-mu4e-context
+                                 :name "dev.terastrm.net"
+                                 :enter-func (lambda () (mu4e-message "Work"))
+                                 ;; no leave-func
+                                 :match-func (lambda (msg)
+                                               (and msg (string-match "/terastrm.net/.*" (mu4e-message-field msg :maildir))))
+                                 :vars '(
+                                         ;; about me
+                                         (user-mail-address  . "chopps@dev.terastrm.net")
+                                         ;; mu4e
+                                         (mu4e-sent-folder   . "/terastrm.net/Sent Messages")
+                                         (mu4e-trash-folder  . "/terastrm.net/Deleted Messages")
+                                         (mu4e-drafts-folder . "/terastrm.net/Drafts")
+                                         (mu4e-sent-messages-behavior   . sent)
+                                         ;; smtp
+                                         (smtpmail-starttls-credentials . '(("smtp.dev.terastrm.net" 587 nil nil)))
+                                         (smtpmail-default-smtp-server  . "smtp.dev.terastrm.net")
+                                         (smtpmail-smtp-server          . "smtp.dev.terastrm.net")
+                                         ;; smtpmail-local-domain?
+                                         ;; smtpmail-sendto-domain?
+                                         (smtpmail-smtp-service         . 587)))
 
-                             ,(make-mu4e-context
-                               :name "gmail.com"
-                               :enter-func (lambda () (mu4e-message "Gmail"))
-                               ;; no leave-func
-                               :match-func (lambda (msg)
-                                             (and msg (string-match "/gmail.com/.*" (mu4e-message-field msg :maildir))))
-                               :vars '(
-                                       ;; about me
-                                       (user-mail-address  . "chopps@gmail.com")
-                                       ;; mu4e
-                                       (mu4e-drafts-folder . "/gmail.com/[Gmail].Drafts")
-                                       (mu4e-sent-folder   . "/gmail.com/[Gmail].Sent Mail")
-                                       (mu4e-trash-folder  . "/gmail.com/[Gmail].Trash")
-                                       (mu4e-sent-messages-behavior   . delete)
-                                       ;; smtp
-                                       (smtpmail-starttls-credentials . '(("smtp.gmail.com" 587 nil nil)))
-                                       (smtpmail-default-smtp-server  . "smtp.gmail.com")
-                                       (smtpmail-smtp-server          . "smtp.gmail.com")
-                                       ;; smtpmail-local-domain?
-                                       ;; smtpmail-sendto-domain?
-                                       (smtpmail-smtp-service . 587)))))
+                               ,(make-mu4e-context
+                                 :name "gmail.com"
+                                 :enter-func (lambda () (mu4e-message "Gmail"))
+                                 ;; no leave-func
+                                 :match-func (lambda (msg)
+                                               (and msg (string-match "/gmail.com/.*" (mu4e-message-field msg :maildir))))
+                                 :vars '(
+                                         ;; about me
+                                         (user-mail-address  . "chopps@gmail.com")
+                                         ;; mu4e
+                                         (mu4e-drafts-folder . "/gmail.com/[Gmail].Drafts")
+                                         (mu4e-sent-folder   . "/gmail.com/[Gmail].Sent Mail")
+                                         (mu4e-trash-folder  . "/gmail.com/[Gmail].Trash")
+                                         (mu4e-sent-messages-behavior   . delete)
+                                         ;; smtp
+                                         (smtpmail-starttls-credentials . '(("smtp.gmail.com" 587 nil nil)))
+                                         (smtpmail-default-smtp-server  . "smtp.gmail.com")
+                                         (smtpmail-smtp-server          . "smtp.gmail.com")
+                                         ;; smtpmail-local-domain?
+                                         ;; smtpmail-sendto-domain?
+                                         (smtpmail-smtp-service . 587))))))
 
       ;; (require 'mu4e-maildirs-extension)
       ;; XXX we need to add this
@@ -1101,17 +1116,21 @@ user code here.  The exception is org related code, which should be placed in `d
                              )))
       (add-hook 'mu4e-view-mode-hook
                 (lambda () (setq show-trailing-whitespace nil)))
-      ;; (add-hook 'mu4e-compose-pre-hook
-      ;;          'my-mu4e-set-account-using-message)
+
+      (if (not (featurep 'mu4e-context))
+          (progn
+            (add-hook 'mu4e-compose-pre-hook
+                      'my-mu4e-set-account-using-message)
+            (my-mu4e-set-account "chopps.org")))
+
       (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
       (add-to-list 'mu4e-view-actions
                    '("ViewInBrowser" . mu4e-action-view-in-browser))
 
-      ;; (my-mu4e-set-account "chopps.org")
       (define-key mu4e-headers-mode-map "d" 'mu4e-headers-mark-for-read)
       (define-key mu4e-view-mode-map "d" 'mu4e-view-mark-for-read)
-      (define-key mu4e-headers-mode-map "#" 'mu4e-headers-mark-move-to-spam)
-      (define-key mu4e-view-mode-map "#" 'mu4e-view-mark-move-to-spam)
+      (define-key mu4e-headers-mode-map "@" 'mu4e-headers-mark-move-to-spam)
+      (define-key mu4e-view-mode-map "@" 'mu4e-view-mark-move-to-spam)
       (define-key mu4e-headers-mode-map "\\" 'mu4e-headers-mark-move-to-spam)
       (define-key mu4e-view-mode-map "\\" 'mu4e-view-mark-move-to-spam)
 
@@ -1686,9 +1705,18 @@ layers configuration. You are free to put any user code."
                   (evil-set-initial-state 'mu4e-compose-mode 'insert)
                   )
 
-    (message "End: %s" inhibit-startup-screen)
-    (if inhibit-startup-screen
-        (quit-window))
+    ;; Remove when merges happen
+    (with-eval-after-load 'mu4e
+      (require 'org-mu4e)
+      (require 'mu4e-maildirs-extension))
+    (with-eval-after-load 'org
+      (require 'org-mu4e))
+    (add-hook 'org-mode-hook 'evil-normalize-keymaps)
+
+
+    ;; (message "End: %s" inhibit-startup-screen)
+    ;; (if inhibit-startup-screen
+    ;;     (quit-window))
     )
   )
 

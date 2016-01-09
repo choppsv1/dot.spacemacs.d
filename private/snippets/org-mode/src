@@ -1,0 +1,8 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: Org Babel Source Block
+# key: src
+# --
+(+begin_src ${1:python} aftertext
+testing: $1
+$0
++end_src)
