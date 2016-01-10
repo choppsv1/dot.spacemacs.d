@@ -24,10 +24,10 @@ values."
      (auto-completion :variables
                       auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets")
 
-     ivy
+     spacemacs-ivy
      ;; better-defaults
-     erc
-     bb-erc
+     ;; erc
+     ;; bb-erc
      eyebrowse
      gtags
      (mu4e :variables
@@ -98,7 +98,7 @@ values."
    ;; variable is `emacs' then the `holy-mode' is enabled at startup. `hybrid'
    ;; uses emacs key bindings for vim's insert mode, but otherwise leaves evil
    ;; unchanged. (default 'vim)
-   dotspacemacs-editing-style 'hybrid
+   dotspacemacs-editing-style 'vim
    ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
    dotspacemacs-verbose-loading t
    ;; Specify the startup banner. Default value is `official', it displays
@@ -332,7 +332,9 @@ user code here.  The exception is org related code, which should be placed in `d
                   ;; "oo" 'org-clock-out
                   "oc" 'org-capture
                   "oC" 'helm-org-capture-templates ;requires templates to be defined.
-                  "ol" 'org-store-link)
+                  "ol" 'org-store-link
+                  "aL" 'lisp-interaction-mode
+                  )
                 )
   (fold-section "Registers (files)"
                 ;; (set-register ?E `(file . ,emacs-init-source))
@@ -658,80 +660,112 @@ user code here.  The exception is org related code, which should be placed in `d
   ;; Messaging
   ;; ==========
 
-  ;; (spacemacs|use-package-add-hook erc-hl-nicks
-  ;;   :post-init
-  ;;   (setq
-  ;;    erc-hl-nicks-minimum-contrast-ratio 3.5
-  ;;    ;; erc-hl-nicks-color-contrast-strategy 'contrast
-  ;;    ;; erc-hl-nicks-color-contrast-strategy 'invert
-  ;;    erc-hl-nicks-skip-nicks '("gitter"))
-  ;;   )
+  (when (configuration-layer/layer-usedp 'erc)
+    (spacemacs|use-package-add-hook erc-hl-nicks
+      :post-init
+      (setq
+       erc-hl-nicks-minimum-contrast-ratio 3.5
+       ;; erc-hl-nicks-color-contrast-strategy 'contrast
+       ;; erc-hl-nicks-color-contrast-strategy 'invert
+       erc-hl-nicks-skip-nicks '("gitter"))
+      )
 
-  (defun launch-irc-gitter ()
-    "Launch irc connection to giter.im"
-    (interactive)
-    (let* ((auth-source-creation-defaults nil)
-           (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
-           (secret (plist-get (nth 0 (auth-source-search
-                                      :type 'netrc
-                                      :max 1
-                                      :host "irc.gitter.im"
-                                      :user "choppsv1"
-                                      :port "6667"
-                                      :create t))
-                              :secret))
-           (password (if (functionp secret)
-                         (funcall secret)
-                       secret)))
+    (defun launch-irc-gitter ()
+      "Launch irc connection to giter.im"
+      (interactive)
+      (let* ((auth-source-creation-defaults nil)
+             (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
+             (secret (plist-get (nth 0 (auth-source-search
+                                        :type 'netrc
+                                        :max 1
+                                        :host "irc.gitter.im"
+                                        :user "choppsv1"
+                                        :port "6667"
+                                        :create t))
+                                :secret))
+             (password (if (functionp secret)
+                           (funcall secret)
+                         secret)))
 
-      (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1" :password password :full-name "chopps")))
-  (defun launch-irc-netbsd ()
-    "Launch irc connection to netbsd"
-    (interactive)
-    (erc-tls :server "mollari.netbsd.org" :port 7001 :nick "chopps" :full-name "Christian E. Hopps"))
-  (defun launch-irc-freenode ()
-    "Launch irc connection to freenode"
-    (interactive)
-    (let* ((auth-source-creation-defaults nil)
-           (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
-           (secret (plist-get (nth 0 (auth-source-search
-                                      :type 'netrc
-                                      :max 1
-                                      :host "freenode.net"
-                                      :user "chopps"
-                                      :port "6697"
-                                      :create t))
-                              :secret))
-           (password (if (functionp secret)
-                         (funcall secret)
-                       secret)))
-      (erc-tls :server "asimov.freenode.net" :port 6697 :nick "chopps" :password password)))
-  (defun launch-irc-jabber ()
-    "Launch irc connection to netbsd"
-    (interactive)
-    (erc :server "localhost" :port 6667 :nick "chopps" :full-name "Christian E. Hopps"))
-  (defun launch-erc ()
-    "Launch all our connections to IRC"
-    (interactive)
-    (launch-irc-gitter)
-    (launch-irc-freenode)
-    (launch-irc-netbsd)
-    (launch-irc-jabber))
+        (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1" :password password :full-name "chopps")))
+    (defun launch-irc-netbsd ()
+      "Launch irc connection to netbsd"
+      (interactive)
+      (erc-tls :server "mollari.netbsd.org" :port 7001 :nick "chopps" :full-name "Christian E. Hopps"))
+    (defun launch-irc-freenode ()
+      "Launch irc connection to freenode"
+      (interactive)
+      (let* ((auth-source-creation-defaults nil)
+             (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
+             (secret (plist-get (nth 0 (auth-source-search
+                                        :type 'netrc
+                                        :max 1
+                                        :host "freenode.net"
+                                        :user "chopps"
+                                        :port "6697"
+                                        :create t))
+                                :secret))
+             (password (if (functionp secret)
+                           (funcall secret)
+                         secret)))
+        (erc-tls :server "asimov.freenode.net" :port 6697 :nick "chopps" :password password)))
+    (defun launch-irc-jabber ()
+      "Launch irc connection to netbsd"
+      (interactive)
+      (erc :server "localhost" :port 6667 :nick "chopps" :full-name "Christian E. Hopps"))
+    (defun launch-erc ()
+      "Launch all our connections to IRC"
+      (interactive)
+      (launch-irc-gitter)
+      (launch-irc-freenode)
+      (launch-irc-netbsd)
+      (launch-irc-jabber))
 
-  (spacemacs/set-leader-keys
-    "aif" 'launch-irc-freenode
-    "aij" 'launch-irc-jabber
-    "ain" 'launch-irc-netbsd
-    "aig" 'launch-irc-gitter
-    "aiL" 'launch-erc)
-
-
+    (spacemacs/set-leader-keys
+      "aif" 'launch-irc-freenode
+      "aij" 'launch-irc-jabber
+      "ain" 'launch-irc-netbsd
+      "aig" 'launch-irc-gitter
+      "aiL" 'launch-erc)
+    )
   (spacemacs|use-package-add-hook erc
     :post-init
     (progn
       (setq erc-autojoin-channels-alist
             '(("irc.gitter.im" "#syl20bnr/spacemacs")
-              ("mollari.netbsd.org" "#NetBSD")))
+              ("mollari.netbsd.org" "#NetBSD"))
+            ;; '(erc-autoaway-idle-seconds 600)
+            ;; '(erc-autojoin-mode t)
+            ;; '(erc-button-mode t)
+            ;; '(erc-current-nick-highlight-type (quote all))
+            ;; '(erc-fill-mode t)
+            ;; '(erc-hl-nicks-mode t)
+            ;; '(erc-hl-nicks-trim-nick-for-face nil)
+            ;; '(erc-irccontrols-mode t)
+            ;; '(erc-kill-buffer-on-part t)
+            ;; '(erc-kill-queries-on-quit t)
+            ;; '(erc-kill-server-buffer-on-quit t)
+            ;; '(erc-list-mode t)
+            ;; '(erc-log-channels-directory "/Users/chopps/Dropbox/erclogs" t)
+            ;; '(erc-log-mode t)
+            ;; '(erc-match-mode t)
+            ;; '(erc-menu-mode t)
+            ;; '(erc-move-to-prompt-mode t)
+            ;; '(erc-netsplit-mode t)
+            ;; '(erc-networks-mode t)
+            ;; '(erc-noncommands-mode t)
+            ;; '(erc-pcomplete-mode t)
+            ;; '(erc-prompt (lambda nil (concat "[" (buffer-name) "]")))
+            ;; '(erc-readonly-mode t)
+            ;; '(erc-ring-mode t)
+            ;; '(erc-server-coding-system (quote (utf-8 . utf-8)))
+            ;; '(erc-services-mode t)
+            ;; '(erc-social-graph-dynamic-graph t)
+            ;; '(erc-stamp-mode t)
+            ;; '(erc-track-minor-mode t)
+            ;; '(erc-track-mode t)
+            ;; '(erc-youtube-mode t)
+            )
 
       (defun bitlbee-netrc-identify ()
         "Auto-identify for Bitlbee channels using authinfo or netrc.
@@ -1094,9 +1128,6 @@ user code here.  The exception is org related code, which should be placed in `d
                                          ;; smtpmail-sendto-domain?
                                          (smtpmail-smtp-service . 587))))))
 
-      ;; (require 'mu4e-maildirs-extension)
-      ;; XXX we need to add this
-      ;; (mu4e-maildirs-extension)
       (require 'mu4e-contrib)
 
       ;; XXX also add this back
@@ -1115,13 +1146,13 @@ user code here.  The exception is org related code, which should be placed in `d
       (add-hook 'mu4e-view-mode-hook
                 (lambda () (setq show-trailing-whitespace nil)))
 
-      (if (not (featurep 'mu4e-context))
-          (progn
-            (add-hook 'mu4e-compose-pre-hook
-                      'my-mu4e-set-account-using-message)
-            (my-mu4e-set-account "chopps.org")))
+      (when (not (featurep 'mu4e-context))
+        (add-hook 'mu4e-compose-pre-hook
+                  'my-mu4e-set-account-using-message)
+        (my-mu4e-set-account "chopps.org"))
 
       (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
+
       (add-to-list 'mu4e-view-actions
                    '("ViewInBrowser" . mu4e-action-view-in-browser))
 
@@ -1719,7 +1750,7 @@ layers configuration. You are free to put any user code."
   )
 
 ;; Local Variables:
-;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\)")
+;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
 ;; End:
 ;; eval: (find-and-close-fold "\\((eval-after-load\\|(spacemacs|use\\)")
 
@@ -1731,41 +1762,11 @@ layers configuration. You are free to put any user code."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(erc-autoaway-idle-seconds 600)
- '(erc-autojoin-mode t)
- '(erc-button-mode t)
- '(erc-current-nick-highlight-type 'all)
- '(erc-fill-mode t)
- '(erc-hl-nicks-mode t)
- '(erc-hl-nicks-trim-nick-for-face nil)
- '(erc-irccontrols-mode t)
- '(erc-kill-buffer-on-part t)
- '(erc-kill-queries-on-quit t)
- '(erc-kill-server-buffer-on-quit t)
- '(erc-list-mode t)
- '(erc-log-channels-directory "/Users/chopps/Dropbox/erclogs" t)
- '(erc-log-mode t)
- '(erc-match-mode t)
- '(erc-menu-mode t)
- '(erc-move-to-prompt-mode t)
- '(erc-netsplit-mode t)
- '(erc-networks-mode t)
- '(erc-noncommands-mode t)
- '(erc-pcomplete-mode t)
- '(erc-prompt (lambda nil (concat "[" (buffer-name) "]")))
- '(erc-readonly-mode t)
- '(erc-ring-mode t)
- '(erc-server-coding-system (quote (utf-8 . utf-8)))
- '(erc-services-mode t)
- '(erc-social-graph-dynamic-graph t)
- '(erc-stamp-mode t)
- '(erc-track-minor-mode t)
- '(erc-track-mode t)
- '(erc-youtube-mode t)
  '(evil-shift-width 4)
  '(safe-local-variable-values
    (quote
-    ((eval progn
+    ((eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
+     (eval progn
            (require
             (quote projectile))
            (puthash
