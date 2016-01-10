@@ -24,6 +24,7 @@ values."
      (auto-completion :variables
                       auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets")
 
+     ivy
      ;; better-defaults
      erc
      bb-erc
@@ -148,6 +149,9 @@ values."
    ;; Major mode leader key accessible in `emacs state' and `insert state'.
    ;; (default "C-M-m)
    dotspacemacs-major-mode-emacs-leader-key "C-M-m"
+   ;; The key used for Emacs commands (M-x) (after pressing on the leader key).
+   ;; (default "SPC")
+   dotspacemacs-emacs-command-key "SPC"
    ;; These variables control whether separate commands are bound in the GUI to
    ;; the key pairs C-i, TAB and C-m, RET.
    ;; Setting it to a non-nil value, allows for separate commands under <C-i>
@@ -156,11 +160,6 @@ values."
    ;; works in the GUI. (default nil)
    dotspacemacs-distinguish-gui-tab nil
    ;; (Not implemented) dotspacemacs-distinguish-gui-ret nil
-   ;; The command key used for Evil commands (ex-commands) and
-   ;; Emacs commands (M-x).
-   ;; By default the command key is `:' so ex-commands are executed like in Vim
-   ;; with `:' and Emacs commands are executed with `<leader> :'.
-   dotspacemacs-command-key ":"
    ;; If non nil `Y' is remapped to `y$'. (default t)
    dotspacemacs-remap-Y-to-y$ t
    ;; Name of the default layout (default "Default")
@@ -251,12 +250,12 @@ values."
    ;; specified with an installed package.
    ;; Not used for now. (default nil)
    dotspacemacs-default-package-repository nil
-   ;; Delete whitespace while saving buffer. Possible values are `all',
-   ;; `trailing', `changed' or `nil'. Default is `changed' (cleanup whitespace
-   ;; on changed lines) (default 'changed)
-   ;; evil-shift-width 4
+   ;; Delete whitespace while saving buffer. Possible values are `all'
+   ;; to aggressively delete empty line and long sequences of whitespace,
+   ;; `trailing' to delete only the whitespace at end of lines, `changed'to
+   ;; delete only whitespace for changed lines or `nil' to disable cleanup.
+   ;; (default nil)
    dotspacemacs-whitespace-cleanup 'changed
-
    ;; Allow for adding to use package configuration.
    use-package-inject-hooks t
    )
@@ -309,6 +308,8 @@ user code here.  The exception is org related code, which should be placed in `d
   (fold-section "Keybindings"
                 (define-key isearch-mode-map [remap isearch-delete-char] 'isearch-del-char)
 
+                (global-set-key (kbd "M-W") 'kill-region-to-ssh)
+                (global-set-key (kbd "M-Y") 'yank-from-ssh)
                 (global-set-key (kbd "M-Q") 'rebox-dwim)
 
                 ;; Find emacs source
@@ -325,7 +326,7 @@ user code here.  The exception is org related code, which should be placed in `d
                 (global-set-key (kbd "C-M-4") 'eyebrowse-switch-to-window-config-4)
                 (global-set-key (kbd "C-M-5") 'eyebrowse-switch-to-window-config-5)
 
-                (evil-leader/set-key
+                (spacemacs/set-leader-keys
                   "oa" 'org-agenda
                   ;; "og" 'helm-org-agenda-files-headings
                   ;; "oo" 'org-clock-out
@@ -601,6 +602,7 @@ user code here.  The exception is org related code, which should be placed in `d
 
       (spacemacs/declare-prefix-for-mode 'python-mode "e" "errors-prefix")
       (spacemacs/set-leader-keys-for-major-mode 'python-mode "ei" 'pyfixer:ignore-current-line)
+      (spacemacs/set-leader-keys-for-major-mode 'python-mode "ei" 'pyfixer:ignore-current-line)
       (spacemacs/set-leader-keys-for-major-mode 'python-mode "ef" 'pyfixer:fix-current-line)
       (spacemacs/set-leader-keys-for-major-mode 'python-mode "eF" 'pyfixer:fix-all-errors)
       (spacemacs/set-leader-keys-for-major-mode 'python-mode "en" 'flycheck-next-error)
@@ -716,15 +718,11 @@ user code here.  The exception is org related code, which should be placed in `d
     (launch-irc-netbsd)
     (launch-irc-jabber))
 
-  (evil-leader/set-key
-    "aif" 'launch-irc-freenode)
-  (evil-leader/set-key
-    "aij" 'launch-irc-jabber)
-  (evil-leader/set-key
-    "ain" 'launch-irc-netbsd)
-  (evil-leader/set-key
-    "aig" 'launch-irc-gitter)
-  (evil-leader/set-key
+  (spacemacs/set-leader-keys
+    "aif" 'launch-irc-freenode
+    "aij" 'launch-irc-jabber
+    "ain" 'launch-irc-netbsd
+    "aig" 'launch-irc-gitter
     "aiL" 'launch-erc)
 
 
@@ -1199,6 +1197,7 @@ user code here.  The exception is org related code, which should be placed in `d
                  (string= lang "dot2tex")
                  (string= lang "dot"))))
       ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
+      (setq org-agenda-start-day "-8d")
       (setq
        org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
        org-src-fontify-natively t
@@ -1221,7 +1220,6 @@ user code here.  The exception is org related code, which should be placed in `d
        ;; headers view
        org-mu4e-link-query-in-headers-mode t
 
-       ;; (setq org-agenda-start-day "-8d")
        org-capture-templates
        '(("d" "Todo" entry (file+headline (concat org-directory "/notes.org") "Tasks")
           "* TODO %?\nSCHEDULED: %T\nDEADLINE: %T\nCreated: %t\nAnnotation: %a\n")
@@ -1233,10 +1231,10 @@ user code here.  The exception is org related code, which should be placed in `d
           "* NOTE %?\nCreated: %U")
 
          ("m" "Mail Todo" entry (file+headline (concat org-directory "/notes.org") "Mail")
-          "* TODO Read Mail%? (%:fromname about %:subject)\n%U\n%a\n")
+          "* TODO Read Mail%? ([f: %:fromname]: %:subject)\n%U\nMessage: %a\n")
 
          ("M" "Mail Todo" entry (file+headline (concat org-directory "/notes.org") "Mail")
-          "* TODO Followup Mail From %:fromname About %:subject)\nSCHEDULED: %T\nDEADLINE: %T\nCreated: %t\n%a\nExtra Notes: %?")
+          "* TODO Followup Mail [f: %:fromname]: %:subject)\nSCHEDULED: %T\nDEADLINE: %T\nCreated: %t\nMessage: %a\nExtra Notes: %?")
 
                                         ; ("M" "Mac Mail Todo" entry (file+headline (concat org-directory "/notes.org") "Mail")
                                         ;  "* TODO %?\n%T\n%(org-mac-message-get-links \"s\")\n")
