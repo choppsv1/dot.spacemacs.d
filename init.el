@@ -21,12 +21,12 @@ values."
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
+     ;; spacemacs-helm
      (auto-completion :variables
                       auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets")
 
-     spacemacs-ivy
      ;; better-defaults
-     ;; erc
+     erc
      ;; bb-erc
      eyebrowse
      gtags
@@ -37,8 +37,12 @@ values."
      org
      ranger
      rebox
+     ;; (rcirc :variables
+     ;;        rcirc-enable-authinfo-support t)
      spacemacs-layouts
+     spacemacs-ivy
      spell-checking
+     spotify
      syntax-checking
      ;; version-control
 
@@ -50,7 +54,7 @@ values."
      ;; go
      html
      ;; java
-     ;; javascript
+     javascript
      latex
      ;; lua
      ;; markdown
@@ -63,9 +67,9 @@ values."
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
-   ;; packages then consider to create a layer, you can also put the
+   ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(mu4e-maildirs-extension)
+   dotspacemacs-additional-packages '()
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages '(smartparens) ; evil-org
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
@@ -111,12 +115,12 @@ values."
    ;; List of items to show in the startup buffer. If nil it is disabled.
    ;; Possible values are: `recents' `bookmarks' `projects'.
    ;; (default '(recents projects))
-   ;; dotspacemacs-scratch-mode 'text-mode
-   dotspacemacs-scratch-mode 'lisp-interaction-mode
    dotspacemacs-startup-lists '(recents projects)
    ;; Number of recent files to show in the startup buffer. Ignored if
    ;; `dotspacemacs-startup-lists' doesn't include `recents'. (default 5)
    dotspacemacs-startup-recent-list-size 5
+   ;; Default major mode of the scratch buffer (default `text-mode')
+   dotspacemacs-scratch-mode 'lisp-interaction-mode
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
@@ -159,9 +163,11 @@ values."
    ;; In the terminal, these pairs are generally indistinguishable, so this only
    ;; works in the GUI. (default nil)
    dotspacemacs-distinguish-gui-tab nil
-   ;; (Not implemented) dotspacemacs-distinguish-gui-ret nil
-   ;; If non nil `Y' is remapped to `y$'. (default t)
-   dotspacemacs-remap-Y-to-y$ t
+   ;; If non nil `Y' is remapped to `y$' in Evil states. (default nil)
+   dotspacemacs-remap-Y-to-y$ nil
+   ;; If non nil, inverse the meaning of `g' in `:substitute' Evil ex-command.
+   ;; (default nil)
+   dotspacemacs-ex-substitute-global nil
    ;; Name of the default layout (default "Default")
    dotspacemacs-default-layout-name "Default"
    ;; If non nil the default layout name is displayed in the mode-line.
@@ -290,8 +296,6 @@ user code here.  The exception is org related code, which should be placed in `d
    org-protocol-default-template-key "t"
    org2blog/wp-shortcode-langs-map '(("emacs-lisp" . "lisp") ("sh" . "bash")))
 
-
-
   ;; =======
   ;; Display
   ;; =======
@@ -310,7 +314,7 @@ user code here.  The exception is org related code, which should be placed in `d
 
                 (global-set-key (kbd "M-W") 'kill-region-to-ssh)
                 (global-set-key (kbd "M-Y") 'yank-from-ssh)
-                (global-set-key (kbd "M-Q") 'rebox-dwim)
+                ;; (global-set-key (kbd "M-Q") 'rebox-dwim)
 
                 ;; Find emacs source
                 (global-set-key (kbd "C-h C-l") 'find-library)
@@ -350,13 +354,17 @@ user code here.  The exception is org related code, which should be placed in `d
   ;; Programming Modes
   ;; =================
 
-  (spacemacs|use-package-add-hook rebox2
-    :post-init
-    (progn
-      (setq rebox-style-loop '(81 82 83))
-      (add-hook 'all-prog-mode-hook 'rebox-mode)
-      )
-    )
+  ;; (spacemacs|use-package-add-hook rebox2
+  ;;   :post-init
+  ;;   (progn
+  ;;     (setq rebox-style-loop '(81 82 83))
+  ;;     ;; (setq rebox-style-loop '(71 72 73 74 75 76 77 81 82 83 84 85 86 87))
+  ;;     ;; C-mode comments
+  ;;     ;; (setq-default '(241 235 243))
+  ;;     (add-hook 'all-prog-mode-hook 'rebox-mode)
+  ;;     )
+  ;;   )
+
   (spacemacs|use-package-add-hook flycheck
     :post-config
     (progn
@@ -388,6 +396,7 @@ user code here.  The exception is org related code, which should be placed in `d
                                :modes python-mode)
       ;; (add-hook 'after-init-hook 'global-flycheck-mode)
       ))
+
   (spacemacs|use-package-add-hook cc-mode
     :post-init
     (setq c-font-lock-extra-types
@@ -656,78 +665,6 @@ user code here.  The exception is org related code, which should be placed in `d
       )
     )
 
-  ;; ==========
-  ;; Messaging
-  ;; ==========
-
-  (when (configuration-layer/layer-usedp 'erc)
-    (spacemacs|use-package-add-hook erc-hl-nicks
-      :post-init
-      (setq
-       erc-hl-nicks-minimum-contrast-ratio 3.5
-       ;; erc-hl-nicks-color-contrast-strategy 'contrast
-       ;; erc-hl-nicks-color-contrast-strategy 'invert
-       erc-hl-nicks-skip-nicks '("gitter"))
-      )
-
-    (defun launch-irc-gitter ()
-      "Launch irc connection to giter.im"
-      (interactive)
-      (let* ((auth-source-creation-defaults nil)
-             (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
-             (secret (plist-get (nth 0 (auth-source-search
-                                        :type 'netrc
-                                        :max 1
-                                        :host "irc.gitter.im"
-                                        :user "choppsv1"
-                                        :port "6667"
-                                        :create t))
-                                :secret))
-             (password (if (functionp secret)
-                           (funcall secret)
-                         secret)))
-
-        (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1" :password password :full-name "chopps")))
-    (defun launch-irc-netbsd ()
-      "Launch irc connection to netbsd"
-      (interactive)
-      (erc-tls :server "mollari.netbsd.org" :port 7001 :nick "chopps" :full-name "Christian E. Hopps"))
-    (defun launch-irc-freenode ()
-      "Launch irc connection to freenode"
-      (interactive)
-      (let* ((auth-source-creation-defaults nil)
-             (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
-             (secret (plist-get (nth 0 (auth-source-search
-                                        :type 'netrc
-                                        :max 1
-                                        :host "freenode.net"
-                                        :user "chopps"
-                                        :port "6697"
-                                        :create t))
-                                :secret))
-             (password (if (functionp secret)
-                           (funcall secret)
-                         secret)))
-        (erc-tls :server "asimov.freenode.net" :port 6697 :nick "chopps" :password password)))
-    (defun launch-irc-jabber ()
-      "Launch irc connection to netbsd"
-      (interactive)
-      (erc :server "localhost" :port 6667 :nick "chopps" :full-name "Christian E. Hopps"))
-    (defun launch-erc ()
-      "Launch all our connections to IRC"
-      (interactive)
-      (launch-irc-gitter)
-      (launch-irc-freenode)
-      (launch-irc-netbsd)
-      (launch-irc-jabber))
-
-    (spacemacs/set-leader-keys
-      "aif" 'launch-irc-freenode
-      "aij" 'launch-irc-jabber
-      "ain" 'launch-irc-netbsd
-      "aig" 'launch-irc-gitter
-      "aiL" 'launch-erc)
-    )
   (spacemacs|use-package-add-hook erc
     :post-init
     (progn
@@ -799,6 +736,27 @@ user code here.  The exception is org related code, which should be placed in `d
       (add-hook 'erc-join-hook 'bitlbee-netrc-identify)
       )
     )
+  (spacemacs|use-package-add-hook erc-hl-nicks
+    :post-init
+    (setq
+     erc-hl-nicks-minimum-contrast-ratio 3.5
+     ;; erc-hl-nicks-color-contrast-strategy 'contrast
+     ;; erc-hl-nicks-color-contrast-strategy 'invert
+     erc-hl-nicks-skip-nicks '("gitter"))
+    )
+  (spacemacs|use-package-add-hook rcirc
+    :post-init
+    (setq-default
+     rcirc-log-directory "~/Dropbox/logs/rcirclogs"
+     )
+    ;;   :post-config
+    ;;   (setq rcirc-server-alist
+    ;;         '(("irc.gitter.im"
+    ;;            :user "choppsv1"
+    ;;            :encryption tls
+    ;;            :port "6697"
+    ;;            :channels ("#syl20bnr/spacemacs")))))
+    )
   (spacemacs|use-package-add-hook mu4e
     :post-init
     (progn
@@ -815,6 +773,7 @@ user code here.  The exception is org related code, which should be placed in `d
             ;; mu4e-update-pre-hook 'mu4e-pre-hook-udpate-command
             mu4e-mu-binary (executable-find "mu")
             mu4e-update-interval nil
+            mu4e-headers-include-related nil
 
             ;; [b]ookmarks
             mu4e-not-junk-folder-filter " AND NOT ( maildir:/gmail.com/[Gmail].Spam OR maildir:/chopps.org/spam* ) "
@@ -879,8 +838,6 @@ user code here.  The exception is org related code, which should be placed in `d
             mu4e-view-html-plaintext-ratio-heuristic 15
             ;; mu4e-html2text-command "html2text -nobs -utf8 -width 120"
 
-
-
             ;; Folders -- most setup per account
             ;; see context below
 
@@ -922,56 +879,7 @@ user code here.  The exception is org related code, which should be placed in `d
 
             ;; don't keep message buffers around
             message-kill-buffer-on-exit t
-
-            my-mu4e-account-alist
-            '(
-              ("chopps.org"
-               ;; about me
-               (user-mail-address      "chopps@chopps.org")
-               ;; mu4e
-               (mu4e-sent-folder   "/chopps.org/Sent Messages")
-               (mu4e-trash-folder  "/chopps.org/Deleted Messages")
-               (mu4e-drafts-folder "/chopps.org/Drafts")
-               (mu4e-sent-messages-behavior sent)
-               ;; smtp
-               (smtpmail-starttls-credentials '(("smtp.chopps.org" 9005 nil nil)))
-               (smtpmail-default-smtp-server "smtp.chopps.org")
-               (smtpmail-smtp-server "smtp.chopps.org")
-               ;; smtpmail-local-domain?
-               ;; smtpmail-sendto-domain?
-               (smtpmail-smtp-service 9005))
-
-              ("terastrm.net"
-               ;; about me
-               (user-mail-address      "chopps@dev.terastrm.net")
-               ;; mu4e
-               (mu4e-sent-folder   "/terastrm.net/Sent Messages")
-               (mu4e-trash-folder  "/terastrm.net/Deleted Messages")
-               (mu4e-drafts-folder "/terastrm.net/Drafts")
-               (mu4e-sent-messages-behavior sent)
-               ;; smtp
-               (smtpmail-starttls-credentials '(("smtp.dev.terastrm.net" 587 nil nil)))
-               (smtpmail-default-smtp-server "smtp.dev.terastrm.net")
-               (smtpmail-smtp-server "smtp.dev.terastrm.net")
-               ;; smtpmail-local-domain?
-               ;; smtpmail-sendto-domain?
-               (smtpmail-smtp-service 587))
-
-              ("gmail.com"
-               ;; about me
-               (user-mail-address      "chopps@gmail.com")
-               ;; mu4e
-               (mu4e-drafts-folder "/gmail.com/[Gmail].Drafts")
-               (mu4e-sent-folder   "/gmail.com/[Gmail].Sent Mail")
-               (mu4e-trash-folder  "/gmail.com/[Gmail].Trash")
-               (mu4e-sent-messages-behavior delete)
-               ;; smtp
-               (smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil)))
-               (smtpmail-default-smtp-server "smtp.gmail.com")
-               (smtpmail-smtp-server "smtp.gmail.com")
-               ;; smtpmail-local-domain?
-               ;; smtpmail-sendto-domain?
-               (smtpmail-smtp-service 587))))
+            )
 
       (defun ch:ct (clist)
         "Transform candidate into (display . real)"
@@ -982,9 +890,10 @@ user code here.  The exception is org related code, which should be placed in `d
                         email))) clist))
       (defun my-message-expand-name (&optional start)
         (interactive)
+        (message "my-message-expand-name called")
         (helm :prompt "contact:" :sources
               (helm-build-sync-source "mu4e contacts"
-                :candidates mu4e~contact-list :candidate-transformer 'ch:ct)))
+                                      :candidates mu4e~contact-list :candidate-transformer 'ch:ct)))
 
       (defun my-mu4e-compose-hook ()
         "Setup outgoing messages"
@@ -1000,39 +909,6 @@ user code here.  The exception is org related code, which should be placed in `d
         ;; (use-hard-newlines t 'guess)
         ;; Sign messages by default
         (mml-secure-message-sign-pgpmime))
-
-      (defun my-mu4e-set-account (account)
-        "Set account variables up"
-        (let ((account-vars (cdr (assoc account my-mu4e-account-alist))))
-          (if account-vars
-              (mapc #'(lambda (var)
-                        (set (car var) (cadr var)))
-                    account-vars)
-            (error "No email account found"))))
-
-      (defun my-mu4e-set-account-using-message ()
-        "Set the account for composing a message."
-        (let* ((defchoice (if mu4e-compose-parent-message
-                              (let ((maildir (mu4e-message-field mu4e-compose-parent-message :maildir)))
-                                (string-match "/\\(.*?\\)/" maildir)
-                                (match-string 1 maildir))
-                            (caar my-mu4e-account-alist)))
-               (account
-                (completing-read (format "Compose with account: (%s) "
-                                         (mapconcat #'(lambda (var) (car var))
-                                                    my-mu4e-account-alist "/"))
-                                 (mapcar #'(lambda (var) (car var)) my-mu4e-account-alist)
-                                 nil
-                                 t
-                                 nil
-                                 nil
-                                 defchoice))
-               (account-vars (cdr (assoc account my-mu4e-account-alist))))
-          (if account-vars
-              (mapc #'(lambda (var)
-                        (set (car var) (cadr var)))
-                    account-vars)
-            (error "No email account found"))))
 
       (defun mu4e-pre-hook-udpate-command ()
         (let ((check (% mu4e-pre-hook-count 4)))
@@ -1145,11 +1021,6 @@ user code here.  The exception is org related code, which should be placed in `d
                              )))
       (add-hook 'mu4e-view-mode-hook
                 (lambda () (setq show-trailing-whitespace nil)))
-
-      (when (not (featurep 'mu4e-context))
-        (add-hook 'mu4e-compose-pre-hook
-                  'my-mu4e-set-account-using-message)
-        (my-mu4e-set-account "chopps.org"))
 
       (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
 
@@ -1660,78 +1531,228 @@ This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
 
   (progn
-    (global-hl-line-mode -1)            ; Disable hihglighting of current line.
 
-    (setq spaceline-window-numbers-unicode nil
-          spaceline-workspace-numbers-unicode nil)
 
-    ;; fill-column-mode character doesn't work
-    (set-face-inverse-video-p 'vertical-border nil)
-    (set-face-background 'vertical-border (face-background 'default))
-    (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u2999))
-    (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u299A))
-    (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u2503))
+    ;; =======
+    ;; Display
+    ;; =======
 
-    (setq-default evil-shift-width 4)
-    (setq
-     evil-shift-round nil
-     evil-search-wrap nil
-     evil-want-C-i-jump nil
-     evil-esc-delay 0.001
-    )
-    (fold-section "Evil"
-                  (defun evil-undefine ()
-                    (interactive)
-                    (let (evil-mode-map-alist)
-                      (call-interactively (key-binding (this-command-keys)))))
+    (fold-section "display"
+                  (global-hl-line-mode -1)            ; Disable hihglighting of current line.
 
-                  ;; What does this do?
-                  ;; (define-key evil-normal-state-map [escape] 'keyboard-quit)
-                  ;; (define-key evil-visual-state-map [escape] 'keyboard-quit)
-                  ;; (define-key evil-normal-state-map (kbd "TAB") 'evil-undefine)
+                  ;; fill-column-mode character doesn't work
+                  (set-face-inverse-video-p 'vertical-border nil)
+                  (set-face-background 'vertical-border (face-background 'default))
+                  (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u2999))
+                  (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u299A))
+                  (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u2503))
 
-                  ;; Undefine vi keys in all modes.
-                  ;; Is this screwing us with C-S keys
-                  ;; (let ((undef '("\C-a" "\C-e" "\C-n" "\C-p")))
-                  ;;   (while undef
-                  ;;     (define-key evil-normal-state-map (car undef) 'evil-undefine)
-                  ;;     (define-key evil-visual-state-map (car undef) 'evil-undefine)
-                  ;;     (define-key evil-insert-state-map (car undef) 'evil-undefine)
-                  ;;     (setq undef (cdr undef))))
+                  (setq spaceline-window-numbers-unicode nil
+                        spaceline-workspace-numbers-unicode nil)
+                  )
 
-                  ;; Undefine vi keys in insert mode.
-                  (let ((undef '("\C-k")))
-                    (while undef
-                      (define-key evil-insert-state-map (car undef) 'evil-undefine)
-                      (setq undef (cdr undef))))
+    ;; Layouts
+    (fold-section "layouts"
+                  (spacemacs|define-custom-layout "mail"
+                                                  :binding "m"
+                                                  :body
+                                                  (mu4e))
+                  )
 
-                  ;; Remove RET and SPC from motion map so they can be overridden by various modes
-                  (defun my-move-key (keymap-from keymap-to key)
-                    "Moves key binding from one keymap to another, deleting from the old location. "
-                    (define-key keymap-to key (lookup-key keymap-from key))
-                    (define-key keymap-from key nil))
-                  (my-move-key evil-motion-state-map evil-normal-state-map (kbd "RET"))
 
-                  ;; (my-move-key evil-motion-state-map evil-normal-state-map " ")
+    ;; ===========
+    ;; Keybindings
+    ;; ===========
 
-                  ;; Check what escape does without this.
-                  ;; (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
-                  ;; (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
-                  ;; (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
-                  ;; (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
-                  ;; (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
+    (fold-section "bindings"
+                  (defun dear-leader/swap-keys (key1 key2)
+                    (let ((map1 (lookup-key spacemacs-default-map key1))
+                          (map2 (lookup-key spacemacs-default-map key2)))
+                      (spacemacs/set-leader-keys key1 map2 key2 map1)))
+                  (dear-leader/swap-keys "am" "aM")
+                  (global-set-key (kbd "C-\\") 'spacemacs//layouts-persp-next-C-l)
+                  )
 
-                  ;; Configure some modes to start in emacs mode.
-                  (dolist (mode '(artist-mode
-                                  gud-minor-mode
-                                  gud-mode
-                                  gud
-                                  pylookup
-                                  pylookup-mode
-                                  ))
-                    (evil-set-initial-state mode 'emacs))
-                  ;; Configure some modes to start in insert mode.
-                  (evil-set-initial-state 'mu4e-compose-mode 'insert)
+    ;; ==========
+    ;; Messaging
+    ;; ==========
+
+    (when (configuration-layer/layer-usedp 'erc)
+      (defun launch-irc-gitter ()
+        "Launch irc connection to giter.im"
+        (interactive)
+        (let* ((auth-source-creation-defaults nil)
+               (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
+               (secret (plist-get (nth 0 (auth-source-search
+                                          :type 'netrc
+                                          :max 1
+                                          :host "irc.gitter.im"
+                                          :user "choppsv1"
+                                          :port "6667"
+                                          :create t))
+                                  :secret))
+               (password (if (functionp secret)
+                             (funcall secret)
+                           secret)))
+
+          (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1" :password password :full-name "chopps")))
+
+      (defun launch-irc-netbsd ()
+        "Launch irc connection to netbsd"
+        (interactive)
+        (erc-tls :server "mollari.netbsd.org" :port 7001 :nick "chopps" :full-name "Christian E. Hopps"))
+
+      (defun launch-irc-freenode ()
+        "Launch irc connection to freenode"
+        (interactive)
+        (let* ((auth-source-creation-defaults nil)
+               (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
+               (secret (plist-get (nth 0 (auth-source-search
+                                          :type 'netrc
+                                          :max 1
+                                          :host "freenode.net"
+                                          :user "chopps"
+                                          :port "6697"
+                                          :create t))
+                                  :secret))
+               (password (if (functionp secret)
+                             (funcall secret)
+                           secret)))
+          (erc-tls :server "asimov.freenode.net" :port 6697 :nick "chopps" :password password)))
+
+      (defun launch-irc-jabber ()
+        "Launch irc connection to jabber"
+        (interactive)
+        (erc :server "localhost" :port 6667 :nick "chopps" :full-name "Christian E. Hopps"))
+
+      (defun launch-erc ()
+        "Launch all our connections to IRC"
+        (interactive)
+        (launch-irc-gitter)
+        (launch-irc-freenode)
+        (launch-irc-netbsd)
+        (launch-irc-jabber))
+
+      (spacemacs/set-leader-keys
+        "aif" 'launch-irc-freenode
+        "aij" 'launch-irc-jabber
+        "ain" 'launch-irc-netbsd
+        "aig" 'launch-irc-gitter
+        "aiL" 'launch-erc)
+      )
+    (when (configuration-layer/layer-usedp 'rcirc)
+      (defun get-gitter-password ()
+        (let* ((auth-source-creation-defaults nil)
+               (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
+               (sec (plist-get (nth 0 (auth-source-search
+                                       :type 'netrc
+                                       :max 1
+                                       :host "irc.gitter.im"
+                                       :port 6667
+                                       :user "choppsv1"))
+                               :secret)))
+          (if (functionp sec)
+              (funcall sec)
+            sec)))
+
+
+      (setq
+       rcirc-time-format "%H:%M "
+       rcirc-server-alist
+       `(("irc.gitter.im"
+          :user "choppsv1"
+          :port "6667"
+          :password ,(get-gitter-password)
+          :encryption tls
+          :channels ("#syl20bnr/spacemacs"))
+         ("asimov.freenode.net"
+          :user "chopps"
+          :port "6697"
+          :encryption tls
+          :channels ("#org-mode")
+          )
+         ;; ("mollari.netbsd.org"
+         ;;  :user "chopps"
+         ;;  :port "7001"
+         ;;  :encryption tls
+         ;;  :channels ("#netbsd")
+         ;; )
+         ("localhost"
+          :user "chopps"
+          :port "6667"
+          ;; :channels ("#ts")
+          )
+         )
+       )
+      )
+
+    ;; ====
+    ;; Evil
+    ;; ====
+
+    (fold-section "evil"
+                  (setq-default evil-shift-width 4)
+
+                  (setq
+                   evil-shift-round nil
+                   evil-search-wrap nil
+                   evil-want-C-i-jump nil
+                   evil-esc-delay 0.001
+                   )
+                  (fold-section "Evil"
+                                (defun evil-undefine ()
+                                  (interactive)
+                                  (let (evil-mode-map-alist)
+                                    (call-interactively (key-binding (this-command-keys)))))
+
+                                ;; What does this do?
+                                ;; (define-key evil-normal-state-map [escape] 'keyboard-quit)
+                                ;; (define-key evil-visual-state-map [escape] 'keyboard-quit)
+                                ;; (define-key evil-normal-state-map (kbd "TAB") 'evil-undefine)
+
+                                ;; Undefine vi keys in all modes.
+                                ;; Is this screwing us with C-S keys
+                                ;; (let ((undef '("\C-a" "\C-e" "\C-n" "\C-p")))
+                                ;;   (while undef
+                                ;;     (define-key evil-normal-state-map (car undef) 'evil-undefine)
+                                ;;     (define-key evil-visual-state-map (car undef) 'evil-undefine)
+                                ;;     (define-key evil-insert-state-map (car undef) 'evil-undefine)
+                                ;;     (setq undef (cdr undef))))
+
+                                ;; Undefine vi keys in insert mode.
+                                (let ((undef '("\C-k")))
+                                  (while undef
+                                    (define-key evil-insert-state-map (car undef) 'evil-undefine)
+                                    (setq undef (cdr undef))))
+
+                                ;; Remove RET and SPC from motion map so they can be overridden by various modes
+                                (defun my-move-key (keymap-from keymap-to key)
+                                  "Moves key binding from one keymap to another, deleting from the old location. "
+                                  (define-key keymap-to key (lookup-key keymap-from key))
+                                  (define-key keymap-from key nil))
+                                (my-move-key evil-motion-state-map evil-normal-state-map (kbd "RET"))
+
+                                ;; (my-move-key evil-motion-state-map evil-normal-state-map " ")
+
+                                ;; Check what escape does without this.
+                                ;; (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
+                                ;; (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
+                                ;; (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
+                                ;; (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
+                                ;; (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
+
+                                ;; Configure some modes to start in emacs mode.
+                                (dolist (mode '(artist-mode
+                                                gud-minor-mode
+                                                gud-mode
+                                                gud
+                                                pylookup
+                                                pylookup-mode
+                                                ))
+                                  (evil-set-initial-state mode 'emacs))
+                                ;; Configure some modes to start in insert mode.
+                                (evil-set-initial-state 'mu4e-compose-mode 'insert)
+                                )
                   )
 
     ;; Remove when merges happen
@@ -1741,7 +1762,6 @@ layers configuration. You are free to put any user code."
     (with-eval-after-load 'org
       (require 'org-mu4e))
     (add-hook 'org-mode-hook 'evil-normalize-keymaps)
-
 
     ;; (message "End: %s" inhibit-startup-screen)
     ;; (if inhibit-startup-screen
