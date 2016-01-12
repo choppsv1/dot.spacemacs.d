@@ -4,6 +4,18 @@
 ;; Copyright (c) 2014 by Christian E. Hopps.
 ;; All rights reserved.
 ;;
+;; Licensed under the Apache License, Version 2.0 (the "License");
+;; you may not use this file except in compliance with the License.
+;; You may obtain a copy of the License at
+;;
+;; http://www.apache.org/licenses/LICENSE-2.0
+;;
+;; Unless required by applicable law or agreed to in writing, software
+;; distributed under the License is distributed on an "AS IS" BASIS,
+;; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+;; See the License for the specific language governing permissions and
+;; limitations under the License.
+
 ;; (require 'flymake)
 
 ;; See if we can load pymacs fixer functions fail silently if we cannot.
@@ -243,7 +255,7 @@
 (defun pyfixer:get-line-errors ()
   "Get a list of error messages from either flymake or flycheck"
   (if (pyfixer:is-flycheck-on)
-      (-keep 'flycheck-error-message
+      (-keep 'flycheck-error-format-message-and-id
              (flycheck-overlay-errors-in (line-beginning-position) (line-end-position)))
     (pyfixer:get-errlist-given-line (line-number-at-pos))))
 
@@ -257,12 +269,12 @@
 
 (defun pyfixer:print-errlist ()
   (interactive)
-  (message "%s" (pyfixer:get-line-errors)))
+  (message "PER: %s" (pyfixer:get-line-errors)))
 (bind-key "C-c 7" 'pyfixer:print-errlist)
 
 (defun pyfixer:print-all-errors ()
   (interactive)
-  (message "%s" (pyfixer:get-buffer-errors)))
+  (message "PAR: %s" (pyfixer:get-buffer-errors)))
 (bind-key "C-c 9" 'pyfixer:print-all-errors)
 
 (defun pyfixer:fix-line-in-list (err-list last-line-no)
@@ -282,7 +294,7 @@
   (interactive)
   (save-excursion
     (pyfixer:fix-line-in-list (pyfixer:get-buffer-errors) -1))
-  (if pyfixer:is-flycheck-on
+  (if (pyfixer:is-flycheck-on)
       (flycheck-handle-save)
     (flymake-start-syntax-check)))
 
@@ -294,7 +306,7 @@
   (let* ((errlist (pyfixer:get-line-errors)))
     (message "Errlist: %s" errlist)
     (mapcar 'pyfixer:fix-error errlist)
-    (if pyfixer:is-flycheck-on
+    (if (pyfixer:is-flycheck-on)
         (flycheck-handle-save)
       (flymake-start-syntax-check))))
 
@@ -316,7 +328,7 @@
   (let* ((errlist (pyfixer:get-line-errors)))
     (message "Errlist: %s" errlist)
     (mapcar 'pyfixer:ignore-error errlist)
-    (if pyfixer:is-flycheck-on
+    (if (pyfixer:is-flycheck-on)
         (flycheck-handle-save)
       (flymake-start-syntax-check))))
 

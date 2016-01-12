@@ -21,7 +21,8 @@ values."
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     ;; spacemacs-helm
+     spacemacs-helm
+     ;; spacemacs-ivy
      (auto-completion :variables
                       auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets")
 
@@ -30,9 +31,10 @@ values."
      ;; bb-erc
      eyebrowse
      gtags
-     (mu4e :variables
-           mu4e-installation-path "/usr/local/share/emacs/site-lisp/mu4e"
-           mu4e-use-maildirs t)
+     mu4e
+     ;; (mu4e :variables
+     ;;       mu4e-installation-path "/usr/local/share/emacs/site-lisp/mu4e"
+     ;;       mu4e-use-maildirs t)
      osx
      org
      ranger
@@ -40,7 +42,6 @@ values."
      ;; (rcirc :variables
      ;;        rcirc-enable-authinfo-support t)
      spacemacs-layouts
-     spacemacs-ivy
      spell-checking
      spotify
      syntax-checking
@@ -59,7 +60,8 @@ values."
      ;; lua
      ;; markdown
      ;; php
-     python
+     (python :variables
+             python-fill-column 120)
      ;; ruby
      shell-scripts
      yaml
@@ -545,16 +547,6 @@ user code here.  The exception is org related code, which should be placed in `d
   (spacemacs|use-package-add-hook python
     :post-init
     (progn
-      ;; (use-package flymake-pyfixers
-      ;;             :commands (pyfixer:ignore-current-line pyfixer:fix-current-line pyfixer:fix-all-errors))
-      ;; (setq pytest-global-name "py.test"
-      ;;      pytest-cmd-flags "-x --doctest-module"))
-
-      ;;       (setq nose-project-root-files '("setup.py" ".hg" ".git" ".svn")))
-
-      ;; (when (not (setq python-check-command (executable-find "pycheckers.sh")))
-      ;;  (setq python-check-command "flake8"))
-
       (setq
        python-fill-docstring-style 'symmetric
        python-fill-string-function 'my-python-fill-string-function)
@@ -564,28 +556,25 @@ user code here.  The exception is org related code, which should be placed in `d
           (python-fill-comment justify)))
 
       (defun my-python-mode-hook ()
-        (message "Python mode hook")
-
-        ;; (elpy-mode)
-        ;; (pyenv-mode)
-
         (require 'pyfixers)
         (setq comment-column 60)
-        (setq fill-column 120)
-        (highlight-indentation-mode -1)
 
-        (flyspell-prog-mode)
-        (flycheck-mode t)
-        (flycheck-select-checker 'python-pycheckers)
-        (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
+        ;; spacemacs does?
+        ;; (highlight-indentation-mode -1)
+        ;; (flyspell-prog-mode)
+        ;; (flycheck-mode t)
 
-
-        (set (make-local-variable 'rebox-style-loop) '(73 74 75 71))
+        ;; This gives and error
+        ;; (flycheck-select-checker 'python-pycheckers)
+        ;; (message "select checker")
+        ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
+        ;; (message "select set exec")
 
         (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
-
         (message "Python mode hook done"))
-      (add-hook 'python-mode-hook 'my-python-mode-hook))
+
+      (add-hook 'python-mode-hook 'my-python-mode-hook)
+      )
     :post-config
     (progn
       (define-key python-mode-map (kbd "M-n") 'flycheck-next-error)
@@ -619,16 +608,10 @@ user code here.  The exception is org related code, which should be placed in `d
       (spacemacs/set-leader-keys-for-major-mode 'python-mode "en" 'flycheck-next-error)
       (spacemacs/set-leader-keys-for-major-mode 'python-mode "ep" 'flycheck-prev-error)
 
-      ;; Elpy config
-      ;; (define-key elpy-mode-map (kbd "C-c C-n") 'next-error)
-      ;; (define-key elpy-mode-map (kbd "C-c C-p") 'previous-error)
-      ;; (elpy-use-ipython)
-      ;; (elpy-clean-modeline)
-
-      ;; Python config
 
       ;; Consider _ a part of words for python
       (modify-syntax-entry ?_ "w" python-mode-syntax-table)
+
       ;; (define-key global-map (kbd "C-c o") 'iedit-mode)
 
       ;; (if (file-exists-p "/usr/local/bin/python"  )
@@ -734,6 +717,18 @@ user code here.  The exception is org related code, which should be placed in `d
                                            (erc-default-target)
                                            password)))))
       (add-hook 'erc-join-hook 'bitlbee-netrc-identify)
+      )
+    :post-config
+    (progn
+      ;; add a user to the current channel
+      (defun add-nick-insert-pre-hook (line)
+        "Add user to ERC channel list"
+        (when (string= erc-session-server "irc.gitter.im")
+          (save-match-data
+            (when (string-match "^<\\([^>]+\\)> .*" line)
+              (let ((nick (match-string 1 line)))
+                (erc-update-current-channel-member nick nick 'add-if-new))))))
+      (add-hook 'erc-insert-pre-hook 'add-nick-insert-pre-hook)
       )
     )
   (spacemacs|use-package-add-hook erc-hl-nicks
@@ -1355,11 +1350,6 @@ user code here.  The exception is org related code, which should be placed in `d
 
                 (eval-after-load 'autoinsert
                   '(progn
-
-                     ;;-----------+
-                     ;;      Home
-                     ;;-----------+
-
                      (define-auto-insert
                        '("\\.org\\'" . "Home Org mode skeleton")
                        '("Short description: "
@@ -1403,6 +1393,7 @@ user code here.  The exception is org related code, which should be placed in `d
                          > "#" \n
                          > "# REDISTRIBUTION IN ANY FORM PROHIBITED WITHOUT PRIOR WRITTEN" \n
                          > "# CONSENT OF THE AUTHOR." \n
+                         > "#" \n
                          > "from __future__ import absolute_import, division, unicode_literals, print_function, nested_scopes" \n
                          > "" \n
                          > _ \n
@@ -1755,12 +1746,6 @@ layers configuration. You are free to put any user code."
                                 )
                   )
 
-    ;; Remove when merges happen
-    (with-eval-after-load 'mu4e
-      (require 'org-mu4e)
-      (require 'mu4e-maildirs-extension))
-    (with-eval-after-load 'org
-      (require 'org-mu4e))
     (add-hook 'org-mode-hook 'evil-normalize-keymaps)
 
     ;; (message "End: %s" inhibit-startup-screen)
