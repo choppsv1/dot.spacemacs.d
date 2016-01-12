@@ -104,7 +104,7 @@ values."
    ;; variable is `emacs' then the `holy-mode' is enabled at startup. `hybrid'
    ;; uses emacs key bindings for vim's insert mode, but otherwise leaves evil
    ;; unchanged. (default 'vim)
-   dotspacemacs-editing-style 'vim
+   dotspacemacs-editing-style 'hybrid
    ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
    dotspacemacs-verbose-loading t
    ;; Specify the startup banner. Default value is `official', it displays
@@ -139,8 +139,8 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
    ;; size to make separators look not too crappy.
-   dotspacemacs-default-font '("Source Code Pro"
-                               :size 13
+   dotspacemacs-default-font '("Menlo"
+                               :size 15
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -651,9 +651,12 @@ user code here.  The exception is org related code, which should be placed in `d
   (spacemacs|use-package-add-hook erc
     :post-init
     (progn
+      (setq erc-prompt-for-nickserv-password nil)
       (setq erc-autojoin-channels-alist
             '(("irc.gitter.im" "#syl20bnr/spacemacs")
-              ("mollari.netbsd.org" "#NetBSD"))
+              ("mollari.netbsd.org" "#NetBSD")
+              ("freenode.net" "#org-mode")))
+
             ;; '(erc-autoaway-idle-seconds 600)
             ;; '(erc-autojoin-mode t)
             ;; '(erc-button-mode t)
@@ -685,7 +688,21 @@ user code here.  The exception is org related code, which should be placed in `d
             ;; '(erc-track-minor-mode t)
             ;; '(erc-track-mode t)
             ;; '(erc-youtube-mode t)
-            )
+
+      (defun erc-acct-get-password (user host port)
+        (let* ((auth-source-creation-defaults nil)
+               (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
+               (secret (plist-get (nth 0 (auth-source-search
+                                          :type 'netrc
+                                          :max 1
+                                          :host host
+                                          :user user
+                                          :port port
+                                          :create t))
+                                  :secret))
+               (password (if (functionp secret)
+                             (funcall secret)
+                           secret)))))
 
       (defun bitlbee-netrc-identify ()
         "Auto-identify for Bitlbee channels using authinfo or netrc.
@@ -700,26 +717,24 @@ user code here.  The exception is org related code, which should be placed in `d
 
         (interactive)
         (when (string= (buffer-name) "&bitlbee")
-          (let* ((auth-source-creation-defaults '((user . "chopps")))
-                 (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
-                 (secret (plist-get (nth 0 (auth-source-search
-                                            :type 'netrc
-                                            :max 1
-                                            :host erc-server
-                                            :user (erc-current-nick)
-                                            :port "6667"
-                                            :create t))
-                                    :secret))
-                 (password (if (functionp secret)
-                               (funcall secret)
-                             secret)))
-            (erc-message "PRIVMSG" (format "%s identify %s"
-                                           (erc-default-target)
-                                           password)))))
+          (let ((pass (erc-acct-get-password (erc-current-nick) erc-session-server "bitlbee")))
+            (message "Sending privmsg to &bitlbee server %s" erc-session-server)
+            (erc-message "PRIVMSG"
+                         (format "%s identify %s"
+                                 (erc-default-target)
+                                 pass)))))
       (add-hook 'erc-join-hook 'bitlbee-netrc-identify)
       )
     :post-config
     (progn
+      (setq erc-auto-query 'window
+            erc-track-switch-direction 'importance)
+      (setq erc-nickserv-passwords
+            `((freenode (("chopps" . ,(erc-acct-get-password "chopps" "freenode.net" "nickserv"))))
+              (localhost (("chopps" . ,(erc-acct-get-password "chopps" "localhost" "bitlbee"))))))
+
+      (erc-services-mode 1)
+
       ;; add a user to the current channel
       (defun add-nick-insert-pre-hook (line)
         "Add user to ERC channel list"
@@ -1548,6 +1563,13 @@ layers configuration. You are free to put any user code."
                                                   :binding "m"
                                                   :body
                                                   (mu4e))
+                  (spacemacs|define-custom-layout "irc"
+                    :binding "i"
+                    :body
+                    (launch-irc-jabber)
+                    (split-window-right)
+                    (launch-irc-gitter)
+                    )
                   )
 
 
@@ -1572,21 +1594,8 @@ layers configuration. You are free to put any user code."
       (defun launch-irc-gitter ()
         "Launch irc connection to giter.im"
         (interactive)
-        (let* ((auth-source-creation-defaults nil)
-               (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
-               (secret (plist-get (nth 0 (auth-source-search
-                                          :type 'netrc
-                                          :max 1
-                                          :host "irc.gitter.im"
-                                          :user "choppsv1"
-                                          :port "6667"
-                                          :create t))
-                                  :secret))
-               (password (if (functionp secret)
-                             (funcall secret)
-                           secret)))
-
-          (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1" :password password :full-name "chopps")))
+        (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1"
+                 :password (erc-acct-get-password "choppsv1" "irc.gitter.im" 6667)))
 
       (defun launch-irc-netbsd ()
         "Launch irc connection to netbsd"
@@ -1596,20 +1605,8 @@ layers configuration. You are free to put any user code."
       (defun launch-irc-freenode ()
         "Launch irc connection to freenode"
         (interactive)
-        (let* ((auth-source-creation-defaults nil)
-               (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
-               (secret (plist-get (nth 0 (auth-source-search
-                                          :type 'netrc
-                                          :max 1
-                                          :host "freenode.net"
-                                          :user "chopps"
-                                          :port "6697"
-                                          :create t))
-                                  :secret))
-               (password (if (functionp secret)
-                             (funcall secret)
-                           secret)))
-          (erc-tls :server "asimov.freenode.net" :port 6697 :nick "chopps" :password password)))
+        (erc-tls :server "asimov.freenode.net" :port 6697 :nick "chopps"
+                 :password (erc-acct-get-password "chopps" "freenode.net" 6697)))
 
       (defun launch-irc-jabber ()
         "Launch irc connection to jabber"
