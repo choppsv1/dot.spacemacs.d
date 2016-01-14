@@ -1563,12 +1563,38 @@ layers configuration. You are free to put any user code."
                                                   :binding "m"
                                                   :body
                                                   (mu4e))
+
                   (spacemacs|define-custom-layout "irc"
                     :binding "i"
                     :body
                     (launch-irc-jabber)
                     (split-window-right)
                     (launch-irc-gitter)
+                    )
+                  (spacemacs|define-custom-layout "W:OCP"
+                    :binding "wo"
+                    :body
+                    (find-file "~/w/ocp/setup.py")
+                    )
+                  (spacemacs|define-custom-layout "W:JDSU"
+                    :binding "wj"
+                    :body
+                    (find-file "~/w/jdsu-ocm/setup.py")
+                    )
+                  (spacemacs|define-custom-layout "W:UTIL"
+                    :binding "wu"
+                    :body
+                    (find-file "~/w/tsutil/setup.py")
+                    )
+                  (spacemacs|define-custom-layout "W:CASSFILE"
+                    :binding "wc"
+                    :body
+                    (find-file "~/w/cassfile/setup.py")
+                    )
+                  (spacemacs|define-custom-layout "W:ONDATA"
+                    :binding "wd"
+                    :body
+                    (find-file "~/w/optical-network-data/terastream.yang")
                     )
                   )
 
