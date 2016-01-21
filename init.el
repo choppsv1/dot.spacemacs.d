@@ -33,9 +33,11 @@ values."
      gtags
      mu4e
      ;; (mu4e :variables
-     ;;       mu4e-installation-path "/usr/local/share/emacs/site-lisp/mu4e"
-     ;;       mu4e-use-maildirs t)
-     osx
+     ;;      mu4e-installation-path "/usr/local/share/emacs/site-lisp/mu4e")
+     ;;      mu4e-use-maildirs t)
+     (osx :variables
+           osx-use-option-as-meta t)
+
      org
      ranger
      rebox
@@ -56,7 +58,8 @@ values."
      html
      ;; java
      javascript
-     latex
+     (latex :variables
+            latex-build-command "latexmk")
      ;; lua
      ;; markdown
      ;; php
@@ -71,7 +74,7 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '()
+   dotspacemacs-additional-packages '(ietf-docs)
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages '(smartparens) ; evil-org
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
@@ -139,8 +142,8 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
    ;; size to make separators look not too crappy.
-   dotspacemacs-default-font '("Deja Vu Sans Mono"
-                               :size 16
+   dotspacemacs-default-font '("DejaVu Sans Mono"
+                               :size 15
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -397,7 +400,8 @@ user code here.  The exception is org related code, which should be placed in `d
                                 )
                                :modes python-mode)
       ;; (add-hook 'after-init-hook 'global-flycheck-mode)
-      ))
+      )
+    )
 
   (spacemacs|use-package-add-hook cc-mode
     :post-init
@@ -544,6 +548,7 @@ user code here.  The exception is org related code, which should be placed in `d
                              (cpp-macro             . -1000)
                              ))))
       ))
+
   (spacemacs|use-package-add-hook python
     :post-init
     (progn
@@ -555,25 +560,6 @@ user code here.  The exception is org related code, which should be placed in `d
         (let ((fill-column 80))
           (python-fill-comment justify)))
 
-      (defun my-python-mode-hook ()
-        (require 'pyfixers)
-        (setq comment-column 60)
-
-        ;; spacemacs does?
-        ;; (highlight-indentation-mode -1)
-        ;; (flyspell-prog-mode)
-        ;; (flycheck-mode t)
-
-        ;; This gives and error
-        ;; (flycheck-select-checker 'python-pycheckers)
-        ;; (message "select checker")
-        ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
-        ;; (message "select set exec")
-
-        (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
-        (message "Python mode hook done"))
-
-      (add-hook 'python-mode-hook 'my-python-mode-hook)
       )
     :post-config
     (progn
@@ -645,128 +631,32 @@ user code here.  The exception is org related code, which should be placed in `d
                   (delete-region impstart impend)
                   (goto-char impstart)
                   (insert bigstr)))))))
+
+      (defun my-python-mode-hook ()
+        (require 'pyfixers)
+        (setq comment-column 60)
+
+        ;; spacemacs does?
+        ;; (highlight-indentation-mode -1)
+        ;; (flyspell-prog-mode)
+        ;; (flycheck-mode t)
+
+        ;; This gives and error
+        (message "select checker")
+        ;; This is required b/c for some reason it's still not loaded at this point.
+        (require 'flycheck)
+        (flycheck-select-checker 'python-pycheckers)
+        (message "post select checker")
+        ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
+        ;; (message "select set exec")
+
+        (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
+        (message "Python mode hook done"))
+
+      (add-hook 'python-mode-hook 'my-python-mode-hook)
       )
     )
 
-  (spacemacs|use-package-add-hook erc
-    :post-init
-    (progn
-      (setq erc-prompt-for-nickserv-password nil)
-      (setq erc-autojoin-channels-alist
-            '(("irc.gitter.im" "#syl20bnr/spacemacs")
-              ("mollari.netbsd.org" "#NetBSD")
-              ("freenode.net" "#org-mode")))
-
-            ;; '(erc-autoaway-idle-seconds 600)
-            ;; '(erc-autojoin-mode t)
-            ;; '(erc-button-mode t)
-            ;; '(erc-current-nick-highlight-type (quote all))
-            ;; '(erc-fill-mode t)
-            ;; '(erc-hl-nicks-mode t)
-            ;; '(erc-hl-nicks-trim-nick-for-face nil)
-            ;; '(erc-irccontrols-mode t)
-            ;; '(erc-kill-buffer-on-part t)
-            ;; '(erc-kill-queries-on-quit t)
-            ;; '(erc-kill-server-buffer-on-quit t)
-            ;; '(erc-list-mode t)
-            ;; '(erc-log-channels-directory "/Users/chopps/Dropbox/erclogs" t)
-            ;; '(erc-log-mode t)
-            ;; '(erc-match-mode t)
-            ;; '(erc-menu-mode t)
-            ;; '(erc-move-to-prompt-mode t)
-            ;; '(erc-netsplit-mode t)
-            ;; '(erc-networks-mode t)
-            ;; '(erc-noncommands-mode t)
-            ;; '(erc-pcomplete-mode t)
-            ;; '(erc-prompt (lambda nil (concat "[" (buffer-name) "]")))
-            ;; '(erc-readonly-mode t)
-            ;; '(erc-ring-mode t)
-            ;; '(erc-server-coding-system (quote (utf-8 . utf-8)))
-            ;; '(erc-services-mode t)
-            ;; '(erc-social-graph-dynamic-graph t)
-            ;; '(erc-stamp-mode t)
-            ;; '(erc-track-minor-mode t)
-            ;; '(erc-track-mode t)
-            ;; '(erc-youtube-mode t)
-
-      (defun erc-acct-get-password (user host port)
-        (let* ((auth-source-creation-defaults nil)
-               (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
-               (secret (plist-get (nth 0 (auth-source-search
-                                          :type 'netrc
-                                          :max 1
-                                          :host host
-                                          :user user
-                                          :port port
-                                          :create t))
-                                  :secret))
-               (password (if (functionp secret)
-                             (funcall secret)
-                           secret)))))
-
-      (defun bitlbee-netrc-identify ()
-        "Auto-identify for Bitlbee channels using authinfo or netrc.
-
-    The entries that we look for in netrc or authinfo files have
-    their 'port' set to 'bitlbee', their 'login' or 'user' set to
-    the current nickname and 'server' set to the current IRC
-    server's name. A sample value that works for authenticating
-    as user 'keramida' on server 'localhost' is:
-
-    machine localhost port bitlbee login keramida password supersecret"
-
-        (interactive)
-        (when (string= (buffer-name) "&bitlbee")
-          (let ((pass (erc-acct-get-password (erc-current-nick) erc-session-server "bitlbee")))
-            (message "Sending privmsg to &bitlbee server %s" erc-session-server)
-            (erc-message "PRIVMSG"
-                         (format "%s identify %s"
-                                 (erc-default-target)
-                                 pass)))))
-      (add-hook 'erc-join-hook 'bitlbee-netrc-identify)
-      )
-    :post-config
-    (progn
-      (setq erc-auto-query 'window
-            erc-track-switch-direction 'importance)
-      (setq erc-nickserv-passwords
-            `((freenode (("chopps" . ,(erc-acct-get-password "chopps" "freenode.net" "nickserv"))))
-              (localhost (("chopps" . ,(erc-acct-get-password "chopps" "localhost" "bitlbee"))))))
-
-      (erc-services-mode 1)
-
-      ;; add a user to the current channel
-      (defun add-nick-insert-pre-hook (line)
-        "Add user to ERC channel list"
-        (when (string= erc-session-server "irc.gitter.im")
-          (save-match-data
-            (when (string-match "^<\\([^>]+\\)> .*" line)
-              (let ((nick (match-string 1 line)))
-                (erc-update-current-channel-member nick nick 'add-if-new))))))
-      (add-hook 'erc-insert-pre-hook 'add-nick-insert-pre-hook)
-      )
-    )
-  (spacemacs|use-package-add-hook erc-hl-nicks
-    :post-init
-    (setq
-     erc-hl-nicks-minimum-contrast-ratio 3.5
-     ;; erc-hl-nicks-color-contrast-strategy 'contrast
-     ;; erc-hl-nicks-color-contrast-strategy 'invert
-     erc-hl-nicks-skip-nicks '("gitter"))
-    )
-  (spacemacs|use-package-add-hook rcirc
-    :post-init
-    (setq-default
-     rcirc-log-directory "~/Dropbox/logs/rcirclogs"
-     )
-    ;;   :post-config
-    ;;   (setq rcirc-server-alist
-    ;;         '(("irc.gitter.im"
-    ;;            :user "choppsv1"
-    ;;            :encryption tls
-    ;;            :port "6697"
-    ;;            :channels ("#syl20bnr/spacemacs")))))
-    )
   (spacemacs|use-package-add-hook mu4e
     :post-init
     (progn
@@ -788,7 +678,7 @@ user code here.  The exception is org related code, which should be placed in `d
             ;; [b]ookmarks
             mu4e-not-junk-folder-filter " AND NOT ( maildir:/gmail.com/[Gmail].Spam OR maildir:/chopps.org/spam* ) "
             mu4e-inbox-filter-base " ( maildir:/gmail.com/INBOX OR maildir:/chopps.org/INBOX OR maildir:/terastrm.net/INBOX OR maildir:/chopps.org/a-terastream ) "
-            mu4e-imp-filter-base " ( maildir:/chopps.org/ietf-rtg-yang-dt OR maildir:/chopps.org/ietf-wg-isis OR maildir:/chopps.org/ietf-wg-netmod OR maildir:/chopps.org/ietf-wg-homenet ) "
+            mu4e-imp-filter-base " ( maildir:/chopps.org/sw-common OR maildir:/chopps.org/ietf-rtg-yang-dt OR maildir:/chopps.org/ietf-wg-isis OR maildir:/chopps.org/ietf-wg-netmod OR maildir:/chopps.org/ietf-wg-homenet ) "
             mu4e-unread-filter " ( flag:unread AND NOT flag:flagged AND NOT flag:trashed ) "
             mu4e-unread-flagged-filter " ( flag:unread AND flag:flagged AND NOT flag:trashed ) "
             mu4e-bookmarks (append
@@ -1191,32 +1081,34 @@ user code here.  The exception is org related code, which should be placed in `d
       )
     :post-config
     (progn
-      ;; (require 'ob-latex)
-      (require 'org-crypt)
-      (add-to-list 'org-babel-load-languages '(python . t))
-      (add-to-list 'org-babel-load-languages '(dot . t))
-      (add-to-list 'org-babel-load-languages '(ditaa . t))
-      (add-to-list 'org-babel-load-languages '(dot2tex . t))
 
-      (require 'ox-latex)
-      (add-to-list 'org-latex-classes
-                   '("beamer"
-                     "\\documentclass\[presentation\]\{beamer}\n
-                  \\uepackage{listings}
-                  \\lstset{numbers=none,language=[ISO]C++,tabsize=4,
-    frame=single,
-    basicstyle=\\small,
-    showspaces=false,showstringspaces=false,
-    showtabs=false,
-    keywordstyle=\\color{blue}\\bfseries,
-    commentstyle=\\color{red},
-    }\n"
-                     ("\\section\{%s\}" . "\\section*\{%s\}")
-                     ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
-                     ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
+    ;;   ;; XXX latex
+    ;;   ;; (require 'ob-latex)
+    ;;   (require 'org-crypt)
+    ;;   (add-to-list 'org-babel-load-languages '(python . t))
+    ;;   (add-to-list 'org-babel-load-languages '(dot . t))
+    ;;   (add-to-list 'org-babel-load-languages '(ditaa . t))
+    ;;   (add-to-list 'org-babel-load-languages '(dot2tex . t))
+
+    ;;   (require 'ox-latex)
+    ;;   (add-to-list 'org-latex-classes
+    ;;                '("beamer"
+    ;;                  "\\documentclass\[presentation\]\{beamer}\n
+    ;;               \\uepackage{listings}
+    ;;               \\lstset{numbers=none,language=[ISO]C++,tabsize=4,
+    ;; frame=single,
+    ;; basicstyle=\\small,
+    ;; showspaces=false,showstringspaces=false,
+    ;; showtabs=false,
+    ;; keywordstyle=\\color{blue}\\bfseries,
+    ;; commentstyle=\\color{red},
+    ;; }\n"
+    ;;                  ("\\section\{%s\}" . "\\section*\{%s\}")
+    ;;                  ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
+    ;;                  ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
 
       ;; (require 'calfw-org)
-      (org-crypt-use-before-save-magic)
+      ;; (org-crypt-use-before-save-magic)
 
       ;; Languages to interpret in begin_src blocks
       (org-babel-do-load-languages
@@ -1255,26 +1147,33 @@ user code here.  The exception is org related code, which should be placed in `d
 
       ;; This is for using xelatex
       (require 'ox-latex)
-      (setq org-latex-listings t)
+      ;; (setq org-latex-listings t)
 
-      ;; Originally taken from Bruno Tavernier: http://thread.gmane.org/gmane.emacs.orgmode/31150/focus=31432
-      ;; but adapted to use latexmk 4.20 or higher.
-      (defun my-auto-tex-cmd ()
-        "When exporting from .org with latex, automatically run latex,
-       pdflatex, or xelatex as appropriate, using latexmk."
-        (let ((texcmd)))
-        ;; default command: oldstyle latex via dvi
-        (setq texcmd "latexmk -dvi -pdfps -quiet %f")
-        ;; pdflatex -> .pdf
-        (if (string-match "LATEX_CMD: pdflatex" (buffer-string))
-            (setq texcmd "latexmk -pdf -quiet %f"))
-        ;; xelatex -> .pdf
-        (if (string-match "LATEX_CMD: xelatex" (buffer-string))
-            (setq texcmd "latexmk -pdflatex=xelatex -pdf -quiet %f"))
-        ;; LaTeX compilation command
-        (setq org-latex-to-pdf-process (list texcmd)))
+      (setq org-latex-listings 'minted)
 
-      (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-cmd)
+      (setq org-latex-pdf-process '("pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"
+                                    "pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"
+                                    "pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"))
+
+      ;; XXX latex
+      ;; ;; Originally taken from Bruno Tavernier: http://thread.gmane.org/gmane.emacs.orgmode/31150/focus=31432
+      ;; ;; but adapted to use latexmk 4.20 or higher.
+      ;; (defun my-auto-tex-cmd ()
+      ;;   "When exporting from .org with latex, automatically run latex,
+      ;;  pdflatex, or xelatex as appropriate, using latexmk."
+      ;;   (let ((texcmd)))
+      ;;   ;; default command: oldstyle latex via dvi
+      ;;   (setq texcmd "latexmk -dvi -pdfps -quiet %f")
+      ;;   ;; pdflatex -> .pdf
+      ;;   (if (string-match "LATEX_CMD: pdflatex" (buffer-string))
+      ;;       (setq texcmd "latexmk -pdf -quiet %f"))
+      ;;   ;; xelatex -> .pdf
+      ;;   (if (string-match "LATEX_CMD: xelatex" (buffer-string))
+      ;;       (setq texcmd "latexmk -pdflatex=xelatex -pdf -quiet %f"))
+      ;;   ;; LaTeX compilation command
+      ;;   (setq org-latex-to-pdf-process (list texcmd)))
+
+      ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-cmd)
 
       (defun org-refile-to-datetree ()
         "Refile a subtree to a datetree corresponding to it's timestamp."
@@ -1300,49 +1199,51 @@ user code here.  The exception is org related code, which should be placed in `d
       (setq org-latex-packages-alist
             '(("" "graphicx" t)
               ("" "longtable" nil)
+              ("" "minted" nil)
               ("" "float" nil)))
 
-      (defun my-auto-tex-parameters ()
-        "Automatically select the tex packages to include."
-        ;; default packages for ordinary latex or pdflatex export
-        (setq org-latex-default-packages-alist
-              '(("AUTO" "inputenc" t)
-                ("T1"   "fontenc"   t)
-                (""     "fixltx2e"  nil)
-                (""     "wrapfig"   nil)
-                (""     "soul"      t)
-                (""     "textcomp"  t)
-                (""     "marvosym"  t)
-                (""     "wasysym"   t)
-                (""     "latexsym"  t)
-                (""     "amssymb"   t)
-                (""     "hyperref"  nil)))
+      ;; XXX latex
+      ;; (defun my-auto-tex-parameters ()
+      ;;   "Automatically select the tex packages to include."
+      ;;   ;; default packages for ordinary latex or pdflatex export
+      ;;   (setq org-latex-default-packages-alist
+      ;;         '(("AUTO" "inputenc" t)
+      ;;           ("T1"   "fontenc"   t)
+      ;;           (""     "fixltx2e"  nil)
+      ;;           (""     "wrapfig"   nil)
+      ;;           (""     "soul"      t)
+      ;;           (""     "textcomp"  t)
+      ;;           (""     "marvosym"  t)
+      ;;           (""     "wasysym"   t)
+      ;;           (""     "latexsym"  t)
+      ;;           (""     "amssymb"   t)
+      ;;           (""     "hyperref"  nil)))
 
-        ;; Packages to include when xelatex is used
-        (if (string-match "LATEX_CMD: xelatex" (buffer-string))
-            (setq org-latex-default-packages-alist
-                  '(("" "fontspec" t)
-                    ("" "xunicode" t)
-                    ("" "url" t)
-                    ("" "rotating" t)
-                    ("american" "babel" t)
-                    ("babel" "csquotes" t)
-                    ("" "soul" t)
-                    ("xetex" "hyperref" nil)
-                    )))
+      ;;   ;; Packages to include when xelatex is used
+      ;;   (if (string-match "LATEX_CMD: xelatex" (buffer-string))
+      ;;       (setq org-latex-default-packages-alist
+      ;;             '(("" "fontspec" t)
+      ;;               ("" "xunicode" t)
+      ;;               ("" "url" t)
+      ;;               ("" "rotating" t)
+      ;;               ("american" "babel" t)
+      ;;               ("babel" "csquotes" t)
+      ;;               ("" "soul" t)
+      ;;               ("xetex" "hyperref" nil)
+      ;;               )))
 
-        (if (string-match "LATEX_CMD: xelatex" (buffer-string))
-            (setq org-latex-classes
-                  (cons '("article"
-                          "\\documentclass[11pt,article,oneside]{memoir}"
-                          ("\\section{%s}" . "\\section*{%s}")
-                          ("\\subsection{%s}" . "\\subsection*{%s}")
-                          ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                          ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                          ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
-                        org-latex-classes))))
+      ;;   (if (string-match "LATEX_CMD: xelatex" (buffer-string))
+      ;;       (setq org-latex-classes
+      ;;             (cons '("article"
+      ;;                     "\\documentclass[11pt,article,oneside]{memoir}"
+      ;;                     ("\\section{%s}" . "\\section*{%s}")
+      ;;                     ("\\subsection{%s}" . "\\subsection*{%s}")
+      ;;                     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+      ;;                     ("\\paragraph{%s}" . "\\paragraph*{%s}")
+      ;;                     ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+      ;;                   org-latex-classes))))
 
-      (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
+      ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
       )
     )
 
@@ -1543,6 +1444,8 @@ layers configuration. You are free to put any user code."
     ;; Display
     ;; =======
 
+    (message "XXX %s" (getenv "PATH"))
+
     (fold-section "display"
                   (global-hl-line-mode -1)            ; Disable hihglighting of current line.
 
@@ -1617,6 +1520,70 @@ layers configuration. You are free to put any user code."
     ;; ==========
 
     (when (configuration-layer/layer-usedp 'erc)
+      (setq erc-prompt-for-nickserv-password nil
+            erc-autojoin-channels-alist '(("irc.gitter.im" "#syl20bnr/spacemacs")
+                                          ("mollari.netbsd.org" "#NetBSD")
+                                          ("freenode.net" "#org-mode"))
+            erc-auto-query 'window
+            erc-track-switch-direction 'importance
+            erc-hl-nicks-minimum-contrast-ratio 3.5
+            ;; erc-hl-nicks-color-contrast-strategy 'contrast
+            ;; erc-hl-nicks-color-contrast-strategy 'invert
+            erc-hl-nicks-skip-nicks '("gitter")
+
+            )
+        ;; '(erc-autoaway-idle-seconds 600)
+        ;; '(erc-autojoin-mode t)
+        ;; '(erc-button-mode t)
+        ;; '(erc-current-nick-highlight-type (quote all))
+        ;; '(erc-fill-mode t)
+        ;; '(erc-hl-nicks-mode t)
+        ;; '(erc-hl-nicks-trim-nick-for-face nil)
+        ;; '(erc-irccontrols-mode t)
+        ;; '(erc-kill-buffer-on-part t)
+        ;; '(erc-kill-queries-on-quit t)
+        ;; '(erc-kill-server-buffer-on-quit t)
+        ;; '(erc-list-mode t)
+        ;; '(erc-log-channels-directory "/Users/chopps/Dropbox/erclogs" t)
+        ;; '(erc-log-mode t)
+        ;; '(erc-match-mode t)
+        ;; '(erc-menu-mode t)
+        ;; '(erc-move-to-prompt-mode t)
+        ;; '(erc-netsplit-mode t)
+        ;; '(erc-networks-mode t)
+        ;; '(erc-noncommands-mode t)
+        ;; '(erc-pcomplete-mode t)
+        ;; '(erc-prompt (lambda nil (concat "[" (buffer-name) "]")))
+        ;; '(erc-readonly-mode t)
+        ;; '(erc-ring-mode t)
+        ;; '(erc-server-coding-system (quote (utf-8 . utf-8)))
+        ;; '(erc-services-mode t)
+        ;; '(erc-social-graph-dynamic-graph t)
+        ;; '(erc-stamp-mode t)
+        ;; '(erc-track-minor-mode t)
+        ;; '(erc-track-mode t)
+        ;; '(erc-youtube-mode t)
+
+      (defun erc-acct-get-password (user host port)
+        (let* ((auth-source-creation-defaults nil)
+               (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
+               (secret (plist-get (nth 0 (auth-source-search
+                                          :type 'netrc
+                                          :max 1
+                                          :host host
+                                          :user user
+                                          :port port
+                                          :create t))
+                                  :secret))
+               (password (if (functionp secret)
+                             (funcall secret)
+                           secret)))))
+
+      (setq erc-nickserv-passwords
+            `((freenode (("chopps" . ,(erc-acct-get-password "chopps" "freenode.net" "nickserv"))))
+              (localhost (("chopps" . ,(erc-acct-get-password "chopps" "localhost" "bitlbee")))))
+            )
+
       (defun launch-irc-gitter ()
         "Launch irc connection to giter.im"
         (interactive)
@@ -1653,7 +1620,43 @@ layers configuration. You are free to put any user code."
         "ain" 'launch-irc-netbsd
         "aig" 'launch-irc-gitter
         "aiL" 'launch-erc)
+
+      (defun bitlbee-netrc-identify ()
+        "Auto-identify for Bitlbee channels using authinfo or netrc.
+
+        The entries that we look for in netrc or authinfo files
+        have their 'port' set to 'bitlbee', their 'login' or
+        'user' set to the current nickname and 'server' set to
+        the current IRC server's name. A sample value that works
+        for authenticating as user 'keramida' on server
+        'localhost' is:
+
+            machine localhost port bitlbee login keramida password supersecret"
+
+        (interactive)
+        (when (string= (buffer-name) "&bitlbee")
+          (let ((pass (erc-acct-get-password (erc-current-nick) erc-session-server "bitlbee")))
+            (message "Sending privmsg to &bitlbee server %s" erc-session-server)
+            (erc-message "PRIVMSG"
+                         (format "%s identify %s"
+                                 (erc-default-target)
+                                 pass)))))
+      (add-hook 'erc-join-hook 'bitlbee-netrc-identify)
+
+
+      ;; add a user to the current channel
+      (defun add-nick-insert-pre-hook (line)
+        "Add user to ERC channel list"
+        (when (string= erc-session-server "irc.gitter.im")
+          (save-match-data
+            (when (string-match "^<\\([^>]+\\)> .*" line)
+              (let ((nick (match-string 1 line)))
+                (erc-update-current-channel-member nick nick 'add-if-new))))))
+      (add-hook 'erc-insert-pre-hook 'add-nick-insert-pre-hook)
+
+      (erc-services-mode 1)
       )
+
     (when (configuration-layer/layer-usedp 'rcirc)
       (defun get-gitter-password ()
         (let* ((auth-source-creation-defaults nil)
@@ -1668,9 +1671,8 @@ layers configuration. You are free to put any user code."
           (if (functionp sec)
               (funcall sec)
             sec)))
-
-
       (setq
+       rcirc-log-directory "~/Dropbox/logs/rcirclogs"
        rcirc-time-format "%H:%M "
        rcirc-server-alist
        `(("irc.gitter.im"
@@ -1769,6 +1771,11 @@ layers configuration. You are free to put any user code."
                                 )
                   )
 
+    (global-set-key (kbd "C-c i o") 'ietf-docs-open-at-point)
+
+    (autoload 'yang-mode "yang-mode")
+    (add-to-list 'auto-mode-alist '("\\.yang\\'" . yang-mode))
+
     (add-hook 'org-mode-hook 'evil-normalize-keymaps)
 
     ;; (message "End: %s" inhibit-startup-screen)
@@ -1793,7 +1800,8 @@ layers configuration. You are free to put any user code."
  '(evil-shift-width 4)
  '(safe-local-variable-values
    (quote
-    ((eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
+    ((evil-shift-width . 2)
+     (eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
      (eval progn
            (require
             (quote projectile))
