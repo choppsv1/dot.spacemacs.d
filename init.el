@@ -31,7 +31,8 @@ values."
      eyebrowse
      gtags
      mu4e
-     osx
+     (osx :variables
+           osx-use-option-as-meta t)
      org
      ranger
      rebox
@@ -52,7 +53,8 @@ values."
      html
      ;; java
      javascript
-     latex
+     (latex :variables
+            latex-build-command "latexmk")
      lua
      ;; markdown
      ;; php
@@ -67,7 +69,7 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '()
+   dotspacemacs-additional-packages '(ietf-docs)
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages '(smartparens) ; evil-org
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
@@ -395,7 +397,8 @@ user code here.  The exception is org related code, which should be placed in `d
                                 )
                                :modes python-mode)
       ;; (add-hook 'after-init-hook 'global-flycheck-mode)
-      ))
+      )
+    )
 
   (spacemacs|use-package-add-hook cc-mode
     :post-init
@@ -542,6 +545,7 @@ user code here.  The exception is org related code, which should be placed in `d
                              (cpp-macro             . -1000)
                              ))))
       ))
+
   (spacemacs|use-package-add-hook python
     :post-init
     (progn
@@ -553,25 +557,6 @@ user code here.  The exception is org related code, which should be placed in `d
         (let ((fill-column 80))
           (python-fill-comment justify)))
 
-      (defun my-python-mode-hook ()
-        (require 'pyfixers)
-        (setq comment-column 60)
-
-        ;; spacemacs does?
-        ;; (highlight-indentation-mode -1)
-        ;; (flyspell-prog-mode)
-        ;; (flycheck-mode t)
-
-        ;; This gives and error
-        ;; (flycheck-select-checker 'python-pycheckers)
-        ;; (message "select checker")
-        ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
-        ;; (message "select set exec")
-
-        (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
-        (message "Python mode hook done"))
-
-      (add-hook 'python-mode-hook 'my-python-mode-hook)
       )
     :post-config
     (progn
@@ -643,707 +628,31 @@ user code here.  The exception is org related code, which should be placed in `d
                   (delete-region impstart impend)
                   (goto-char impstart)
                   (insert bigstr)))))))
+
+      (defun my-python-mode-hook ()
+        (require 'pyfixers)
+        (setq comment-column 60)
+
+        ;; spacemacs does?
+        ;; (highlight-indentation-mode -1)
+        ;; (flyspell-prog-mode)
+        ;; (flycheck-mode t)
+
+        ;; This gives and error
+        (message "select checker")
+        ;; This is required b/c for some reason it's still not loaded at this point.
+        ;; (require 'flycheck)
+        (flycheck-select-checker 'python-pycheckers)
+        (message "post select checker")
+        ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
+        ;; (message "select set exec")
+
+        (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
+        (message "Python mode hook done"))
+
+      (add-hook 'python-mode-hook 'my-python-mode-hook 'append)
       )
     )
-
-  (spacemacs|use-package-add-hook erc
-    :post-init
-    (progn
-      (setq erc-prompt-for-nickserv-password nil)
-      (setq erc-autojoin-channels-alist
-            '(("irc.gitter.im" "#syl20bnr/spacemacs")
-              ("mollari.netbsd.org" "#NetBSD")
-              ("freenode.net" "#org-mode")))
-
-            ;; '(erc-autoaway-idle-seconds 600)
-            ;; '(erc-autojoin-mode t)
-            ;; '(erc-button-mode t)
-            ;; '(erc-current-nick-highlight-type (quote all))
-            ;; '(erc-fill-mode t)
-            ;; '(erc-hl-nicks-mode t)
-            ;; '(erc-hl-nicks-trim-nick-for-face nil)
-            ;; '(erc-irccontrols-mode t)
-            ;; '(erc-kill-buffer-on-part t)
-            ;; '(erc-kill-queries-on-quit t)
-            ;; '(erc-kill-server-buffer-on-quit t)
-            ;; '(erc-list-mode t)
-            ;; '(erc-log-channels-directory "/Users/chopps/Dropbox/erclogs" t)
-            ;; '(erc-log-mode t)
-            ;; '(erc-match-mode t)
-            ;; '(erc-menu-mode t)
-            ;; '(erc-move-to-prompt-mode t)
-            ;; '(erc-netsplit-mode t)
-            ;; '(erc-networks-mode t)
-            ;; '(erc-noncommands-mode t)
-            ;; '(erc-pcomplete-mode t)
-            ;; '(erc-prompt (lambda nil (concat "[" (buffer-name) "]")))
-            ;; '(erc-readonly-mode t)
-            ;; '(erc-ring-mode t)
-            ;; '(erc-server-coding-system (quote (utf-8 . utf-8)))
-            ;; '(erc-services-mode t)
-            ;; '(erc-social-graph-dynamic-graph t)
-            ;; '(erc-stamp-mode t)
-            ;; '(erc-track-minor-mode t)
-            ;; '(erc-track-mode t)
-            ;; '(erc-youtube-mode t)
-
-      (defun erc-acct-get-password (user host port)
-        (let* ((auth-source-creation-defaults nil)
-               (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
-               (secret (plist-get (nth 0 (auth-source-search
-                                          :type 'netrc
-                                          :max 1
-                                          :host host
-                                          :user user
-                                          :port port
-                                          :create t))
-                                  :secret))
-               (password (if (functionp secret)
-                             (funcall secret)
-                           secret)))))
-
-      (defun bitlbee-netrc-identify ()
-        "Auto-identify for Bitlbee channels using authinfo or netrc.
-
-    The entries that we look for in netrc or authinfo files have
-    their 'port' set to 'bitlbee', their 'login' or 'user' set to
-    the current nickname and 'server' set to the current IRC
-    server's name. A sample value that works for authenticating
-    as user 'keramida' on server 'localhost' is:
-
-    machine localhost port bitlbee login keramida password supersecret"
-
-        (interactive)
-        (when (string= (buffer-name) "&bitlbee")
-          (let ((pass (erc-acct-get-password (erc-current-nick) erc-session-server "bitlbee")))
-            (message "Sending privmsg to &bitlbee server %s" erc-session-server)
-            (erc-message "PRIVMSG"
-                         (format "%s identify %s"
-                                 (erc-default-target)
-                                 pass)))))
-      (add-hook 'erc-join-hook 'bitlbee-netrc-identify)
-      )
-    :post-config
-    (progn
-      (setq erc-auto-query 'window
-            erc-track-switch-direction 'importance)
-      (setq erc-nickserv-passwords
-            `((freenode (("chopps" . ,(erc-acct-get-password "chopps" "freenode.net" "nickserv"))))
-              (localhost (("chopps" . ,(erc-acct-get-password "chopps" "localhost" "bitlbee"))))))
-
-      (erc-services-mode 1)
-
-      ;; add a user to the current channel
-      (defun add-nick-insert-pre-hook (line)
-        "Add user to ERC channel list"
-        (when (string= erc-session-server "irc.gitter.im")
-          (save-match-data
-            (when (string-match "^<\\([^>]+\\)> .*" line)
-              (let ((nick (match-string 1 line)))
-                (erc-update-current-channel-member nick nick 'add-if-new))))))
-      (add-hook 'erc-insert-pre-hook 'add-nick-insert-pre-hook)
-      )
-    )
-  (spacemacs|use-package-add-hook erc-hl-nicks
-    :post-init
-    (setq
-     erc-hl-nicks-minimum-contrast-ratio 3.5
-     ;; erc-hl-nicks-color-contrast-strategy 'contrast
-     ;; erc-hl-nicks-color-contrast-strategy 'invert
-     erc-hl-nicks-skip-nicks '("gitter"))
-    )
-  (spacemacs|use-package-add-hook rcirc
-    :post-init
-    (setq-default
-     rcirc-log-directory "~/Dropbox/logs/rcirclogs"
-     )
-    ;;   :post-config
-    ;;   (setq rcirc-server-alist
-    ;;         '(("irc.gitter.im"
-    ;;            :user "choppsv1"
-    ;;            :encryption tls
-    ;;            :port "6697"
-    ;;            :channels ("#syl20bnr/spacemacs")))))
-    )
-  (spacemacs|use-package-add-hook mu4e
-    :post-init
-    (progn
-      (defcustom mu4e-spam-folder "/chopps.org/spam-train"
-        "Folder for spam email"
-        :type '(string :tag "Folder name")
-        :group 'mu4e-folders)
-
-      (setq mu4e-maildir "~/Maildir"
-            ;; Updating
-            ;; mu4e-pre-hook-count 0
-            ;; mu4e-full-update-mail-command "bash -c '(cd && offlineimap -l /Users/chopps/.offlineimap/logfile)'"
-            ;; mu4e-quick-update-mail-command "bash -c '(cd && offlineimap -q -l /Users/chopps/.offlineimap/logfile)'"
-            ;; mu4e-update-pre-hook 'mu4e-pre-hook-udpate-command
-            mu4e-mu-binary (executable-find "mu")
-            mu4e-update-interval nil
-            mu4e-headers-include-related nil
-
-            ;; [b]ookmarks
-            mu4e-not-junk-folder-filter " AND NOT ( maildir:/gmail.com/[Gmail].Spam OR maildir:/chopps.org/spam* ) "
-            mu4e-inbox-filter-base " ( maildir:/gmail.com/INBOX OR maildir:/chopps.org/INBOX OR maildir:/terastrm.net/INBOX OR maildir:/chopps.org/a-terastream ) "
-            mu4e-imp-filter-base " ( maildir:/chopps.org/ietf-rtg-yang-dt OR maildir:/chopps.org/ietf-wg-isis OR maildir:/chopps.org/ietf-wg-netmod OR maildir:/chopps.org/ietf-wg-homenet ) "
-            mu4e-unread-filter " ( flag:unread AND NOT flag:flagged AND NOT flag:trashed ) "
-            mu4e-unread-flagged-filter " ( flag:unread AND flag:flagged AND NOT flag:trashed ) "
-            mu4e-bookmarks (append
-                            (list (list (concat "flag:unread AND NOT flag:trashed AND " mu4e-inbox-filter-base) "Unread [i]NBOX messages" ?i)
-
-                                  (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
-                                  (list (concat "flag:flagged AND NOT flag:trashed AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "[F]lagged Non-INBOX messages" ?F)
-
-                                  (list (concat mu4e-unread-filter         mu4e-imp-filter-base) "Unread Important messages" ?n)
-                                  (list (concat mu4e-unread-flagged-filter mu4e-imp-filter-base) "Unread-Flagged Important messages" ?N)
-
-                                  (list (concat mu4e-unread-filter         "AND NOT" mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread [u]nimportant messages" ?u)
-                                  (list (concat mu4e-unread-flagged-filter "AND NOT" mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged [U]nimportant messages" ?U)
-
-                                  (list (concat mu4e-unread-filter         " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread Non-INBOX messages" ?o)
-                                  (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged Non-INBOX messages" ?O)
-
-                                  (list (concat mu4e-unread-filter         mu4e-not-junk-folder-filter) "Unread messages" ?a)
-                                  (list (concat mu4e-unread-flagged-filter mu4e-not-junk-folder-filter) "Unread-flagged messages" ?A)
-
-                                  (list "maildir:/chopps.org/spam-probable" "Probable spam messages" ?s)
-                                  )
-                            (mapcar (lambda (x) (cons (concat (car x) mu4e-not-junk-folder-filter) (cdr x)))
-                                    '(("flag:unread AND NOT flag:trashed" "Unread messages" ?u)
-                                      ("date:1h..now" "Last hours messages" ?h)
-                                      ("date:24h..now" "Today's messages" ?d)
-                                      ("date:today..now" "Today's messages" ?t)
-                                      ("date:7d..now" "Last 7 days" ?w)
-                                      ("mime:7d..now" "Last 7 days" ?w)
-                                      ("mime:*pdf" "Messages with PDF" 112)
-                                      ("mime:*vcs" "Messages with VCS" 113)
-                                      )))
-
-
-            ;; [j]ump shortcuts
-            mu4e-maildir-shortcuts '(("/chopps.org/INBOX" . ?i)
-                                     ("/gmail.com/INBOX" . ?g)
-                                     ("/terastrm.net/INBOX" . ?w)
-                                     ("/chopps.org/receipts" . ?r)
-                                     ("/chopps.org/a-terastream" . ?t)
-                                     ("/chopps.org/aa-netbsd" . ?n)
-                                     ("/chopps.org/ietf-wg-isis" . ?I)
-                                     ("/chopps.org/ietf-wg-homenet" . ?H)
-                                     ("/chopps.org/ietf-wg-netmod" . ?N)
-                                     ("/chopps.org/spam-train" . ?S)
-                                     ("/chopps.org/spam-probable" . ?s))
-
-            ;; Visuals
-            mu4e-use-fancy-chars nil
-            mu4e-view-show-addresses t
-            mu4e-headers-visible-lines 15
-            mu4e-headers-visible-columns 80
-            mu4e-html2text-command 'mu4e-shr2text
-            ;; make work better in dark themes
-            ;; [[mu4e:msgid:87vb7ng3tn.fsf@djcbsoftware.nl][Re: I find html2markdown the best value for mu4e-html2text-command]]
-            shr-color-visible-luminance-min 80
-            mu4e-view-html-plaintext-ratio-heuristic 15
-            ;; mu4e-html2text-command "html2text -nobs -utf8 -width 120"
-
-            ;; Folders -- most setup per account
-            ;; see context below
-
-            ;; mu4e-sent-folder   "/chopps.org/Sent Messages"
-            ;; mu4e-drafts-folder "/chopps.org/Drafts"
-            ;; mu4e-trash-folder  "/chopps.org/Deleted Messages"
-
-            mu4e-attachment-dir "~/Downloads"
-
-            ;; only complete addresses found in email to one of the below addresses
-            mu4e-compose-complete-only-personal t
-            mu4e-user-mail-address-list (list "chopps@chopps.org"
-                                              "chopps@dev.terastrm.net"
-                                              "chopps@gmail.com"
-                                              "chopps@netbsd.org"
-                                              "chopps@rawdofmt.org")
-            ;; This isn't used yet but we'd like it to be for getting
-            ;; contact completions from any mail with these addresses in them.
-            mu4e-contacts-user-mail-address-list (list
-                                                  "chopps@chopps.org"
-                                                  "chopps@dev.terastrm.net"
-                                                  "chopps@gmail.com"
-                                                  "chopps@netbsd.org"
-                                                  "chopps@rawdofmt.org"
-                                                  ;; we want contacts added from these mailing lists
-                                                  "isis-wg@ietf.org"
-                                                  "developers@netbsd.org"
-                                                  "netbsd-developers@netbsd.org"
-                                                  )
-
-            mu4e-compose-signature-auto-include nil
-            mu4e-compose-complete-addresses t
-            message-completion-alistp '(("^\\(Newsgroups\\|Followup-To\\|Posted-To\\|Gcc\\):" . message-expand-group)
-                                        ("^\\(Resent-\\)?\\(To\\|B?Cc\\):" . my-message-expand-name)
-                                        ("^\\(Reply-To\\|From\\|Mail-Followup-To\\|Mail-Copies-To\\):" . message-expand-name)
-                                        ("^\\(Disposition-Notification-To\\|Return-Receipt-To\\):" . message-expand-name))
-
-
-
-            ;; don't keep message buffers around
-            message-kill-buffer-on-exit t
-            )
-
-      (defun ch:ct (clist)
-        "Transform candidate into (display . real)"
-        (mapcar (lambda (candidate)
-                  (let* ((name (plist-get candidate :name))
-                         email (plist-get candidate :mail))
-                    (or (and name (format "%s <%s>" name email))
-                        email))) clist))
-      (defun my-message-expand-name (&optional start)
-        (interactive)
-        (message "my-message-expand-name called")
-        (helm :prompt "contact:" :sources
-              (helm-build-sync-source "mu4e contacts"
-                                      :candidates mu4e~contact-list :candidate-transformer 'ch:ct)))
-
-      (defun my-mu4e-compose-hook ()
-        "Setup outgoing messages"
-        ;; Add chopps@<account-sending-from> to CC
-        ;; Add chopps@chopps.org to Bcc if not sending from @chopps.org
-        (let ((buffer-modified (buffer-modified-p)))
-          (save-excursion
-            (message-add-header (concat "Cc: " user-mail-address))
-            (if (not (string= user-mail-address "chopps@chopps.org"))
-                (message-add-header "Bcc: chopps@chopps.org")))
-          (set-buffer-modified-p buffer-modified))
-        ;; Outgoing mails get format=flowed.
-        ;; (use-hard-newlines t 'guess)
-        ;; Sign messages by default
-        (mml-secure-message-sign-pgpmime))
-
-      (defun mu4e-pre-hook-udpate-command ()
-        (let ((check (% mu4e-pre-hook-count 4)))
-          (setq mu4e-get-mail-command (if (= check 0)
-                                          mu4e-full-update-mail-command
-                                        mu4e-full-update-mail-command))
-          (setq mu4e-pre-hook-count (1+ mu4e-pre-hook-count))))
-
-      ;; Mark to move to spam folder from headers view.
-      (defun mu4e-headers-mark-move-to-spam ()
-        (interactive)
-        (mu4e-mark-set 'move mu4e-spam-folder)
-        (mu4e-headers-next))
-
-      ;; Mark to move to spam folder from message view.
-      (defun mu4e-view-mark-move-to-spam ()
-        (interactive)
-        (mu4e~view-in-headers-context
-         (mu4e-headers-mark-move-to-spam)))
-      )
-    :post-config
-    (progn
-      (message "mu4e eval after load")
-      ;; XXX these aren't defined
-      ;; (define-key mu4e-headers-mode-map (kbd "C-c c") 'org-mu4e-store-and-capture)
-      ;; (define-key mu4e-view-mode-map    (kbd "C-c c") 'org-mu4e-store-and-capture)
-
-      (bind-key (kbd "'") 'mu4e-headers-next 'mu4e-headers-mode-map)
-      (bind-key (kbd "\"") 'mu4e-headers-prev 'mu4e-headers-mode-map)
-      (bind-key (kbd "\"") 'mu4e-view-headers-prev 'mu4e-view-mode-map)
-
-      (when (require 'mu4e-context nil t)
-        (setq mu4e-contexts `( ,(make-mu4e-context
-                                 :name "chopps.org"
-                                 :enter-func (lambda () (mu4e-message "Home"))
-                                 ;; no leave-func
-                                 :match-func (lambda (msg)
-                                               (and msg (string-match "/chopps.org/.*" (mu4e-message-field msg :maildir))))
-                                 :vars '((user-mail-address  . "chopps@chopps.org")
-                                         ;; mu4e
-                                         (mu4e-sent-folder   . "/chopps.org/Sent Messages")
-                                         (mu4e-trash-folder  . "/chopps.org/Deleted Messages")
-                                         (mu4e-drafts-folder . "/chopps.org/Drafts")
-                                         (mu4e-sent-messages-behavior   . sent)
-                                         ;; smtp
-                                         (smtpmail-starttls-credentials . '(("smtp.chopps.org" 9005 nil nil)))
-                                         (smtpmail-default-smtp-server  . "smtp.chopps.org")
-                                         (smtpmail-smtp-server          . "smtp.chopps.org")
-                                         ;; smtpmail-local-domain?
-                                         ;; smtpmail-sendto-domain?
-                                         (smtpmail-smtp-service         . 9005)))
-                               ,(make-mu4e-context
-                                 :name "dev.terastrm.net"
-                                 :enter-func (lambda () (mu4e-message "Work"))
-                                 ;; no leave-func
-                                 :match-func (lambda (msg)
-                                               (and msg (string-match "/terastrm.net/.*" (mu4e-message-field msg :maildir))))
-                                 :vars '(
-                                         ;; about me
-                                         (user-mail-address  . "chopps@dev.terastrm.net")
-                                         ;; mu4e
-                                         (mu4e-sent-folder   . "/terastrm.net/Sent Messages")
-                                         (mu4e-trash-folder  . "/terastrm.net/Deleted Messages")
-                                         (mu4e-drafts-folder . "/terastrm.net/Drafts")
-                                         (mu4e-sent-messages-behavior   . sent)
-                                         ;; smtp
-                                         (smtpmail-starttls-credentials . '(("smtp.dev.terastrm.net" 587 nil nil)))
-                                         (smtpmail-default-smtp-server  . "smtp.dev.terastrm.net")
-                                         (smtpmail-smtp-server          . "smtp.dev.terastrm.net")
-                                         ;; smtpmail-local-domain?
-                                         ;; smtpmail-sendto-domain?
-                                         (smtpmail-smtp-service         . 587)))
-
-                               ,(make-mu4e-context
-                                 :name "gmail.com"
-                                 :enter-func (lambda () (mu4e-message "Gmail"))
-                                 ;; no leave-func
-                                 :match-func (lambda (msg)
-                                               (and msg (string-match "/gmail.com/.*" (mu4e-message-field msg :maildir))))
-                                 :vars '(
-                                         ;; about me
-                                         (user-mail-address  . "chopps@gmail.com")
-                                         ;; mu4e
-                                         (mu4e-drafts-folder . "/gmail.com/[Gmail].Drafts")
-                                         (mu4e-sent-folder   . "/gmail.com/[Gmail].Sent Mail")
-                                         (mu4e-trash-folder  . "/gmail.com/[Gmail].Trash")
-                                         (mu4e-sent-messages-behavior   . delete)
-                                         ;; smtp
-                                         (smtpmail-starttls-credentials . '(("smtp.gmail.com" 587 nil nil)))
-                                         (smtpmail-default-smtp-server  . "smtp.gmail.com")
-                                         (smtpmail-smtp-server          . "smtp.gmail.com")
-                                         ;; smtpmail-local-domain?
-                                         ;; smtpmail-sendto-domain?
-                                         (smtpmail-smtp-service . 587))))))
-
-      (require 'mu4e-contrib)
-
-      ;; XXX also add this back
-      ;; (mu4e-alert-enable-mode-line-display)
-      ;; (mu4e-alert-enable-notifications)
-
-      (add-hook 'mu4e-headers-mode-hook
-                (lambda () (progn
-                             (make-local-variable 'scroll-conservatively)
-                             (setq
-                              show-trailing-whitespace nil
-                              scroll-conservatively 0
-                              scroll-up-aggressively .8
-                              scroll-down-aggressively .8)
-                             )))
-      (add-hook 'mu4e-view-mode-hook
-                (lambda () (setq show-trailing-whitespace nil)))
-
-      (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
-
-      (add-to-list 'mu4e-view-actions
-                   '("ViewInBrowser" . mu4e-action-view-in-browser))
-
-      (define-key mu4e-headers-mode-map "d" 'mu4e-headers-mark-for-read)
-      (define-key mu4e-view-mode-map "d" 'mu4e-view-mark-for-read)
-      (define-key mu4e-headers-mode-map "@" 'mu4e-headers-mark-move-to-spam)
-      (define-key mu4e-view-mode-map "@" 'mu4e-view-mark-move-to-spam)
-      (define-key mu4e-headers-mode-map "\\" 'mu4e-headers-mark-move-to-spam)
-      (define-key mu4e-view-mode-map "\\" 'mu4e-view-mark-move-to-spam)
-
-      (add-to-list 'mu4e-header-info-custom
-                   '(:list-or-dir .
-                                  (:name "ML or maildir" ;; long name, as seen in message view
-                                         :shortname "ML-D"     ;; short name, as seen in the headers view
-                                         :help "Mailing list or maildir if not set"
-                                         :function
-                                         (lambda (msg)
-                                           (or (mu4e-message-field msg :mailing-list)
-                                               (mu4e-message-field msg :maildir))))))
-
-      (setq
-       ;; "Date         Flgs   List       From                   Subject
-       mu4e-headers-fields (quote (
-                                   (:flags          .  5)
-                                   (:human-date     . 15)
-                                   (:from           . 26)
-                                   (:list-or-dir    . 30)
-                                   (:thread-subject . nil))))
-
-      )
-    )
-
-  ;; ========
-  ;; Org Mode
-  ;; ========
-
-  (spacemacs|use-package-add-hook org
-    :post-init
-    (progn
-      (add-hook 'org-mode-hook #'yas-minor-mode)
-
-      ;; :mode (("\\.org\\'" . org-mode)
-      ;;        ("\\.o2b\\'" . org-mode))
-      ;; :bind (("C-c c" . org-capture)
-      ;;        ("C-c a" . org-agenda)
-      ;;        ("C-c l" . org-store-link))
-
-      (defun my-org-mode-hook ()
-        (if debug-init-msg
-            (message "Org-mode-hook"))
-        ;; (org-set-local 'yas/trigger-key [tab])
-        ;;(yas-minor-mode)
-
-        (turn-on-flyspell)
-
-        ;; (define-key yas/keymap [tab] 'yas/next-field-or-maybe-expand)
-        (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)
-        (define-key org-mode-map (kbd "C-c e e") 'org-encrypt-entries)
-        (define-key org-mode-map (kbd "C-c e E") 'org-encrypt-entry)
-        (define-key org-mode-map (kbd "C-c e d") 'org-decrypt-entries)
-        (define-key org-mode-map (kbd "C-c e D") 'org-decrypt-entry)
-
-        (setq org-tags-exclude-from-inheritance '("crypt"))
-        (setq org-crypt-disable-auto-save t)
-        (and (buffer-file-name)
-             (string-match "\\.o2b$" (buffer-file-name))
-             (org2blog/wp-mode))
-        (setq org-crypt-key "D7B83025"))
-      (add-hook 'org-mode-hook 'my-org-mode-hook)
-
-      (defun my-org-confirm-babel-evaluate (lang body)
-        (not (or (string= lang "ditaa")
-                 (string= lang "dot2tex")
-                 (string= lang "dot"))))
-      ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
-      (setq org-agenda-start-day "-8d")
-      (setq
-       org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
-       org-src-fontify-natively t
-       org-default-notes-file (concat org-directory "/notes.org")
-       org-agenda-start-on-weekday 5
-       org-src-window-setup 'current-window
-       org-log-done 'time
-       org-hide-leading-stars t
-       org-refile-use-outline-path 'file
-       org-outline-path-complete-in-steps t
-       org-export-latex-emphasis-alist (quote (("*" "\\textbf{%s}" nil)
-                                               ("/" "\\emph{%s}" nil)
-                                               ("_" "\\underline{%s}" nil)
-                                               ("+" "\\texttt{%s}" nil)
-                                               ("=" "\\verb=%s=" nil)
-                                               ("~" "\\verb~%s~" t)
-                                               ("@" "\\alert{%s}" nil)))
-
-       ;; capture the search instead of the highlighted message in
-       ;; headers view
-       org-mu4e-link-query-in-headers-mode t
-
-       org-capture-templates
-       '(("d" "Todo" entry (file+headline (concat org-directory "/notes.org") "Tasks")
-          "* TODO %?\nSCHEDULED: %T\nDEADLINE: %T\nCreated: %t\nAnnotation: %a\n")
-
-         ("t" "Todo" entry (file+headline (concat org-directory "/notes.org") "Tasks")
-          "* TODO %?\nCreated: %t\nAnnotation: %a\n")
-
-         ("x" "Tramdose" entry (file+datetree (concat org-directory "/medicine.org") "Tramadol")
-          "* NOTE %?\nCreated: %U")
-
-         ("m" "Mail Todo" entry (file+headline (concat org-directory "/notes.org") "Mail")
-          "* TODO Read Mail%? ([f: %:fromname]: %:subject)\n%U\nMessage: %a\n")
-
-         ("M" "Mail Todo" entry (file+headline (concat org-directory "/notes.org") "Mail")
-          "* TODO Followup Mail [f: %:fromname]: %:subject)\nSCHEDULED: %T\nDEADLINE: %T\nCreated: %t\nMessage: %a\nExtra Notes: %?")
-
-                                        ; ("M" "Mac Mail Todo" entry (file+headline (concat org-directory "/notes.org") "Mail")
-                                        ;  "* TODO %?\n%T\n%(org-mac-message-get-links \"s\")\n")
-
-         ("l" "Link Note" entry (file+headline (concat org-directory "/notes.org") "Notes")
-          "* NOTE %?\n%T\n%(org-mac-safari-get-frontmost-url)\n")
-
-         ("n" "Generic Note" entry (file+headline (concat org-directory "/notes.org") "Notes")
-          "* NOTE %?\n%T\nannotation:%a\nx:%x\n")
-
-         ("s" "Status" entry (file+datetree (concat org-directory "/status.org"))
-          "* NOTE %?\n%T\n")
-
-         ("i" "IETF related")
-         ("im" "IETF Todo w/ Mac Mail" entry (file+headline (concat org-directory "/notes.org") "IETF")
-          "* TODO %?\n%T\n%(org-mac-message-get-links \"s\")\n")
-         ("il" "IETF Note w/ Mac Link " entry (file+headline (concat org-directory "/notes.org") "IETF")
-          "* NOTE %?\n%T\n%(org-mac-safari-get-frontmost-url)\n")
-         ("in" "IETF Note (ann, clip)" entry (file+headline (concat org-directory "/notes.org") "IETF")
-          "* NOTE %?\n%T\nannotation:%a\nx:%x\n")
-         ("it" "IETF Todo (with annotation)" entry (file+headline (concat org-directory "/notes.org") "IETF")
-          "* TODO %?\n%T\nannotation:%a\n")
-
-         ("T" "Terastream related")
-         ("Tm" "Terastram Todo with Mac Mail" entry (file+headline (concat org-directory "/notes.org") "Terastream")
-          "* TODO %?\n%T\n%(org-mac-message-get-links \"s\")\n")
-         ("Tl" "Terastram Safari Note" entry (file+headline (concat org-directory "/notes.org") "Terastream")
-          "* NOTE %?\n%T\n%(org-mac-safari-get-frontmost-url)\n")
-         ("Tl" "Terastram Safari Todo" entry (file+headline (concat org-directory "/notes.org") "Terastream")
-          "* TODO %?\n%T\n%(org-mac-safari-get-frontmost-url)\n")
-         ("Tc" "Terastram Code Todo" entry (file+olp (concat org-directory "/notes.org") "Terastream" "Code Todo")
-          "* TODO %?\n%t\n%f:%a\n")
-         ("Tt" "Terastream Todo" entry (file+headline (concat org-directory "/notes.org") "Terastream")
-          "* TODO %?\n%T\n")
-         )
-       )
-
-      ;; (add-to-list 'org-babel-load-languages '(python . t))
-      ;; (add-to-list 'org-babel-load-languages '(dot . t))
-      ;; (add-to-list 'org-babel-load-languages '(ditaa . t))
-      ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
-      )
-    :post-config
-    (progn
-      ;; (require 'ob-latex)
-      (require 'org-crypt)
-      (add-to-list 'org-babel-load-languages '(python . t))
-      (add-to-list 'org-babel-load-languages '(dot . t))
-      (add-to-list 'org-babel-load-languages '(ditaa . t))
-      (add-to-list 'org-babel-load-languages '(dot2tex . t))
-
-      (require 'ox-latex)
-      (add-to-list 'org-latex-classes
-                   '("beamer"
-                     "\\documentclass\[presentation\]\{beamer}\n
-                  \\uepackage{listings}
-                  \\lstset{numbers=none,language=[ISO]C++,tabsize=4,
-    frame=single,
-    basicstyle=\\small,
-    showspaces=false,showstringspaces=false,
-    showtabs=false,
-    keywordstyle=\\color{blue}\\bfseries,
-    commentstyle=\\color{red},
-    }\n"
-                     ("\\section\{%s\}" . "\\section*\{%s\}")
-                     ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
-                     ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
-
-      ;; (require 'calfw-org)
-      (org-crypt-use-before-save-magic)
-
-      ;; Languages to interpret in begin_src blocks
-      (org-babel-do-load-languages
-       'org-babel-load-languages
-       '((python . t)
-         (ditaa . t)
-         (dot2tex . t)
-         (dot . t))
-       )
-      ;;  (dot2tex . t))
-
-      ;; (eval-after-load "org"
-      ;;   '(mapc
-      ;;     (lambda (face)
-      ;;       (set-face-attribute
-      ;;        face nil
-      ;;        :inherit
-      ;;        (my-adjoin-to-list-or-symbol
-      ;;         'fixed-pitch
-      ;;         (face-attribute face :inherit))))
-      ;;     (list 'org-code 'org-block 'org-table 'org-block-background)))
-
-      ;; (add-to-list 'org-modules 'org-mac-message)
-      ;; (setq org-mac-mail-account "Work")
-
-      ;; - Vi friendly bindings replacing cursor movement with meta-{hjkl}
-      (bind-key "C-c w" 'org-refile-to-datetree)
-      (bind-key "M-h" 'org-metaleft org-mode-map)
-      (bind-key "M-l" 'org-metaright org-mode-map)
-      (bind-key "M-k" 'org-metaup org-mode-map)
-      (bind-key "M-j" 'org-metadown org-mode-map)
-      (bind-key "M-H" 'org-shiftmetaleft org-mode-map)
-      (bind-key "M-L" 'org-shiftmetaright org-mode-map)
-      (bind-key "M-K" 'org-shiftmetaup org-mode-map)
-      (bind-key "M-J" 'org-shiftmetadown org-mode-map)
-
-      ;; This is for using xelatex
-      (require 'ox-latex)
-      (setq org-latex-listings t)
-
-      ;; Originally taken from Bruno Tavernier: http://thread.gmane.org/gmane.emacs.orgmode/31150/focus=31432
-      ;; but adapted to use latexmk 4.20 or higher.
-      (defun my-auto-tex-cmd ()
-        "When exporting from .org with latex, automatically run latex,
-       pdflatex, or xelatex as appropriate, using latexmk."
-        (let ((texcmd)))
-        ;; default command: oldstyle latex via dvi
-        (setq texcmd "latexmk -dvi -pdfps -quiet %f")
-        ;; pdflatex -> .pdf
-        (if (string-match "LATEX_CMD: pdflatex" (buffer-string))
-            (setq texcmd "latexmk -pdf -quiet %f"))
-        ;; xelatex -> .pdf
-        (if (string-match "LATEX_CMD: xelatex" (buffer-string))
-            (setq texcmd "latexmk -pdflatex=xelatex -pdf -quiet %f"))
-        ;; LaTeX compilation command
-        (setq org-latex-to-pdf-process (list texcmd)))
-
-      (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-cmd)
-
-      (defun org-refile-to-datetree ()
-        "Refile a subtree to a datetree corresponding to it's timestamp."
-        (interactive)
-        (let* ((datetree-date (org-entry-get nil "TIMESTAMP" t))
-               (date (org-date-to-gregorian datetree-date)))
-          (when date
-            (save-excursion
-              (org-cut-subtree)
-              (org-datetree-find-date-create date)
-              (org-narrow-to-subtree)
-              (show-subtree)
-              (org-end-of-subtree t)
-              (newline)
-              (goto-char (point-max))
-              (org-paste-subtree 4)
-              (widen)
-              )
-            )
-          ))
-
-      ;; Specify default packages to be included in every tex file, whether pdflatex or xelatex
-      (setq org-latex-packages-alist
-            '(("" "graphicx" t)
-              ("" "longtable" nil)
-              ("" "float" nil)))
-
-      (defun my-auto-tex-parameters ()
-        "Automatically select the tex packages to include."
-        ;; default packages for ordinary latex or pdflatex export
-        (setq org-latex-default-packages-alist
-              '(("AUTO" "inputenc" t)
-                ("T1"   "fontenc"   t)
-                (""     "fixltx2e"  nil)
-                (""     "wrapfig"   nil)
-                (""     "soul"      t)
-                (""     "textcomp"  t)
-                (""     "marvosym"  t)
-                (""     "wasysym"   t)
-                (""     "latexsym"  t)
-                (""     "amssymb"   t)
-                (""     "hyperref"  nil)))
-
-        ;; Packages to include when xelatex is used
-        (if (string-match "LATEX_CMD: xelatex" (buffer-string))
-            (setq org-latex-default-packages-alist
-                  '(("" "fontspec" t)
-                    ("" "xunicode" t)
-                    ("" "url" t)
-                    ("" "rotating" t)
-                    ("american" "babel" t)
-                    ("babel" "csquotes" t)
-                    ("" "soul" t)
-                    ("xetex" "hyperref" nil)
-                    )))
-
-        (if (string-match "LATEX_CMD: xelatex" (buffer-string))
-            (setq org-latex-classes
-                  (cons '("article"
-                          "\\documentclass[11pt,article,oneside]{memoir}"
-                          ("\\section{%s}" . "\\section*{%s}")
-                          ("\\subsection{%s}" . "\\subsection*{%s}")
-                          ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                          ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                          ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
-                        org-latex-classes))))
-
-      (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
-      )
-    )
-
 
   ;; ---------------------
   ;; Auto insert templates
@@ -1559,10 +868,10 @@ layers configuration. You are free to put any user code."
 
     ;; Layouts
     (fold-section "layouts"
-                  (spacemacs|define-custom-layout "mail"
-                                                  :binding "m"
-                                                  :body
-                                                  (mu4e))
+                  ;; (spacemacs|define-custom-layout "mail"
+                  ;;                                 :binding "m"
+                  ;;                                 :body
+                  ;;                                 (mu4e))
 
                   (spacemacs|define-custom-layout "irc"
                     :binding "i"
@@ -1599,6 +908,7 @@ layers configuration. You are free to put any user code."
                   )
 
 
+
     ;; ===========
     ;; Keybindings
     ;; ===========
@@ -1616,7 +926,372 @@ layers configuration. You are free to put any user code."
     ;; Messaging
     ;; ==========
 
+    (when (configuration-layer/layer-usedp 'mu4e)
+      (progn
+        (defcustom mu4e-spam-folder "/chopps.org/spam-train"
+          "Folder for spam email"
+          :type '(string :tag "Folder name")
+          :group 'mu4e-folders)
+
+        (message "mu4e eval after load")
+        (message "post-init mu4e eval after load")
+
+        (setq mu4e-maildir "~/Maildir"
+              ;; Updating
+              ;; mu4e-pre-hook-count 0
+              ;; mu4e-full-update-mail-command "bash -c '(cd && offlineimap -l /Users/chopps/.offlineimap/logfile)'"
+              ;; mu4e-quick-update-mail-command "bash -c '(cd && offlineimap -q -l /Users/chopps/.offlineimap/logfile)'"
+              ;; mu4e-update-pre-hook 'mu4e-pre-hook-udpate-command
+              mu4e-mu-binary (executable-find "mu")
+              mu4e-update-interval nil
+              mu4e-headers-include-related nil
+
+              ;; [b]ookmarks
+              mu4e-not-junk-folder-filter " AND NOT ( maildir:/gmail.com/[Gmail].Spam OR maildir:/chopps.org/spam* ) "
+              mu4e-inbox-filter-base " ( maildir:/gmail.com/INBOX OR maildir:/chopps.org/INBOX OR maildir:/terastrm.net/INBOX OR maildir:/chopps.org/a-terastream ) "
+              mu4e-imp-filter-base " ( maildir:/chopps.org/sw-common OR maildir:/chopps.org/ietf-rtg-yang-dt OR maildir:/chopps.org/ietf-wg-isis OR maildir:/chopps.org/ietf-wg-netmod OR maildir:/chopps.org/ietf-wg-homenet ) "
+              mu4e-unread-filter " ( flag:unread AND NOT flag:flagged AND NOT flag:trashed ) "
+              mu4e-unread-flagged-filter " ( flag:unread AND flag:flagged AND NOT flag:trashed ) "
+              mu4e-bookmarks (append
+                              (list (list (concat "flag:unread AND NOT flag:trashed AND " mu4e-inbox-filter-base) "Unread [i]NBOX messages" ?i)
+
+                                    (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
+                                    (list (concat "flag:flagged AND NOT flag:trashed AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "[F]lagged Non-INBOX messages" ?F)
+
+                                    (list (concat mu4e-unread-filter         mu4e-imp-filter-base) "Unread Important messages" ?n)
+                                    (list (concat mu4e-unread-flagged-filter mu4e-imp-filter-base) "Unread-Flagged Important messages" ?N)
+
+                                    (list (concat mu4e-unread-filter         "AND NOT" mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread [u]nimportant messages" ?u)
+                                    (list (concat mu4e-unread-flagged-filter "AND NOT" mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged [U]nimportant messages" ?U)
+
+                                    (list (concat mu4e-unread-filter         " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread Non-INBOX messages" ?o)
+                                    (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged Non-INBOX messages" ?O)
+
+                                    (list (concat mu4e-unread-filter         mu4e-not-junk-folder-filter) "Unread messages" ?a)
+                                    (list (concat mu4e-unread-flagged-filter mu4e-not-junk-folder-filter) "Unread-flagged messages" ?A)
+
+                                    (list "maildir:/chopps.org/spam-probable" "Probable spam messages" ?s)
+                                    )
+                              (mapcar (lambda (x) (cons (concat (car x) mu4e-not-junk-folder-filter) (cdr x)))
+                                      '(("flag:unread AND NOT flag:trashed" "Unread messages" ?u)
+                                        ("date:1h..now" "Last hours messages" ?h)
+                                        ("date:24h..now" "Today's messages" ?d)
+                                        ("date:today..now" "Today's messages" ?t)
+                                        ("date:7d..now" "Last 7 days" ?w)
+                                        ("mime:7d..now" "Last 7 days" ?w)
+                                        ("mime:*pdf" "Messages with PDF" 112)
+                                        ("mime:*vcs" "Messages with VCS" 113)
+                                        )))
+
+
+              ;; [j]ump shortcuts
+              mu4e-maildir-shortcuts '(("/chopps.org/INBOX" . ?i)
+                                       ("/gmail.com/INBOX" . ?g)
+                                       ("/terastrm.net/INBOX" . ?w)
+                                       ("/chopps.org/receipts" . ?r)
+                                       ("/chopps.org/a-terastream" . ?t)
+                                       ("/chopps.org/aa-netbsd" . ?n)
+                                       ("/chopps.org/ietf-wg-isis" . ?I)
+                                       ("/chopps.org/ietf-wg-homenet" . ?H)
+                                       ("/chopps.org/ietf-wg-netmod" . ?N)
+                                       ("/chopps.org/spam-train" . ?S)
+                                       ("/chopps.org/spam-probable" . ?s))
+
+              ;; Visuals
+              mu4e-use-fancy-chars nil
+              mu4e-view-show-addresses t
+              mu4e-headers-visible-lines 15
+              mu4e-headers-visible-columns 80
+              mu4e-html2text-command 'mu4e-shr2text
+              ;; make work better in dark themes
+              ;; [[mu4e:msgid:87vb7ng3tn.fsf@djcbsoftware.nl][Re: I find html2markdown the best value for mu4e-html2text-command]]
+              shr-color-visible-luminance-min 80
+              mu4e-view-html-plaintext-ratio-heuristic 15
+              ;; mu4e-html2text-command "html2text -nobs -utf8 -width 120"
+
+              ;; Folders -- most setup per account
+              ;; see context below
+
+              ;; mu4e-sent-folder   "/chopps.org/Sent Messages"
+              ;; mu4e-drafts-folder "/chopps.org/Drafts"
+              ;; mu4e-trash-folder  "/chopps.org/Deleted Messages"
+
+              mu4e-attachment-dir "~/Downloads"
+
+              ;; only complete addresses found in email to one of the below addresses
+              mu4e-compose-complete-only-personal t
+              mu4e-user-mail-address-list (list "chopps@chopps.org"
+                                                "chopps@dev.terastrm.net"
+                                                "chopps@gmail.com"
+                                                "chopps@netbsd.org"
+                                                "chopps@rawdofmt.org")
+              ;; This isn't used yet but we'd like it to be for getting
+              ;; contact completions from any mail with these addresses in them.
+              mu4e-contacts-user-mail-address-list (list
+                                                    "chopps@chopps.org"
+                                                    "chopps@dev.terastrm.net"
+                                                    "chopps@gmail.com"
+                                                    "chopps@netbsd.org"
+                                                    "chopps@rawdofmt.org"
+                                                    ;; we want contacts added from these mailing lists
+                                                    "isis-wg@ietf.org"
+                                                    "developers@netbsd.org"
+                                                    "netbsd-developers@netbsd.org"
+                                                    )
+
+              mu4e-compose-signature-auto-include nil
+              mu4e-compose-complete-addresses t
+              message-completion-alistp '(("^\\(Newsgroups\\|Followup-To\\|Posted-To\\|Gcc\\):" . message-expand-group)
+                                          ("^\\(Resent-\\)?\\(To\\|B?Cc\\):" . my-message-expand-name)
+                                          ("^\\(Reply-To\\|From\\|Mail-Followup-To\\|Mail-Copies-To\\):" . message-expand-name)
+                                          ("^\\(Disposition-Notification-To\\|Return-Receipt-To\\):" . message-expand-name))
+
+
+
+              ;; don't keep message buffers around
+              message-kill-buffer-on-exit t
+              )
+
+        (defun ch:ct (clist)
+          "Transform candidate into (display . real)"
+          (mapcar (lambda (candidate)
+                    (let* ((name (plist-get candidate :name))
+                           email (plist-get candidate :mail))
+                      (or (and name (format "%s <%s>" name email))
+                          email))) clist))
+        (defun my-message-expand-name (&optional start)
+          (interactive)
+          (message "my-message-expand-name called")
+          (helm :prompt "contact:" :sources
+                (helm-build-sync-source "mu4e contacts"
+                  :candidates mu4e~contact-list :candidate-transformer 'ch:ct)))
+
+        (defun my-mu4e-compose-hook ()
+          "Setup outgoing messages"
+          ;; Add chopps@<account-sending-from> to CC
+          ;; Add chopps@chopps.org to Bcc if not sending from @chopps.org
+          (let ((buffer-modified (buffer-modified-p)))
+            (save-excursion
+              (message-add-header (concat "Cc: " user-mail-address))
+              (if (not (string= user-mail-address "chopps@chopps.org"))
+                  (message-add-header "Bcc: chopps@chopps.org")))
+            (set-buffer-modified-p buffer-modified))
+          ;; Outgoing mails get format=flowed.
+          ;; (use-hard-newlines t 'guess)
+          ;; Sign messages by default
+          (mml-secure-message-sign-pgpmime))
+
+        (defun mu4e-pre-hook-udpate-command ()
+          (let ((check (% mu4e-pre-hook-count 4)))
+            (setq mu4e-get-mail-command (if (= check 0)
+                                            mu4e-full-update-mail-command
+                                          mu4e-full-update-mail-command))
+            (setq mu4e-pre-hook-count (1+ mu4e-pre-hook-count))))
+
+        ;; Mark to move to spam folder from headers view.
+        (defun mu4e-headers-mark-move-to-spam ()
+          (interactive)
+          (mu4e-mark-set 'move mu4e-spam-folder)
+          (mu4e-headers-next))
+
+        ;; Mark to move to spam folder from message view.
+        (defun mu4e-view-mark-move-to-spam ()
+          (interactive)
+          (mu4e~view-in-headers-context
+           (mu4e-headers-mark-move-to-spam)))
+        (message "post-init end mu4e eval after load")
+
+        ;; XXX these aren't defined
+        ;; (define-key mu4e-headers-mode-map (kbd "C-c c") 'org-mu4e-store-and-capture)
+        ;; (define-key mu4e-view-mode-map    (kbd "C-c c") 'org-mu4e-store-and-capture)
+
+        (with-eval-after-load 'mu4e
+          (bind-key (kbd "'") 'mu4e-headers-next 'mu4e-headers-mode-map)
+          (bind-key (kbd "\"") 'mu4e-headers-prev 'mu4e-headers-mode-map)
+          (bind-key (kbd "\"") 'mu4e-view-headers-prev 'mu4e-view-mode-map)
+
+          (when (require 'mu4e-context nil t)
+            (setq mu4e-contexts `( ,(make-mu4e-context
+                                     :name "chopps.org"
+                                     :enter-func (lambda () (mu4e-message "Home"))
+                                     ;; no leave-func
+                                     :match-func (lambda (msg)
+                                                   (and msg (string-match "/chopps.org/.*" (mu4e-message-field msg :maildir))))
+                                     :vars '((user-mail-address  . "chopps@chopps.org")
+                                             ;; mu4e
+                                             (mu4e-sent-folder   . "/chopps.org/Sent Messages")
+                                             (mu4e-trash-folder  . "/chopps.org/Deleted Messages")
+                                             (mu4e-drafts-folder . "/chopps.org/Drafts")
+                                             (mu4e-sent-messages-behavior   . sent)
+                                             ;; smtp
+                                             (smtpmail-starttls-credentials . '(("smtp.chopps.org" 9005 nil nil)))
+                                             (smtpmail-default-smtp-server  . "smtp.chopps.org")
+                                             (smtpmail-smtp-server          . "smtp.chopps.org")
+                                             ;; smtpmail-local-domain?
+                                             ;; smtpmail-sendto-domain?
+                                             (smtpmail-smtp-service         . 9005)))
+                                   ,(make-mu4e-context
+                                     :name "dev.terastrm.net"
+                                     :enter-func (lambda () (mu4e-message "Work"))
+                                     ;; no leave-func
+                                     :match-func (lambda (msg)
+                                                   (and msg (string-match "/terastrm.net/.*" (mu4e-message-field msg :maildir))))
+                                     :vars '(
+                                             ;; about me
+                                             (user-mail-address  . "chopps@dev.terastrm.net")
+                                             ;; mu4e
+                                             (mu4e-sent-folder   . "/terastrm.net/Sent Messages")
+                                             (mu4e-trash-folder  . "/terastrm.net/Deleted Messages")
+                                             (mu4e-drafts-folder . "/terastrm.net/Drafts")
+                                             (mu4e-sent-messages-behavior   . sent)
+                                             ;; smtp
+                                             (smtpmail-starttls-credentials . '(("smtp.dev.terastrm.net" 587 nil nil)))
+                                             (smtpmail-default-smtp-server  . "smtp.dev.terastrm.net")
+                                             (smtpmail-smtp-server          . "smtp.dev.terastrm.net")
+                                             ;; smtpmail-local-domain?
+                                             ;; smtpmail-sendto-domain?
+                                             (smtpmail-smtp-service         . 587)))
+
+                                   ,(make-mu4e-context
+                                     :name "gmail.com"
+                                     :enter-func (lambda () (mu4e-message "Gmail"))
+                                     ;; no leave-func
+                                     :match-func (lambda (msg)
+                                                   (and msg (string-match "/gmail.com/.*" (mu4e-message-field msg :maildir))))
+                                     :vars '(
+                                             ;; about me
+                                             (user-mail-address  . "chopps@gmail.com")
+                                             ;; mu4e
+                                             (mu4e-drafts-folder . "/gmail.com/[Gmail].Drafts")
+                                             (mu4e-sent-folder   . "/gmail.com/[Gmail].Sent Mail")
+                                             (mu4e-trash-folder  . "/gmail.com/[Gmail].Trash")
+                                             (mu4e-sent-messages-behavior   . delete)
+                                             ;; smtp
+                                             (smtpmail-starttls-credentials . '(("smtp.gmail.com" 587 nil nil)))
+                                             (smtpmail-default-smtp-server  . "smtp.gmail.com")
+                                             (smtpmail-smtp-server          . "smtp.gmail.com")
+                                             ;; smtpmail-local-domain?
+                                             ;; smtpmail-sendto-domain?
+                                             (smtpmail-smtp-service . 587))))))
+
+          (require 'mu4e-contrib)
+
+          ;; XXX also add this back
+          ;; (mu4e-alert-enable-mode-line-display)
+          ;; (mu4e-alert-enable-notifications)
+
+          (add-hook 'mu4e-headers-mode-hook
+                    (lambda () (progn
+                                 (make-local-variable 'scroll-conservatively)
+                                 (setq
+                                  show-trailing-whitespace nil
+                                  scroll-conservatively 0
+                                  scroll-up-aggressively .8
+                                  scroll-down-aggressively .8)
+                                 )))
+          (add-hook 'mu4e-view-mode-hook
+                    (lambda () (setq show-trailing-whitespace nil)))
+
+          (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
+
+          (add-to-list 'mu4e-view-actions
+                       '("ViewInBrowser" . mu4e-action-view-in-browser))
+
+          (define-key mu4e-headers-mode-map "d" 'mu4e-headers-mark-for-read)
+          (define-key mu4e-view-mode-map "d" 'mu4e-view-mark-for-read)
+          (define-key mu4e-headers-mode-map "@" 'mu4e-headers-mark-move-to-spam)
+          (define-key mu4e-view-mode-map "@" 'mu4e-view-mark-move-to-spam)
+          (define-key mu4e-headers-mode-map "\\" 'mu4e-headers-mark-move-to-spam)
+          (define-key mu4e-view-mode-map "\\" 'mu4e-view-mark-move-to-spam)
+
+          (add-to-list 'mu4e-header-info-custom
+                       '(:list-or-dir .
+                                      (:name "ML or maildir" ;; long name, as seen in message view
+                                             :shortname "ML-D"     ;; short name, as seen in the headers view
+                                             :help "Mailing list or maildir if not set"
+                                             :function
+                                             (lambda (msg)
+                                               (or (mu4e-message-field msg :mailing-list)
+                                                   (mu4e-message-field msg :maildir))))))
+
+          (setq
+           ;; "Date         Flgs   List       From                   Subject
+           mu4e-headers-fields (quote (
+                                       (:flags          .  5)
+                                       (:human-date     . 15)
+                                       (:from           . 26)
+                                       (:list-or-dir    . 30)
+                                       (:thread-subject . nil))))
+
+          )
+        )
+      )
+
     (when (configuration-layer/layer-usedp 'erc)
+      (setq erc-prompt-for-nickserv-password nil
+            erc-autojoin-channels-alist '(("irc.gitter.im" "#syl20bnr/spacemacs")
+                                          ("mollari.netbsd.org" "#NetBSD")
+                                          ("freenode.net" "#org-mode"))
+            erc-auto-query 'window
+            erc-track-switch-direction 'importance
+            erc-hl-nicks-minimum-contrast-ratio 3.5
+            ;; erc-hl-nicks-color-contrast-strategy 'contrast
+            ;; erc-hl-nicks-color-contrast-strategy 'invert
+            erc-hl-nicks-skip-nicks '("gitter")
+
+            )
+        ;; '(erc-autoaway-idle-seconds 600)
+        ;; '(erc-autojoin-mode t)
+        ;; '(erc-button-mode t)
+        ;; '(erc-current-nick-highlight-type (quote all))
+        ;; '(erc-fill-mode t)
+        ;; '(erc-hl-nicks-mode t)
+        ;; '(erc-hl-nicks-trim-nick-for-face nil)
+        ;; '(erc-irccontrols-mode t)
+        ;; '(erc-kill-buffer-on-part t)
+        ;; '(erc-kill-queries-on-quit t)
+        ;; '(erc-kill-server-buffer-on-quit t)
+        ;; '(erc-list-mode t)
+        ;; '(erc-log-channels-directory "/Users/chopps/Dropbox/erclogs" t)
+        ;; '(erc-log-mode t)
+        ;; '(erc-match-mode t)
+        ;; '(erc-menu-mode t)
+        ;; '(erc-move-to-prompt-mode t)
+        ;; '(erc-netsplit-mode t)
+        ;; '(erc-networks-mode t)
+        ;; '(erc-noncommands-mode t)
+        ;; '(erc-pcomplete-mode t)
+        ;; '(erc-prompt (lambda nil (concat "[" (buffer-name) "]")))
+        ;; '(erc-readonly-mode t)
+        ;; '(erc-ring-mode t)
+        ;; '(erc-server-coding-system (quote (utf-8 . utf-8)))
+        ;; '(erc-services-mode t)
+        ;; '(erc-social-graph-dynamic-graph t)
+        ;; '(erc-stamp-mode t)
+        ;; '(erc-track-minor-mode t)
+        ;; '(erc-track-mode t)
+        ;; '(erc-youtube-mode t)
+
+      (defun erc-acct-get-password (user host port)
+        (let* ((auth-source-creation-defaults nil)
+               (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
+               (secret (plist-get (nth 0 (auth-source-search
+                                          :type 'netrc
+                                          :max 1
+                                          :host host
+                                          :user user
+                                          :port port
+                                          :create t))
+                                  :secret))
+               (password (if (functionp secret)
+                             (funcall secret)
+                           secret)))))
+
+      (setq erc-nickserv-passwords
+            `((freenode (("chopps" . ,(erc-acct-get-password "chopps" "freenode.net" "nickserv"))))
+              (localhost (("chopps" . ,(erc-acct-get-password "chopps" "localhost" "bitlbee")))))
+            )
+
       (defun launch-irc-gitter ()
         "Launch irc connection to giter.im"
         (interactive)
@@ -1653,7 +1328,44 @@ layers configuration. You are free to put any user code."
         "ain" 'launch-irc-netbsd
         "aig" 'launch-irc-gitter
         "aiL" 'launch-erc)
+
+      (defun bitlbee-netrc-identify ()
+        "Auto-identify for Bitlbee channels using authinfo or netrc.
+
+        The entries that we look for in netrc or authinfo files
+        have their 'port' set to 'bitlbee', their 'login' or
+        'user' set to the current nickname and 'server' set to
+        the current IRC server's name. A sample value that works
+        for authenticating as user 'keramida' on server
+        'localhost' is:
+
+            machine localhost port bitlbee login keramida password supersecret"
+
+        (interactive)
+        (when (string= (buffer-name) "&bitlbee")
+          (let ((pass (erc-acct-get-password (erc-current-nick) erc-session-server "bitlbee")))
+            (message "Sending privmsg to &bitlbee server %s" erc-session-server)
+            (erc-message "PRIVMSG"
+                         (format "%s identify %s"
+                                 (erc-default-target)
+                                 pass)))))
+      (add-hook 'erc-join-hook 'bitlbee-netrc-identify)
+
+
+      ;; add a user to the current channel
+      (defun add-nick-insert-pre-hook (line)
+        "Add user to ERC channel list"
+        (when (string= erc-session-server "irc.gitter.im")
+          (save-match-data
+            (when (string-match "^<\\([^>]+\\)> .*" line)
+              (let ((nick (match-string 1 line)))
+                (erc-update-current-channel-member nick nick 'add-if-new))))))
+      (add-hook 'erc-insert-pre-hook 'add-nick-insert-pre-hook)
+
+      (erc-services-mode 1)
       )
+
+
     (when (configuration-layer/layer-usedp 'rcirc)
       (defun get-gitter-password ()
         (let* ((auth-source-creation-defaults nil)
@@ -1668,9 +1380,8 @@ layers configuration. You are free to put any user code."
           (if (functionp sec)
               (funcall sec)
             sec)))
-
-
       (setq
+       rcirc-log-directory "~/Dropbox/logs/rcirclogs"
        rcirc-time-format "%H:%M "
        rcirc-server-alist
        `(("irc.gitter.im"
@@ -1698,6 +1409,294 @@ layers configuration. You are free to put any user code."
           )
          )
        )
+      )
+
+    ;;
+    ;;
+    ;;
+    (when (configuration-layer/layer-usedp 'org)
+      (progn
+        (message "post-init-start")
+        (add-hook 'org-mode-hook #'yas-minor-mode)
+
+        ;; :mode (("\\.org\\'" . org-mode)
+        ;;        ("\\.o2b\\'" . org-mode))
+        ;; :bind (("C-c c" . org-capture)
+        ;;        ("C-c a" . org-agenda)
+        ;;        ("C-c l" . org-store-link))
+
+        (defun my-org-mode-hook ()
+          (if debug-init-msg
+              (message "Org-mode-hook"))
+          ;; (org-set-local 'yas/trigger-key [tab])
+          ;;(yas-minor-mode)
+
+          (turn-on-flyspell)
+
+          ;; (define-key yas/keymap [tab] 'yas/next-field-or-maybe-expand)
+          (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)
+          (define-key org-mode-map (kbd "C-c e e") 'org-encrypt-entries)
+          (define-key org-mode-map (kbd "C-c e E") 'org-encrypt-entry)
+          (define-key org-mode-map (kbd "C-c e d") 'org-decrypt-entries)
+          (define-key org-mode-map (kbd "C-c e D") 'org-decrypt-entry)
+
+          (setq org-tags-exclude-from-inheritance '("crypt"))
+          (setq org-crypt-disable-auto-save t)
+          (and (buffer-file-name)
+               (string-match "\\.o2b$" (buffer-file-name))
+               (org2blog/wp-mode))
+          (setq org-crypt-key "D7B83025"))
+        (add-hook 'org-mode-hook 'my-org-mode-hook)
+
+        (defun my-org-confirm-babel-evaluate (lang body)
+          (not (or (string= lang "ditaa")
+                   (string= lang "dot2tex")
+                   (string= lang "dot"))))
+        ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
+        (setq org-agenda-start-day "-8d")
+        (setq
+         org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
+         org-src-fontify-natively t
+         org-default-notes-file (concat org-directory "/notes.org")
+         org-agenda-start-on-weekday 5
+         org-src-window-setup 'current-window
+         org-log-done 'time
+         org-hide-leading-stars t
+         org-refile-use-outline-path 'file
+         org-outline-path-complete-in-steps t
+         org-export-latex-emphasis-alist (quote (("*" "\\textbf{%s}" nil)
+                                                 ("/" "\\emph{%s}" nil)
+                                                 ("_" "\\underline{%s}" nil)
+                                                 ("+" "\\texttt{%s}" nil)
+                                                 ("=" "\\verb=%s=" nil)
+                                                 ("~" "\\verb~%s~" t)
+                                                 ("@" "\\alert{%s}" nil)))
+
+         ;; capture the search instead of the highlighted message in
+         ;; headers view
+         org-mu4e-link-query-in-headers-mode t
+
+         org-capture-templates
+         '(("d" "Todo" entry (file+headline (concat org-directory "/notes.org") "Tasks")
+            "* TODO %?\nSCHEDULED: %T\nDEADLINE: %T\nCreated: %t\nAnnotation: %a\n")
+
+           ("t" "Todo" entry (file+headline (concat org-directory "/notes.org") "Tasks")
+            "* TODO %?\nCreated: %t\nAnnotation: %a\n")
+
+           ("x" "Tramdose" entry (file+datetree (concat org-directory "/medicine.org") "Tramadol")
+            "* NOTE %?\nCreated: %U")
+
+           ("m" "Mail Todo" entry (file+headline (concat org-directory "/notes.org") "Mail")
+            "* TODO Read Mail%? ([f: %:fromname]: %:subject)\n%U\nMessage: %a\n")
+
+           ("M" "Mail Todo" entry (file+headline (concat org-directory "/notes.org") "Mail")
+            "* TODO Followup Mail [f: %:fromname]: %:subject)\nSCHEDULED: %T\nDEADLINE: %T\nCreated: %t\nMessage: %a\nExtra Notes: %?")
+
+                                        ; ("M" "Mac Mail Todo" entry (file+headline (concat org-directory "/notes.org") "Mail")
+                                        ;  "* TODO %?\n%T\n%(org-mac-message-get-links \"s\")\n")
+
+           ("l" "Link Note" entry (file+headline (concat org-directory "/notes.org") "Notes")
+            "* NOTE %?\n%T\n%(org-mac-safari-get-frontmost-url)\n")
+
+           ("n" "Generic Note" entry (file+headline (concat org-directory "/notes.org") "Notes")
+            "* NOTE %?\n%T\nannotation:%a\nx:%x\n")
+
+           ("s" "Status" entry (file+datetree (concat org-directory "/status.org"))
+            "* NOTE %?\n%T\n")
+
+           ("i" "IETF related")
+           ("im" "IETF Todo w/ Mac Mail" entry (file+headline (concat org-directory "/notes.org") "IETF")
+            "* TODO %?\n%T\n%(org-mac-message-get-links \"s\")\n")
+           ("il" "IETF Note w/ Mac Link " entry (file+headline (concat org-directory "/notes.org") "IETF")
+            "* NOTE %?\n%T\n%(org-mac-safari-get-frontmost-url)\n")
+           ("in" "IETF Note (ann, clip)" entry (file+headline (concat org-directory "/notes.org") "IETF")
+            "* NOTE %?\n%T\nannotation:%a\nx:%x\n")
+           ("it" "IETF Todo (with annotation)" entry (file+headline (concat org-directory "/notes.org") "IETF")
+            "* TODO %?\n%T\nannotation:%a\n")
+
+           ("T" "Terastream related")
+           ("Tm" "Terastram Todo with Mac Mail" entry (file+headline (concat org-directory "/notes.org") "Terastream")
+            "* TODO %?\n%T\n%(org-mac-message-get-links \"s\")\n")
+           ("Tl" "Terastram Safari Note" entry (file+headline (concat org-directory "/notes.org") "Terastream")
+            "* NOTE %?\n%T\n%(org-mac-safari-get-frontmost-url)\n")
+           ("Tl" "Terastram Safari Todo" entry (file+headline (concat org-directory "/notes.org") "Terastream")
+            "* TODO %?\n%T\n%(org-mac-safari-get-frontmost-url)\n")
+           ("Tc" "Terastram Code Todo" entry (file+olp (concat org-directory "/notes.org") "Terastream" "Code Todo")
+            "* TODO %?\n%t\n%f:%a\n")
+           ("Tt" "Terastream Todo" entry (file+headline (concat org-directory "/notes.org") "Terastream")
+            "* TODO %?\n%T\n")
+           )
+         )
+
+        ;; (add-to-list 'org-babel-load-languages '(python . t))
+        ;; (add-to-list 'org-babel-load-languages '(dot . t))
+        ;; (add-to-list 'org-babel-load-languages '(ditaa . t))
+        ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
+        (message "post-init-end")
+
+        ;;   ;; XXX latex
+        ;;   ;; (require 'ob-latex)
+        ;;   (require 'org-crypt)
+        ;;   (add-to-list 'org-babel-load-languages '(python . t))
+        ;;   (add-to-list 'org-babel-load-languages '(dot . t))
+        ;;   (add-to-list 'org-babel-load-languages '(ditaa . t))
+        ;;   (add-to-list 'org-babel-load-languages '(dot2tex . t))
+
+        ;;   (require 'ox-latex)
+        ;;   (add-to-list 'org-latex-classes
+        ;;                '("beamer"
+        ;;                  "\\documentclass\[presentation\]\{beamer}\n
+        ;;               \\uepackage{listings}
+        ;;               \\lstset{numbers=none,language=[ISO]C++,tabsize=4,
+        ;; frame=single,
+        ;; basicstyle=\\small,
+        ;; showspaces=false,showstringspaces=false,
+        ;; showtabs=false,
+        ;; keywordstyle=\\color{blue}\\bfseries,
+        ;; commentstyle=\\color{red},
+        ;; }\n"
+        ;;                  ("\\section\{%s\}" . "\\section*\{%s\}")
+        ;;                  ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
+        ;;                  ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
+
+        ;; (require 'calfw-org)
+        ;; (org-crypt-use-before-save-magic)
+
+        ;; Languages to interpret in begin_src blocks
+        (org-babel-do-load-languages
+         'org-babel-load-languages
+         '((python . t)
+           (ditaa . t)
+           (dot2tex . t)
+           (dot . t))
+         )
+        ;;  (dot2tex . t))
+
+        ;; (eval-after-load "org"
+        ;;   '(mapc
+        ;;     (lambda (face)
+        ;;       (set-face-attribute
+        ;;        face nil
+        ;;        :inherit
+        ;;        (my-adjoin-to-list-or-symbol
+        ;;         'fixed-pitch
+        ;;         (face-attribute face :inherit))))
+        ;;     (list 'org-code 'org-block 'org-table 'org-block-background)))
+
+        ;; (add-to-list 'org-modules 'org-mac-message)
+        ;; (setq org-mac-mail-account "Work")
+
+        ;; - Vi friendly bindings replacing cursor movement with meta-{hjkl}
+        (bind-key "C-c w" 'org-refile-to-datetree)
+        (bind-key "M-h" 'org-metaleft org-mode-map)
+        (bind-key "M-l" 'org-metaright org-mode-map)
+        (bind-key "M-k" 'org-metaup org-mode-map)
+        (bind-key "M-j" 'org-metadown org-mode-map)
+        (bind-key "M-H" 'org-shiftmetaleft org-mode-map)
+        (bind-key "M-L" 'org-shiftmetaright org-mode-map)
+        (bind-key "M-K" 'org-shiftmetaup org-mode-map)
+        (bind-key "M-J" 'org-shiftmetadown org-mode-map)
+
+        ;; This is for using xelatex
+        (require 'ox-latex)
+        ;; (setq org-latex-listings t)
+
+        (setq org-latex-listings 'minted)
+
+        (setq org-latex-pdf-process '("pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"
+                                      "pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"
+                                      "pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"))
+
+        ;; XXX latex
+        ;; ;; Originally taken from Bruno Tavernier: http://thread.gmane.org/gmane.emacs.orgmode/31150/focus=31432
+        ;; ;; but adapted to use latexmk 4.20 or higher.
+        ;; (defun my-auto-tex-cmd ()
+        ;;   "When exporting from .org with latex, automatically run latex,
+        ;;  pdflatex, or xelatex as appropriate, using latexmk."
+        ;;   (let ((texcmd)))
+        ;;   ;; default command: oldstyle latex via dvi
+        ;;   (setq texcmd "latexmk -dvi -pdfps -quiet %f")
+        ;;   ;; pdflatex -> .pdf
+        ;;   (if (string-match "LATEX_CMD: pdflatex" (buffer-string))
+        ;;       (setq texcmd "latexmk -pdf -quiet %f"))
+        ;;   ;; xelatex -> .pdf
+        ;;   (if (string-match "LATEX_CMD: xelatex" (buffer-string))
+        ;;       (setq texcmd "latexmk -pdflatex=xelatex -pdf -quiet %f"))
+        ;;   ;; LaTeX compilation command
+        ;;   (setq org-latex-to-pdf-process (list texcmd)))
+
+        ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-cmd)
+
+        (defun org-refile-to-datetree ()
+          "Refile a subtree to a datetree corresponding to it's timestamp."
+          (interactive)
+          (let* ((datetree-date (org-entry-get nil "TIMESTAMP" t))
+                 (date (org-date-to-gregorian datetree-date)))
+            (when date
+              (save-excursion
+                (org-cut-subtree)
+                (org-datetree-find-date-create date)
+                (org-narrow-to-subtree)
+                (show-subtree)
+                (org-end-of-subtree t)
+                (newline)
+                (goto-char (point-max))
+                (org-paste-subtree 4)
+                (widen)
+                )
+              )
+            ))
+
+        ;; Specify default packages to be included in every tex file, whether pdflatex or xelatex
+        (setq org-latex-packages-alist
+              '(("" "graphicx" t)
+                ("" "longtable" nil)
+                ("" "minted" nil)
+                ("" "float" nil)))
+
+        ;; XXX latex
+        ;; (defun my-auto-tex-parameters ()
+        ;;   "Automatically select the tex packages to include."
+        ;;   ;; default packages for ordinary latex or pdflatex export
+        ;;   (setq org-latex-default-packages-alist
+        ;;         '(("AUTO" "inputenc" t)
+        ;;           ("T1"   "fontenc"   t)
+        ;;           (""     "fixltx2e"  nil)
+        ;;           (""     "wrapfig"   nil)
+        ;;           (""     "soul"      t)
+        ;;           (""     "textcomp"  t)
+        ;;           (""     "marvosym"  t)
+        ;;           (""     "wasysym"   t)
+        ;;           (""     "latexsym"  t)
+        ;;           (""     "amssymb"   t)
+        ;;           (""     "hyperref"  nil)))
+
+        ;;   ;; Packages to include when xelatex is used
+        ;;   (if (string-match "LATEX_CMD: xelatex" (buffer-string))
+        ;;       (setq org-latex-default-packages-alist
+        ;;             '(("" "fontspec" t)
+        ;;               ("" "xunicode" t)
+        ;;               ("" "url" t)
+        ;;               ("" "rotating" t)
+        ;;               ("american" "babel" t)
+        ;;               ("babel" "csquotes" t)
+        ;;               ("" "soul" t)
+        ;;               ("xetex" "hyperref" nil)
+        ;;               )))
+
+        ;;   (if (string-match "LATEX_CMD: xelatex" (buffer-string))
+        ;;       (setq org-latex-classes
+        ;;             (cons '("article"
+        ;;                     "\\documentclass[11pt,article,oneside]{memoir}"
+        ;;                     ("\\section{%s}" . "\\section*{%s}")
+        ;;                     ("\\subsection{%s}" . "\\subsection*{%s}")
+        ;;                     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+        ;;                     ("\\paragraph{%s}" . "\\paragraph*{%s}")
+        ;;                     ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+        ;;                   org-latex-classes))))
+
+        ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
+        )
       )
 
     ;; ====
@@ -1769,6 +1768,11 @@ layers configuration. You are free to put any user code."
                                 )
                   )
 
+    (global-set-key (kbd "C-c i o") 'ietf-docs-open-at-point)
+
+    (autoload 'yang-mode "yang-mode")
+    (add-to-list 'auto-mode-alist '("\\.yang\\'" . yang-mode))
+
     (add-hook 'org-mode-hook 'evil-normalize-keymaps)
 
     ;; (message "End: %s" inhibit-startup-screen)
@@ -1793,7 +1797,8 @@ layers configuration. You are free to put any user code."
  '(evil-shift-width 4)
  '(safe-local-variable-values
    (quote
-    ((eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
+    ((evil-shift-width . 2)
+     (eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
      (eval progn
            (require
             (quote projectile))
