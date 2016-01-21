@@ -21,8 +21,8 @@ values."
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     spacemacs-helm
-     ;; spacemacs-ivy
+     ;; spacemacs-helm
+     spacemacs-ivy
      (auto-completion :variables
                       auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets")
 
@@ -32,9 +32,6 @@ values."
      eyebrowse
      gtags
      mu4e
-     ;; (mu4e :variables
-     ;;       mu4e-installation-path "/usr/local/share/emacs/site-lisp/mu4e"
-     ;;       mu4e-use-maildirs t)
      osx
      org
      ranger
@@ -57,7 +54,7 @@ values."
      ;; java
      javascript
      latex
-     ;; lua
+     lua
      ;; markdown
      ;; php
      (python :variables
@@ -137,13 +134,17 @@ values."
                          )
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
+
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
    ;; size to make separators look not too crappy.
-   dotspacemacs-default-font '("Deja Vu Sans Mono"
-                               :size 16
-                               :weight normal
-                               :width normal
-                               :powerline-scale 1.1)
+   ;; dotspacemacs-default-font '("DejaVu Sans Mono"
+   ;;                             :size 28
+   ;;                             :weight normal
+   ;;                             :width normal
+   ;;                             :powerline-scale 1.1)
+   ;; dotspacemacs-default-font '("Ubuntu Mono" :size 24 :weight normal :width normal :powerline-scale 1.1)
+   ;; dotspacemacs-default-font '(:powerline-scale 1.1)
+
    ;; The leader key
    dotspacemacs-leader-key "SPC"
    ;; The leader key accessible in `emacs state' and `insert state'
@@ -1542,6 +1543,8 @@ layers configuration. You are free to put any user code."
     ;; =======
     ;; Display
     ;; =======
+
+    (setq powerline-default-separator 'nil)
 
     (fold-section "display"
                   (global-hl-line-mode -1)            ; Disable hihglighting of current line.
