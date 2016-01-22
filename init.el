@@ -933,8 +933,6 @@ layers configuration. You are free to put any user code."
           :type '(string :tag "Folder name")
           :group 'mu4e-folders)
 
-        (message "mu4e eval after load")
-        (message "post-init mu4e eval after load")
 
         (setq mu4e-maildir "~/Maildir"
               ;; Updating
@@ -1412,7 +1410,7 @@ layers configuration. You are free to put any user code."
       )
 
     ;;
-    ;;
+    ;; Org
     ;;
     (when (configuration-layer/layer-usedp 'org)
       (progn
@@ -1453,12 +1451,12 @@ layers configuration. You are free to put any user code."
                    (string= lang "dot2tex")
                    (string= lang "dot"))))
         ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
-        (setq org-agenda-start-day "-8d")
         (setq
          org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
          org-src-fontify-natively t
          org-default-notes-file (concat org-directory "/notes.org")
-         org-agenda-start-on-weekday 5
+         ;; org-agenda-start-day "-8d"
+         org-agenda-start-on-weekday 1
          org-src-window-setup 'current-window
          org-log-done 'time
          org-hide-leading-stars t
