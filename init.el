@@ -21,7 +21,8 @@ values."
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     spacemacs-ivy
+     ;; spacemacs-ivy
+     spacemacs-helm
      (auto-completion :variables
                       auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets")
 
@@ -286,17 +287,24 @@ user code here.  The exception is org related code, which should be placed in `d
 
   (auto-insert-mode)
 
-
   (setq
    debug-init-msg t
    dropbox-directory "~/Dropbox"
    evil-search-wrap nil
    evil-want-C-i-jump nil
    ;; evil-esc-delay 0.001
+   ;; js2-basic-offset 2
+   ;; js-indent-level 1
    org-directory "~/org"
    org-agenda-files '("~/org")
    org-protocol-default-template-key "t"
-   org2blog/wp-shortcode-langs-map '(("emacs-lisp" . "lisp") ("sh" . "bash")))
+   org2blog/wp-shortcode-langs-map '(("emacs-lisp" . "lisp") ("sh" . "bash"))
+   rebox-style-loop '(71 72 73))
+
+  (with-eval-after-load "evil-evilified-state"
+    (define-key evil-evilified-state-map-original "H" 'evil-window-top)
+    (define-key evil-evilified-state-map-original "L" 'evil-window-bottom)
+    (define-key evil-evilified-state-map-original "M" 'evil-window-middle))
 
   ;; =======
   ;; Display
@@ -367,292 +375,6 @@ user code here.  The exception is org related code, which should be placed in `d
   ;;     )
   ;;   )
 
-  (spacemacs|use-package-add-hook flycheck
-    :post-config
-    (progn
-      (flycheck-define-checker python-pycheckers
-                               "A python syntax and style checker using flake8 and pylint."
-                               :command ("pycheckers.sh"
-                                         (config-file "-8" flycheck-flake8rc)
-                                         (config-file "-r" flycheck-pylintrc)
-                                         source-inplace)
-                               :error-patterns
-                               ((error line-start
-                                       (file-name) ":" line ":" (optional column ":") " "
-                                       (message "E" (one-or-more digit) (zero-or-more not-newline))
-                                       line-end)
-                                (warning line-start
-                                         (file-name) ":" line ":" (optional column ":") " "
-                                         (message (or "F"            ; Pyflakes in Flake8 >= 2.0
-                                                      "W"            ; Pyflakes in Flake8 < 2.0
-                                                      "C")           ; McCabe in Flake >= 2.0
-                                                  (one-or-more digit) (zero-or-more not-newline))
-                                         line-end)
-                                (info line-start
-                                      (file-name) ":" line ":" (optional column ":") " "
-                                      (message (or "N"              ; pep8-naming in Flake8 >= 2.0
-                                                   "R")             ; re-factor from python.
-                                               (one-or-more digit) (zero-or-more not-newline))
-                                      line-end)
-                                )
-                               :modes python-mode)
-      ;; (add-hook 'after-init-hook 'global-flycheck-mode)
-      )
-    )
-
-  (spacemacs|use-package-add-hook cc-mode
-    :post-init
-    (setq c-font-lock-extra-types
-          (quote
-           ("FILE"
-            "\\sw+_st" "\\sw+_t" "\\sw+type" ; procket types
-            "\\(u_?\\)?int\\(8\\|16\\|32\\|64\\)_t" "ushort" "uchar"
-            "bool" "boolean")))
-
-    :post-config
-    (progn
-      ;; (modify-syntax-entry ?_ "w" awk-mode-syntax-table)
-      (modify-syntax-entry ?_ "w" c-mode-syntax-table)
-      (modify-syntax-entry ?_ "w" objc-mode-syntax-table)
-      (modify-syntax-entry ?_ "w" c++-mode-syntax-table)
-      ;; (modify-syntax-entry ?_ "w" java-mode-syntax-table)
-      ;; (modify-syntax-entry ?_ "w" objc-mode-syntax-table)
-      (add-hook 'c-mode-common-hook
-                (function (lambda ()
-                            (if (string= (shell-command-to-string "uname -s") "NetBSD\n")
-                                (c-set-style "KNF")
-                              (c-set-style "Procket")
-                              (setq indent-tabs-mode nil))
-                            (c-toggle-auto-hungry-state 1)
-                            (setq fill-column 80)
-                            (flyspell-prog-mode)
-                            )))
-
-      (c-add-style
-       "KNF"
-       '((indent-tabs-mode . t)
-         (c-basic-offset . 8)
-         (c-comment-only-line-offset . 0)
-         (c-label-minimum-indentation . 0)
-         (c-tab-always-indent    . t)
-         (c-hanging-semi&comma-criteria (lambda () 'stop))
-         (c-hanging-braces-alist . ((class-open) (class-close) (defun-open)
-                                    (defun-close) (inline-open) (inline-close)
-                                    (brace-list-open) (brace-list-close)
-                                    (brace-list-intro) (brace-list-entry)
-                                    (block-open) (block-close) (substatement-open)
-                                    (statement-case-open) (extern-lang-open)
-                                    (extern-lang-close)))
-         (c-hanging-colons-alist     . ((access-label)
-                                        (case-label)
-                                        (label)
-                                        (member-init-intro)
-                                        (inher-intro)))
-                                        ;   (c-cleanup-list             . (scope-operator
-                                        ;                                 empty-defun-braces
-                                        ;                                 defun-close-semi))
-         (c-offsets-alist . ((string                . -1000)
-                             (c                     . c-lineup-C-comments)
-                             (defun-open            . 0)
-                             (defun-close           . 0)
-                             (defun-block-intro     . +)
-                             (func-decl-cont        . 0)
-                                        ; above is ansi        (func-decl-cont        . 0)
-                             (knr-argdecl-intro     . 0)
-                             (knr-argdecl           . 0)
-                             (topmost-intro         . 0)
-                             (topmost-intro-cont    . 0)
-                             (block-open            . 0)
-                             (block-close           . 0)
-                             (brace-list-open       . 0)
-                             (brace-list-close      . 0)
-                             (brace-list-intro      . +)
-                             (brace-list-entry      . 0)
-                             (statement             . 0)
-                             (statement-cont        . 4)
-                             (statement-block-intro . +)
-                             (statement-case-intro  . +)
-                             (statement-case-open   . 0)
-                             (substatement          . +)
-                             (substatement-open     . 0)
-                             (case-label            . 0)
-                             (label                 . -)
-                             (do-while-closure      . 0)
-                             (else-clause           . 0)
-                             (comment-intro         . c-lineup-comment)
-                             (arglist-intro         . 4)
-                             (arglist-cont          . 0)
-                             (arglist-cont-nonempty . 4)
-                             (arglist-close         . 4)
-                             (cpp-macro             . -1000)
-                             ))))
-
-      (c-add-style
-       "Procket"
-       '((c-basic-offset . 4)
-         (c-comment-only-line-offset . 0)
-         (c-label-minimum-indentation . 0)
-         (c-tab-always-indent    . t)
-         (c-hanging-semi&comma-criteria (lambda () 'stop))
-         (c-hanging-braces-alist . ((class-open) (class-close) (defun-open)
-                                    (defun-close) (inline-open) (inline-close)
-                                    (brace-list-open) (brace-list-close)
-                                    (brace-list-intro) (brace-list-entry)
-                                    (block-open) (block-close) (substatement-open)
-                                    (statement-case-open) (extern-lang-open)
-                                    (extern-lang-close)))
-         (c-hanging-colons-alist     . ((access-label)
-                                        (case-label)
-                                        (label)
-                                        (member-init-intro)
-                                        (inher-intro)))
-                                        ;   (c-cleanup-list             . (scope-operator
-                                        ;                                 empty-defun-braces
-                                        ;                                 defun-close-semi))
-         (c-offsets-alist . ((string                . -1000)
-                             (c                     . c-lineup-C-comments)
-                             (defun-open            . 0)
-                             (defun-close           . 0)
-                             (defun-block-intro     . +)
-                             (func-decl-cont        . 0)
-                                        ; above is ansi        (func-decl-cont        . 0)
-                             (knr-argdecl-intro     . 0)
-                             (knr-argdecl           . 0)
-                             (topmost-intro         . 0)
-                             (topmost-intro-cont    . 0)
-                             (block-open            . 0)
-                             (block-close           . 0)
-                             (brace-list-open       . 0)
-                             (brace-list-close      . 0)
-                             (brace-list-intro      . +)
-                             (brace-list-entry      . 0)
-                             (statement             . 0)
-                             (statement-cont        . c-lineup-math)
-                             (statement-block-intro . +)
-                             (statement-case-intro  . +)
-                             (statement-case-open   . 0)
-                             (substatement          . +)
-                             (substatement-open     . 0)
-                             (case-label            . 0)
-                             (label                 . -)
-                             (do-while-closure      . 0)
-                             (else-clause           . 0)
-                             (comment-intro         . c-lineup-comment)
-                             (arglist-intro         . 4)
-                             (arglist-cont          . 0)
-                             (arglist-cont-nonempty . c-lineup-arglist)
-                             (arglist-close         . 4)
-                             (cpp-macro             . -1000)
-                             ))))
-      ))
-
-  (spacemacs|use-package-add-hook python
-    :post-init
-    (progn
-      (setq
-       python-fill-docstring-style 'symmetric
-       python-fill-string-function 'my-python-fill-string-function)
-
-      (defun my-python-fill-comment-function (&optional justify)
-        (let ((fill-column 80))
-          (python-fill-comment justify)))
-
-      )
-    :post-config
-    (progn
-      (define-key python-mode-map (kbd "M-n") 'flycheck-next-error)
-      (define-key python-mode-map (kbd "M-p") 'flycheck-previous-error)
-      ;; (define-key python-mode-map (kbd "C-c Ta") 'nosetests-all)
-      ;; (define-key python-mode-map (kbd "C-c Tm") 'nosetests-module)
-      ;; (define-key python-mode-map (kbd "C-c To") 'nosetests-one)
-      ;; (define-key python-mode-map (kbd "C-c Tpa") 'nosetests-pdb-all)
-      ;; (define-key python-mode-map (kbd "C-c Tpm") 'nosetests-pdb-module)
-      ;; (define-key python-mode-map (kbd "C-c Tpo") 'nosetests-pdb-one)
-      ;; (define-key python-mode-map (kbd "C-c ta") 'pytest-all)
-      ;; (define-key python-mode-map (kbd "C-c tm") 'pytest-module)
-      ;; (define-key python-mode-map (kbd "C-c to") 'pytest-one)
-      ;; (define-key python-mode-map (kbd "C-c td") 'pytest-directory)
-      ;; (define-key python-mode-map (kbd "C-c tpa") 'pytest-pdb-all)
-      ;; (define-key python-mode-map (kbd "C-c tpm") 'pytest-pdb-module)
-      ;; (define-key python-mode-map (kbd "C-c tpo") 'pytest-pdb-one)
-      ;; SPC m e i[gnore]
-      ;; SPC m e f[ix]
-      ;; (define-key python-mode-map (kbd "C-c M-\\") 'pyfixer:ignore-current-line)
-      ;; (define-key python-mode-map (kbd "C-c C-\\") 'pyfixer:fix-current-line)
-      ;; (define-key python-mode-map (kbd "C-c C-M-\\") 'pyfixer:fix-all-errors)
-      ;; (define-key python-mode-map (kbd "C-c 8") 'pyfixer:fix-all-errors)
-      ;; (bind-key "C-c C-h" 'pylookup-lookup python-mode-map)
-
-      (spacemacs/declare-prefix-for-mode 'python-mode "e" "errors-prefix")
-      (spacemacs/set-leader-keys-for-major-mode 'python-mode "ei" 'pyfixer:ignore-current-line)
-      (spacemacs/set-leader-keys-for-major-mode 'python-mode "ei" 'pyfixer:ignore-current-line)
-      (spacemacs/set-leader-keys-for-major-mode 'python-mode "ef" 'pyfixer:fix-current-line)
-      (spacemacs/set-leader-keys-for-major-mode 'python-mode "eF" 'pyfixer:fix-all-errors)
-      (spacemacs/set-leader-keys-for-major-mode 'python-mode "en" 'flycheck-next-error)
-      (spacemacs/set-leader-keys-for-major-mode 'python-mode "ep" 'flycheck-prev-error)
-
-
-      ;; Consider _ a part of words for python
-      (modify-syntax-entry ?_ "w" python-mode-syntax-table)
-
-      ;; (define-key global-map (kbd "C-c o") 'iedit-mode)
-
-      ;; (if (file-exists-p "/usr/local/bin/python"  )
-      ;; (setenv "PYMACS_PYTHON" "/usr/local/bin/python"))
-
-      (defun python-sort-import-list ()
-        "Split an single import lines with multiple module imports into separate lines sort results"
-        (interactive)
-        (if (not (use-region-p))
-            (error "No region defined"))
-        (let* ((start (region-beginning))
-               (end (region-end))
-               (value 0)
-               found)
-          (save-excursion
-            (let* (modlist impstart impend bigstr)
-              (setq modlist '())
-              (goto-char start)
-              (when (re-search-forward "^import \\([[:alnum:]_,\\. ]+\\)$" end t)
-                (setq impstart (match-beginning 0))
-                (setq impend (match-end 0))
-                (setq modlist (append modlist (mapcar 's-trim (s-split "," (match-string 1)))))
-                (while (setq found (re-search-forward "^import \\([[:alnum:]_,\\. ]+\\)$" end t))
-                  (setq impend (match-end 0))
-                  (setq modlist (append modlist (mapcar 's-trim (s-split "," (match-string 1))))))
-                (setq modlist (sort modlist 's-less?))
-                (setq modlist (mapcar (lambda (x) (concat "import " x)) modlist))
-                (setq bigstr (s-join "\n" modlist))
-                (save-restriction
-                  (narrow-to-region impstart impend)
-                  (delete-region impstart impend)
-                  (goto-char impstart)
-                  (insert bigstr)))))))
-
-      (defun my-python-mode-hook ()
-        (require 'pyfixers)
-        (setq comment-column 60)
-
-        ;; spacemacs does?
-        ;; (highlight-indentation-mode -1)
-        ;; (flyspell-prog-mode)
-        ;; (flycheck-mode t)
-
-        ;; This gives and error
-        (message "select checker")
-        ;; This is required b/c for some reason it's still not loaded at this point.
-        ;; (require 'flycheck)
-        (flycheck-select-checker 'python-pycheckers)
-        (message "post select checker")
-        ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
-        ;; (message "select set exec")
-
-        (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
-        (message "Python mode hook done"))
-
-      (add-hook 'python-mode-hook 'my-python-mode-hook 'append)
-      )
-    )
 
   ;; ---------------------
   ;; Auto insert templates
@@ -866,12 +588,15 @@ layers configuration. You are free to put any user code."
                         spaceline-workspace-numbers-unicode nil)
                   )
 
+    ;; =======
     ;; Layouts
+    ;; =======
+
     (fold-section "layouts"
-                  ;; (spacemacs|define-custom-layout "mail"
-                  ;;                                 :binding "m"
-                  ;;                                 :body
-                  ;;                                 (mu4e))
+                  (spacemacs|define-custom-layout "mail"
+                                                  :binding "m"
+                                                  :body
+                                                  (mu4e))
 
                   (spacemacs|define-custom-layout "irc"
                     :binding "i"
@@ -906,8 +631,6 @@ layers configuration. You are free to put any user code."
                     (find-file "~/w/optical-network-data/terastream.yang")
                     )
                   )
-
-
 
     ;; ===========
     ;; Keybindings
@@ -1224,7 +947,6 @@ layers configuration. You are free to put any user code."
           )
         )
       )
-
     (when (configuration-layer/layer-usedp 'erc)
       (setq erc-prompt-for-nickserv-password nil
             erc-autojoin-channels-alist '(("irc.gitter.im" "#syl20bnr/spacemacs")
@@ -1362,8 +1084,6 @@ layers configuration. You are free to put any user code."
 
       (erc-services-mode 1)
       )
-
-
     (when (configuration-layer/layer-usedp 'rcirc)
       (defun get-gitter-password ()
         (let* ((auth-source-creation-defaults nil)
@@ -1409,9 +1129,296 @@ layers configuration. You are free to put any user code."
        )
       )
 
-    ;;
+    ;; =================
+    ;; Programming Modes
+    ;; =================
+
+    (when (configuration-layer/layer-usedp 'syntax-checking)
+      (with-eval-after-load "flycheck"
+
+        (define-key flycheck-mode-map (kbd "M-n") 'flycheck-next-error)
+        (define-key flycheck-mode-map (kbd "M-p") 'flycheck-previous-error)
+
+        (flycheck-define-checker python-pycheckers
+                                 "A python syntax and style checker using flake8 and pylint."
+                                 :command ("pycheckers.sh"
+                                           (config-file "-8" flycheck-flake8rc)
+                                           (config-file "-r" flycheck-pylintrc)
+                                           source-inplace)
+                                 :error-patterns
+                                 ((error line-start
+                                         (file-name) ":" line ":" (optional column ":") " "
+                                         (message "E" (one-or-more digit) (zero-or-more not-newline))
+                                         line-end)
+                                  (warning line-start
+                                           (file-name) ":" line ":" (optional column ":") " "
+                                           (message (or "F"            ; Pyflakes in Flake8 >= 2.0
+                                                        "W"            ; Pyflakes in Flake8 < 2.0
+                                                        "C")           ; McCabe in Flake >= 2.0
+                                                    (one-or-more digit) (zero-or-more not-newline))
+                                           line-end)
+                                  (info line-start
+                                        (file-name) ":" line ":" (optional column ":") " "
+                                        (message (or "N"              ; pep8-naming in Flake8 >= 2.0
+                                                     "R")             ; re-factor from python.
+                                                 (one-or-more digit) (zero-or-more not-newline))
+                                        line-end)
+                                  )
+                                 :modes python-mode)))
+    (when (configuration-layer/layer-usedp 'emacs-lisp)
+      (with-eval-after-load "lisp-mode"
+        (defun rebox-lisp-hook ()
+          (message "rebox lisp hook")
+          (setq-default rebox-style-loop '(81 82 83)))
+        (add-hook 'lisp-mode-hook 'rebox-lisp-hook)
+        (add-hook 'emacs-lisp-mode-hook 'rebox-lisp-hook)))
+    (when (configuration-layer/layer-usedp 'c-c++)
+      (setq c-font-lock-extra-types
+            (quote
+             ("FILE"
+              "\\sw+_st" "\\sw+_t" "\\sw+type" ; procket types
+              "\\(u_?\\)?int\\(8\\|16\\|32\\|64\\)_t" "ushort" "uchar"
+              "bool" "boolean")))
+
+      (with-eval-after-load "cc-mode"
+        ;; (modify-syntax-entry ?_ "w" awk-mode-syntax-table)
+        (modify-syntax-entry ?_ "w" c-mode-syntax-table)
+        (modify-syntax-entry ?_ "w" objc-mode-syntax-table)
+        (modify-syntax-entry ?_ "w" c++-mode-syntax-table)
+        ;; (modify-syntax-entry ?_ "w" java-mode-syntax-table)
+        ;; (modify-syntax-entry ?_ "w" objc-mode-syntax-table)
+        (add-hook 'c-mode-common-hook
+                  (function (lambda ()
+                              (if (string= (shell-command-to-string "uname -s") "NetBSD\n")
+                                  (c-set-style "KNF")
+                                (c-set-style "Procket")
+                                (setq indent-tabs-mode nil))
+                              (c-toggle-auto-hungry-state 1)
+                              (setq fill-column 80)
+                              (flyspell-prog-mode)
+                              )))
+
+        (c-add-style
+         "KNF"
+         '((indent-tabs-mode . t)
+           (c-basic-offset . 8)
+           (c-comment-only-line-offset . 0)
+           (c-label-minimum-indentation . 0)
+           (c-tab-always-indent    . t)
+           (c-hanging-semi&comma-criteria (lambda () 'stop))
+           (c-hanging-braces-alist . ((class-open) (class-close) (defun-open)
+                                      (defun-close) (inline-open) (inline-close)
+                                      (brace-list-open) (brace-list-close)
+                                      (brace-list-intro) (brace-list-entry)
+                                      (block-open) (block-close) (substatement-open)
+                                      (statement-case-open) (extern-lang-open)
+                                      (extern-lang-close)))
+           (c-hanging-colons-alist     . ((access-label)
+                                          (case-label)
+                                          (label)
+                                          (member-init-intro)
+                                          (inher-intro)))
+                                        ;   (c-cleanup-list             . (scope-operator
+                                        ;                                 empty-defun-braces
+                                        ;                                 defun-close-semi))
+           (c-offsets-alist . ((string                . -1000)
+                               (c                     . c-lineup-C-comments)
+                               (defun-open            . 0)
+                               (defun-close           . 0)
+                               (defun-block-intro     . +)
+                               (func-decl-cont        . 0)
+                                        ; above is ansi        (func-decl-cont        . 0)
+                               (knr-argdecl-intro     . 0)
+                               (knr-argdecl           . 0)
+                               (topmost-intro         . 0)
+                               (topmost-intro-cont    . 0)
+                               (block-open            . 0)
+                               (block-close           . 0)
+                               (brace-list-open       . 0)
+                               (brace-list-close      . 0)
+                               (brace-list-intro      . +)
+                               (brace-list-entry      . 0)
+                               (statement             . 0)
+                               (statement-cont        . 4)
+                               (statement-block-intro . +)
+                               (statement-case-intro  . +)
+                               (statement-case-open   . 0)
+                               (substatement          . +)
+                               (substatement-open     . 0)
+                               (case-label            . 0)
+                               (label                 . -)
+                               (do-while-closure      . 0)
+                               (else-clause           . 0)
+                               (comment-intro         . c-lineup-comment)
+                               (arglist-intro         . 4)
+                               (arglist-cont          . 0)
+                               (arglist-cont-nonempty . 4)
+                               (arglist-close         . 4)
+                               (cpp-macro             . -1000)
+                               ))))
+
+        (c-add-style
+         "Procket"
+         '((c-basic-offset . 4)
+           (c-comment-only-line-offset . 0)
+           (c-label-minimum-indentation . 0)
+           (c-tab-always-indent    . t)
+           (c-hanging-semi&comma-criteria (lambda () 'stop))
+           (c-hanging-braces-alist . ((class-open) (class-close) (defun-open)
+                                      (defun-close) (inline-open) (inline-close)
+                                      (brace-list-open) (brace-list-close)
+                                      (brace-list-intro) (brace-list-entry)
+                                      (block-open) (block-close) (substatement-open)
+                                      (statement-case-open) (extern-lang-open)
+                                      (extern-lang-close)))
+           (c-hanging-colons-alist     . ((access-label)
+                                          (case-label)
+                                          (label)
+                                          (member-init-intro)
+                                          (inher-intro)))
+                                        ;   (c-cleanup-list             . (scope-operator
+                                        ;                                 empty-defun-braces
+                                        ;                                 defun-close-semi))
+           (c-offsets-alist . ((string                . -1000)
+                               (c                     . c-lineup-C-comments)
+                               (defun-open            . 0)
+                               (defun-close           . 0)
+                               (defun-block-intro     . +)
+                               (func-decl-cont        . 0)
+                                        ; above is ansi        (func-decl-cont        . 0)
+                               (knr-argdecl-intro     . 0)
+                               (knr-argdecl           . 0)
+                               (topmost-intro         . 0)
+                               (topmost-intro-cont    . 0)
+                               (block-open            . 0)
+                               (block-close           . 0)
+                               (brace-list-open       . 0)
+                               (brace-list-close      . 0)
+                               (brace-list-intro      . +)
+                               (brace-list-entry      . 0)
+                               (statement             . 0)
+                               (statement-cont        . c-lineup-math)
+                               (statement-block-intro . +)
+                               (statement-case-intro  . +)
+                               (statement-case-open   . 0)
+                               (substatement          . +)
+                               (substatement-open     . 0)
+                               (case-label            . 0)
+                               (label                 . -)
+                               (do-while-closure      . 0)
+                               (else-clause           . 0)
+                               (comment-intro         . c-lineup-comment)
+                               (arglist-intro         . 4)
+                               (arglist-cont          . 0)
+                               (arglist-cont-nonempty . c-lineup-arglist)
+                               (arglist-close         . 4)
+                               (cpp-macro             . -1000)
+                               ))))
+        ))
+    (when (configuration-layer/layer-usedp 'python)
+      (with-eval-after-load "python-mode"
+        (setq python-fill-docstring-style 'symmetric
+              python-fill-string-function 'my-python-fill-string-function)
+
+        (defun my-python-fill-comment-function (&optional justify)
+          (let ((fill-column 80))
+            (python-fill-comment justify)))
+
+        ;; (define-key python-mode-map (kbd "C-c Ta") 'nosetests-all)
+        ;; (define-key python-mode-map (kbd "C-c Tm") 'nosetests-module)
+        ;; (define-key python-mode-map (kbd "C-c To") 'nosetests-one)
+        ;; (define-key python-mode-map (kbd "C-c Tpa") 'nosetests-pdb-all)
+        ;; (define-key python-mode-map (kbd "C-c Tpm") 'nosetests-pdb-module)
+        ;; (define-key python-mode-map (kbd "C-c Tpo") 'nosetests-pdb-one)
+        ;; (define-key python-mode-map (kbd "C-c ta") 'pytest-all)
+        ;; (define-key python-mode-map (kbd "C-c tm") 'pytest-module)
+        ;; (define-key python-mode-map (kbd "C-c to") 'pytest-one)
+        ;; (define-key python-mode-map (kbd "C-c td") 'pytest-directory)
+        ;; (define-key python-mode-map (kbd "C-c tpa") 'pytest-pdb-all)
+        ;; (define-key python-mode-map (kbd "C-c tpm") 'pytest-pdb-module)
+        ;; (define-key python-mode-map (kbd "C-c tpo") 'pytest-pdb-one)
+        ;; SPC m e i[gnore]
+        ;; SPC m e f[ix]
+        ;; (define-key python-mode-map (kbd "C-c M-\\") 'pyfixer:ignore-current-line)
+        ;; (define-key python-mode-map (kbd "C-c C-\\") 'pyfixer:fix-current-line)
+        ;; (define-key python-mode-map (kbd "C-c C-M-\\") 'pyfixer:fix-all-errors)
+        ;; (define-key python-mode-map (kbd "C-c 8") 'pyfixer:fix-all-errors)
+        ;; (bind-key "C-c C-h" 'pylookup-lookup python-mode-map)
+
+        (spacemacs/declare-prefix-for-mode 'python-mode "e" "errors-prefix")
+        (spacemacs/set-leader-keys-for-major-mode 'python-mode "ei" 'pyfixer:ignore-current-line)
+        (spacemacs/set-leader-keys-for-major-mode 'python-mode "ef" 'pyfixer:fix-current-line)
+        (spacemacs/set-leader-keys-for-major-mode 'python-mode "eF" 'pyfixer:fix-all-errors)
+        (spacemacs/set-leader-keys-for-major-mode 'python-mode "en" 'flycheck-next-error)
+        (spacemacs/set-leader-keys-for-major-mode 'python-mode "ep" 'flycheck-prev-error)
+
+
+        ;; Consider _ a part of words for python
+        (modify-syntax-entry ?_ "w" python-mode-syntax-table)
+
+        ;; (define-key global-map (kbd "C-c o") 'iedit-mode)
+
+        ;; (if (file-exists-p "/usr/local/bin/python"  )
+        ;; (setenv "PYMACS_PYTHON" "/usr/local/bin/python"))
+
+        (defun python-sort-import-list ()
+          "Split an single import lines with multiple module imports into separate lines sort results"
+          (interactive)
+          (if (not (use-region-p))
+              (error "No region defined"))
+          (let* ((start (region-beginning))
+                 (end (region-end))
+                 (value 0)
+                 found)
+            (save-excursion
+              (let* (modlist impstart impend bigstr)
+                (setq modlist '())
+                (goto-char start)
+                (when (re-search-forward "^import \\([[:alnum:]_,\\. ]+\\)$" end t)
+                  (setq impstart (match-beginning 0))
+                  (setq impend (match-end 0))
+                  (setq modlist (append modlist (mapcar 's-trim (s-split "," (match-string 1)))))
+                  (while (setq found (re-search-forward "^import \\([[:alnum:]_,\\. ]+\\)$" end t))
+                    (setq impend (match-end 0))
+                    (setq modlist (append modlist (mapcar 's-trim (s-split "," (match-string 1))))))
+                  (setq modlist (sort modlist 's-less?))
+                  (setq modlist (mapcar (lambda (x) (concat "import " x)) modlist))
+                  (setq bigstr (s-join "\n" modlist))
+                  (save-restriction
+                    (narrow-to-region impstart impend)
+                    (delete-region impstart impend)
+                    (goto-char impstart)
+                    (insert bigstr)))))))
+
+        (defun my-python-mode-hook ()
+          (require 'pyfixers)
+          (setq comment-column 60)
+
+          ;; spacemacs does?
+          ;; (highlight-indentation-mode -1)
+          ;; (flyspell-prog-mode)
+          ;; (flycheck-mode t)
+
+          ;; This gives and error
+          (message "select checker")
+          ;; This is required b/c for some reason it's still not loaded at this point.
+          ;; (require 'flycheck)
+          (flycheck-select-checker 'python-pycheckers)
+          (message "post select checker")
+          ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
+          ;; (message "select set exec")
+
+          (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
+          (message "Python mode hook done"))
+
+        (add-hook 'python-mode-hook 'my-python-mode-hook 'append)
+        )
+      )
+
+    ;; ===
     ;; Org
-    ;;
+    ;; ===
+
     (when (configuration-layer/layer-usedp 'org)
       (progn
         (message "post-init-start")
@@ -1795,7 +1802,8 @@ layers configuration. You are free to put any user code."
  '(evil-shift-width 4)
  '(safe-local-variable-values
    (quote
-    ((evil-shift-width . 2)
+    ((js2-indent-level . 2)
+     (evil-shift-width . 2)
      (eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
      (eval progn
            (require
