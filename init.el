@@ -1327,55 +1327,54 @@ layers configuration. You are free to put any user code."
          org-mu4e-link-query-in-headers-mode t
 
          org-capture-templates
-         '(("d" "Todo" entry (file+headline (concat org-directory "/notes.org") "Tasks")
-            "* TODO %?\nSCHEDULED: %T\nDEADLINE: %T\nCreated: %t\nAnnotation: %a\n")
-
+         '(
            ("t" "Todo" entry (file+headline (concat org-directory "/notes.org") "Tasks")
             "* TODO %?\nCreated: %t\nAnnotation: %a\n")
 
-           ("x" "Tramdose" entry (file+datetree (concat org-directory "/medicine.org") "Tramadol")
-            "* NOTE %?\nCreated: %U")
+           ("m" "Mail Followup" entry (file+headline (concat org-directory "/notes.org") "Mail")
+            "* Mail TODO Read Mail%? ([f: %:fromname]: %:subject)\n%U\nMessage: %a\n")
 
-           ("m" "Mail Todo" entry (file+headline (concat org-directory "/notes.org") "Mail")
-            "* TODO Read Mail%? ([f: %:fromname]: %:subject)\n%U\nMessage: %a\n")
+           ("c" "Code Todo" entry (file+headline (concat org-directory "/notes.org") "Code Todo")
+            "* Code TODO %?\nCreated: %t\nAnnotation: %a\n")
 
-           ("M" "Mail Todo" entry (file+headline (concat org-directory "/notes.org") "Mail")
-            "* TODO Followup Mail [f: %:fromname]: %:subject)\nSCHEDULED: %T\nDEADLINE: %T\nCreated: %t\nMessage: %a\nExtra Notes: %?")
-
-                                        ; ("M" "Mac Mail Todo" entry (file+headline (concat org-directory "/notes.org") "Mail")
-                                        ;  "* TODO %?\n%T\n%(org-mac-message-get-links \"s\")\n")
-
-           ("l" "Link Note" entry (file+headline (concat org-directory "/notes.org") "Notes")
-            "* NOTE %?\n%T\n%(org-mac-safari-get-frontmost-url)\n")
+           ("L" "Mac Link Note" entry (file+headline (concat org-directory "/notes.org") "Notes")
+            "* NOTE %?\n%u\n%(org-mac-safari-get-frontmost-url)\n")
 
            ("n" "Generic Note" entry (file+headline (concat org-directory "/notes.org") "Notes")
-            "* NOTE %?\n%T\nannotation:%a\nx:%x\n")
+            "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
 
            ("s" "Status" entry (file+datetree (concat org-directory "/status.org"))
-            "* NOTE %?\n%T\n")
+            "* NOTE %?\n%u\n")
+
+           ("x" "Tramdose 100mg" entry (file+datetree (concat org-directory "/medicine.org") "Tramadol")
+            "* NOTE 100mg\nCreated: %U" :immediate-finish)
+
+           ("X" "Tramdose" entry (file+datetree (concat org-directory "/medicine.org") "Tramadol")
+            "* NOTE %?\nCreated: %U")
+
 
            ("i" "IETF related")
-           ("im" "IETF Todo w/ Mac Mail" entry (file+headline (concat org-directory "/notes.org") "IETF")
-            "* TODO %?\n%T\n%(org-mac-message-get-links \"s\")\n")
-           ("il" "IETF Note w/ Mac Link " entry (file+headline (concat org-directory "/notes.org") "IETF")
-            "* NOTE %?\n%T\n%(org-mac-safari-get-frontmost-url)\n")
-           ("in" "IETF Note (ann, clip)" entry (file+headline (concat org-directory "/notes.org") "IETF")
-            "* NOTE %?\n%T\nannotation:%a\nx:%x\n")
-           ("it" "IETF Todo (with annotation)" entry (file+headline (concat org-directory "/notes.org") "IETF")
-            "* TODO %?\n%T\nannotation:%a\n")
+           ;;; XXX these are exact copies of the generic ones different file.
+           ("it" "Todo" entry (file+headline (concat org-directory "/ietf.org") "Tasks")
+            "* TODO %?\nCreated: %t\nAnnotation: %a\n")
 
-           ("T" "Terastream related")
-           ("Tm" "Terastram Todo with Mac Mail" entry (file+headline (concat org-directory "/notes.org") "Terastream")
-            "* TODO %?\n%T\n%(org-mac-message-get-links \"s\")\n")
-           ("Tl" "Terastram Safari Note" entry (file+headline (concat org-directory "/notes.org") "Terastream")
-            "* NOTE %?\n%T\n%(org-mac-safari-get-frontmost-url)\n")
-           ("Tl" "Terastram Safari Todo" entry (file+headline (concat org-directory "/notes.org") "Terastream")
-            "* TODO %?\n%T\n%(org-mac-safari-get-frontmost-url)\n")
-           ("Tc" "Terastram Code Todo" entry (file+olp (concat org-directory "/notes.org") "Terastream" "Code Todo")
-            "* TODO %?\n%t\n%f:%a\n")
-           ("Tt" "Terastream Todo" entry (file+headline (concat org-directory "/notes.org") "Terastream")
-            "* TODO %?\n%T\n")
+           ("in" "Generic Note" entry (file+headline (concat org-directory "/ietf.org") "Notes")
+            "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
+
+           ("w" "Work related")
+           ;;; XXX these are exact copies of the generic ones different file.
+           ("wt" "Todo" entry (file+headline (concat org-directory "/work.org") "Tasks")
+            "* TODO %?\nCreated: %t\nAnnotation: %a\n")
+
+           ("wc" "Code Todo" entry (file+headline (concat org-directory "/work.org") "Code Todo")
+            "* Code TODO %?\nCreated: %t\nAnnotation: %a\n")
+
+           ("wn" "Generic Note" entry (file+headline (concat org-directory "/work.org") "Notes")
+            "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
            )
+         ;; In mail map todo to mail-todo
+         org-capture-templates-contexts '(("t" "m" ((in-mode . "mu4e-headers-mode")))
+                                          ("t" "m" ((in-mode . "mu4e-view-mode"))))
          )
 
         ;; (add-to-list 'org-babel-load-languages '(python . t))
