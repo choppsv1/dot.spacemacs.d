@@ -1,0 +1,44 @@
+#+TITLE: %LAYER_NAME% layer
+#+HTML_HEAD_EXTRA: <link rel="stylesheet" type="text/css" href="../css/readtheorg.css" />
+
+* Table of Contents                                        :TOC_4_org:noexport:
+ - [[Description][Description]]
+   - [[ietf-docs][ietf-docs]]
+   - [[IRFC mode][IRFC mode]]
+ - [[Install][Install]]
+ - [[Key bindings][Key bindings]]
+
+* Description
+The =IETF= layer collects various useful packages for participating in the
+Internet Engineering Task Force (https://www.ietf.org). Currently there are 2
+packages.
+  - ietf-docs
+  - irfc
+
+** ietf-docs
+The IETF docs package adds support for fetching and displaying IETF documents
+with a function based on the name of the document. For example if the point is
+anwhere on the text RFC781 and one invokes the ~ietf-docs-open-at-point~ the
+package will fetch the document to a local cache (if not present) and view it.
+This works for the 3 standard document names, STDXXX, RFCXXX and draft-xxxx-yyy.
+
+** IRFC mode
+RFC mode is a minor mode supporting viewing of IETF documents, it uses the well
+known structure of all IETF documents to format the viewing of them.
+Additionally it creates hyperlinks for references within the document.
+
+* Install
+To use this contribution add it to your =~/.spacemacs=
+
+:variables ietf-docs-dir - where cached documents should be stored.
+
+#+begin_src emacs-lisp
+  (setq-default dotspacemacs-configuration-layers '(ietf))
+#+end_src
+
+* Key bindings
+
+| Key Binding | Description                                         |
+|-------------+-----------------------------------------------------|
+| ~<SPC> f I~ | Opens IETF document based on the text at the point. |
+|             |                                                     |
