@@ -21,15 +21,15 @@ values."
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     ;; spacemacs-ivy
-     spacemacs-helm
+     ;; spacemacs-helm
      (auto-completion :variables
                       auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets")
 
-     ;; better-defaults
+     ;; ;; better-defaults
      erc
+     ;; rcirc
      ;; bb-erc
-     eyebrowse
+     ;; eyebrowse blows layouts away!
      gtags
      mu4e
      (osx :variables
@@ -39,32 +39,42 @@ values."
      rebox
      ;; (rcirc :variables
      ;;        rcirc-enable-authinfo-support t)
-     spacemacs-layouts
      spell-checking
      spotify
      syntax-checking
      ;; version-control
 
-     ;; Langs
+     ;; ;; Langs
+     ;; c-c++
+     ;; emacs-lisp
+     ;; ;; erlang
+     ;; git
+     ;; ;; go
+     ;; html
+     ;; ;; java
+     ;; javascript
+     ;; (latex :variables
+     ;;        latex-build-command "latexmk")
+     ;; lua
+     ;; ;; markdown
+     ;; ;; php
+     ;; (python :variables
+     ;;         python-fill-column 120)
+     ;; ;; ruby
+     ;; shell-scripts
+     ;; yaml
+
+     ;; Languages
      c-c++
      emacs-lisp
-     ;; erlang
      git
-     ;; go
      html
-     ;; java
      javascript
-     (latex :variables
-            latex-build-command "latexmk")
      lua
-     ;; markdown
-     ;; php
      (python :variables
              python-fill-column 120)
-     ;; ruby
      shell-scripts
      yaml
-
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -72,7 +82,7 @@ values."
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages '(ietf-docs)
    ;; A list of packages and/or extensions that will not be install and loaded.
-   dotspacemacs-excluded-packages '(smartparens) ; evil-org
+   dotspacemacs-excluded-packages '(mu4e-maildirs-extension smartparens) ; evil-org
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
    ;; are declared in a layer which is not a member of
    ;; the list `dotspacemacs-configuration-layers'. (default t)
@@ -175,7 +185,7 @@ values."
    dotspacemacs-default-layout-name "Default"
    ;; If non nil the default layout name is displayed in the mode-line.
    ;; (default nil)
-   dotspacemacs-display-default-layout nil
+   dotspacemacs-display-default-layout t
    ;; If non nil then the last auto saved layouts are resume automatically upon
    ;; start. (default nil)
    dotspacemacs-auto-resume-layouts nil
@@ -266,7 +276,7 @@ values."
    ;; (default nil)
    dotspacemacs-whitespace-cleanup 'changed
    ;; Allow for adding to use package configuration.
-   use-package-inject-hooks t
+   ;; use-package-inject-hooks t
    )
   )
 
@@ -376,188 +386,6 @@ user code here.  The exception is org related code, which should be placed in `d
   ;;   )
 
 
-  ;; ---------------------
-  ;; Auto insert templates
-  ;; ---------------------
-
-  (fold-section "Auto Insert Templates"
-                (defun user-full-name ()
-                  "Christian Hopps")
-
-                (defun my-get-date ()
-                  (concat (format-time-string "%B" (current-time))
-                          " "
-                          (trim-string (format-time-string " %e" (current-time)))
-                          (format-time-string " %Y" (current-time))))
-
-                (setq work-ai-prefix "/.*/\\(?:\\(?:Documents|Dropbox\\)/[Ww]ork\\|chopps/w\\)/.*/")
-
-                (eval-after-load 'autoinsert
-                  '(progn
-                     (define-auto-insert
-                       '("\\.org\\'" . "Home Org mode skeleton")
-                       '("Short description: "
-                         "#+TITLE: " _ \n
-                         > "#+AUTHOR: Christian E. Hopps" \n
-                         > "#+EMAIL: chopps@gmail.com" \n
-                         > "#+STARTUP: indent" \n
-                         > "" \n
-                         ))
-                     (define-auto-insert
-                       '("\\.o2b\\'" . "Home Blog Org mode skeleton")
-                       '("Short description: "
-                         "#+TITLE: " _ \n
-                         > "#+BLOG: hoppsjots.org" \n
-                         > "#+AUTHOR: Christian E. Hopps" \n
-                         > "#+EMAIL: chopps@gmail.com" \n
-                         > "#+CATEGORY: Development" _ \n
-                         > "#+OPTIONS: toc:nil num:nil todo:nil pri:nil tags:nil ^:nil TeX:nil" \n
-                         > "#+STARTUP: indent" \n
-                         > "" \n
-                         ))
-                     (define-auto-insert
-                       '("\\.el\\'" . "Home Lisp comment skeleton")
-                       '("Short description: "
-                         ";;" \n
-                         > ";; " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
-                         > ";;" \n
-                         > ";; Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps" \n
-                         > ";; All rights reserved." \n
-                         > ";;" \n
-                         > _ ))
-                     (define-auto-insert
-                       '("\\.py\\'" . "# Home python comment skeleton")
-                       '("Short description: "
-                         "# -*- coding: utf-8 -*-"
-                         > "#" \n
-                         > "# " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
-                         > "#" \n
-                         > "# Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
-                         > "# All rights reserved." \n
-                         > "#" \n
-                         > "# REDISTRIBUTION IN ANY FORM PROHIBITED WITHOUT PRIOR WRITTEN" \n
-                         > "# CONSENT OF THE AUTHOR." \n
-                         > "#" \n
-                         > "from __future__ import absolute_import, division, unicode_literals, print_function, nested_scopes" \n
-                         > "" \n
-                         > _ \n
-                         > "" \n
-                         > "__author__ = '" (user-full-name) "'" \n
-                         > "__date__ = '" (my-get-date) "'" \n
-                         > "__version__ = '1.0'" \n
-                         > "__docformat__ = \"restructuredtext en\"" \n
-                         > _ ))
-                     (define-auto-insert
-                       '("\\.sh\'" . "# Home shell comment skeleton")
-                       '("Short description: "
-                         "#!/bin/bash" \n
-                         > "#" \n
-                         > "# " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
-                         > "#" \n
-                         > "# Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
-                         > "# All rights reserved." \n
-                         > "#" \n
-                         > _ ))
-                     (define-auto-insert
-                       '("\\.\\(pl\\|tcl\\)" . "# Home comment skeleton")
-                       '("Short description: "
-                         "#" \n
-                         > "# " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
-                         > "#" \n
-                         > "# Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
-                         > "# All rights reserved." \n
-                         > "#" \n
-                         > _ ))
-                     (define-auto-insert
-                       '("\\.rst\\'" . "Home ReST skeleton")
-                       '("Short description: "
-                         ".." \n
-                         > ".. " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
-                         > ".." \n
-                         > ".. Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
-                         > ".. All rights reserved." \n
-                         > ".." \n
-                         > _ ))
-                     (define-auto-insert
-                       '("\\.\\(h\\|c\\|CC?\\|cc\\|cxx\\|cpp\\|c++\\|m\\)\\'" . "Home C-style skeleton")
-                       '("Short description: "
-                         "/*" \n
-                         > " * " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
-                         > "*" \n
-                         > "* Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
-                         > "* All rights reserved." \n
-                         > "*" \n
-                         > "* REDISTRIBUTION IN ANY FORM PROHIBITED WITHOUT PRIOR WRITTEN" \n
-                         > "* CONSENT OF THE AUTHOR." \n
-                         > "*/" \n
-                         > _ ))
-
-
-                     ;;-----------+
-                     ;;      Work
-                     ;;-----------+
-
-                     (define-auto-insert
-                       (cons (concat work-ai-prefix "\\.org\\'") "Work org mode skeleton")
-                       '("Short description: "
-                         "#+TITLE: " _ \n
-                         > "#+AUTHOR: Christian E. Hopps" \n
-                         > "#+EMAIL: chopps@gmail.com" \n
-                         > "#+STARTUP: indent" \n
-                         > "" \n
-                         ))
-                     (define-auto-insert
-                       (cons (concat work-ai-prefix "\\.el\\'") "Work Lisp comment skeleton")
-                       '("Short description: "
-                         ";;" \n
-                         > ";; " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
-                         > ";;" \n
-                         > _
-                         ))
-                     (define-auto-insert
-                       (cons (concat work-ai-prefix "\\.py\\'") "# Work python comment skeleton")
-                       '("Short description: "
-                         "# -*- coding: utf-8 -*-"
-                         > "#" \n
-                         > "# " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
-                         > "#" \n
-                         > "from __future__ import absolute_import, division, unicode_literals, print_function, nested_scopes" \n
-                         > _ \n
-                         > "__author__ = '" (user-full-name) "'" \n
-                         > "__date__ = '" (my-get-date) "'" \n
-                         > "__version__ = '1.0'" \n
-                         > "__docformat__ = \"restructuredtext en\"" \n
-                         ))
-                     (define-auto-insert
-                       (cons (concat work-ai-prefix "\\.sh\\'") "# Work comment skeleton")
-                       '("Short description: "
-                         "#!/bin/bash" \n
-                         > "#" \n
-                         > "# " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
-                         > "#" \n
-                         > _ ))
-                     (define-auto-insert
-                       (cons (concat work-ai-prefix "\\.\\(pl\\|tcl\\)\\'") "# Work comment skeleton")
-                       '("Short description: "
-                         "#" \n
-                         > "# " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
-                         > "#" \n
-                         > _ ))
-                     (define-auto-insert
-                       (cons (concat work-ai-prefix "\\.rst\\'") "Work ReST skeleton")
-                       '("Short description: "
-                         ".." \n
-                         > ".. " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
-                         > ".." \n
-                         > _ ))
-                     (define-auto-insert
-                       (cons (concat work-ai-prefix "\\.\\(h\\|c\\|CC?\\|cc\\|cxx\\|cpp\\|c++\\|m\\)\\'") "Work C-style skeleton")
-                       '("Short description: "
-                         "/*" \n
-                         > "* " (my-get-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
-                         > "*/" \n
-                         > _ ))
-                     )))
   )
 
 (defun dotspacemacs/user-config ()
@@ -601,9 +429,12 @@ layers configuration. You are free to put any user code."
                   (spacemacs|define-custom-layout "irc"
                     :binding "i"
                     :body
-                    (launch-irc-jabber)
-                    (split-window-right)
-                    (launch-irc-gitter)
+                    (progn
+                      (add-hook 'erc-mode-hook #'(lambda ()
+                                                   (persp-add-buffer (current-buffer))))
+                      (launch-irc-jabber)
+                      (split-window-right)
+                      (launch-irc-gitter))
                     )
                   (spacemacs|define-custom-layout "W:OCP"
                     :binding "wo"
@@ -648,6 +479,13 @@ layers configuration. You are free to put any user code."
     ;; ==========
     ;; Messaging
     ;; ==========
+
+    (defun my-erc-perspective ()
+      "Switch or create to a perspective called 'erc' and connect to IRC"
+      (interactive)
+      (select-frame (make-frame '((name . "ERC") (minibuffer . t))))
+      (persp-switch "freenode.net")
+      (erc :server "asimov.freenode.net" :port "6667" :nick "chopps"))
 
     (when (configuration-layer/layer-usedp 'mu4e)
       (progn
@@ -1084,6 +922,7 @@ layers configuration. You are free to put any user code."
 
       (erc-services-mode 1)
       )
+
     (when (configuration-layer/layer-usedp 'rcirc)
       (defun get-gitter-password ()
         (let* ((auth-source-creation-defaults nil)
@@ -1102,11 +941,12 @@ layers configuration. You are free to put any user code."
        rcirc-log-directory "~/Dropbox/logs/rcirclogs"
        rcirc-time-format "%H:%M "
        rcirc-server-alist
-       `(("irc.gitter.im"
+       `(
+         ("127.0.0.1"
           :user "choppsv1"
-          :port "6667"
+          :port "6669"
           :password ,(get-gitter-password)
-          :encryption tls
+          ;; :encryption tls
           :channels ("#syl20bnr/spacemacs"))
          ("asimov.freenode.net"
           :user "chopps"
@@ -1780,16 +1620,190 @@ layers configuration. You are free to put any user code."
 
     (add-hook 'org-mode-hook 'evil-normalize-keymaps)
 
+    ;; ---------------------
+    ;; Auto insert templates
+    ;; ---------------------
+
+    (fold-section "Auto Insert Templates"
+                  (defun new-file-header-date ()
+                    (concat (format-time-string "%B" (current-time))
+                            " "
+                            (trim-string (format-time-string " %e" (current-time)))
+                            (format-time-string " %Y" (current-time))))
+
+                  (setq work-ai-prefix "/.*/\\(?:\\(?:Documents|Dropbox\\)/[Ww]ork\\|chopps/w\\)/.*/")
+
+                  (with-eval-after-load 'autoinsert
+                    (define-auto-insert
+                      '("\\.org\\'" . "Home Org mode skeleton")
+                      '("Short description: "
+                        "#+TITLE: " _ \n
+                        > "#+AUTHOR: Christian E. Hopps" \n
+                        > "#+EMAIL: chopps@gmail.com" \n
+                        > "#+STARTUP: indent" \n
+                        > "" \n
+                        ))
+                    (define-auto-insert
+                      '("\\.o2b\\'" . "Home Blog Org mode skeleton")
+                      '("Short description: "
+                        "#+TITLE: " _ \n
+                        > "#+BLOG: hoppsjots.org" \n
+                        > "#+AUTHOR: Christian E. Hopps" \n
+                        > "#+EMAIL: chopps@gmail.com" \n
+                        > "#+CATEGORY: Development" _ \n
+                        > "#+OPTIONS: toc:nil num:nil todo:nil pri:nil tags:nil ^:nil TeX:nil" \n
+                        > "#+STARTUP: indent" \n
+                        > "" \n
+                        ))
+                    (define-auto-insert
+                      '("\\.el\\'" . "Home Lisp comment skeleton")
+                      '("Short description: "
+                        ";;" \n
+                        > ";; " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > ";;" \n
+                        > ";; Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps" \n
+                        > ";; All rights reserved." \n
+                        > ";;" \n
+                        > _ ))
+                    (define-auto-insert
+                      '("\\.py\\'" . "# Home python comment skeleton")
+                      '("Short description: "
+                        "# -*- coding: utf-8 -*-"
+                        > "#" \n
+                        > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > "#" \n
+                        > "# Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
+                        > "# All rights reserved." \n
+                        > "#" \n
+                        > "# REDISTRIBUTION IN ANY FORM PROHIBITED WITHOUT PRIOR WRITTEN" \n
+                        > "# CONSENT OF THE AUTHOR." \n
+                        > "#" \n
+                        > "from __future__ import absolute_import, division, unicode_literals, print_function, nested_scopes" \n
+                        > "" \n
+                        > _ \n
+                        > "" \n
+                        > "__author__ = '" (user-full-name) "'" \n
+                        > "__date__ = '" (new-file-header-date) "'" \n
+                        > "__version__ = '1.0'" \n
+                        > "__docformat__ = \"restructuredtext en\"" \n
+                        > _ ))
+                    (define-auto-insert
+                      '("\\.sh\'" . "# Home shell comment skeleton")
+                      '("Short description: "
+                        "#!/bin/bash" \n
+                        > "#" \n
+                        > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > "#" \n
+                        > "# Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
+                        > "# All rights reserved." \n
+                        > "#" \n
+                        > _ ))
+                    (define-auto-insert
+                      '("\\.\\(pl\\|tcl\\)" . "# Home comment skeleton")
+                      '("Short description: "
+                        "#" \n
+                        > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > "#" \n
+                        > "# Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
+                        > "# All rights reserved." \n
+                        > "#" \n
+                        > _ ))
+                    (define-auto-insert
+                      '("\\.rst\\'" . "Home ReST skeleton")
+                      '("Short description: "
+                        ".." \n
+                        > ".. " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > ".." \n
+                        > ".. Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
+                        > ".. All rights reserved." \n
+                        > ".." \n
+                        > _ ))
+                    (define-auto-insert
+                      '("\\.\\(h\\|c\\|CC?\\|cc\\|cxx\\|cpp\\|c++\\|m\\)\\'" . "Home C-style skeleton")
+                      '("Short description: "
+                        "/*" \n
+                        > " * " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > "*" \n
+                        > "* Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
+                        > "* All rights reserved." \n
+                        > "*" \n
+                        > "* REDISTRIBUTION IN ANY FORM PROHIBITED WITHOUT PRIOR WRITTEN" \n
+                        > "* CONSENT OF THE AUTHOR." \n
+                        > "*/" \n
+                        > _ ))
+
+
+                    ;;-----------+
+                    ;;      Work
+                    ;;-----------+
+
+                    (define-auto-insert
+                      (cons (concat work-ai-prefix "\\.org\\'") "Work org mode skeleton")
+                      '("Short description: "
+                        "#+TITLE: " _ \n
+                        > "#+AUTHOR: Christian E. Hopps" \n
+                        > "#+EMAIL: chopps@gmail.com" \n
+                        > "#+STARTUP: indent" \n
+                        > "" \n
+                        ))
+                    (define-auto-insert
+                      (cons (concat work-ai-prefix "\\.el\\'") "Work Lisp comment skeleton")
+                      '("Short description: "
+                        ";;" \n
+                        > ";; " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > ";;" \n
+                        > _
+                        ))
+                    (define-auto-insert
+                      (cons (concat work-ai-prefix "\\.py\\'") "# Work python comment skeleton")
+                      '("Short description: "
+                        "# -*- coding: utf-8 -*-"
+                        > "#" \n
+                        > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > "#" \n
+                        > "from __future__ import absolute_import, division, unicode_literals, print_function, nested_scopes" \n
+                        > _ \n
+                        > "__author__ = '" (user-full-name) "'" \n
+                        > "__date__ = '" (new-file-header-date) "'" \n
+                        > "__version__ = '1.0'" \n
+                        > "__docformat__ = \"restructuredtext en\"" \n
+                        ))
+                    (define-auto-insert
+                      (cons (concat work-ai-prefix "\\.sh\\'") "# Work comment skeleton")
+                      '("Short description: "
+                        "#!/bin/bash" \n
+                        > "#" \n
+                        > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > "#" \n
+                        > _ ))
+                    (define-auto-insert
+                      (cons (concat work-ai-prefix "\\.\\(pl\\|tcl\\)\\'") "# Work comment skeleton")
+                      '("Short description: "
+                        "#" \n
+                        > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > "#" \n
+                        > _ ))
+                    (define-auto-insert
+                      (cons (concat work-ai-prefix "\\.rst\\'") "Work ReST skeleton")
+                      '("Short description: "
+                        ".." \n
+                        > ".. " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > ".." \n
+                        > _ ))
+                    (define-auto-insert
+                      (cons (concat work-ai-prefix "\\.\\(h\\|c\\|CC?\\|cc\\|cxx\\|cpp\\|c++\\|m\\)\\'") "Work C-style skeleton")
+                      '("Short description: "
+                        "/*" \n
+                        > "* " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > "*/" \n
+                        > _ ))
+                    ))
+
     ;; (message "End: %s" inhibit-startup-screen)
     ;; (if inhibit-startup-screen
     ;;     (quit-window))
     )
   )
-
-;; Local Variables:
-;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
-;; End:
-;; eval: (find-and-close-fold "\\((eval-after-load\\|(spacemacs|use\\)")
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
@@ -1802,16 +1816,15 @@ layers configuration. You are free to put any user code."
  '(evil-shift-width 4)
  '(safe-local-variable-values
    (quote
-    ((js2-indent-level . 2)
+    ((eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
+     (js2-indent-level . 2)
      (evil-shift-width . 2)
-     (eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
      (eval progn
            (require
             (quote projectile))
            (puthash
             (projectile-project-root)
-            "make test" projectile-test-cmd-map))
-     (eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\)"))))
+            "make test" projectile-test-cmd-map)))))
  '(send-mail-function (quote smtpmail-send-it)))
 
 (custom-set-faces
@@ -1823,3 +1836,7 @@ layers configuration. You are free to put any user code."
  '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil))))
  '(erc-input-face ((t (:foreground "cornflowerblue"))))
  '(evil-search-highlight-persist-highlight-face ((t (:inherit region :background "yellow3" :foreground "black")))))
+
+;; Local Variables:
+;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
+;; End:

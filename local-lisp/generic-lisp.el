@@ -7,7 +7,7 @@
   (interactive "sFold on regexp:")
   (save-excursion
     (goto-char (point-max))
-    (while (re-search-backward re-string)
+    (while (re-search-backward re-string nil 'noerror)
       (message "found and folding point: %d" (point))
       (evil-close-fold)
       (goto-char (- (point) 1))
