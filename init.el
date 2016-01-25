@@ -40,7 +40,7 @@ values."
      ;; (rcirc :variables
      ;;        rcirc-enable-authinfo-support t)
      spell-checking
-     spotify
+     ;; spotify
      syntax-checking
      ;; version-control
 
@@ -64,6 +64,9 @@ values."
      ;; shell-scripts
      ;; yaml
 
+     ;;(ietf :variables ietf-docs-cache "~/ietf-docs-cache")
+     ietf
+
      ;; Languages
      c-c++
      emacs-lisp
@@ -80,7 +83,7 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(ietf-docs)
+   dotspacemacs-additional-packages '()
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages '(mu4e-maildirs-extension smartparens) ; evil-org
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
@@ -796,6 +799,7 @@ layers configuration. You are free to put any user code."
             ;; erc-hl-nicks-color-contrast-strategy 'contrast
             ;; erc-hl-nicks-color-contrast-strategy 'invert
             erc-hl-nicks-skip-nicks '("gitter")
+            erc-notifications-icon (concat user-emacs-directory "./layers/+irc/rcirc/img/irc.png")
 
             )
         ;; '(erc-autoaway-idle-seconds 600)
@@ -838,8 +842,7 @@ layers configuration. You are free to put any user code."
                                           :max 1
                                           :host host
                                           :user user
-                                          :port port
-                                          :create t))
+                                          :port port))
                                   :secret))
                (password (if (functionp secret)
                              (funcall secret)
@@ -853,8 +856,10 @@ layers configuration. You are free to put any user code."
       (defun launch-irc-gitter ()
         "Launch irc connection to giter.im"
         (interactive)
-        (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1"
-                 :password (erc-acct-get-password "choppsv1" "irc.gitter.im" 6667)))
+        (erc :server "192.168.1.5" :port 6669 :nick "choppsv1"
+             :password (erc-acct-get-password "choppsv1" "192.168.1.5" 6667)))
+        ;; (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1"
+        ;;         :password (erc-acct-get-password "choppsv1" "irc.gitter.im" 6667)))
 
       (defun launch-irc-netbsd ()
         "Launch irc connection to netbsd"
@@ -909,16 +914,16 @@ layers configuration. You are free to put any user code."
                                  pass)))))
       (add-hook 'erc-join-hook 'bitlbee-netrc-identify)
 
-
-      ;; add a user to the current channel
-      (defun add-nick-insert-pre-hook (line)
-        "Add user to ERC channel list"
-        (when (string= erc-session-server "irc.gitter.im")
-          (save-match-data
-            (when (string-match "^<\\([^>]+\\)> .*" line)
-              (let ((nick (match-string 1 line)))
-                (erc-update-current-channel-member nick nick 'add-if-new))))))
-      (add-hook 'erc-insert-pre-hook 'add-nick-insert-pre-hook)
+      ;; We only need this if we aren't using our local bridge
+      ;; ;; add a user to the current channel
+      ;; (defun add-nick-insert-pre-hook (line)
+      ;;   "Add user to ERC channel list"
+      ;;   (when (string= erc-session-server "irc.gitter.im")
+      ;;     (save-match-data
+      ;;       (when (string-match "^<\\([^>]+\\)> .*" line)
+      ;;         (let ((nick (match-string 1 line)))
+      ;;           (erc-update-current-channel-member nick nick 'add-if-new))))))
+      ;; (add-hook 'erc-insert-pre-hook 'add-nick-insert-pre-hook)
 
       (erc-services-mode 1)
       )
