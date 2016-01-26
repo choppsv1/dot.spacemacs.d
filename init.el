@@ -35,6 +35,7 @@ values."
      (osx :variables
            osx-use-option-as-meta t)
      org
+     org2blog
      ranger
      rebox
      ;; (rcirc :variables
@@ -856,10 +857,10 @@ layers configuration. You are free to put any user code."
       (defun launch-irc-gitter ()
         "Launch irc connection to giter.im"
         (interactive)
-        (erc :server "192.168.1.5" :port 6669 :nick "choppsv1"
-             :password (erc-acct-get-password "choppsv1" "192.168.1.5" 6667)))
-        ;; (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1"
-        ;;         :password (erc-acct-get-password "choppsv1" "irc.gitter.im" 6667)))
+        ;; (erc :server "192.168.1.5" :port 6669 :nick "choppsv1"
+        ;;     :password (erc-acct-get-password "choppsv1" "192.168.1.5" 6667)))
+        (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1"
+                :password (erc-acct-get-password "choppsv1" "irc.gitter.im" 6667)))
 
       (defun launch-irc-netbsd ()
         "Launch irc connection to netbsd"
@@ -1546,6 +1547,27 @@ layers configuration. You are free to put any user code."
 
         ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
         )
+      )
+
+    (when (configuration-layer/layer-usedp 'org2blog)
+      (with-eval-after-load "org2blog"
+        ;; XXX cool addition add after testing
+        ;; ;; (add-hook 'org2blog/wp-mode-hook '(lambda () (org-mode t)))
+        ;; (add-to-list 'org2blog/wp-sourcecode-langs "lisp")
+        ;; (add-to-list 'org2blog/wp-sourcecode-langs "sh")
+
+        ;; (defadvice org-wp-src-block (after ad-org-wp-src-block activate)
+        ;;   "Always use space as title if none given"
+        ;;   (setq ad-return-value (replace-regexp-in-string "title=\"\"" "title=\" \"" ad-return-value)))
+        ;; (ad-activate 'org-wp-src-block)
+
+        ;; Should probably be in layer config
+        (setq org2blog/wp-use-sourcecode-shortcode t)
+        (setq org2blog/wp-blog-alist `(("hoppsjots.org"
+                                        :url "http://hoppsjots.org/xmlrpc.php"
+                                        :default-categories ("Development" "Emacs")
+                                        :username ,(car (auth-source-user-and-password "hoppsjots.org"))
+                                        :password ,(cadr (auth-source-user-and-password "hoppsjots.org"))))))
       )
 
     ;; ====
