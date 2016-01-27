@@ -47,7 +47,7 @@
 (defun org2blog/init-org2blog ()
   (use-package org2blog
     ;; Do we want to defer how does it know about orgblog in org files then
-    ;; :commands (org2blog/wp-mode org2blog/wp-login)
+    :commands (org2blog/wp-mode org2blog/wp-login)
     ))
 
 ;;; packages.el ends here

@@ -157,7 +157,7 @@ values."
    ;;                             :weight normal
    ;;                             :width normal
    ;;                             :powerline-scale 1.1)
-   ;; dotspacemacs-default-font '("Ubuntu Mono" :size 24 :weight normal :width normal :powerline-scale 1.1)
+   dotspacemacs-default-font '("Ubuntu Mono-10" :weight normal :width normal :powerline-scale 1.4)
 
    ;; The leader key
    dotspacemacs-leader-key "SPC"
@@ -404,7 +404,6 @@ layers configuration. You are free to put any user code."
     ;; Display
     ;; =======
 
-    (setq powerline-default-separator 'nil)
 
     (fold-section "display"
                   (global-hl-line-mode -1)            ; Disable hihglighting of current line.
@@ -672,6 +671,7 @@ layers configuration. You are free to put any user code."
           (bind-key (kbd "'") 'mu4e-headers-next 'mu4e-headers-mode-map)
           (bind-key (kbd "\"") 'mu4e-headers-prev 'mu4e-headers-mode-map)
           (bind-key (kbd "\"") 'mu4e-view-headers-prev 'mu4e-view-mode-map)
+          (bind-key (kbd "f") 'mu4e-view-go-to-url 'mu4e-view-mode-map)
 
           (when (require 'mu4e-context nil t)
             (setq mu4e-contexts `( ,(make-mu4e-context
@@ -794,6 +794,7 @@ layers configuration. You are free to put any user code."
             erc-autojoin-channels-alist '(("irc.gitter.im" "#syl20bnr/spacemacs")
                                           ("mollari.netbsd.org" "#NetBSD")
                                           ("freenode.net" "#org-mode"))
+            erc-spelling-mode t
             erc-auto-query 'window
             erc-track-switch-direction 'importance
             erc-hl-nicks-minimum-contrast-ratio 3.5
@@ -803,6 +804,10 @@ layers configuration. You are free to put any user code."
             erc-notifications-icon (concat user-emacs-directory "./layers/+irc/rcirc/img/irc.png")
 
             )
+      ;; We want to be in normal state most of the time so we can flip in and out.
+      (evil-set-initial-state 'erc-mode 'normal)
+      (add-hook 'erc-send-post-hook 'evil-normal-state)
+
         ;; '(erc-autoaway-idle-seconds 600)
         ;; '(erc-autojoin-mode t)
         ;; '(erc-button-mode t)
@@ -849,18 +854,18 @@ layers configuration. You are free to put any user code."
                              (funcall secret)
                            secret)))))
 
-      (setq erc-nickserv-passwords
-            `((freenode (("chopps" . ,(erc-acct-get-password "chopps" "freenode.net" "nickserv"))))
-              (localhost (("chopps" . ,(erc-acct-get-password "chopps" "localhost" "bitlbee")))))
-            )
+      ;; (setq erc-nickserv-passwords
+      ;;       `((freenode (("chopps" . ,(erc-acct-get-password "chopps" "freenode.net" "nickserv"))))
+      ;;         (localhost (("chopps" . ,(erc-acct-get-password "chopps" "localhost" "bitlbee")))))
+      ;;       )
 
       (defun launch-irc-gitter ()
         "Launch irc connection to giter.im"
         (interactive)
-        ;; (erc :server "192.168.1.5" :port 6669 :nick "choppsv1"
-        ;;     :password (erc-acct-get-password "choppsv1" "192.168.1.5" 6667)))
-        (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1"
-                :password (erc-acct-get-password "choppsv1" "irc.gitter.im" 6667)))
+        (erc :server "192.168.1.5" :port 6669 :nick "choppsv1"
+            :password (erc-acct-get-password "choppsv1" "192.168.1.5" 6669)))
+        ;; (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1"
+        ;;         :password (erc-acct-get-password "choppsv1" "irc.gitter.im" 6667)))
 
       (defun launch-irc-netbsd ()
         "Launch irc connection to netbsd"
@@ -926,7 +931,9 @@ layers configuration. You are free to put any user code."
       ;;           (erc-update-current-channel-member nick nick 'add-if-new))))))
       ;; (add-hook 'erc-insert-pre-hook 'add-nick-insert-pre-hook)
 
-      (erc-services-mode 1)
+      (with-eval-after-load "erc"
+        (erc-services-mode 1)
+        (erc-spelling-mode 1))
       )
 
     (when (configuration-layer/layer-usedp 'rcirc)
@@ -1269,6 +1276,18 @@ layers configuration. You are free to put any user code."
       (progn
         (message "post-init-start")
         (add-hook 'org-mode-hook #'yas-minor-mode)
+
+        (evil-define-key 'normal evil-org-mode-map "H" 'evil-window-top)
+        (evil-define-key 'normal org-mode-map "M" 'evil-window-middle)
+        (evil-define-key 'normal org-mode-map "L" 'evil-window-bottom)
+
+        (evil-define-key 'visual org-mode-map "H" 'evil-window-top)
+        (evil-define-key 'vidual org-mode-map "M" 'evil-window-middle)
+        (evil-define-key 'vidual org-mode-map "L" 'evil-window-bottom)
+
+        (evil-define-key 'motion org-mode-map "H" 'evil-window-top)
+        (evil-define-key 'motion org-mode-map "M" 'evil-window-middle)
+        (evil-define-key 'motion org-mode-map "L" 'evil-window-bottom)
 
         ;; :mode (("\\.org\\'" . org-mode)
         ;;        ("\\.o2b\\'" . org-mode))
@@ -1828,8 +1847,39 @@ layers configuration. You are free to put any user code."
     ;; (message "End: %s" inhibit-startup-screen)
     ;; (if inhibit-startup-screen
     ;;     (quit-window))
+
+    (setq powerline-default-separator 'wave)
+
+    (defun split-window-sensibly-prefer-horizontal (&optional window)
+      "Same as `split-window-sensibly' except prefer to split horizontally first."
+      (let ((window (or window (selected-window))))
+        (or (and (window-splittable-p window t)
+                 ;; Split window horizontally.
+                 (with-selected-window window
+                   (split-window-right)))
+            (and (window-splittable-p window)
+                 ;; Split window vertically.
+                 (with-selected-window window
+                   (split-window-below)))
+            (and (eq window (frame-root-window (window-frame window)))
+                 (not (window-minibuffer-p window))
+                 ;; If WINDOW is the only window on its frame and is not the
+                 ;; minibuffer window, try to split it vertically disregarding
+                 ;; the value of `split-height-threshold'.
+                 (let ((split-height-threshold 0))
+                   (when (window-splittable-p window)
+                     (with-selected-window window
+                       (split-window-below))))))))
+
+    (setq split-width-threshold 100)
+    (setq window-min-width 40)
+    (setq split-window-preferred-function 'split-window-sensibly-prefer-horizontal)
     )
   )
+
+;; Local Variables:
+;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
+;; End:
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
@@ -1861,8 +1911,8 @@ layers configuration. You are free to put any user code."
  '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
  '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil))))
  '(erc-input-face ((t (:foreground "cornflowerblue"))))
- '(evil-search-highlight-persist-highlight-face ((t (:inherit region :background "yellow3" :foreground "black")))))
-
-;; Local Variables:
-;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
-;; End:
+ '(evil-search-highlight-persist-highlight-face ((t (:inherit region :background "yellow3" :foreground "black"))))
+ '(mode-line ((t (:background "blue4" :foreground "#eeeeec"))))
+ '(mode-line-inactive ((t (:background "grey40" :foreground "grey60"))))
+ '(powerline-active1 ((t (:inherit mode-line :background "Deep Sky Blue"))))
+ '(powerline-active2 ((t (:inherit mode-line :background "light sky blue")))))
