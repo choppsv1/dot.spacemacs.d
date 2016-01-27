@@ -157,7 +157,7 @@ values."
    ;;                             :weight normal
    ;;                             :width normal
    ;;                             :powerline-scale 1.1)
-   dotspacemacs-default-font '("Ubuntu Mono-10" :weight normal :width normal :powerline-scale 1.4)
+   dotspacemacs-default-font '("Ubuntu Mono" :size 10.0 :weight normal :width normal :powerline-scale 1.4)
 
    ;; The leader key
    dotspacemacs-leader-key "SPC"
