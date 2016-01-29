@@ -339,4 +339,20 @@
      (modify-syntax-entry ?- "w" lisp-mode-syntax-table)
      ))
 
+(defun _url-open-with-buffer (url)
+  "Open a URL into a file buffer"
+  (interactive "M")
+  (let* ((basename (url-file-nondirectory url))
+         (url-content-buffer (url-retrieve-synchronously url)))
+    (set-buffer url-content-buffer)
+    (rename-buffer basename 'unique)))
+
+(defun url-open-with-buffer (url)
+  "Open a URL into a file buffer"
+  (interactive "M")
+  (let* ((basename (url-file-nondirectory url))
+         (nbuffer (generate-new-buffer basename)))
+    (switch-to-buffer nbuffer)
+    (shell-command (concat "curl -s " url) nbuffer)))
+
 (provide 'generic-lisp)

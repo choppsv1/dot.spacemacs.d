@@ -1275,48 +1275,43 @@ layers configuration. You are free to put any user code."
     (when (configuration-layer/layer-usedp 'org)
       (progn
         (message "post-init-start")
+
+        ;; Do we want this?
         (add-hook 'org-mode-hook #'yas-minor-mode)
 
-        (evil-define-key 'normal evil-org-mode-map "H" 'evil-window-top)
-        (evil-define-key 'normal org-mode-map "M" 'evil-window-middle)
-        (evil-define-key 'normal org-mode-map "L" 'evil-window-bottom)
-
-        (evil-define-key 'visual org-mode-map "H" 'evil-window-top)
-        (evil-define-key 'vidual org-mode-map "M" 'evil-window-middle)
-        (evil-define-key 'vidual org-mode-map "L" 'evil-window-bottom)
-
-        (evil-define-key 'motion org-mode-map "H" 'evil-window-top)
-        (evil-define-key 'motion org-mode-map "M" 'evil-window-middle)
-        (evil-define-key 'motion org-mode-map "L" 'evil-window-bottom)
-
-        ;; :mode (("\\.org\\'" . org-mode)
-        ;;        ("\\.o2b\\'" . org-mode))
-        ;; :bind (("C-c c" . org-capture)
-        ;;        ("C-c a" . org-agenda)
-        ;;        ("C-c l" . org-store-link))
+        ;; This is for using xelatex
+        (with-eval-after-load "org"
+          (dolist (state '(normal visual motion))
+            (evil-define-key state org-mode-map "H" nil)
+            (evil-define-key state org-mode-map "M" nil)
+            (evil-define-key state org-mode-map "L" nil))
+          (require 'ox-latex))
 
         (defun my-org-mode-hook ()
           (if debug-init-msg
               (message "Org-mode-hook"))
           ;; (org-set-local 'yas/trigger-key [tab])
-          ;;(yas-minor-mode)
-
-          (turn-on-flyspell)
+          ;; (yas-minor-mode)
+          ;; Probably done now.
+          ;; (turn-on-flyspell)
 
           ;; (define-key yas/keymap [tab] 'yas/next-field-or-maybe-expand)
+          ;; XXX need to redefine this for firefox in archlinux
           (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)
           (define-key org-mode-map (kbd "C-c e e") 'org-encrypt-entries)
           (define-key org-mode-map (kbd "C-c e E") 'org-encrypt-entry)
           (define-key org-mode-map (kbd "C-c e d") 'org-decrypt-entries)
           (define-key org-mode-map (kbd "C-c e D") 'org-decrypt-entry)
 
-          (setq org-tags-exclude-from-inheritance '("crypt"))
-          (setq org-crypt-disable-auto-save t)
-          (and (buffer-file-name)
-               (string-match "\\.o2b$" (buffer-file-name))
-               (org2blog/wp-mode))
-          (setq org-crypt-key "D7B83025"))
+          ;; Let's skip this for now
+          ;; (and (buffer-file-name)
+          ;;      (string-match "\\.o2b$" (buffer-file-name))
+          ;;      (org2blog/wp-mode))
+          )
+
+
         (add-hook 'org-mode-hook 'my-org-mode-hook)
+
 
         (defun my-org-confirm-babel-evaluate (lang body)
           (not (or (string= lang "ditaa")
@@ -1324,6 +1319,10 @@ layers configuration. You are free to put any user code."
                    (string= lang "dot"))))
         ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
         (setq
+         ;; Crypt
+         org-tags-exclude-from-inheritance '("crypt")
+         org-crypt-disable-auto-save t
+         org-crypt-key "D7B83025"
          org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
          org-src-fontify-natively t
          org-default-notes-file (concat org-directory "/notes.org")
@@ -1341,6 +1340,17 @@ layers configuration. You are free to put any user code."
                                                  ("=" "\\verb=%s=" nil)
                                                  ("~" "\\verb~%s~" t)
                                                  ("@" "\\alert{%s}" nil)))
+
+         org-latex-listings 'minted
+         org-latex-packages-alist '(("" "graphicx" t)
+                                    ("" "longtable" nil)
+                                    ("" "minted" nil)
+                                    ("" "float" nil))
+
+
+         org-latex-pdf-process '("pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"
+                                 "pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"
+                                 "pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f")
 
          ;; capture the search instead of the highlighted message in
          ;; headers view
@@ -1456,25 +1466,15 @@ layers configuration. You are free to put any user code."
         ;; (setq org-mac-mail-account "Work")
 
         ;; - Vi friendly bindings replacing cursor movement with meta-{hjkl}
-        (bind-key "C-c w" 'org-refile-to-datetree)
-        (bind-key "M-h" 'org-metaleft org-mode-map)
-        (bind-key "M-l" 'org-metaright org-mode-map)
-        (bind-key "M-k" 'org-metaup org-mode-map)
-        (bind-key "M-j" 'org-metadown org-mode-map)
-        (bind-key "M-H" 'org-shiftmetaleft org-mode-map)
-        (bind-key "M-L" 'org-shiftmetaright org-mode-map)
-        (bind-key "M-K" 'org-shiftmetaup org-mode-map)
-        (bind-key "M-J" 'org-shiftmetadown org-mode-map)
-
-        ;; This is for using xelatex
-        (require 'ox-latex)
-        ;; (setq org-latex-listings t)
-
-        (setq org-latex-listings 'minted)
-
-        (setq org-latex-pdf-process '("pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"
-                                      "pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"
-                                      "pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"))
+        ;; (bind-key "C-c w" 'org-refile-to-datetree)
+        ;; (bind-key "M-h" 'org-metaleft org-mode-map)
+        ;; (bind-key "M-l" 'org-metaright org-mode-map)
+        ;; (bind-key "M-k" 'org-metaup org-mode-map)
+        ;; (bind-key "M-j" 'org-metadown org-mode-map)
+        ;; (bind-key "M-H" 'org-shiftmetaleft org-mode-map)
+        ;; (bind-key "M-L" 'org-shiftmetaright org-mode-map)
+        ;; (bind-key "M-K" 'org-shiftmetaup org-mode-map)
+        ;; (bind-key "M-J" 'org-shiftmetadown org-mode-map)
 
         ;; XXX latex
         ;; ;; Originally taken from Bruno Tavernier: http://thread.gmane.org/gmane.emacs.orgmode/31150/focus=31432
@@ -1517,12 +1517,6 @@ layers configuration. You are free to put any user code."
             ))
 
         ;; Specify default packages to be included in every tex file, whether pdflatex or xelatex
-        (setq org-latex-packages-alist
-              '(("" "graphicx" t)
-                ("" "longtable" nil)
-                ("" "minted" nil)
-                ("" "float" nil)))
-
         ;; XXX latex
         ;; (defun my-auto-tex-parameters ()
         ;;   "Automatically select the tex packages to include."
@@ -1566,6 +1560,10 @@ layers configuration. You are free to put any user code."
 
         ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
         )
+      (when (daemonp)
+        (require 'org-notify)
+        (org-notify-add '(:time "1h" :period "30m" :duration 0 :actions -notify/window))
+        (org-notify-start))
       )
 
     (when (configuration-layer/layer-usedp 'org2blog)
