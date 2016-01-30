@@ -10,6 +10,21 @@
 ;; It does use a bunch of stuff internal to the timer package.
 ;;
 
+
+(defvar timers-menu-mode-map
+  (let ((map (make-sparse-keymap)))
+    (suppress-keymap map)
+    (define-key map "q" 'quit-window)
+    (define-key map " " 'scroll-up-command)
+    (define-key map [?\S-\ ] 'scroll-down-command)
+    (define-key map "\C-?" 'scroll-down-command)
+    (define-key map "?" 'describe-mode)
+    (define-key map "h" 'describe-mode)
+    (define-key map ">" 'end-of-buffer)
+    (define-key map "<" 'beginning-of-buffer)
+    (define-key map "g" 'revert-buffer)
+    map))
+
 (define-derived-mode timers-menu-mode tabulated-list-mode "Timer Menu"
   "Major mode for displaying the active timers."
   (setq tabulated-list-format [("Time" 20 t)

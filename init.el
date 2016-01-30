@@ -801,11 +801,14 @@ layers configuration. You are free to put any user code."
             ;; erc-hl-nicks-color-contrast-strategy 'contrast
             ;; erc-hl-nicks-color-contrast-strategy 'invert
             erc-hl-nicks-skip-nicks '("gitter")
+            erc-log-channels-directory "~/Dropbox/logs/erclogs"
             erc-notifications-icon (concat user-emacs-directory "./layers/+irc/rcirc/img/irc.png")
 
             )
       ;; We want to be in normal state most of the time so we can flip in and out.
       (evil-set-initial-state 'erc-mode 'normal)
+
+      ;; Actually we really only want this when we move away from the buffer?
       (add-hook 'erc-send-post-hook 'evil-normal-state)
 
         ;; '(erc-autoaway-idle-seconds 600)
@@ -1267,6 +1270,10 @@ layers configuration. You are free to put any user code."
         (add-hook 'python-mode-hook 'my-python-mode-hook 'append)
         )
       )
+
+    (when (configuration-layer/layer-usedp 'lua)
+      (with-eval-after-load 'lua-mode
+        (setq-default lua-indent-level 4)))
 
     ;; ===
     ;; Org
@@ -1872,7 +1879,11 @@ layers configuration. You are free to put any user code."
     (setq split-width-threshold 100)
     (setq window-min-width 40)
     (setq split-window-preferred-function 'split-window-sensibly-prefer-horizontal)
+
+    (require 'list-timers)
+    (evil-set-initial-state 'timers-menu-mode 'insert)
     )
+
   )
 
 ;; Local Variables:
