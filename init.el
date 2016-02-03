@@ -74,6 +74,8 @@ values."
      git
      html
      javascript
+     (latex :variables
+            latex-build-command "latexmk")
      lua
      (python :variables
              python-fill-column 120)
@@ -86,7 +88,13 @@ values."
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages '()
    ;; A list of packages and/or extensions that will not be install and loaded.
-   dotspacemacs-excluded-packages '(mu4e-maildirs-extension smartparens) ; evil-org
+   dotspacemacs-excluded-packages
+   '(
+     erc-yt
+     erc-view-log
+     mu4e-maildirs-extension
+     smartparens
+     ) ; evil-org
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
    ;; are declared in a layer which is not a member of
    ;; the list `dotspacemacs-configuration-layers'. (default t)
@@ -157,7 +165,7 @@ values."
    ;;                             :weight normal
    ;;                             :width normal
    ;;                             :powerline-scale 1.1)
-   dotspacemacs-default-font '("Ubuntu Mono" :size 10.0 :weight normal :width normal :powerline-scale 1.4)
+   dotspacemacs-default-font '("Ubuntu Mono" :size 11.0 :weight normal :width normal :powerline-scale 1.4)
 
    ;; The leader key
    dotspacemacs-leader-key "SPC"
@@ -435,8 +443,8 @@ layers configuration. You are free to put any user code."
                     (progn
                       (add-hook 'erc-mode-hook #'(lambda ()
                                                    (persp-add-buffer (current-buffer))))
-                      (launch-irc-jabber)
-                      (split-window-right)
+                      ;; (launch-irc-jabber)
+                      ;; (split-window-right)
                       (launch-irc-gitter))
                     )
                   (spacemacs|define-custom-layout "W:OCP"
@@ -794,15 +802,16 @@ layers configuration. You are free to put any user code."
             erc-autojoin-channels-alist '(("irc.gitter.im" "#syl20bnr/spacemacs")
                                           ("mollari.netbsd.org" "#NetBSD")
                                           ("freenode.net" "#org-mode"))
-            erc-spelling-mode t
             erc-auto-query 'window
-            erc-track-switch-direction 'importance
-            erc-hl-nicks-minimum-contrast-ratio 3.5
+            erc-fill-mode nil
+            ;; erc-hl-nicks-minimum-contrast-ratio 3.5
             ;; erc-hl-nicks-color-contrast-strategy 'contrast
             ;; erc-hl-nicks-color-contrast-strategy 'invert
             erc-hl-nicks-skip-nicks '("gitter")
             erc-log-channels-directory "~/Dropbox/logs/erclogs"
             erc-notifications-icon (concat user-emacs-directory "./layers/+irc/rcirc/img/irc.png")
+            erc-spelling-mode t
+            erc-track-switch-direction 'importance
 
             )
       ;; We want to be in normal state most of the time so we can flip in and out.
@@ -865,7 +874,7 @@ layers configuration. You are free to put any user code."
       (defun launch-irc-gitter ()
         "Launch irc connection to giter.im"
         (interactive)
-        (erc :server "192.168.1.5" :port 6669 :nick "choppsv1"
+        (erc :server "localhost" :port 6669 :nick "choppsv1"
             :password (erc-acct-get-password "choppsv1" "192.168.1.5" 6669)))
         ;; (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1"
         ;;         :password (erc-acct-get-password "choppsv1" "irc.gitter.im" 6667)))
@@ -934,10 +943,16 @@ layers configuration. You are free to put any user code."
       ;;           (erc-update-current-channel-member nick nick 'add-if-new))))))
       ;; (add-hook 'erc-insert-pre-hook 'add-nick-insert-pre-hook)
 
-      (with-eval-after-load "erc"
-        (erc-services-mode 1)
-        (erc-spelling-mode 1))
+      ;; (setq erc-modules (delete 'fill erc-modules))
+
+      (with-eval-after-load 'erc
+        (erc-fill-disable)
+        ;; (erc-log-enable)
+        (setq erc-modules (cons 'log (delete 'fill erc-modules))))
+        ;; (erc-services-mode 1)
+        ;; (erc-spelling-mode 1))
       )
+
 
     (when (configuration-layer/layer-usedp 'rcirc)
       (defun get-gitter-password ()
@@ -1349,15 +1364,17 @@ layers configuration. You are free to put any user code."
                                                  ("@" "\\alert{%s}" nil)))
 
          org-latex-listings 'minted
-         org-latex-packages-alist '(("" "graphicx" t)
-                                    ("" "longtable" nil)
-                                    ("" "minted" nil)
-                                    ("" "float" nil))
+         ;; org-latex-packages-alist '(("" "graphicx" t)
+         ;;                            ("" "longtable" nil)
+         ;;                            ("" "minted" nil)
+         ;;                            ("" "float" nil))
 
+         org-latex-packages-alist '(("" "minted" nil))
 
-         org-latex-pdf-process '("pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"
-                                 "pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"
-                                 "pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f")
+         org-latex-pdf-process
+         '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+           "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+           "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f")
 
          ;; capture the search instead of the highlighted message in
          ;; headers view
@@ -1410,8 +1427,8 @@ layers configuration. You are free to put any user code."
             "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
            )
          ;; In mail map todo to mail-todo
-         org-capture-templates-contexts '(("t" "m" ((in-mode . "mu4e-headers-mode")))
-                                          ("t" "m" ((in-mode . "mu4e-view-mode"))))
+         ;; org-capture-templates-contexts '(("t" "m" ((in-mode . "mu4e-headers-mode")))
+         ;;                                  ("t" "m" ((in-mode . "mu4e-view-mode"))))
          )
 
         ;; (add-to-list 'org-babel-load-languages '(python . t))
@@ -1569,7 +1586,29 @@ layers configuration. You are free to put any user code."
         )
       (when (daemonp)
         (require 'org-notify)
-        (org-notify-add '(:time "1h" :period "30m" :duration 0 :actions -notify/window))
+        (defun org-notify-action-notify-urgency (plist)
+          "Pop up a notification window."
+          (require 'notifications)
+          (let* ((duration (plist-get plist :duration))
+                 (urgency (pilst-get plist :urgency))
+                 (id (notifications-notify
+                      :title     (plist-get plist :heading)
+                      :body      (org-notify-body-text plist)
+                      :urgency   (or urgency 'normal)
+                      :timeout   (if duration (* duration 1000))
+                      :actions   org-notify-actions
+                      :on-action 'org-notify-on-action-notify)))
+            (setq org-notify-on-action-map
+                  (plist-put org-notify-on-action-map id plist))))
+
+        (org-notify-add '('default
+                           :time "1h"
+                           :period "30m"
+                           :duration 0
+                           :urgency 'critical
+                           :app-icon (concat (configuration-layer/get-layer-path "org")
+                                             "img/org.png")
+                           :actions 'org-notify-action-notify-urgency))
         (org-notify-start))
       )
 
@@ -1898,10 +1937,12 @@ layers configuration. You are free to put any user code."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(evil-disable-insert-state-bindings t)
  '(evil-shift-width 4)
  '(safe-local-variable-values
    (quote
-    ((eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
+    ((org-confirm-babel-evaluate)
+     (eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
      (js2-indent-level . 2)
      (evil-shift-width . 2)
      (eval progn
