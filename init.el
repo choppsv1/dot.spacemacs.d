@@ -985,9 +985,10 @@ layers configuration. You are free to put any user code."
       (defun evil-normal-state-on-unfocus ()
         "Return to normal state when a buffer in a given major mode is unfocussed"
         (when (member major-mode evil-normal-state-on-unfocus-modes)
+          (message "XXX UNFOCUSSED %s XXX" (buffer-name))
           (evil-normal-state)))
 
-      (add-hook 'mouse-leave-buffer-hook 'evil-normal-state-on-unfocus)
+      (add-hook 'unfocus-buffer-hook 'evil-normal-state-on-unfocus)
 
       (with-eval-after-load 'erc
         (erc-fill-disable)

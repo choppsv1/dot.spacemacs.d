@@ -5,6 +5,33 @@
 ;; All rights reserved.
 ;;
 
+
+;; ===================
+;; Run hook on unfocus
+;; ===================
+
+
+(defvar unfocus-buffer-hook nil
+  "Hooks to be run prior to a buffer losing focus")
+
+(defun run-unfocus-hooks ()
+  (run-hooks 'unfocus-buffer-hook))
+
+;; Should return nil
+(defadvice other-window
+    (before run-unfocus-hooks-other-advice activate)
+  (run-unfocus-hooks))
+
+  ;; Should return the buffer
+(defadvice pop-to-buffer
+    (before run-unfocus-hooks-pop-advice activate)
+  (run-unfocus-hooks))
+
+(add-hook 'mouse-leave-buffer-hook 'run-unfocus-hooks)
+(ad-activate 'other-window)
+(ad-activate 'pop-to-buffer)
+
+
 ;; ===================
 ;; All text mode hooks
 ;; ===================
