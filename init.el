@@ -25,21 +25,21 @@ values."
      (auto-completion :variables
                       auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets")
 
-     ;; ;; better-defaults
-     erc
-     ;; rcirc
-     ;; bb-erc
-     ;; eyebrowse blows layouts away!
-     gtags
-     mu4e
+     ;; old comment from me indicating eyebrows blows away layouts.
+     eyebrowse
      (osx :variables
-           osx-use-option-as-meta t)
+          osx-use-option-as-meta t)
+     ;; ;; better-defaults
+     gtags
+
+     mu4e
+
      org
      org2blog
      ranger
+
      rebox
-     ;; (rcirc :variables
-     ;;        rcirc-enable-authinfo-support t)
+
      spell-checking
      ;; spotify
      syntax-checking
@@ -69,6 +69,7 @@ values."
      ietf
 
      ;; Languages
+     
      c-c++
      emacs-lisp
      git
@@ -77,22 +78,33 @@ values."
      (latex :variables
             latex-build-command "latexmk")
      lua
+     markdown
      (python :variables
              python-fill-column 120)
      shell-scripts
      yaml
+
+     ;; Let's keep this later.
+     erc
+     bb-erc
+     ;; rcirc
+     ;; (rcirc :variables
+     ;;        rcirc-enable-authinfo-support t)
+     ;; eyebrowse blows layouts away!
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '()
+   dotspacemacs-additional-packages '(org-caldav)
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages
    '(
      erc-yt
      erc-view-log
      mu4e-maildirs-extension
+     ;; projectile
+     ;; projectile-mode
      smartparens
      ) ; evil-org
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
@@ -317,11 +329,12 @@ user code here.  The exception is org related code, which should be placed in `d
    ;; evil-esc-delay 0.001
    ;; js2-basic-offset 2
    ;; js-indent-level 1
-   org-directory "~/org"
-   org-agenda-files '("~/org")
+   org-directory "~/Dropbox/org-mode"
+   org-agenda-files '("~/Dropbox/org-mode")
    org-protocol-default-template-key "t"
    org2blog/wp-shortcode-langs-map '(("emacs-lisp" . "lisp") ("sh" . "bash"))
    rebox-style-loop '(71 72 73))
+
 
   (with-eval-after-load "evil-evilified-state"
     (define-key evil-evilified-state-map-original "H" 'evil-window-top)
@@ -444,7 +457,10 @@ layers configuration. You are free to put any user code."
                       (add-hook 'erc-mode-hook #'(lambda ()
                                                    (persp-add-buffer (current-buffer))))
                       ;; (launch-irc-jabber)
-                      ;; (split-window-right)
+                      (launch-irc-netbsd)
+                      (split-window-right)
+                      (launch-irc-freenode)
+                      (split-window-right)
                       (launch-irc-gitter))
                     )
                   (spacemacs|define-custom-layout "W:OCP"
@@ -760,6 +776,7 @@ layers configuration. You are free to put any user code."
                                   scroll-up-aggressively .8
                                   scroll-down-aggressively .8)
                                  )))
+
           (add-hook 'mu4e-view-mode-hook
                     (lambda () (setq show-trailing-whitespace nil)))
 
@@ -808,17 +825,35 @@ layers configuration. You are free to put any user code."
             ;; erc-hl-nicks-color-contrast-strategy 'contrast
             ;; erc-hl-nicks-color-contrast-strategy 'invert
             erc-hl-nicks-skip-nicks '("gitter")
+
+            ;; Logging
             erc-log-channels-directory "~/Dropbox/logs/erclogs"
+            ;; erc-log-all-but-server-buffers t
+            erc-log-insert-log-on-open nil ;; this inserts after the prompt which is scary as it
+            ;; might send
+            erc-save-buffer-on-part nil
+            erc-save-queries-on-quit nil
+            erc-log-write-after-send t
+            erc-log-write-after-insert t
+
+            ;; Notifcations
             erc-notifications-icon (concat user-emacs-directory "./layers/+irc/rcirc/img/irc.png")
             erc-spelling-mode t
-            erc-track-switch-direction 'importance
 
+            erc-track-switch-direction 'importance
             )
       ;; We want to be in normal state most of the time so we can flip in and out.
       (evil-set-initial-state 'erc-mode 'normal)
 
+      ;; Simplify this function so it works
+      (with-eval-after-load 'erc-log
+        (defun erc-log-all-but-server-buffers (buffer)
+          (not (erc-server-buffer-p buffer))))
+
       ;; Actually we really only want this when we move away from the buffer?
-      (add-hook 'erc-send-post-hook 'evil-normal-state)
+      ;; (add-hook 'erc-send-post-hook 'evil-normal-state)
+      ;; (remove-hook 'erc-send-post-hook 'evil-normal-state)
+
 
         ;; '(erc-autoaway-idle-seconds 600)
         ;; '(erc-autojoin-mode t)
@@ -866,10 +901,10 @@ layers configuration. You are free to put any user code."
                              (funcall secret)
                            secret)))))
 
-      ;; (setq erc-nickserv-passwords
-      ;;       `((freenode (("chopps" . ,(erc-acct-get-password "chopps" "freenode.net" "nickserv"))))
-      ;;         (localhost (("chopps" . ,(erc-acct-get-password "chopps" "localhost" "bitlbee")))))
-      ;;       )
+      (with-eval-after-load 'erc
+       (setq erc-nickserv-passwords
+             `((freenode (("chopps" . ,(erc-acct-get-password "chopps" "freenode.net" "nickserv"))))
+               (localhost (("chopps" . ,(erc-acct-get-password "chopps" "localhost" "bitlbee")))))))
 
       (defun launch-irc-gitter ()
         "Launch irc connection to giter.im"
@@ -944,6 +979,15 @@ layers configuration. You are free to put any user code."
       ;; (add-hook 'erc-insert-pre-hook 'add-nick-insert-pre-hook)
 
       ;; (setq erc-modules (delete 'fill erc-modules))
+
+      (defvar evil-normal-state-on-unfocus-modes
+        '(erc-mode))
+      (defun evil-normal-state-on-unfocus ()
+        "Return to normal state when a buffer in a given major mode is unfocussed"
+        (when (member major-mode evil-normal-state-on-unfocus-modes)
+          (evil-normal-state)))
+
+      (add-hook 'mouse-leave-buffer-hook 'evil-normal-state-on-unfocus)
 
       (with-eval-after-load 'erc
         (erc-fill-disable)
@@ -1471,7 +1515,9 @@ layers configuration. You are free to put any user code."
          '((python . t)
            (ditaa . t)
            (dot2tex . t)
-           (dot . t))
+           (dot . t)
+           (pic . t)
+           )
          )
         ;;  (dot2tex . t))
 
@@ -1611,6 +1657,37 @@ layers configuration. You are free to put any user code."
                            :actions 'org-notify-action-notify-urgency))
         (org-notify-start))
       )
+
+    (with-eval-after-load "org-caldav"
+      ;;https://calendar.google.com/calendar/ical/j2nmb305oqb7n6428m4pf1rctk%40group.calendar.google.com/private-c46e82d6b4bae1f85fe4415a769d225b/basic.ics
+      ;;https://calendar.google.com/calendar/ical/
+      ;; USERNAME: j2nmb305oqb7n6428m4pf1rctk%40group.calendar.google.com/
+      ;; PRIVATE: private-c46e82d6b4bae1f85fe4415a769d225b/basic.ics
+      ;; ID: j2nmb305oqb7n6428m4pf1rctk@group.calendar.google.com
+      (setq org-caldav-url "https://www.google.com/calendar/dav"
+            org-icalendar-timezone "US/Eastern"
+            org-caldav-calendar-id "naqenfju9vq9tr0r4nnh7eaiic@group.calendar.google.com"
+            org-caldav-inbox "/home/chopps/org/goog-work.org"
+            org-caldav-files '()
+            ;; org-caldav-calendars
+            ;; '((:calendar-id "f1jltqbvdp88o8htcjkbg920sc@group.calendar.google.com"
+            ;;                 :files ()
+            ;;                 :inbox "~/org/goog-home.org")
+            ;;   (:calendar-id "l8cjg3irk2h5a8gk5ch9mtp6ls@group.calendar.google.com"
+            ;;                 :files ()
+            ;;                 :inbox "~/org/goog-family.org")
+            ;;   (:calendar-id "v8eda33vlrn98c9oj2hefjld7s@group.calendar.google.com"
+            ;;                 :files ()
+            ;;                 :inbox "~/org/goog-ietf.org")
+            ;;   )
+            ))
+
+      ;; (setq org-caldav-principal-url "https://p25-caldav.icloud.com/65837734/principal"
+      ;;       org-caldav-url "https://p25-caldav.icloud.com/65837734/calendars"
+      ;;       org-caldav-calendar-id "AF7013C4-D5A4-4885-BF8B-0B11FB3A1488"
+      ;;       org-caldav-inbox "/home/chopps/org/orgmode-caldav.org"
+      ;;       org-caldav-files '()
+      ;;       org-icalendar-timezone "US/Eastern"))
 
     (when (configuration-layer/layer-usedp 'org2blog)
       (with-eval-after-load "org2blog"
@@ -1919,9 +1996,11 @@ layers configuration. You are free to put any user code."
     (setq window-min-width 40)
     (setq split-window-preferred-function 'split-window-sensibly-prefer-horizontal)
 
+
     (require 'list-timers)
     (evil-set-initial-state 'timers-menu-mode 'insert)
     )
+
 
   )
 
@@ -1944,13 +2023,7 @@ layers configuration. You are free to put any user code."
     ((org-confirm-babel-evaluate)
      (eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
      (js2-indent-level . 2)
-     (evil-shift-width . 2)
-     (eval progn
-           (require
-            (quote projectile))
-           (puthash
-            (projectile-project-root)
-            "make test" projectile-test-cmd-map)))))
+     (evil-shift-width . 2))))
  '(send-mail-function (quote smtpmail-send-it)))
 
 (custom-set-faces
