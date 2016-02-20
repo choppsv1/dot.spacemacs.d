@@ -9,6 +9,9 @@ values."
    ;; `+distribution'. For now available distributions are `spacemacs-base'
    ;; or `spacemacs'. (default 'spacemacs)
    dotspacemacs-distribution 'spacemacs
+   ;; If non-nil layers with lazy install support are lazy installed.
+   ;; (default nil)
+   dotspacemacs-enable-lazy-installation nil
    ;; List of additional paths where to look for configuration layers.
    ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
    dotspacemacs-configuration-layer-path '()
@@ -34,8 +37,10 @@ values."
 
      mu4e
 
+     graphviz
      org
      org2blog
+     pdf-tools
      ranger
 
      rebox
@@ -148,7 +153,7 @@ values."
    ;; If the value is nil then no banner is displayed. (default 'official)
    dotspacemacs-startup-banner 'official
    ;; List of items to show in the startup buffer. If nil it is disabled.
-   ;; Possible values are: `recents' `bookmarks' `projects'.
+   ;; Possible values are: `recents' `bookmarks' `projects' `agenda' `todos'.
    ;; (default '(recents projects))
    dotspacemacs-startup-lists '(recents projects)
    ;; Number of recent files to show in the startup buffer. Ignored if
@@ -234,7 +239,7 @@ values."
    dotspacemacs-helm-position 'bottom
    ;; If non nil the paste micro-state is enabled. When enabled pressing `p`
    ;; several times cycle between the kill ring content. (default nil)
-   dotspacemacs-enable-paste-micro-state nil
+   dotspacemacs-enable-paste-transient-state nil
    ;; Which-key delay in seconds. The which-key buffer is the popup listing
    ;; the commands bound to the current keystroke sequence. (default 0.4)
    dotspacemacs-which-key-delay 0.4
@@ -265,11 +270,15 @@ values."
    ;; the transparency level of a frame when it's inactive or deselected.
    ;; Transparency can be toggled through `toggle-transparency'. (default 90)
    dotspacemacs-inactive-transparency 90
+   ;; If non nil show the titles of transient states. (default t)
+   dotspacemacs-show-transient-state-title t
+   ;; If non nil show the color guide hint for transient state keys. (default t)
+   dotspacemacs-show-transient-state-color-guide t
    ;; If non nil unicode symbols are displayed in the mode line. (default t)
    dotspacemacs-mode-line-unicode-symbols t
    ;; If non nil smooth scrolling (native-scrolling) is enabled. Smooth
-   ;; scrolling overrides the default behavior of Emacs which recenters the
-   ;; point when it reaches the top or bottom of the screen. (default t)
+   ;; scrolling overrides the default behavior of Emacs which recenters point
+   ;; when it reaches the top or bottom of the screen. (default t)
    dotspacemacs-smooth-scrolling t
    ;; If non nil line numbers are turned on in all `prog-mode' and `text-mode'
    ;; derivatives. If set to `relative', also turns on relative line numbers.
@@ -278,6 +287,10 @@ values."
    ;; If non-nil smartparens-strict-mode will be enabled in programming modes.
    ;; (default nil)
    dotspacemacs-smartparens-strict-mode nil
+   ;; If non-nil pressing the closing parenthesis `)' key in insert mode passes
+   ;; over any automatically added closing parenthesis, bracket, quote, etc…
+   ;; This can be temporary disabled by pressing `C-q' before `)'. (default nil)
+   dotspacemacs-smart-closing-parenthesis nil
    ;; Select a scope to highlight delimiters. Possible values are `any',
    ;; `current', `all' or `nil'. Default is `all' (highlight any scope and
    ;; emphasis the current one). (default 'all)
@@ -326,6 +339,9 @@ user code here.  The exception is org related code, which should be placed in `d
    dropbox-directory "~/Dropbox"
    evil-search-wrap nil
    evil-want-C-i-jump nil
+   ;; This is very annoying to have to set, visual highlight in evil is hijacking PRIMARY selection
+   ;; behavior..
+   x-select-enable-primary t
    ;; evil-esc-delay 0.001
    ;; js2-basic-offset 2
    ;; js-indent-level 1
@@ -340,6 +356,43 @@ user code here.  The exception is org related code, which should be placed in `d
     (define-key evil-evilified-state-map-original "H" 'evil-window-top)
     (define-key evil-evilified-state-map-original "L" 'evil-window-bottom)
     (define-key evil-evilified-state-map-original "M" 'evil-window-middle))
+
+
+  ;; XXX what we want actually is to advise this function and temporarily change
+  ;; XXX the definition of x-select-text to (x-set-selection 'PRIMARY ...) so
+  ;; XXX that the correct thing happens
+  (defun _evil-visual-update-x-selection (&optional buffer)
+    "Update the X selection with the current visual region."
+    (let ((buf (or buffer (current-buffer))))
+      (message "XXXVISUALSELECT1")
+      (when (buffer-live-p buf)
+        (with-current-buffer buf
+          (when (and (evil-visual-state-p)
+                     (fboundp 'x-set-selection)
+                     (or (not (boundp 'ns-initialized))
+                         (with-no-warnings ns-initialized))
+                     (not (eq evil-visual-selection 'block)))
+            (x-set-selection nil (buffer-substring-no-properties
+                                  evil-visual-beginning
+                                  evil-visual-end))
+            ;; is this last thing right?
+            (message "XXXVISUALSELECT2")
+            (setq x-last-selected-text-primary )
+            )))))
+
+
+  (defun _evil-visual-update-x-selection (&optional buffer)
+    "Update the X selection with the current visual region."
+    (with-current-buffer (or buffer (current-buffer))
+      (when (and (evil-visual-state-p)
+                 (fboundp 'x-set-selection)   ; <-- small change, hope it works ;)
+                 (or (not (boundp 'ns-initialized))
+                     (with-no-warnings ns-initialized))
+                 (not (eq evil-visual-selection 'block)))
+        (x-set-selection 'PRIMARY (buffer-substring-no-properties
+                                   evil-visual-beginning
+                                   evil-visual-end))
+        (setq x-last-selected-text-primary ))))
 
   ;; =======
   ;; Display
@@ -385,6 +438,7 @@ user code here.  The exception is org related code, which should be placed in `d
                   "aL" 'lisp-interaction-mode
                   )
                 )
+
   (fold-section "Registers (files)"
                 ;; (set-register ?E `(file . ,emacs-init-source))
                 (progn
@@ -456,12 +510,22 @@ layers configuration. You are free to put any user code."
                     (progn
                       (add-hook 'erc-mode-hook #'(lambda ()
                                                    (persp-add-buffer (current-buffer))))
-                      ;; (launch-irc-jabber)
-                      (launch-irc-netbsd)
+                      ;;(launch-irc-jabber)
+                      ;;(launch-irc-netbsd)
+                      ;;(split-window-right)
+                      ;;(launch-irc-freenode)
+                      ;;(split-window-right)
+                      (launch-irc-gitter)
+                      )
+                    )
+                  (spacemacs|define-custom-layout "notes"
+                    :binding "n"
+                    :body
+                    (progn
+                      (find-file "~/Dropbox/org-mode/work.org")
                       (split-window-right)
-                      (launch-irc-freenode)
-                      (split-window-right)
-                      (launch-irc-gitter))
+                      (find-file "~/Dropbox/org-mode/notes.org")
+                      )
                     )
                   (spacemacs|define-custom-layout "W:OCP"
                     :binding "wo"
@@ -488,6 +552,11 @@ layers configuration. You are free to put any user code."
                     :body
                     (find-file "~/w/optical-network-data/terastream.yang")
                     )
+                  (spacemacs|define-custom-layout "P:O"
+                    :binding "po"
+                    :body
+                    (find-file "~/p/org-beamer-sandbox")
+                    )
                   )
 
     ;; ===========
@@ -501,6 +570,7 @@ layers configuration. You are free to put any user code."
                       (spacemacs/set-leader-keys key1 map2 key2 map1)))
                   (dear-leader/swap-keys "am" "aM")
                   (global-set-key (kbd "C-\\") 'spacemacs//layouts-persp-next-C-l)
+
                   )
 
     ;; ==========
@@ -532,42 +602,69 @@ layers configuration. You are free to put any user code."
               mu4e-update-interval nil
               mu4e-headers-include-related nil
 
+              mu4e-inbox-mailbox '("maildir:/gmail.com/INBOX"
+                                   "maildir:/chopps.org/INBOX"
+                                   "maildir:/terastrm.net/INBOX"
+                                   "maildir:/chopps.org/a-terastream")
+
+              mu4e-imp-mailbox '("maildir:/chopps.org/ietf-chairs"
+                                 "maildir:/chopps.org/ietf-chairs-rtg"
+                                 "maildir:/chopps.org/ietf-dir-dir"
+                                 "maildir:/chopps.org/ietf-rtg-yang-dt"
+                                 "maildir:/chopps.org/ietf-wg-isis"
+                                 "maildir:/chopps.org/ietf-wg-netmod")
+
+              mu4e-junk-mailbox '("maildir:/gmail.com/[Gmail].Spam"
+                                  "maildir:/chopps.org/spam-probable"
+                                  "maildir:/chopps.org/spam-train"
+                                  "maildir:/chopps.org/spam")
+              ;; -----------
               ;; [b]ookmarks
-              mu4e-not-junk-folder-filter " AND NOT ( maildir:/gmail.com/[Gmail].Spam OR maildir:/chopps.org/spam* ) "
-              mu4e-inbox-filter-base " ( maildir:/gmail.com/INBOX OR maildir:/chopps.org/INBOX OR maildir:/terastrm.net/INBOX OR maildir:/chopps.org/a-terastream ) "
-              mu4e-imp-filter-base " ( maildir:/chopps.org/sw-common OR maildir:/chopps.org/ietf-rtg-yang-dt OR maildir:/chopps.org/ietf-wg-isis OR maildir:/chopps.org/ietf-wg-netmod OR maildir:/chopps.org/ietf-wg-homenet ) "
-              mu4e-unread-filter " ( flag:unread AND NOT flag:flagged AND NOT flag:trashed ) "
-              mu4e-unread-flagged-filter " ( flag:unread AND flag:flagged AND NOT flag:trashed ) "
-              mu4e-bookmarks (append
-                              (list (list (concat "flag:unread AND NOT flag:trashed AND " mu4e-inbox-filter-base) "Unread [i]NBOX messages" ?i)
+              ;; -----------
 
-                                    (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
-                                    (list (concat "flag:flagged AND NOT flag:trashed AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "[F]lagged Non-INBOX messages" ?F)
+              mu4e-not-junk-folder-filter
+              (concat " AND NOT (" (s-join " OR " mu4e-junk-mailbox) ")")
 
-                                    (list (concat mu4e-unread-filter         mu4e-imp-filter-base) "Unread Important messages" ?n)
-                                    (list (concat mu4e-unread-flagged-filter mu4e-imp-filter-base) "Unread-Flagged Important messages" ?N)
+              mu4e-inbox-filter-base
+              (concat "(" (s-join " OR " mu4e-inbox-mailbox) ")")
 
-                                    (list (concat mu4e-unread-filter         "AND NOT" mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread [u]nimportant messages" ?u)
-                                    (list (concat mu4e-unread-flagged-filter "AND NOT" mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged [U]nimportant messages" ?U)
+              mu4e-imp-filter-base
+              (concat "(" (s-join " OR " mu4e-imp-mailbox) ")")
 
-                                    (list (concat mu4e-unread-filter         " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread Non-INBOX messages" ?o)
-                                    (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged Non-INBOX messages" ?O)
+              mu4e-unread-filter "(flag:unread AND NOT flag:flagged AND NOT flag:trashed)"
+              mu4e-unread-flagged-filter "(flag:unread AND flag:flagged AND NOT flag:trashed)"
 
-                                    (list (concat mu4e-unread-filter         mu4e-not-junk-folder-filter) "Unread messages" ?a)
-                                    (list (concat mu4e-unread-flagged-filter mu4e-not-junk-folder-filter) "Unread-flagged messages" ?A)
+              mu4e-bookmarks
+              (append
+               (list (list (concat "flag:unread AND NOT flag:trashed AND " mu4e-inbox-filter-base) "Unread [i]NBOX messages" ?i)
+                     (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-*") "Unread IETF messages" ?I)
 
-                                    (list "maildir:/chopps.org/spam-probable" "Probable spam messages" ?s)
-                                    )
-                              (mapcar (lambda (x) (cons (concat (car x) mu4e-not-junk-folder-filter) (cdr x)))
-                                      '(("flag:unread AND NOT flag:trashed" "Unread messages" ?u)
-                                        ("date:1h..now" "Last hours messages" ?h)
-                                        ("date:24h..now" "Today's messages" ?d)
-                                        ("date:today..now" "Today's messages" ?t)
-                                        ("date:7d..now" "Last 7 days" ?w)
-                                        ("mime:7d..now" "Last 7 days" ?w)
-                                        ("mime:*pdf" "Messages with PDF" 112)
-                                        ("mime:*vcs" "Messages with VCS" 113)
-                                        )))
+                     (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
+                     (list (concat "flag:flagged AND NOT flag:trashed AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "[F]lagged Non-INBOX messages" ?F)
+
+                     (list (concat mu4e-unread-filter         mu4e-imp-filter-base) "Unread Important messages" ?n)
+                     (list (concat mu4e-unread-flagged-filter mu4e-imp-filter-base) "Unread-Flagged Important messages" ?N)
+
+                     (list (concat mu4e-unread-filter         " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread [u]nimportant messages" ?u)
+                     (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged [U]nimportant messages" ?U)
+
+                     (list (concat mu4e-unread-filter         " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread Non-INBOX messages" ?o)
+                     (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged Non-INBOX messages" ?O)
+
+
+                     (list (concat mu4e-unread-filter         mu4e-not-junk-folder-filter) "Unread messages" ?a)
+                     (list (concat mu4e-unread-flagged-filter mu4e-not-junk-folder-filter) "Unread-flagged messages" ?A)
+
+                     (list "maildir:/chopps.org/spam-probable" "Probable spam messages" ?s))
+               (mapcar (lambda (x) (cons (concat (car x) mu4e-not-junk-folder-filter) (cdr x)))
+                       '(("flag:unread AND NOT flag:trashed" "Unread messages" ?u)
+                         ("date:1h..now" "Last hours messages" ?h)
+                         ("date:24h..now" "Today's messages" ?d)
+                         ("date:today..now" "Today's messages" ?t)
+                         ("date:7d..now" "Last 7 days" ?w)
+                         ("mime:7d..now" "Last 7 days" ?w)
+                         ("mime:*pdf" "Messages with PDF" 112)
+                         ("mime:*vcs" "Messages with VCS" 113))))
 
 
               ;; [j]ump shortcuts
@@ -584,7 +681,6 @@ layers configuration. You are free to put any user code."
                                        ("/chopps.org/spam-probable" . ?s))
 
               ;; Visuals
-              mu4e-use-fancy-chars nil
               mu4e-view-show-addresses t
               mu4e-headers-visible-lines 15
               mu4e-headers-visible-columns 80
@@ -594,6 +690,13 @@ layers configuration. You are free to put any user code."
               shr-color-visible-luminance-min 80
               mu4e-view-html-plaintext-ratio-heuristic 15
               ;; mu4e-html2text-command "html2text -nobs -utf8 -width 120"
+              mu4e-use-fancy-chars nil
+              ;; mu4e-headers-has-child-prefix    '(" ┬●")  ; Parent
+              ;; mu4e-headers-empty-parent-prefix '(" ─●")  ; Orphan
+              ;; mu4e-headers-first-child-prefix  '("└─●")  ; First child
+              ;; mu4e-headers-duplicate-prefix    '("└≡")   ; Duplicate
+              ;; mu4e-headers-default-prefix      '("  ●") ; Default.
+
 
               ;; Folders -- most setup per account
               ;; see context below
@@ -1335,6 +1438,374 @@ layers configuration. You are free to put any user code."
       (with-eval-after-load 'lua-mode
         (setq-default lua-indent-level 4)))
 
+
+    ;; ============
+    ;; Org Exports
+    ;; ============
+    (setq image-transform-scale 2.0)
+
+    (with-eval-after-load "ox"
+      ;;
+      (defconst chopps/org-latex-packages-alist-pre-hyperref
+        '(
+          ;; This conflicts with Beamer
+          ;; ("letterpaper,margin=1.0in" "geometry")
+
+          ;; Prevent an image from floating to a different location.
+          ;; http://tex.stackexchange.com/a/8633/52678
+          ("" "float")
+          ;; % 0 paragraph indent, adds vertical space between paragraphs
+          ;; http://en.wikibooks.org/wiki/LaTeX/Paragraph_Formatting
+          ("" "parskip"))
+        "Alist of packages that have to be loaded before `hyperref'package is loaded ftp://ftp.ctan.org/tex-archive/macros/latex/contrib/hyperref/README.pdf ")
+
+      ;; Need to only load geometry if not a beamer file
+      ;; ,(not (eq org-latex-create-formula-image-program 'dvipng)))) ; snippet-flag
+
+      (defconst chopps/org-latex-packages-alist-post-hyperref
+        '(
+          ;; Prevent tables/figures from one section to float into another section
+          ;; http://tex.stackexchange.com/a/282/52678
+          ("section" "placeins")
+          ;; Graphics package for more complicated figures
+          ("" "tikz")
+          ("" "caption")
+          ("" "adjustbox")
+          ;;
+          ;; Packages suggested to be added for previewing latex fragments
+          ;; http://orgmode.org/worg/org-tutorials/org-latex-preview.html
+          ("mathscr" "eucal")
+          ("" "latexsym"))
+        "Alist of packages that have to (or can be) loaded after `hyperref' package is loaded.")
+
+      (defvar latex-minted-cachedir (concat temporary-file-directory
+                                            (getenv "USER")
+                                            "/.minted/\\jobname"))
+
+      (add-to-list 'chopps/org-latex-packages-alist-post-hyperref
+                   `(,(concat "cachedir=" ; options
+                              latex-minted-cachedir)
+                     "minted" ; package
+                     ;; If `org-latex-create-formula-image-program'
+                     ;; is set to `dvipng', minted package cannot be
+                     ;; used to show latex previews.
+                     ,(not (eq org-latex-create-formula-image-program 'dvipng)))) ; snippet-flag
+
+      ;; remove hyperref from default package list.
+      (setq org-latex-default-packages-alist
+            (delq (rassoc '("hyperref" nil) org-latex-default-packages-alist)
+                  org-latex-default-packages-alist))
+
+      ;; This is no longer needed
+      (setq org-latex-default-packages-alist
+            (delq (rassoc '("fixltx2e" nil) org-latex-default-packages-alist)
+                  org-latex-default-packages-alist))
+
+      ;; Setup package list with correct placement of hyperref
+      (setq org-latex-packages-alist
+            (append chopps/org-latex-packages-alist-pre-hyperref
+                    '(("" "hyperref" nil))
+                    chopps/org-latex-packages-alist-post-hyperref))
+    )
+
+    (unless t
+    (with-eval-after-load "ox"
+      ;; ox-latex - LaTeX export
+      (with-eval-after-load "ox-latex"
+        (defvar modi/ox-latex-use-minted t
+          "Use `minted' package for listings.")
+
+        (setq org-latex-compiler "xelatex") ; introduced in org 9.0
+
+        (setq org-latex-prefer-user-labels t) ; org-mode version 8.3+
+
+        ;; ox-latex patches
+        ;; XXX chopps not here
+        ;; (load (expand-file-name
+        ;;        "ox-latex-patches.el"
+        ;;        (concat user-emacs-directory "elisp/patches/"))
+        ;;       nil :nomessage)
+
+        ;; Previewing latex fragments in org mode
+        ;; http://orgmode.org/worg/org-tutorials/org-latex-preview.html
+        ;; (setq org-latex-create-formula-image-program 'dvipng) ; NOT Recommended
+        (setq org-latex-create-formula-image-program 'imagemagick) ; Recommended
+
+        ;; Controlling the order of loading certain packages w.r.t. `hyperref'
+        ;; http://tex.stackexchange.com/a/1868/52678
+        ;; ftp://ftp.ctan.org/tex-archive/macros/latex/contrib/hyperref/README.pdf
+        ;; Remove the list element in `org-latex-default-packages-alist'.
+        ;; that has '("hyperref" nil) as its cdr.
+        ;; http://stackoverflow.com/a/9813211/1219634
+        (setq org-latex-default-packages-alist
+              (delq (rassoc '("hyperref" nil) org-latex-default-packages-alist)
+                    org-latex-default-packages-alist))
+        ;; `hyperref' will be added again later in `org-latex-packages-alist'
+        ;; in the correct order.
+
+        ;; The `org-latex-packages-alist' will output tex files with
+        ;;   \usepackage[FIRST STRING IF NON-EMPTY]{SECOND STRING}
+        ;; It is a list of cells of the format:
+        ;;   ("options" "package" SNIPPET-FLAG COMPILERS)
+        ;; If SNIPPET-FLAG is non-nil, the package also needs to be included
+        ;; when compiling LaTeX snippets into images for inclusion into
+        ;; non-LaTeX output (like when previewing latex fragments using the
+        ;; "C-c C-x C-l" binding.
+        ;; COMPILERS is a list of compilers that should include the package,
+        ;; see `org-latex-compiler'.  If the document compiler is not in the
+        ;; list, and the list is non-nil, the package will not be inserted
+        ;; in the final document.
+
+        (defconst modi/org-latex-packages-alist-pre-hyperref
+          '(
+            ;; Prevent an image from floating to a different location.
+            ;; http://tex.stackexchange.com/a/8633/52678
+            ("" "float")
+
+            ("letterpaper,margin=1.0in" "geometry")
+            ;; % 0 paragraph indent, adds vertical space between paragraphs
+            ;; http://en.wikibooks.org/wiki/LaTeX/Paragraph_Formatting
+            ("" "parskip"))
+          "Alist of packages that have to be loaded before `hyperref'
+package is loaded
+ftp://ftp.ctan.org/tex-archive/macros/latex/contrib/hyperref/README.pdf ")
+
+        (defconst modi/org-latex-packages-alist-post-hyperref
+          '(;; Prevent tables/figures from one section to float into another section
+            ;; http://tex.stackexchange.com/a/282/52678
+            ("section" "placeins")
+            ;; Graphics package for more complicated figures
+            ("" "tikz")
+            ("" "caption")
+            ;;
+            ;; Packages suggested to be added for previewing latex fragments
+            ;; http://orgmode.org/worg/org-tutorials/org-latex-preview.html
+            ("mathscr" "eucal")
+            ("" "latexsym"))
+          "Alist of packages that have to (or can be) loaded after `hyperref'
+package is loaded.")
+
+        ;; The "H" option (`float' package) prevents images from floating around.
+        (setq org-latex-default-figure-position "H") ; figures are NOT floating
+        ;; (setq org-latex-default-figure-position "htb") ; default - figures are floating
+
+        ;; `hyperref' package setup
+        (setq org-latex-hyperref-template
+              (concat "\\hypersetup{\n"
+                      "pdfauthor={%a},\n"
+                      "pdftitle={%t},\n"
+                      "pdfkeywords={%k},\n"
+                      "pdfsubject={%d},\n"
+                      "pdfcreator={%c},\n"
+                      "pdflang={%L},\n"
+                      ;; Get rid of the red boxes drawn around the links
+                      "colorlinks,\n"
+                      "citecolor=black,\n"
+                      "filecolor=black,\n"
+                      "linkcolor=blue,\n"
+                      "urlcolor=blue\n"
+                      "}"))
+
+        (if modi/ox-latex-use-minted
+            ;; using minted
+            ;; https://github.com/gpoore/minted
+            (progn
+              (setq org-latex-listings 'minted) ; default nil
+              ;; The default value of the `minted' package option `cachedir'
+              ;; is "_minted-\jobname". That clutters the working dirs with
+              ;; _minted* dirs. So instead create them in temp folders.
+              (defvar latex-minted-cachedir (concat temporary-file-directory
+                                                    (getenv "USER")
+                                                    "/.minted/\\jobname"))
+              ;; `minted' package needed to be loaded AFTER `hyperref'.
+              ;; http://tex.stackexchange.com/a/19586/52678
+              (add-to-list 'modi/org-latex-packages-alist-post-hyperref
+                           `(,(concat "cachedir=" ; options
+                                      latex-minted-cachedir)
+                             "minted" ; package
+                             ;; If `org-latex-create-formula-image-program'
+                             ;; is set to `dvipng', minted package cannot be
+                             ;; used to show latex previews.
+                             ,(not (eq org-latex-create-formula-image-program 'dvipng)))) ; snippet-flag
+
+              ;; minted package options (applied to embedded source codes)
+              (setq org-latex-minted-options
+                    '(("linenos")
+                      ("numbersep" "5pt")
+                      ("frame"     "none") ; box frame is created by `mdframed' package
+                      ("framesep"  "2mm")
+                      ;; minted 2.0+ required for `breaklines'
+                      ("breaklines"))) ; line wrapping within code blocks
+              (when (equal org-latex-compiler "pdflatex")
+                (add-to-list 'org-latex-minted-options '(("fontfamily"  "zi4")))))
+          ;; not using minted
+          (progn
+            ;; Commented out below because it clashes with `placeins' package
+            ;; (add-to-list 'modi/org-latex-packages-alist-post-hyperref '("" "color"))
+            (add-to-list 'modi/org-latex-packages-alist-post-hyperref '("" "listings"))))
+
+        (setq org-latex-packages-alist
+              (append modi/org-latex-packages-alist-pre-hyperref
+                      '(("" "hyperref" nil))
+                      modi/org-latex-packages-alist-post-hyperref))
+
+        ;; `-shell-escape' is required when using the `minted' package
+
+        ;; http://orgmode.org/worg/org-faq.html#using-xelatex-for-pdf-export
+        ;; latexmk runs pdflatex/xelatex (whatever is specified) multiple times
+        ;; automatically to resolve the cross-references.
+        ;; (setq org-latex-pdf-process '("latexmk -xelatex -quiet -shell-escape -f %f"))
+
+        ;; Below value of `org-latex-pdf-process' with %latex will work in org 9.0+
+        ;; (setq org-latex-pdf-process
+        ;;       '("%latex -interaction nonstopmode -shell-escape -output-directory %o %f"
+        ;;         "%latex -interaction nonstopmode -shell-escape -output-directory %o %f"
+        ;;         "%latex -interaction nonstopmode -shell-escape -output-directory %o %f"))
+
+        ;; Run xelatex multiple times to get the cross-references right
+        (setq org-latex-pdf-process '("xelatex -shell-escape %f"
+                                      "xelatex -shell-escape %f"
+                                      "xelatex -shell-escape %f"))
+
+        ;; Override `org-latex-format-headline-default-function' definition
+        ;; so that the TODO keyword in TODO marked headings is exported in
+        ;; bold red.
+        (defun org-latex-format-headline-default-function
+            (todo _todo-type priority text tags info)
+          "Default format function for a headline.
+See `org-latex-format-headline-function' for details."
+          (concat
+           ;; Tue Jan 19 16:00:58 EST 2016 - kmodi
+           ;; My only change to the original function was to add \\color{red}
+           (and todo (format "{\\color{red}\\bfseries\\sffamily %s} " todo))
+           (and priority (format "\\framebox{\\#%c} " priority))
+           text
+           (and tags
+                (format "\\hfill{}\\textsc{%s}"
+                        (mapconcat (lambda (tag) (org-latex-plain-text tag info))
+                                   tags ":"))))))
+
+      ;; ox-html - HTML export
+      (with-eval-after-load 'ox-html
+
+        ;; ox-html patches
+        ;; XXX chopps not here
+        ;;   (load (expand-file-name
+        ;;          "ox-html-patches.el"
+        ;;          (concat user-emacs-directory "elisp/patches/"))
+        ;;         nil :nomessage)
+
+        ;; Remove HTML tags from in-between <title>..</title> else they show
+        ;; up verbatim in the browser tabs e.g. "Text <br> More Text"
+        (defun modi/ox-html-remove-tags-from-title-tag (orig-return-val)
+          (replace-regexp-in-string ".*<title>.*\\(<.*>\\).*</title>.*"
+                                    ""
+                                    orig-return-val
+                                    :fixedcase :literal 1))
+        (advice-add 'org-html--build-meta-info :filter-return
+                    #'modi/ox-html-remove-tags-from-title-tag)
+
+        (use-package ox-html-fancybox
+          :load-path "elisp/ox-html-fancybox")
+
+        ;; Center align the tables when exporting to HTML
+        ;; Note: This aligns the whole table, not the table columns
+        (setq org-html-table-default-attributes
+              '(:border "2"
+                        :cellspacing "0"
+                        :cellpadding "6"
+                        :rules "groups"
+                        :frame "hsides"
+                        :align "center"
+                        ;; below class requires bootstrap.css ( http://getbootstrap.com )
+                        :class "table-striped"))
+
+        ;; Customize the HTML postamble
+        ;; http://thread.gmane.org/gmane.emacs.orgmode/104502/focus=104526
+        (defun modi/org-html-postamble-fn (info)
+          "My custom postamble for org to HTML exports.
+INFO is the property list of export options."
+          (let ((author (car (plist-get info :author)))
+                (creator (plist-get info :creator))
+                (date (car (org-export-get-date info)))
+                (d1 "<div style=\"display: inline\" ")
+                (d2 "</div>"))
+            (concat "Exported using "
+                    d1 "class=\"creator\">" creator d2 ; emacs and org versions
+                    (when author
+                      (concat " by " author))
+                    (when date
+                      (concat " on " d1 "class=\"date\">" date d2))
+                    ".")))
+        (setq org-html-postamble #'modi/org-html-postamble-fn) ; default: 'auto
+
+        (setq org-html-htmlize-output-type 'css) ; default: 'inline-css
+        (setq org-html-htmlize-font-prefix "org-") ; default: "org-"
+
+        ;; http://emacs.stackexchange.com/a/14560/115
+        (defvar modi/htmlize-html-file (concat user-home-directory
+                                               "temp/htmlize_temp.html")
+          "Name of the html file exported by `modi/htmlize-region-as-html-file'.")
+        (defvar modi/htmlize-css-file (concat user-emacs-directory
+                                              "misc/css/leuven_theme.css")
+          "CSS file to be embedded in the html file created using the
+             `modi/htmlize-region-as-html-file' function.")
+        (defun modi/htmlize-region-as-html-file (open-in-browser)
+          "Export the selected region to an html file. If a region is not
+selected, export the whole buffer.
+
+If OPEN-IN-BROWSER is non-nil, also open the exported html file in
+the default browser."
+          (interactive "P")
+          (let ((org-html-htmlize-output-type 'css)
+                (org-html-htmlize-font-prefix "org-")
+                start end html-string)
+            (if (use-region-p)
+                (progn
+                  (setq start (region-beginning))
+                  (setq end   (region-end)))
+              (progn
+                (setq start (point-min))
+                (setq end   (point-max))))
+            (setq html-string (org-html-htmlize-region-for-paste start end))
+            (with-temp-buffer
+              ;; Insert the `modi/htmlize-css-file' contents in the temp buffer
+              (insert-file-contents modi/htmlize-css-file nil nil nil :replace)
+              ;; Go to the beginning of the buffer and insert comments and
+              ;; opening tags for `html', `head' and `style'. These are
+              ;; inserted *above* the earlier inserted css code.
+              (goto-char (point-min))
+              (insert (concat "<!-- This file is generated using the "
+                              "modi/htmlize-region-as-html-file function\n"
+                              "from https://github.com/kaushalmodi/.emacs.d/"
+                              "blob/master/setup-files/setup-org.el -->\n"))
+              (insert "<html>\n<head>\n<style media=\"screen\" type=\"text/css\">\n")
+              ;; Go to the end of the buffer (end of the css code) and
+              ;; insert the closing tags for `style' and `head' and opening
+              ;; tag for `body'.
+              (goto-char (point-max))
+              (insert "</style>\n</head>\n<body>\n")
+              ;; Insert the HTML for fontified text in `html-string'.
+              (insert html-string)
+              ;; Close the `body' and `html' tags.
+              (insert "</body>\n</html>\n")
+              (write-file modi/htmlize-html-file)
+              (when open-in-browser
+                (browse-url-of-file modi/htmlize-html-file)))))
+        (bind-key "H" #'modi/htmlize-region-as-html-file region-bindings-mode-map))
+
+      ;; ox-beamer - Beamer export
+      (with-eval-after-load 'ox-beamer
+        ;; allow for export=>beamer by placing
+        ;; #+LaTeX_CLASS: beamer in org files
+        (add-to-list 'org-latex-classes
+                     '("beamer"
+                       "\\documentclass[presentation]{beamer}"
+                       ("\\section{%s}"        . "\\section*{%s}")
+                       ("\\subsection{%s}"     . "\\subsection*{%s}")
+                       ("\\subsubsection{%s}"  . "\\subsubsection*{%s}"))))))
+
+
     ;; ===
     ;; Org
     ;; ===
@@ -1348,10 +1819,13 @@ layers configuration. You are free to put any user code."
 
         ;; This is for using xelatex
         (with-eval-after-load "org"
-          (dolist (state '(normal visual motion))
-            (evil-define-key state org-mode-map "H" nil)
-            (evil-define-key state org-mode-map "M" nil)
-            (evil-define-key state org-mode-map "L" nil))
+          ;; (dolist (estate '(normal visual motion))
+          ;;   (evil-define-key estate evil-org-mode-map "H" nil)
+          ;;   (evil-define-key estate evil-org-mode-map "L" nil)
+          ;;   (evil-define-key estate org-mode-map "H" nil)
+          ;;   (evil-define-key estate org-mode-map "M" nil)
+          ;;   (evil-define-key estate org-mode-map "L" nil))
+          (add-to-list 'org-file-apps '("\\.pdf\\'" . emacs))
           (require 'ox-latex))
 
         (defun my-org-mode-hook ()
@@ -1376,15 +1850,30 @@ layers configuration. You are free to put any user code."
           ;;      (org2blog/wp-mode))
           )
 
+        ;; (setq TeX-view-program-selection
+        ;;       (append
+        ;;        (delq (assoc 'output-pdf TeX-view-program-selection) TeX-view-program-selection)
+        ;;        '((output-pdf "PDF Tools"))))
 
         (add-hook 'org-mode-hook 'my-org-mode-hook)
 
+        ;; (defun th/pdf-view-revert-buffer-maybe (file)
+        ;;   (when-let ((buf (find-buffer-visiting file)))
+        ;;             (with-current-buffer buf
+        ;;               (when (derived-mode-p 'pdf-view-mode)
+        ;;                 (pdf-view-revert-buffer nil t)))))
+
+        ;; (add-hook 'TeX-after-TeX-LaTeX-command-finished-hook
+        ;;           #'th/pdf-view-revert-buffer-maybe)
 
         (defun my-org-confirm-babel-evaluate (lang body)
           (not (or (string= lang "ditaa")
                    (string= lang "dot2tex")
-                   (string= lang "dot"))))
+                   (string= lang "dot")
+                   (string= lang "plantuml")
+                   )))
         ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
+
         (setq
          ;; Crypt
          org-tags-exclude-from-inheritance '("crypt")
@@ -1393,6 +1882,9 @@ layers configuration. You are free to put any user code."
          org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
          org-src-fontify-natively t
          org-default-notes-file (concat org-directory "/notes.org")
+         ;; display
+         org-display-inline-images t
+
          ;; org-agenda-start-day "-8d"
          org-agenda-start-on-weekday 1
          org-src-window-setup 'current-window
@@ -1400,6 +1892,7 @@ layers configuration. You are free to put any user code."
          org-hide-leading-stars t
          org-refile-use-outline-path 'file
          org-outline-path-complete-in-steps t
+         org-plantuml-jar-path "/opt/plantuml/plantuml.jar"
          org-export-latex-emphasis-alist (quote (("*" "\\textbf{%s}" nil)
                                                  ("/" "\\emph{%s}" nil)
                                                  ("_" "\\underline{%s}" nil)
@@ -1414,7 +1907,9 @@ layers configuration. You are free to put any user code."
          ;;                            ("" "minted" nil)
          ;;                            ("" "float" nil))
 
-         org-latex-packages-alist '(("" "minted" nil))
+         ;; we do this above
+         ;; org-latex-packages-alist '(("" "minted" nil))
+         org-latex-create-formula-image-program 'imagemagick
 
          org-latex-pdf-process
          '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
@@ -1424,6 +1919,12 @@ layers configuration. You are free to put any user code."
          ;; capture the search instead of the highlighted message in
          ;; headers view
          org-mu4e-link-query-in-headers-mode t
+
+         ;; XXX investigate this more
+         ;; org-icalendar-include-todo t
+         ;; org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
+         ;; org-icalendar-use-scheduled '(event-if-todo event-if-not-todo todo-start)
+         ;; org-icalendar-with-timestamps t
 
          org-capture-templates
          '(
@@ -1450,6 +1951,16 @@ layers configuration. You are free to put any user code."
 
            ("X" "Tramdose" entry (file+datetree (concat org-directory "/medicine.org") "Tramadol")
             "* NOTE %?\nCreated: %U")
+
+           ("g" "Google Calendars")
+           ("gh" "Todo" entry (file (concat org-directory "/goog-home.org"))
+            "* TODO %?\n%T\nAnnotation: %a\n")
+
+           ("gf" "Todo" entry (file (concat org-directory "/goog-family.org"))
+            "* TODO %?\n%T\nAnnotation: %a\n")
+
+           ("gw" "Todo" entry (file (concat org-directory "/goog-work.org"))
+            "* TODO %?\n%T\nAnnotation: %a\n")
 
 
            ("i" "IETF related")
@@ -1518,6 +2029,7 @@ layers configuration. You are free to put any user code."
            (dot2tex . t)
            (dot . t)
            (pic . t)
+           (plantuml . t)
            )
          )
         ;;  (dot2tex . t))
@@ -1631,6 +2143,7 @@ layers configuration. You are free to put any user code."
 
         ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
         )
+      ;; XXX need to change this
       (when (daemonp)
         (require 'org-notify)
         (defun org-notify-action-notify-urgency (plist)
@@ -1670,17 +2183,20 @@ layers configuration. You are free to put any user code."
             org-caldav-calendar-id "naqenfju9vq9tr0r4nnh7eaiic@group.calendar.google.com"
             org-caldav-inbox "/home/chopps/org/goog-work.org"
             org-caldav-files '()
-            ;; org-caldav-calendars
-            ;; '((:calendar-id "f1jltqbvdp88o8htcjkbg920sc@group.calendar.google.com"
-            ;;                 :files ()
-            ;;                 :inbox "~/org/goog-home.org")
-            ;;   (:calendar-id "l8cjg3irk2h5a8gk5ch9mtp6ls@group.calendar.google.com"
-            ;;                 :files ()
-            ;;                 :inbox "~/org/goog-family.org")
-            ;;   (:calendar-id "v8eda33vlrn98c9oj2hefjld7s@group.calendar.google.com"
-            ;;                 :files ()
-            ;;                 :inbox "~/org/goog-ietf.org")
-            ;;   )
+            org-caldav-calendars
+            '(;;(:calendar-id "f1jltqbvdp88o8htcjkbg920sc@group.calendar.google.com"
+              ;;              :files ()
+              ;;              :inbox "~/org/goog-home.org")
+              (:calendar-id "naqenfju9vq9tr0r4nnh7eaiic@group.calendar.google.com"
+                            :files ()
+                            :inbox "~/org/goog-work.org")
+              (:calendar-id "l8cjg3irk2h5a8gk5ch9mtp6ls@group.calendar.google.com"
+                            :files ()
+                            :inbox "~/org/goog-family.org")
+              ;;(:calendar-id "v8eda33vlrn98c9oj2hefjld7s@group.calendar.google.com"
+              ;;              :files ()
+              ;;              :inbox "~/org/goog-ietf.org")
+              )
             ))
 
       ;; (setq org-caldav-principal-url "https://p25-caldav.icloud.com/65837734/principal"
@@ -2012,6 +2528,7 @@ layers configuration. You are free to put any user code."
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
 
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -2021,7 +2538,13 @@ layers configuration. You are free to put any user code."
  '(evil-shift-width 4)
  '(safe-local-variable-values
    (quote
-    ((org-confirm-babel-evaluate)
+    ((eval progn
+           (require
+            (quote projectile))
+           (puthash
+            (projectile-project-root)
+            "make test" projectile-test-cmd-map))
+     (org-confirm-babel-evaluate)
      (eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
      (js2-indent-level . 2)
      (evil-shift-width . 2))))
