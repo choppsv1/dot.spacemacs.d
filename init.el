@@ -164,13 +164,18 @@ values."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(misterioso
+   dotspacemacs-themes '(
+                         molokai
+                         monokai
+                         misterioso
+                         quasi-monochrome
+                         phoenix-dark-pink
+                         phoenix-dark-mono
                          spacemacs-dark
                          spacemacs-light
                          ;; solarized-light
                          solarized-dark
                          leuven
-                         monokai
                          zenburn
                          )
    ;; If non nil the cursor color matches the state color in GUI Emacs.
@@ -182,7 +187,7 @@ values."
    ;;                             :weight normal
    ;;                             :width normal
    ;;                             :powerline-scale 1.1)
-   dotspacemacs-default-font '("Ubuntu Mono" :size 11.0 :weight normal :width normal :powerline-scale 1.4)
+   dotspacemacs-default-font '("Ubuntu Mono" :size 10.0 :weight normal :width normal :powerline-scale 1.4)
 
    ;; The leader key
    dotspacemacs-leader-key "SPC"
@@ -473,7 +478,25 @@ This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
 
   (progn
+    ;; Everything uses 4 space indent
+    ;; (dolist (c spacemacs--indent-variable-alist)
+    ;;   (if (listp (cdr c))
+    ;;       (dolist (x (cdr c)) (setq-default x 8))
+    ;;     (setq-default (cdr c) 8)))
 
+    (dolist (e spacemacs--indent-variable-alist)
+      (if (symbolp (cdr e))
+          (set-default (cdr e) 4)
+        (dolist (x (cdr e)) (setq-default x 4))))
+    (setq-default lisp-indent-offset 2)
+
+
+    ;; tabs are 8 characters wide!
+    (setq-default tab-width 8)
+
+    (run-hook-with-args 'spacemacs--hjkl-completion-navigation-functions
+                        (member dotspacemacs-editing-style '(vim)))
+    (setq spacemacs--hjkl-completion-navigation-functions nil)
 
     ;; =======
     ;; Display
@@ -499,17 +522,32 @@ layers configuration. You are free to put any user code."
     ;; =======
 
     (fold-section "layouts"
+                  (defun persp-mode-buffer-assoc (buffer layout-name)
+                    (let* ((npersp (or (persp-get-by-name layout-name)
+                                       (and (message "XXX Adding new persp %s" layout-name)
+                                            (persp-add-new layout-name))))
+                           (cpersp (get-frame-persp)))
+
+                      (message "XXX persp-mode-buffer-assoc current layout: %s target layout %s target name %s buffer: %s"
+                               (persp-name cpersp) (persp-name npersp) layout-name buffer)
+                        ;; Add to correct perspective
+                      (if (memq buffer (persp-buffers npersp))
+                          (message "XXX buffer %s already in %s" buffer npersp)
+                        (message "XXX Adding buffer %s to %s" buffer (persp-name npersp))
+                        (persp-add-buffer buffer npersp t))))
+
+
                   (spacemacs|define-custom-layout "mail"
                                                   :binding "m"
                                                   :body
                                                   (mu4e))
 
-                  (spacemacs|define-custom-layout "irc"
+                  (spacemacs|define-custom-layout "IRC"
                     :binding "i"
                     :body
                     (progn
-                      (add-hook 'erc-mode-hook #'(lambda ()
-                                                   (persp-add-buffer (current-buffer))))
+                      (add-hook 'erc-connect-pre-hook '(lambda (x)
+                                                         (persp-mode-buffer-assoc x "IRC")))
                       ;;(launch-irc-jabber)
                       ;;(launch-irc-netbsd)
                       ;;(split-window-right)
@@ -527,32 +565,37 @@ layers configuration. You are free to put any user code."
                       (find-file "~/Dropbox/org-mode/notes.org")
                       )
                     )
-                  (spacemacs|define-custom-layout "W:OCP"
-                    :binding "wo"
+                  (spacemacs|define-custom-layout "W:CASSFILE"
+                    :binding "wc"
                     :body
-                    (find-file "~/w/ocp/setup.py")
+                    (find-file "~/w/cassfile/cassfile/main.py")
+                    )
+                  (spacemacs|define-custom-layout "W:JDSUAPP"
+                    :binding "wa"
+                    :body
+                    (ranger "~/w/jdsu-util-ts/")
                     )
                   (spacemacs|define-custom-layout "W:JDSU"
                     :binding "wj"
                     :body
-                    (find-file "~/w/jdsu-ocm/setup.py")
-                    )
-                  (spacemacs|define-custom-layout "W:UTIL"
-                    :binding "wu"
-                    :body
-                    (find-file "~/w/tsutil/setup.py")
-                    )
-                  (spacemacs|define-custom-layout "W:CASSFILE"
-                    :binding "wc"
-                    :body
-                    (find-file "~/w/cassfile/setup.py")
+                    (find-file "~/w/jdsu-ocm/jdsuocm/main.py")
                     )
                   (spacemacs|define-custom-layout "W:ONDATA"
                     :binding "wd"
                     :body
                     (find-file "~/w/optical-network-data/terastream.yang")
                     )
-                  (spacemacs|define-custom-layout "P:O"
+                  (spacemacs|define-custom-layout "W:OCP"
+                    :binding "wo"
+                    :body
+                    (find-file "~/w/ocp/ocp/main.py")
+                    )
+                  (spacemacs|define-custom-layout "W:UTIL"
+                    :binding "wu"
+                    :body
+                    (find-file "~/w/tsutil/setup.py")
+                    )
+                  (spacemacs|define-custom-layout "P:OrgBeamerSandbox"
                     :binding "po"
                     :body
                     (find-file "~/p/org-beamer-sandbox")
@@ -928,6 +971,7 @@ layers configuration. You are free to put any user code."
             ;; erc-hl-nicks-color-contrast-strategy 'contrast
             ;; erc-hl-nicks-color-contrast-strategy 'invert
             erc-hl-nicks-skip-nicks '("gitter")
+            erc-join-buffer 'bury
 
             ;; Logging
             erc-log-channels-directory "~/Dropbox/logs/erclogs"
@@ -952,6 +996,7 @@ layers configuration. You are free to put any user code."
       (with-eval-after-load 'erc-log
         (defun erc-log-all-but-server-buffers (buffer)
           (not (erc-server-buffer-p buffer))))
+
 
       ;; Actually we really only want this when we move away from the buffer?
       ;; (add-hook 'erc-send-post-hook 'evil-normal-state)
@@ -1088,7 +1133,6 @@ layers configuration. You are free to put any user code."
       (defun evil-normal-state-on-unfocus ()
         "Return to normal state when a buffer in a given major mode is unfocussed"
         (when (member major-mode evil-normal-state-on-unfocus-modes)
-          (message "XXX UNFOCUSSED %s XXX" (buffer-name))
           (evil-normal-state)))
 
       (add-hook 'unfocus-buffer-hook 'evil-normal-state-on-unfocus)
@@ -1434,6 +1478,7 @@ layers configuration. You are free to put any user code."
         )
       )
 
+    ;; remove when added to spacemacs--indent-variable-alist
     (when (configuration-layer/layer-usedp 'lua)
       (with-eval-after-load 'lua-mode
         (setq-default lua-indent-level 4)))
@@ -2024,12 +2069,15 @@ the default browser."
         ;; Languages to interpret in begin_src blocks
         (org-babel-do-load-languages
          'org-babel-load-languages
-         '((python . t)
-           (ditaa . t)
-           (dot2tex . t)
+         '((ditaa . t)
+           (emacs-lisp . t)
            (dot . t)
+           (gnuplot . nil)
+           (latex . t)
            (pic . t)
            (plantuml . t)
+           (python . t)
+           (sh . t)
            )
          )
         ;;  (dot2tex . t))
