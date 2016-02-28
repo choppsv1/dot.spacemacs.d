@@ -19,83 +19,85 @@ values."
    ;; of a list then all discovered layers will be installed.
    dotspacemacs-configuration-layers
    '(
-     ;; ----------------------------------------------------------------
-     ;; Example of useful layers you may want to use right away.
-     ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
-     ;; <M-m f e R> (Emacs style) to install them.
-     ;; ----------------------------------------------------------------
-     ;; spacemacs-helm
-     (auto-completion :variables
-                      auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets")
+      ;; ----------------------------------------------------------------
+      ;; Example of useful layers you may want to use right away.
+      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
+      ;; <M-m f e R> (Emacs style) to install them.
+      ;; ----------------------------------------------------------------
+      spacemacs-ivy
+      ;; spacemacs-helm
+      (auto-completion :variables
+        auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets")
 
-     ;; old comment from me indicating eyebrows blows away layouts.
-     eyebrowse
-     (osx :variables
-          osx-use-option-as-meta t)
-     ;; ;; better-defaults
-     gtags
+      ;; old comment from me indicating eyebrows blows away layouts.
+      eyebrowse
+      (osx :variables
+        osx-use-option-as-meta t)
+      ;; ;; better-defaults
+      gtags
 
-     mu4e
+      mu4e
 
-     graphviz
-     org
-     org2blog
-     pdf-tools
-     ranger
+      graphviz
+      org
+      (org2blog :variables org2blog-name "hoppsjots.org")
+      pandoc
+      pdf-tools
+      ranger
 
-     rebox
+      rebox
 
-     spell-checking
-     ;; spotify
-     syntax-checking
-     ;; version-control
+      spell-checking
+      ;; spotify
+      syntax-checking
+      ;; version-control
 
-     ;; ;; Langs
-     ;; c-c++
-     ;; emacs-lisp
-     ;; ;; erlang
-     ;; git
-     ;; ;; go
-     ;; html
-     ;; ;; java
-     ;; javascript
-     ;; (latex :variables
-     ;;        latex-build-command "latexmk")
-     ;; lua
-     ;; ;; markdown
-     ;; ;; php
-     ;; (python :variables
-     ;;         python-fill-column 120)
-     ;; ;; ruby
-     ;; shell-scripts
-     ;; yaml
+      ;; ;; Langs
+      ;; c-c++
+      ;; emacs-lisp
+      ;; ;; erlang
+      ;; git
+      ;; ;; go
+      ;; html
+      ;; ;; java
+      ;; javascript
+      ;; (latex :variables
+      ;;        latex-build-command "latexmk")
+      ;; lua
+      ;; ;; markdown
+      ;; ;; php
+      ;; (python :variables
+      ;;         python-fill-column 120)
+      ;; ;; ruby
+      ;; shell-scripts
+      ;; yaml
 
-     ;;(ietf :variables ietf-docs-cache "~/ietf-docs-cache")
-     ietf
+      ;;(ietf :variables ietf-docs-cache "~/ietf-docs-cache")
+      ietf
 
-     ;; Languages
-     
-     c-c++
-     emacs-lisp
-     git
-     html
-     javascript
-     (latex :variables
-            latex-build-command "latexmk")
-     lua
-     markdown
-     (python :variables
-             python-fill-column 120)
-     shell-scripts
-     yaml
+      ;; Languages
 
-     ;; Let's keep this later.
-     erc
-     bb-erc
-     ;; rcirc
-     ;; (rcirc :variables
-     ;;        rcirc-enable-authinfo-support t)
-     ;; eyebrowse blows layouts away!
+      c-c++
+      emacs-lisp
+      git
+      html
+      javascript
+      (latex :variables
+        latex-build-command "latexmk")
+      lua
+      markdown
+      (python :variables
+        python-fill-column 120)
+      shell-scripts
+      yaml
+
+      ;; Let's keep this later.
+      erc
+      bb-erc
+      ;; rcirc
+      ;; (rcirc :variables
+      ;;        rcirc-enable-authinfo-support t)
+      ;; eyebrowse blows layouts away!
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -353,7 +355,6 @@ user code here.  The exception is org related code, which should be placed in `d
    org-directory "~/Dropbox/org-mode"
    org-agenda-files '("~/Dropbox/org-mode")
    org-protocol-default-template-key "t"
-   org2blog/wp-shortcode-langs-map '(("emacs-lisp" . "lisp") ("sh" . "bash"))
    rebox-style-loop '(71 72 73))
 
 
@@ -522,85 +523,89 @@ layers configuration. You are free to put any user code."
     ;; =======
 
     (fold-section "layouts"
-                  (defun persp-mode-buffer-assoc (buffer layout-name)
-                    (let* ((npersp (or (persp-get-by-name layout-name)
-                                       (and (message "XXX Adding new persp %s" layout-name)
-                                            (persp-add-new layout-name))))
-                           (cpersp (get-frame-persp)))
+      (defun persp-mode-buffer-assoc (buffer layout-name)
+        (let* ((npersp (or (persp-get-by-name layout-name)
+                         (and (message "XXX Adding new persp %s" layout-name)
+                           (persp-add-new layout-name))))
+                (cpersp (get-frame-persp)))
 
-                      (message "XXX persp-mode-buffer-assoc current layout: %s target layout %s target name %s buffer: %s"
-                               (persp-name cpersp) (persp-name npersp) layout-name buffer)
-                        ;; Add to correct perspective
-                      (if (memq buffer (persp-buffers npersp))
-                          (message "XXX buffer %s already in %s" buffer npersp)
-                        (message "XXX Adding buffer %s to %s" buffer (persp-name npersp))
-                        (persp-add-buffer buffer npersp t))))
+          (message "XXX persp-mode-buffer-assoc current layout: %s target layout %s target name %s buffer: %s"
+            (persp-name cpersp) (persp-name npersp) layout-name buffer)
+          ;; Add to correct perspective
+          (if (memq buffer (persp-buffers npersp))
+            (message "XXX buffer %s already in %s" buffer npersp)
+            (message "XXX Adding buffer %s to %s" buffer (persp-name npersp))
+            (persp-add-buffer buffer npersp t))))
 
+      (spacemacs|define-custom-layout "agenda"
+        :binding "a"
+        :body
+        (org-agenda-list))
 
-                  (spacemacs|define-custom-layout "mail"
-                                                  :binding "m"
-                                                  :body
-                                                  (mu4e))
+      (spacemacs|define-custom-layout "mail"
+        :binding "m"
+        :body
+        (mu4e))
 
-                  (spacemacs|define-custom-layout "IRC"
-                    :binding "i"
-                    :body
-                    (progn
-                      (add-hook 'erc-connect-pre-hook '(lambda (x)
-                                                         (persp-mode-buffer-assoc x "IRC")))
-                      ;;(launch-irc-jabber)
-                      ;;(launch-irc-netbsd)
-                      ;;(split-window-right)
-                      ;;(launch-irc-freenode)
-                      ;;(split-window-right)
-                      (launch-irc-gitter)
-                      )
-                    )
-                  (spacemacs|define-custom-layout "notes"
-                    :binding "n"
-                    :body
-                    (progn
-                      (find-file "~/Dropbox/org-mode/work.org")
-                      (split-window-right)
-                      (find-file "~/Dropbox/org-mode/notes.org")
-                      )
-                    )
-                  (spacemacs|define-custom-layout "W:CASSFILE"
-                    :binding "wc"
-                    :body
-                    (find-file "~/w/cassfile/cassfile/main.py")
-                    )
-                  (spacemacs|define-custom-layout "W:JDSUAPP"
-                    :binding "wa"
-                    :body
-                    (ranger "~/w/jdsu-util-ts/")
-                    )
-                  (spacemacs|define-custom-layout "W:JDSU"
-                    :binding "wj"
-                    :body
-                    (find-file "~/w/jdsu-ocm/jdsuocm/main.py")
-                    )
-                  (spacemacs|define-custom-layout "W:ONDATA"
-                    :binding "wd"
-                    :body
-                    (find-file "~/w/optical-network-data/terastream.yang")
-                    )
-                  (spacemacs|define-custom-layout "W:OCP"
-                    :binding "wo"
-                    :body
-                    (find-file "~/w/ocp/ocp/main.py")
-                    )
-                  (spacemacs|define-custom-layout "W:UTIL"
-                    :binding "wu"
-                    :body
-                    (find-file "~/w/tsutil/setup.py")
-                    )
-                  (spacemacs|define-custom-layout "P:OrgBeamerSandbox"
-                    :binding "po"
-                    :body
-                    (find-file "~/p/org-beamer-sandbox")
-                    )
-                  )
+      (spacemacs|define-custom-layout "IRC"
+        :binding "i"
+        :body
+        (progn
+          (add-hook 'erc-connect-pre-hook '(lambda (x)
+                                             (persp-mode-buffer-assoc x "IRC")))
+          ;;(launch-irc-jabber)
+          ;;(launch-irc-netbsd)
+          ;;(split-window-right)
+          ;;(launch-irc-freenode)
+          ;;(split-window-right)
+          (launch-irc-gitter)
+          )
+        )
+      (spacemacs|define-custom-layout "notes"
+        :binding "n"
+        :body
+        (progn
+          (find-file "~/Dropbox/org-mode/work.org")
+          (split-window-right)
+          (find-file "~/Dropbox/org-mode/notes.org")
+          )
+        )
+      (spacemacs|define-custom-layout "W:CASSFILE"
+        :binding "wc"
+        :body
+        (find-file "~/w/cassfile/cassfile/main.py")
+        )
+      (spacemacs|define-custom-layout "W:JDSUAPP"
+        :binding "wa"
+        :body
+        (ranger "~/w/jdsu-util-ts/")
+        )
+      (spacemacs|define-custom-layout "W:JDSU"
+        :binding "wj"
+        :body
+        (find-file "~/w/jdsu-ocm/jdsuocm/main.py")
+        )
+      (spacemacs|define-custom-layout "W:ONDATA"
+        :binding "wd"
+        :body
+        (find-file "~/w/optical-network-data/terastream.yang")
+        )
+      (spacemacs|define-custom-layout "W:OCP"
+        :binding "wo"
+        :body
+        (find-file "~/w/ocp/ocp/main.py")
+        )
+      (spacemacs|define-custom-layout "W:UTIL"
+        :binding "wu"
+        :body
+        (find-file "~/w/tsutil/setup.py")
+        )
+      (spacemacs|define-custom-layout "P:OrgBeamerSandbox"
+        :binding "po"
+        :body
+        (find-file "~/p/org-beamer-sandbox")
+        )
+      )
 
     ;; ===========
     ;; Keybindings
@@ -628,229 +633,172 @@ layers configuration. You are free to put any user code."
       (erc :server "asimov.freenode.net" :port "6667" :nick "chopps"))
 
     (when (configuration-layer/layer-usedp 'mu4e)
-      (progn
-        (defcustom mu4e-spam-folder "/chopps.org/spam-train"
-          "Folder for spam email"
-          :type '(string :tag "Folder name")
-          :group 'mu4e-folders)
+      (defcustom mu4e-spam-folder "/chopps.org/spam-train"
+        "Folder for spam email"
+        :type '(string :tag "Folder name")
+        :group 'mu4e-folders)
 
 
-        (setq mu4e-maildir "~/Maildir"
-              ;; Updating
-              ;; mu4e-pre-hook-count 0
-              ;; mu4e-full-update-mail-command "bash -c '(cd && offlineimap -l /Users/chopps/.offlineimap/logfile)'"
-              ;; mu4e-quick-update-mail-command "bash -c '(cd && offlineimap -q -l /Users/chopps/.offlineimap/logfile)'"
-              ;; mu4e-update-pre-hook 'mu4e-pre-hook-udpate-command
-              mu4e-mu-binary (executable-find "mu")
-              mu4e-update-interval nil
-              mu4e-headers-include-related nil
+      (setq mu4e-maildir "~/Documents/imap-accounts"
+        ;; Updating
+        ;; mu4e-pre-hook-count 0
+        ;; mu4e-full-update-mail-command "bash -c '(cd && offlineimap -l /Users/chopps/.offlineimap/logfile)'"
+        ;; mu4e-quick-update-mail-command "bash -c '(cd && offlineimap -q -l /Users/chopps/.offlineimap/logfile)'"
 
-              mu4e-inbox-mailbox '("maildir:/gmail.com/INBOX"
-                                   "maildir:/chopps.org/INBOX"
-                                   "maildir:/terastrm.net/INBOX"
-                                   "maildir:/chopps.org/a-terastream")
-
-              mu4e-imp-mailbox '("maildir:/chopps.org/ietf-chairs"
-                                 "maildir:/chopps.org/ietf-chairs-rtg"
-                                 "maildir:/chopps.org/ietf-dir-dir"
-                                 "maildir:/chopps.org/ietf-rtg-yang-dt"
-                                 "maildir:/chopps.org/ietf-wg-isis"
-                                 "maildir:/chopps.org/ietf-wg-netmod")
-
-              mu4e-junk-mailbox '("maildir:/gmail.com/[Gmail].Spam"
-                                  "maildir:/chopps.org/spam-probable"
-                                  "maildir:/chopps.org/spam-train"
-                                  "maildir:/chopps.org/spam")
-              ;; -----------
-              ;; [b]ookmarks
-              ;; -----------
-
-              mu4e-not-junk-folder-filter
-              (concat " AND NOT (" (s-join " OR " mu4e-junk-mailbox) ")")
-
-              mu4e-inbox-filter-base
-              (concat "(" (s-join " OR " mu4e-inbox-mailbox) ")")
-
-              mu4e-imp-filter-base
-              (concat "(" (s-join " OR " mu4e-imp-mailbox) ")")
-
-              mu4e-unread-filter "(flag:unread AND NOT flag:flagged AND NOT flag:trashed)"
-              mu4e-unread-flagged-filter "(flag:unread AND flag:flagged AND NOT flag:trashed)"
-
-              mu4e-bookmarks
-              (append
-               (list (list (concat "flag:unread AND NOT flag:trashed AND " mu4e-inbox-filter-base) "Unread [i]NBOX messages" ?i)
-                     (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-*") "Unread IETF messages" ?I)
-
-                     (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
-                     (list (concat "flag:flagged AND NOT flag:trashed AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "[F]lagged Non-INBOX messages" ?F)
-
-                     (list (concat mu4e-unread-filter         mu4e-imp-filter-base) "Unread Important messages" ?n)
-                     (list (concat mu4e-unread-flagged-filter mu4e-imp-filter-base) "Unread-Flagged Important messages" ?N)
-
-                     (list (concat mu4e-unread-filter         " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread [u]nimportant messages" ?u)
-                     (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged [U]nimportant messages" ?U)
-
-                     (list (concat mu4e-unread-filter         " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread Non-INBOX messages" ?o)
-                     (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged Non-INBOX messages" ?O)
+        ;; mu4e-update-pre-hook 'mu4e-pre-hook-udpate-command
+        mu4e-mu-binary (executable-find "mu")
+        mu4e-update-interval nil
+        mu4e-headers-include-related nil
 
 
-                     (list (concat mu4e-unread-filter         mu4e-not-junk-folder-filter) "Unread messages" ?a)
-                     (list (concat mu4e-unread-flagged-filter mu4e-not-junk-folder-filter) "Unread-flagged messages" ?A)
+        mu4e-context-policy 'pick-first
+        mu4e-compose-context-policy 'ask-if-none
 
-                     (list "maildir:/chopps.org/spam-probable" "Probable spam messages" ?s))
-               (mapcar (lambda (x) (cons (concat (car x) mu4e-not-junk-folder-filter) (cdr x)))
-                       '(("flag:unread AND NOT flag:trashed" "Unread messages" ?u)
-                         ("date:1h..now" "Last hours messages" ?h)
-                         ("date:24h..now" "Today's messages" ?d)
-                         ("date:today..now" "Today's messages" ?t)
-                         ("date:7d..now" "Last 7 days" ?w)
-                         ("mime:7d..now" "Last 7 days" ?w)
-                         ("mime:*pdf" "Messages with PDF" 112)
-                         ("mime:*vcs" "Messages with VCS" 113))))
+        ;; -----------
+        ;; [b]ookmarks
+        ;; -----------
 
+        mu4e-inbox-mailbox '("maildir:/gmail.com/INBOX"
+                              "maildir:/chopps.org/INBOX"
+                              "maildir:/terastrm.net/INBOX"
+                              "maildir:/chopps.org/a-terastream")
 
-              ;; [j]ump shortcuts
-              mu4e-maildir-shortcuts '(("/chopps.org/INBOX" . ?i)
-                                       ("/gmail.com/INBOX" . ?g)
-                                       ("/terastrm.net/INBOX" . ?w)
-                                       ("/chopps.org/receipts" . ?r)
-                                       ("/chopps.org/a-terastream" . ?t)
-                                       ("/chopps.org/aa-netbsd" . ?n)
-                                       ("/chopps.org/ietf-wg-isis" . ?I)
-                                       ("/chopps.org/ietf-wg-homenet" . ?H)
-                                       ("/chopps.org/ietf-wg-netmod" . ?N)
-                                       ("/chopps.org/spam-train" . ?S)
-                                       ("/chopps.org/spam-probable" . ?s))
+        mu4e-imp-mailbox '("maildir:/chopps.org/ietf-chairs"
+                            "maildir:/chopps.org/ietf-chairs-rtg"
+                            "maildir:/chopps.org/ietf-dir-dir"
+                            "maildir:/chopps.org/ietf-rtg-yang-dt"
+                            "maildir:/chopps.org/ietf-wg-isis"
+                            "maildir:/chopps.org/ietf-wg-netmod")
 
-              ;; Visuals
-              mu4e-view-show-addresses t
-              mu4e-headers-visible-lines 15
-              mu4e-headers-visible-columns 80
-              mu4e-html2text-command 'mu4e-shr2text
-              ;; make work better in dark themes
-              ;; [[mu4e:msgid:87vb7ng3tn.fsf@djcbsoftware.nl][Re: I find html2markdown the best value for mu4e-html2text-command]]
-              shr-color-visible-luminance-min 80
-              mu4e-view-html-plaintext-ratio-heuristic 15
-              ;; mu4e-html2text-command "html2text -nobs -utf8 -width 120"
-              mu4e-use-fancy-chars nil
-              ;; mu4e-headers-has-child-prefix    '(" ┬●")  ; Parent
-              ;; mu4e-headers-empty-parent-prefix '(" ─●")  ; Orphan
-              ;; mu4e-headers-first-child-prefix  '("└─●")  ; First child
-              ;; mu4e-headers-duplicate-prefix    '("└≡")   ; Duplicate
-              ;; mu4e-headers-default-prefix      '("  ●") ; Default.
+        mu4e-junk-mailbox '("maildir:/gmail.com/[Gmail].Spam"
+                             "maildir:/chopps.org/spam-probable"
+                             "maildir:/chopps.org/spam-train"
+                             "maildir:/chopps.org/spam")
+        mu4e-not-junk-folder-filter
+        (concat " AND NOT (" (s-join " OR " mu4e-junk-mailbox) ")")
 
+        mu4e-inbox-filter-base
+        (concat "(" (s-join " OR " mu4e-inbox-mailbox) ")")
 
-              ;; Folders -- most setup per account
-              ;; see context below
+        mu4e-imp-filter-base
+        (concat "(" (s-join " OR " mu4e-imp-mailbox) ")")
 
-              ;; mu4e-sent-folder   "/chopps.org/Sent Messages"
-              ;; mu4e-drafts-folder "/chopps.org/Drafts"
-              ;; mu4e-trash-folder  "/chopps.org/Deleted Messages"
+        mu4e-unread-filter "(flag:unread AND NOT flag:flagged AND NOT flag:trashed)"
+        mu4e-unread-flagged-filter "(flag:unread AND flag:flagged AND NOT flag:trashed)"
 
-              mu4e-attachment-dir "~/Downloads"
+        mu4e-bookmarks
+        (append
+          (list (list (concat "flag:unread AND NOT flag:trashed AND " mu4e-inbox-filter-base) "Unread [i]NBOX messages" ?i)
+            (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-*") "Unread IETF messages" ?I)
 
-              ;; only complete addresses found in email to one of the below addresses
-              mu4e-compose-complete-only-personal t
-              mu4e-user-mail-address-list (list "chopps@chopps.org"
-                                                "chopps@dev.terastrm.net"
-                                                "chopps@gmail.com"
-                                                "chopps@netbsd.org"
-                                                "chopps@rawdofmt.org")
-              ;; This isn't used yet but we'd like it to be for getting
-              ;; contact completions from any mail with these addresses in them.
-              mu4e-contacts-user-mail-address-list (list
-                                                    "chopps@chopps.org"
-                                                    "chopps@dev.terastrm.net"
-                                                    "chopps@gmail.com"
-                                                    "chopps@netbsd.org"
-                                                    "chopps@rawdofmt.org"
-                                                    ;; we want contacts added from these mailing lists
-                                                    "isis-wg@ietf.org"
-                                                    "developers@netbsd.org"
-                                                    "netbsd-developers@netbsd.org"
-                                                    )
+            (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
+            (list (concat "flag:flagged AND NOT flag:trashed AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "[F]lagged Non-INBOX messages" ?F)
 
-              mu4e-compose-signature-auto-include nil
-              mu4e-compose-complete-addresses t
-              message-completion-alistp '(("^\\(Newsgroups\\|Followup-To\\|Posted-To\\|Gcc\\):" . message-expand-group)
-                                          ("^\\(Resent-\\)?\\(To\\|B?Cc\\):" . my-message-expand-name)
-                                          ("^\\(Reply-To\\|From\\|Mail-Followup-To\\|Mail-Copies-To\\):" . message-expand-name)
-                                          ("^\\(Disposition-Notification-To\\|Return-Receipt-To\\):" . message-expand-name))
+            (list (concat mu4e-unread-filter         mu4e-imp-filter-base) "Unread Important messages" ?n)
+            (list (concat mu4e-unread-flagged-filter mu4e-imp-filter-base) "Unread-Flagged Important messages" ?N)
+
+            (list (concat mu4e-unread-filter         " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread [u]nimportant messages" ?u)
+            (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged [U]nimportant messages" ?U)
+
+            (list (concat mu4e-unread-filter         " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread Non-INBOX messages" ?o)
+            (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged Non-INBOX messages" ?O)
 
 
+            (list (concat mu4e-unread-filter         mu4e-not-junk-folder-filter) "Unread messages" ?a)
+            (list (concat mu4e-unread-flagged-filter mu4e-not-junk-folder-filter) "Unread-flagged messages" ?A)
 
-              ;; don't keep message buffers around
-              message-kill-buffer-on-exit t
-              )
+            (list "maildir:/chopps.org/spam-probable" "Probable spam messages" ?s))
+          (mapcar (lambda (x) (cons (concat (car x) mu4e-not-junk-folder-filter) (cdr x)))
+            '(("flag:unread AND NOT flag:trashed" "Unread messages" ?u)
+               ("date:1h..now" "Last hours messages" ?h)
+               ("date:24h..now" "Today's messages" ?d)
+               ("date:today..now" "Today's messages" ?t)
+               ("date:7d..now" "Last 7 days" ?w)
+               ("mime:7d..now" "Last 7 days" ?w)
+               ("mime:*pdf" "Messages with PDF" 112)
+               ("mime:*vcs" "Messages with VCS" 113))))
 
-        (defun ch:ct (clist)
-          "Transform candidate into (display . real)"
-          (mapcar (lambda (candidate)
-                    (let* ((name (plist-get candidate :name))
-                           email (plist-get candidate :mail))
-                      (or (and name (format "%s <%s>" name email))
-                          email))) clist))
-        (defun my-message-expand-name (&optional start)
-          (interactive)
-          (message "my-message-expand-name called")
-          (helm :prompt "contact:" :sources
-                (helm-build-sync-source "mu4e contacts"
-                  :candidates mu4e~contact-list :candidate-transformer 'ch:ct)))
 
-        (defun my-mu4e-compose-hook ()
-          "Setup outgoing messages"
-          ;; Add chopps@<account-sending-from> to CC
-          ;; Add chopps@chopps.org to Bcc if not sending from @chopps.org
-          (let ((buffer-modified (buffer-modified-p)))
-            (save-excursion
-              (message-add-header (concat "Cc: " user-mail-address))
-              (if (not (string= user-mail-address "chopps@chopps.org"))
-                  (message-add-header "Bcc: chopps@chopps.org")))
-            (set-buffer-modified-p buffer-modified))
-          ;; Outgoing mails get format=flowed.
-          ;; (use-hard-newlines t 'guess)
-          ;; Sign messages by default
-          (mml-secure-message-sign-pgpmime))
+        ;; [j]ump shortcuts
+        mu4e-maildir-shortcuts '(("/chopps.org/INBOX" . ?i)
+                                  ("/gmail.com/INBOX" . ?g)
+                                  ("/terastrm.net/INBOX" . ?w)
+                                  ("/chopps.org/receipts" . ?r)
+                                  ("/chopps.org/a-terastream" . ?t)
+                                  ("/chopps.org/aa-netbsd" . ?n)
+                                  ("/chopps.org/ietf-wg-isis" . ?I)
+                                  ("/chopps.org/ietf-wg-homenet" . ?H)
+                                  ("/chopps.org/ietf-wg-netmod" . ?N)
+                                  ("/chopps.org/spam-train" . ?S)
+                                  ("/chopps.org/spam-probable" . ?s))
 
-        (defun mu4e-pre-hook-udpate-command ()
-          (let ((check (% mu4e-pre-hook-count 4)))
-            (setq mu4e-get-mail-command (if (= check 0)
-                                            mu4e-full-update-mail-command
-                                          mu4e-full-update-mail-command))
-            (setq mu4e-pre-hook-count (1+ mu4e-pre-hook-count))))
+        ;; Visuals
+        mu4e-view-show-addresses t
+        mu4e-headers-visible-lines 15
+        mu4e-headers-visible-columns 80
+        mu4e-html2text-command 'mu4e-shr2text
+        ;; make work better in dark themes
+        ;; [[mu4e:msgid:87vb7ng3tn.fsf@djcbsoftware.nl][Re: I find html2markdown the best value for mu4e-html2text-command]]
+        shr-color-visible-luminance-min 80
+        mu4e-view-html-plaintext-ratio-heuristic 15
+        ;; mu4e-html2text-command "html2text -nobs -utf8 -width 120"
+        mu4e-use-fancy-chars nil
+        ;; mu4e-headers-has-child-prefix    '(" ┬●")  ; Parent
+        ;; mu4e-headers-empty-parent-prefix '(" ─●")  ; Orphan
+        ;; mu4e-headers-first-child-prefix  '("└─●")  ; First child
+        ;; mu4e-headers-duplicate-prefix    '("└≡")   ; Duplicate
+        ;; mu4e-headers-default-prefix      '("  ●") ; Default.
 
-        ;; Mark to move to spam folder from headers view.
-        (defun mu4e-headers-mark-move-to-spam ()
-          (interactive)
-          (mu4e-mark-set 'move mu4e-spam-folder)
-          (mu4e-headers-next))
 
-        ;; Mark to move to spam folder from message view.
-        (defun mu4e-view-mark-move-to-spam ()
-          (interactive)
-          (mu4e~view-in-headers-context
-           (mu4e-headers-mark-move-to-spam)))
-        (message "post-init end mu4e eval after load")
+        ;; Folders -- most setup per account
+        ;; see context below
 
-        ;; XXX these aren't defined
-        ;; (define-key mu4e-headers-mode-map (kbd "C-c c") 'org-mu4e-store-and-capture)
-        ;; (define-key mu4e-view-mode-map    (kbd "C-c c") 'org-mu4e-store-and-capture)
+        ;; mu4e-sent-folder   "/chopps.org/Sent Messages"
+        ;; mu4e-drafts-folder "/chopps.org/Drafts"
+        ;; mu4e-trash-folder  "/chopps.org/Deleted Messages"
 
-        (with-eval-after-load 'mu4e
-          (bind-key (kbd "'") 'mu4e-headers-next 'mu4e-headers-mode-map)
-          (bind-key (kbd "\"") 'mu4e-headers-prev 'mu4e-headers-mode-map)
-          (bind-key (kbd "\"") 'mu4e-view-headers-prev 'mu4e-view-mode-map)
-          (bind-key (kbd "f") 'mu4e-view-go-to-url 'mu4e-view-mode-map)
+        mu4e-attachment-dir "~/Downloads"
 
-          (when (require 'mu4e-context nil t)
-            (setq mu4e-contexts `( ,(make-mu4e-context
-                                     :name "chopps.org"
-                                     :enter-func (lambda () (mu4e-message "Home"))
-                                     ;; no leave-func
-                                     :match-func (lambda (msg)
-                                                   (and msg (string-match "/chopps.org/.*" (mu4e-message-field msg :maildir))))
-                                     :vars '((user-mail-address  . "chopps@chopps.org")
+        ;; only complete addresses found in email to one of the below addresses
+        mu4e-compose-complete-only-personal t
+        mu4e-user-mail-address-list (list "chopps@chopps.org"
+                                      "chopps@dev.terastrm.net"
+                                      "chopps@gmail.com"
+                                      "chopps@netbsd.org"
+                                      "chopps@rawdofmt.org")
+        ;; This isn't used yet but we'd like it to be for getting
+        ;; contact completions from any mail with these addresses in them.
+        mu4e-contacts-user-mail-address-list (list
+                                               "chopps@chopps.org"
+                                               "chopps@dev.terastrm.net"
+                                               "chopps@gmail.com"
+                                               "chopps@netbsd.org"
+                                               "chopps@rawdofmt.org"
+                                               ;; we want contacts added from these mailing lists
+                                               "isis-wg@ietf.org"
+                                               "developers@netbsd.org"
+                                               "netbsd-developers@netbsd.org"
+                                               )
+
+        mu4e-compose-signature-auto-include nil
+        mu4e-compose-complete-addresses t
+        message-completion-alistp '(("^\\(Newsgroups\\|Followup-To\\|Posted-To\\|Gcc\\):" . message-expand-group)
+                                     ("^\\(Resent-\\)?\\(To\\|B?Cc\\):" . my-message-expand-name)
+                                     ("^\\(Reply-To\\|From\\|Mail-Followup-To\\|Mail-Copies-To\\):" . message-expand-name)
+                                     ("^\\(Disposition-Notification-To\\|Return-Receipt-To\\):" . message-expand-name))
+
+
+
+        ;; don't keep message buffers around
+        message-kill-buffer-on-exit t
+        )
+      (with-eval-after-load 'mu4e
+        (progn
+          (setq mu4e-contexts `( ,(make-mu4e-context
+                                    :name "chopps.org"
+                                    :match-func (lambda (msg)
+                                                  (and msg (string-match "/chopps.org/.*" (mu4e-message-field msg :maildir))))
+                                    :vars '((user-mail-address  . "chopps@chopps.org")
                                              ;; mu4e
                                              (mu4e-sent-folder   . "/chopps.org/Sent Messages")
                                              (mu4e-trash-folder  . "/chopps.org/Deleted Messages")
@@ -860,18 +808,12 @@ layers configuration. You are free to put any user code."
                                              (smtpmail-starttls-credentials . '(("smtp.chopps.org" 9005 nil nil)))
                                              (smtpmail-default-smtp-server  . "smtp.chopps.org")
                                              (smtpmail-smtp-server          . "smtp.chopps.org")
-                                             ;; smtpmail-local-domain?
-                                             ;; smtpmail-sendto-domain?
                                              (smtpmail-smtp-service         . 9005)))
-                                   ,(make-mu4e-context
-                                     :name "dev.terastrm.net"
-                                     :enter-func (lambda () (mu4e-message "Work"))
-                                     ;; no leave-func
-                                     :match-func (lambda (msg)
-                                                   (and msg (string-match "/terastrm.net/.*" (mu4e-message-field msg :maildir))))
-                                     :vars '(
-                                             ;; about me
-                                             (user-mail-address  . "chopps@dev.terastrm.net")
+                                 ,(make-mu4e-context
+                                    :name "dev.terastrm.net"
+                                    :match-func (lambda (msg)
+                                                  (and msg (string-match "/terastrm.net/.*" (mu4e-message-field msg :maildir))))
+                                    :vars '((user-mail-address  . "chopps@dev.terastrm.net")
                                              ;; mu4e
                                              (mu4e-sent-folder   . "/terastrm.net/Sent Messages")
                                              (mu4e-trash-folder  . "/terastrm.net/Deleted Messages")
@@ -881,19 +823,12 @@ layers configuration. You are free to put any user code."
                                              (smtpmail-starttls-credentials . '(("smtp.dev.terastrm.net" 587 nil nil)))
                                              (smtpmail-default-smtp-server  . "smtp.dev.terastrm.net")
                                              (smtpmail-smtp-server          . "smtp.dev.terastrm.net")
-                                             ;; smtpmail-local-domain?
-                                             ;; smtpmail-sendto-domain?
                                              (smtpmail-smtp-service         . 587)))
-
-                                   ,(make-mu4e-context
-                                     :name "gmail.com"
-                                     :enter-func (lambda () (mu4e-message "Gmail"))
-                                     ;; no leave-func
-                                     :match-func (lambda (msg)
-                                                   (and msg (string-match "/gmail.com/.*" (mu4e-message-field msg :maildir))))
-                                     :vars '(
-                                             ;; about me
-                                             (user-mail-address  . "chopps@gmail.com")
+                                 ,(make-mu4e-context
+                                    :name "gmail.com"
+                                    :match-func (lambda (msg)
+                                                  (and msg (string-match "/gmail.com/.*" (mu4e-message-field msg :maildir))))
+                                    :vars '((user-mail-address  . "chopps@gmail.com")
                                              ;; mu4e
                                              (mu4e-drafts-folder . "/gmail.com/[Gmail].Drafts")
                                              (mu4e-sent-folder   . "/gmail.com/[Gmail].Sent Mail")
@@ -903,9 +838,66 @@ layers configuration. You are free to put any user code."
                                              (smtpmail-starttls-credentials . '(("smtp.gmail.com" 587 nil nil)))
                                              (smtpmail-default-smtp-server  . "smtp.gmail.com")
                                              (smtpmail-smtp-server          . "smtp.gmail.com")
-                                             ;; smtpmail-local-domain?
-                                             ;; smtpmail-sendto-domain?
-                                             (smtpmail-smtp-service . 587))))))
+                                             (smtpmail-smtp-service . 587)))))
+
+          (bind-key (kbd "'") 'mu4e-headers-next 'mu4e-headers-mode-map)
+          (bind-key (kbd "\"") 'mu4e-headers-prev 'mu4e-headers-mode-map)
+          (bind-key (kbd "\"") 'mu4e-view-headers-prev 'mu4e-view-mode-map)
+          (bind-key (kbd "f") 'mu4e-view-go-to-url 'mu4e-view-mode-map)
+
+          (defun ch:ct (clist)
+            "Transform candidate into (display . real)"
+            (mapcar (lambda (candidate)
+                      (let* ((name (plist-get candidate :name))
+                              email (plist-get candidate :mail))
+                        (or (and name (format "%s <%s>" name email))
+                          email))) clist))
+          (defun my-message-expand-name (&optional start)
+            (interactive)
+            (message "my-message-expand-name called")
+            (helm :prompt "contact:" :sources
+              (helm-build-sync-source "mu4e contacts"
+                :candidates mu4e~contact-list :candidate-transformer 'ch:ct)))
+
+          (defun my-mu4e-compose-hook ()
+            "Setup outgoing messages"
+            ;; Add chopps@<account-sending-from> to CC
+            ;; Add chopps@chopps.org to Bcc if not sending from @chopps.org
+            (let ((buffer-modified (buffer-modified-p)))
+              (save-excursion
+                (message-add-header (concat "Cc: " user-mail-address))
+                (if (not (string= user-mail-address "chopps@chopps.org"))
+                  (message-add-header "Bcc: chopps@chopps.org")))
+              (set-buffer-modified-p buffer-modified))
+
+            ;; Outgoing mails get format=flowed.
+            ;; (use-hard-newlines t 'guess)
+            ;; Sign messages by default
+            (mml-secure-message-sign-pgpmime))
+
+          (defun mu4e-pre-hook-udpate-command ()
+            (let ((check (% mu4e-pre-hook-count 4)))
+              (setq mu4e-get-mail-command (if (= check 0)
+                                            mu4e-full-update-mail-command
+                                            mu4e-full-update-mail-command))
+              (setq mu4e-pre-hook-count (1+ mu4e-pre-hook-count))))
+
+          ;; Mark to move to spam folder from headers view.
+          (defun mu4e-headers-mark-move-to-spam ()
+            (interactive)
+            (mu4e-mark-set 'move mu4e-spam-folder)
+            (mu4e-headers-next))
+
+          ;; Mark to move to spam folder from message view.
+          (defun mu4e-view-mark-move-to-spam ()
+            (interactive)
+            (mu4e~view-in-headers-context
+              (mu4e-headers-mark-move-to-spam)))
+          (message "post-init end mu4e eval after load")
+
+          ;; XXX these aren't defined
+          ;; (define-key mu4e-headers-mode-map (kbd "C-c c") 'org-mu4e-store-and-capture)
+          ;; (define-key mu4e-view-mode-map    (kbd "C-c c") 'org-mu4e-store-and-capture)
 
           (require 'mu4e-contrib)
 
@@ -914,22 +906,22 @@ layers configuration. You are free to put any user code."
           ;; (mu4e-alert-enable-notifications)
 
           (add-hook 'mu4e-headers-mode-hook
-                    (lambda () (progn
-                                 (make-local-variable 'scroll-conservatively)
-                                 (setq
-                                  show-trailing-whitespace nil
-                                  scroll-conservatively 0
-                                  scroll-up-aggressively .8
-                                  scroll-down-aggressively .8)
-                                 )))
+            (lambda () (progn
+                         (make-local-variable 'scroll-conservatively)
+                         (setq
+                           show-trailing-whitespace nil
+                           scroll-conservatively 0
+                           scroll-up-aggressively .8
+                           scroll-down-aggressively .8)
+                         )))
 
           (add-hook 'mu4e-view-mode-hook
-                    (lambda () (setq show-trailing-whitespace nil)))
+            (lambda () (setq show-trailing-whitespace nil)))
 
           (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
 
           (add-to-list 'mu4e-view-actions
-                       '("ViewInBrowser" . mu4e-action-view-in-browser))
+            '("ViewInBrowser" . mu4e-action-view-in-browser))
 
           (define-key mu4e-headers-mode-map "d" 'mu4e-headers-mark-for-read)
           (define-key mu4e-view-mode-map "d" 'mu4e-view-mark-for-read)
@@ -939,27 +931,28 @@ layers configuration. You are free to put any user code."
           (define-key mu4e-view-mode-map "\\" 'mu4e-view-mark-move-to-spam)
 
           (add-to-list 'mu4e-header-info-custom
-                       '(:list-or-dir .
-                                      (:name "ML or maildir" ;; long name, as seen in message view
-                                             :shortname "ML-D"     ;; short name, as seen in the headers view
-                                             :help "Mailing list or maildir if not set"
-                                             :function
-                                             (lambda (msg)
-                                               (or (mu4e-message-field msg :mailing-list)
-                                                   (mu4e-message-field msg :maildir))))))
+            '(:list-or-dir .
+               (:name "ML or maildir" ;; long name, as seen in message view
+                 :shortname "ML-D"     ;; short name, as seen in the headers view
+                 :help "Mailing list or maildir if not set"
+                 :function
+                 (lambda (msg)
+                   (or (mu4e-message-field msg :mailing-list)
+                     (mu4e-message-field msg :maildir))))))
 
           (setq
-           ;; "Date         Flgs   List       From                   Subject
-           mu4e-headers-fields (quote (
-                                       (:flags          .  5)
-                                       (:human-date     . 15)
-                                       (:from           . 26)
-                                       (:list-or-dir    . 30)
-                                       (:thread-subject . nil))))
+            ;; "Date         Flgs   List       From                   Subject
+            mu4e-headers-fields (quote (
+                                         (:flags          .  5)
+                                         (:human-date     . 15)
+                                         (:from           . 26)
+                                         (:list-or-dir    . 30)
+                                         (:thread-subject . nil))))
 
           )
         )
       )
+
     (when (configuration-layer/layer-usedp 'erc)
       (setq erc-prompt-for-nickserv-password nil
             erc-autojoin-channels-alist '(("irc.gitter.im" "#syl20bnr/spacemacs")
@@ -1888,11 +1881,6 @@ the default browser."
           (define-key org-mode-map (kbd "C-c e E") 'org-encrypt-entry)
           (define-key org-mode-map (kbd "C-c e d") 'org-decrypt-entries)
           (define-key org-mode-map (kbd "C-c e D") 'org-decrypt-entry)
-
-          ;; Let's skip this for now
-          ;; (and (buffer-file-name)
-          ;;      (string-match "\\.o2b$" (buffer-file-name))
-          ;;      (org2blog/wp-mode))
           )
 
         ;; (setq TeX-view-program-selection
@@ -2256,23 +2244,13 @@ the default browser."
 
     (when (configuration-layer/layer-usedp 'org2blog)
       (with-eval-after-load "org2blog"
-        ;; XXX cool addition add after testing
-        ;; ;; (add-hook 'org2blog/wp-mode-hook '(lambda () (org-mode t)))
-        ;; (add-to-list 'org2blog/wp-sourcecode-langs "lisp")
-        ;; (add-to-list 'org2blog/wp-sourcecode-langs "sh")
-
         ;; (defadvice org-wp-src-block (after ad-org-wp-src-block activate)
         ;;   "Always use space as title if none given"
         ;;   (setq ad-return-value (replace-regexp-in-string "title=\"\"" "title=\" \"" ad-return-value)))
         ;; (ad-activate 'org-wp-src-block)
 
-        ;; Should probably be in layer config
         (setq org2blog/wp-use-sourcecode-shortcode t)
-        (setq org2blog/wp-blog-alist `(("hoppsjots.org"
-                                        :url "http://hoppsjots.org/xmlrpc.php"
-                                        :default-categories ("Development" "Emacs")
-                                        :username ,(car (auth-source-user-and-password "hoppsjots.org"))
-                                        :password ,(cadr (auth-source-user-and-password "hoppsjots.org"))))))
+        )
       )
 
     ;; ====
@@ -2365,15 +2343,15 @@ the default browser."
                   (setq work-ai-prefix "/.*/\\(?:\\(?:Documents|Dropbox\\)/[Ww]ork\\|chopps/w\\)/.*/")
 
                   (with-eval-after-load 'autoinsert
-                    (define-auto-insert
-                      '("\\.org\\'" . "Home Org mode skeleton")
-                      '("Short description: "
-                        "#+TITLE: " _ \n
-                        > "#+AUTHOR: Christian E. Hopps" \n
-                        > "#+EMAIL: chopps@gmail.com" \n
-                        > "#+STARTUP: indent" \n
-                        > "" \n
-                        ))
+                    ;; (define-auto-insert
+                    ;;   '("\\.org\\'" . "Home Org mode skeleton")
+                    ;;   '("Short description: "
+                    ;;     "#+TITLE: " _ \n
+                    ;;     > "#+AUTHOR: Christian E. Hopps" \n
+                    ;;     > "#+EMAIL: chopps@gmail.com" \n
+                    ;;     > "#+STARTUP: indent" \n
+                    ;;     > "" \n
+                    ;;     ))
                     (define-auto-insert
                       '("\\.o2b\\'" . "Home Blog Org mode skeleton")
                       '("Short description: "
@@ -2468,15 +2446,15 @@ the default browser."
                     ;;      Work
                     ;;-----------+
 
-                    (define-auto-insert
-                      (cons (concat work-ai-prefix "\\.org\\'") "Work org mode skeleton")
-                      '("Short description: "
-                        "#+TITLE: " _ \n
-                        > "#+AUTHOR: Christian E. Hopps" \n
-                        > "#+EMAIL: chopps@gmail.com" \n
-                        > "#+STARTUP: indent" \n
-                        > "" \n
-                        ))
+                    ;; (define-auto-insert
+                    ;;   (cons (concat work-ai-prefix "\\.org\\'") "Work org mode skeleton")
+                    ;;   '("Short description: "
+                    ;;     "#+TITLE: " _ \n
+                    ;;     > "#+AUTHOR: Christian E. Hopps" \n
+                    ;;     > "#+EMAIL: chopps@gmail.com" \n
+                    ;;     > "#+STARTUP: indent" \n
+                    ;;     > "" \n
+                    ;;     ))
                     (define-auto-insert
                       (cons (concat work-ai-prefix "\\.el\\'") "Work Lisp comment skeleton")
                       '("Short description: "
@@ -2582,21 +2560,91 @@ the default browser."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+  '(ansi-color-faces-vector
+     [default default default italic underline success warning error])
+  '(ansi-color-names-vector
+     ["#3F3F3F" "#CC9393" "#7F9F7F" "#F0DFAF" "#8CD0D3" "#DC8CC3" "#93E0E3" "#DCDCCC"])
+ '(compilation-message-face (quote default))
+ '(cua-global-mark-cursor-color "#2aa198")
+ '(cua-normal-cursor-color "#839496")
+ '(cua-overwrite-cursor-color "#b58900")
+ '(cua-read-only-cursor-color "#859900")
  '(evil-disable-insert-state-bindings t)
  '(evil-shift-width 4)
- '(safe-local-variable-values
-   (quote
-    ((eval progn
-           (require
+ '(highlight-changes-colors (quote ("#d33682" "#6c71c4")))
+  '(highlight-symbol-colors
+     (--map
+       (solarized-color-blend it "#002b36" 0.25)
+       (quote
+         ("#b58900" "#2aa198" "#dc322f" "#6c71c4" "#859900" "#cb4b16" "#268bd2"))))
+ '(highlight-symbol-foreground-color "#93a1a1")
+  '(highlight-tail-colors
+     (quote
+       (("#073642" . 0)
+         ("#546E00" . 20)
+         ("#00736F" . 30)
+         ("#00629D" . 50)
+         ("#7B6000" . 60)
+         ("#8B2C02" . 70)
+         ("#93115C" . 85)
+         ("#073642" . 100))))
+  '(hl-bg-colors
+     (quote
+       ("#7B6000" "#8B2C02" "#990A1B" "#93115C" "#3F4D91" "#00629D" "#00736F" "#546E00")))
+  '(hl-fg-colors
+     (quote
+       ("#002b36" "#002b36" "#002b36" "#002b36" "#002b36" "#002b36" "#002b36" "#002b36")))
+ '(magit-diff-use-overlays nil)
+  '(nrepl-message-colors
+     (quote
+       ("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3")))
+ '(pos-tip-background-color "#073642")
+ '(pos-tip-foreground-color "#93a1a1")
+  '(safe-local-variable-values
+     (quote
+       ((eval progn
+          (require
             (quote projectile))
-           (puthash
+          (puthash
             (projectile-project-root)
             "make test" projectile-test-cmd-map))
-     (org-confirm-babel-evaluate)
-     (eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
-     (js2-indent-level . 2)
-     (evil-shift-width . 2))))
- '(send-mail-function (quote smtpmail-send-it)))
+         (org-confirm-babel-evaluate)
+         (eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
+         (js2-indent-level . 2)
+         (evil-shift-width . 2))))
+ '(send-mail-function (quote smtpmail-send-it))
+ '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#073642" 0.2))
+ '(term-default-bg-color "#002b36")
+ '(term-default-fg-color "#839496")
+ '(vc-annotate-background "#2B2B2B")
+  '(vc-annotate-color-map
+     (quote
+       ((20 . "#BC8383")
+         (40 . "#CC9393")
+         (60 . "#DFAF8F")
+         (80 . "#D0BF8F")
+         (100 . "#E0CF9F")
+         (120 . "#F0DFAF")
+         (140 . "#5F7F5F")
+         (160 . "#7F9F7F")
+         (180 . "#8FB28F")
+         (200 . "#9FC59F")
+         (220 . "#AFD8AF")
+         (240 . "#BFEBBF")
+         (260 . "#93E0E3")
+         (280 . "#6CA0A3")
+         (300 . "#7CB8BB")
+         (320 . "#8CD0D3")
+         (340 . "#94BFF3")
+         (360 . "#DC8CC3"))))
+ '(vc-annotate-very-old-color "#DC8CC3")
+  '(weechat-color-list
+     (quote
+       (unspecified "#002b36" "#073642" "#990A1B" "#dc322f" "#546E00" "#859900" "#7B6000" "#b58900" "#00629D" "#268bd2" "#93115C" "#d33682" "#00736F" "#2aa198" "#839496" "#657b83")))
+  '(xterm-color-names
+     ["#073642" "#dc322f" "#859900" "#b58900" "#268bd2" "#d33682" "#2aa198" "#eee8d5"])
+  '(xterm-color-names-bright
+     ["#002b36" "#cb4b16" "#586e75" "#657b83" "#839496" "#6c71c4" "#93a1a1" "#fdf6e3"]))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -2607,7 +2655,10 @@ the default browser."
  '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil))))
  '(erc-input-face ((t (:foreground "cornflowerblue"))))
  '(evil-search-highlight-persist-highlight-face ((t (:inherit region :background "yellow3" :foreground "black"))))
+ ;;'(font-lock-comment-delimiter-face ((t (:foreground "gray" :slant oblique))))
+ ;; '(font-lock-comment-face ((t (:foreground "gray" :slant oblique))))
  '(mode-line ((t (:background "blue4" :foreground "#eeeeec"))))
  '(mode-line-inactive ((t (:background "grey40" :foreground "grey60"))))
+ '(org-block ((t (:inherit font-lock-comment-face))))
  '(powerline-active1 ((t (:inherit mode-line :background "Deep Sky Blue"))))
  '(powerline-active2 ((t (:inherit mode-line :background "light sky blue")))))

@@ -1,29 +1,42 @@
 #+TITLE: org2blog-wp layer
 #+HTML_HEAD_EXTRA: <link rel="stylesheet" type="text/css" href="../css/readtheorg.css" />
 
-#+CAPTION: logo
-
-# The maximum height of the logo should be 200 pixels.
-[[img/org2blog-wp.png]]
-
 * Table of Contents                                        :TOC_4_org:noexport:
  - [[Description][Description]]
  - [[Install][Install]]
  - [[Key bindings][Key bindings]]
 
 * Description
-This layer does wonderful things:
-  - thing01
+This layer provides org to wordpress blog integration. For standard
+configurations one simply needs to configure the hostname of the wordpress blog
+and enter the username and password in a ~.netrc~ or ~.authinfo.gpg~ file.
 
 * Install
-To use this contribution add it to your =~/.spacemacs=
+To use org2blog add it to your =~/.spacemacs= file
 
 #+begin_src emacs-lisp
-  (setq-default dotspacemacs-configuration-layers '(org2blog-wp))
+  (setq-default dotspacemacs-configuration-layers
+    '((org2blog-wp :variables org2blog-name "myblog.wordpress.com")))
 #+end_src
+
+Additionally add an entry for the blog in your ~.netrc~ or ~.authinfo~ file.
+
+#+caption: example ~.authinfo.gpg~
+#+begin_example
+      machine myblog.wordpress.com login myusername password mypassword
+#+end_example
 
 * Key bindings
 
-| Key Binding     | Description    |
-|-----------------+----------------|
-| ~<SPC> x x x~   | Does thing01   |
+| Key Binding   | Description                                    |
+|---------------+------------------------------------------------|
+| ~<SPC> o b~   | org2blog/wp-new-entry                          |
+| ~<SPC> m B n~ | org2blog/wp-preview-buffer-post                |
+| ~<SPC> m B N~ | org2blog/wp-preview-subtree-post               |
+| ~<SPC> m B d~ | org2blog/wp-post-buffer                        |
+| ~<SPC> m B p~ | org2blog/wp-post-buffer-as-page                |
+| ~<SPC> m B s~ | org2blog/wp-post-buffer-as-subtree             |
+| ~<SPC> m B B~ | org2blog/wp-post-buffer-and-publish            |
+| ~<SPC> m B P~ | org2blog/wp-post-buffer-as-page-and-publish    |
+| ~<SPC> m B S~ | org2blog/wp-post-buffer-as-subtree-and-publish |
+|---------------+------------------------------------------------|
