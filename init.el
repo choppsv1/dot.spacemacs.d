@@ -24,10 +24,20 @@ values."
       ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
       ;; <M-m f e R> (Emacs style) to install them.
       ;; ----------------------------------------------------------------
-      spacemacs-ivy
-      ;; spacemacs-helm
+      ;; spacemacs-ivy
+      spacemacs-helm
       (auto-completion :variables
-        auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets")
+                       auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets"
+                       auto-completion-tab-key-behavior 'complete
+                       )
+      ;; (auto-completion :variables
+      ;;   auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets"
+      ;;   auto-completion-enable-sort-by-usage t
+      ;;   auto-completion-enable-snippets-in-popup t
+      ;;   auto-completion-tab-key-behavior 'complete
+      ;;   )
+      ;; company-complete vs complete-at-point
+
 
       ;; old comment from me indicating eyebrows blows away layouts.
       eyebrowse
@@ -112,6 +122,8 @@ values."
      mu4e-maildirs-extension
      ;; projectile
      ;; projectile-mode
+     ;; recentf
+     ;; savehist
      smartparens
      ) ; evil-org
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
@@ -140,11 +152,16 @@ values."
    ;; If non nil then spacemacs will check for updates at startup
    ;; when the current branch is not `develop'. (default t)
    dotspacemacs-check-for-update t
-   ;; One of `vim', `emacs' or `hybrid'. Evil is always enabled but if the
-   ;; variable is `emacs' then the `holy-mode' is enabled at startup. `hybrid'
-   ;; uses emacs key bindings for vim's insert mode, but otherwise leaves evil
-   ;; unchanged. (default 'vim)
-   dotspacemacs-editing-style 'hybrid
+   ;; One of `vim', `emacs' or `hybrid'.
+   ;; `hybrid' is like `vim' except that `insert state' is replaced by the
+   ;; `hybrid state' with `emacs' key bindings. The value can also be a list
+   ;; with `:variables' keyword (similar to layers). Check the editing styles
+   ;; section of the documentation for details on available variables.
+   ;; (default 'vim)
+   dotspacemacs-editing-style '(hybrid :variables
+                                       hybrid-mode-enable-hjkl-bindings t
+                                       hybrid-mode-enable-evilified-state t
+                                       hybrid-mode-default-state 'normal)
    ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
    dotspacemacs-verbose-loading t
    ;; Specify the startup banner. Default value is `official', it displays
@@ -167,18 +184,18 @@ values."
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(
-                         molokai
-                         monokai
                          misterioso
-                         quasi-monochrome
-                         phoenix-dark-pink
-                         phoenix-dark-mono
-                         spacemacs-dark
-                         spacemacs-light
-                         ;; solarized-light
-                         solarized-dark
-                         leuven
-                         zenburn
+                          molokai
+                          monokai
+                          quasi-monochrome
+                          phoenix-dark-pink
+                          phoenix-dark-mono
+                          spacemacs-dark
+                          spacemacs-light
+                          ;; solarized-light
+                          solarized-dark
+                          leuven
+                          zenburn
                          )
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
@@ -189,7 +206,12 @@ values."
    ;;                             :weight normal
    ;;                             :width normal
    ;;                             :powerline-scale 1.1)
-   dotspacemacs-default-font '("Ubuntu Mono" :size 10.0 :weight normal :width normal :powerline-scale 1.4)
+   dotspacemacs-default-font '("Ubuntu Mono" :size 11.0 :weight normal :width normal :powerline-scale 1.4)
+    ;; dotspacemacs-default-font '("Source Code Pro"
+    ;;                              :size 16.0
+    ;;                              :weight normal
+    ;;                              :width normal
+    ;;                              :powerline-scale 1.4)
 
    ;; The leader key
    dotspacemacs-leader-key "SPC"
@@ -225,6 +247,10 @@ values."
    ;; If non nil then the last auto saved layouts are resume automatically upon
    ;; start. (default nil)
    dotspacemacs-auto-resume-layouts nil
+   ;; Size (in MB) above which spacemacs will prompt to open the large file
+   ;; literally to avoid performance issues. Opening a file literally means that
+   ;; no major mode or minor modes are active. (default is 1)
+   dotspacemacs-large-file-size 1
    ;; Location where to auto-save files. Possible values are `original' to
    ;; auto-save the file in-place, `cache' to auto-save the file to another
    ;; file stored in the cache directory and `nil' to disable auto-saving.
@@ -232,10 +258,6 @@ values."
    dotspacemacs-auto-save-file-location 'cache
    ;; Maximum number of rollback slots to keep in the cache. (default 5)
    dotspacemacs-max-rollback-slots 5
-   ;; If non nil then `ido' replaces `helm' for some commands. For now only
-   ;; `find-files' (SPC f f), `find-spacemacs-file' (SPC f e s), and
-   ;; `find-contrib-file' (SPC f e c) are replaced. (default nil)
-   dotspacemacs-use-ido nil
    ;; If non nil, `helm' will try to minimize the space it uses. (default nil)
    dotspacemacs-helm-resize nil
    ;; if non nil, the helm header is hidden when there is only one source.
@@ -334,6 +356,7 @@ user code here.  The exception is org related code, which should be placed in `d
   ;; =========
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp"))
+  (add-to-list 'load-path (concat "~/p/ietf-docs"))
   ;;(require 'iterm-custom-keys)
   (require 'iterm-xterm-extra)
   (require 'generic-lisp)
@@ -485,11 +508,15 @@ layers configuration. You are free to put any user code."
     ;;       (dolist (x (cdr c)) (setq-default x 8))
     ;;     (setq-default (cdr c) 8)))
 
+
     (dolist (e spacemacs--indent-variable-alist)
       (if (symbolp (cdr e))
-          (set-default (cdr e) 4)
+          (if (not (eq 'lisp-indent-offset (cdr e)))
+              (set-default (cdr e) 4))
         (dolist (x (cdr e)) (setq-default x 4))))
-    (setq-default lisp-indent-offset 2)
+
+    ;; (setq-default lisp-indent-offset nil)
+      ;; (setq emacs-lisp-mode lisp-mode) . lisp-indent-offset)
 
 
     ;; tabs are 8 characters wide!
@@ -660,7 +687,7 @@ layers configuration. You are free to put any user code."
 
         mu4e-inbox-mailbox '("maildir:/gmail.com/INBOX"
                               "maildir:/chopps.org/INBOX"
-                              "maildir:/terastrm.net/INBOX"
+                              "maildir:/dev.terastrm.net/INBOX"
                               "maildir:/chopps.org/a-terastream")
 
         mu4e-imp-mailbox '("maildir:/chopps.org/ietf-chairs"
@@ -674,6 +701,8 @@ layers configuration. You are free to put any user code."
                              "maildir:/chopps.org/spam-probable"
                              "maildir:/chopps.org/spam-train"
                              "maildir:/chopps.org/spam")
+
+        mu4e-unread-filter "(flag:unread AND NOT flag:flagged AND NOT flag:trashed)"
         mu4e-not-junk-folder-filter
         (concat " AND NOT (" (s-join " OR " mu4e-junk-mailbox) ")")
 
@@ -722,7 +751,7 @@ layers configuration. You are free to put any user code."
         ;; [j]ump shortcuts
         mu4e-maildir-shortcuts '(("/chopps.org/INBOX" . ?i)
                                   ("/gmail.com/INBOX" . ?g)
-                                  ("/terastrm.net/INBOX" . ?w)
+                                  ("/dev.terastrm.net/INBOX" . ?w)
                                   ("/chopps.org/receipts" . ?r)
                                   ("/chopps.org/a-terastream" . ?t)
                                   ("/chopps.org/aa-netbsd" . ?n)
@@ -736,12 +765,18 @@ layers configuration. You are free to put any user code."
         mu4e-view-show-addresses t
         mu4e-headers-visible-lines 15
         mu4e-headers-visible-columns 80
+
+        ;; XXX Try running w/o this to see if hangs go away.
         mu4e-html2text-command 'mu4e-shr2text
+
         ;; make work better in dark themes
         ;; [[mu4e:msgid:87vb7ng3tn.fsf@djcbsoftware.nl][Re: I find html2markdown the best value for mu4e-html2text-command]]
         shr-color-visible-luminance-min 80
         mu4e-view-html-plaintext-ratio-heuristic 15
+
         ;; mu4e-html2text-command "html2text -nobs -utf8 -width 120"
+
+
         mu4e-use-fancy-chars nil
         ;; mu4e-headers-has-child-prefix    '(" ┬●")  ; Parent
         ;; mu4e-headers-empty-parent-prefix '(" ─●")  ; Orphan
@@ -792,6 +827,7 @@ layers configuration. You are free to put any user code."
         ;; don't keep message buffers around
         message-kill-buffer-on-exit t
         )
+
       (with-eval-after-load 'mu4e
         (progn
           (setq mu4e-contexts `( ,(make-mu4e-context
@@ -805,19 +841,19 @@ layers configuration. You are free to put any user code."
                                              (mu4e-drafts-folder . "/chopps.org/Drafts")
                                              (mu4e-sent-messages-behavior   . sent)
                                              ;; smtp
-                                             (smtpmail-starttls-credentials . '(("smtp.chopps.org" 9005 nil nil)))
+                                             (smtpmail-starttls-credentials . '(("smtp.chopps.org" 587 nil nil)))
                                              (smtpmail-default-smtp-server  . "smtp.chopps.org")
                                              (smtpmail-smtp-server          . "smtp.chopps.org")
-                                             (smtpmail-smtp-service         . 9005)))
+                                             (smtpmail-smtp-service         . 587)))
                                  ,(make-mu4e-context
                                     :name "dev.terastrm.net"
                                     :match-func (lambda (msg)
-                                                  (and msg (string-match "/terastrm.net/.*" (mu4e-message-field msg :maildir))))
+                                                  (and msg (string-match "/dev.terastrm.net/.*" (mu4e-message-field msg :maildir))))
                                     :vars '((user-mail-address  . "chopps@dev.terastrm.net")
                                              ;; mu4e
-                                             (mu4e-sent-folder   . "/terastrm.net/Sent Messages")
-                                             (mu4e-trash-folder  . "/terastrm.net/Deleted Messages")
-                                             (mu4e-drafts-folder . "/terastrm.net/Drafts")
+                                             (mu4e-sent-folder   . "/dev.terastrm.net/Sent Messages")
+                                             (mu4e-trash-folder  . "/dev.terastrm.net/Deleted Messages")
+                                             (mu4e-drafts-folder . "/dev.terastrm.net/Drafts")
                                              (mu4e-sent-messages-behavior   . sent)
                                              ;; smtp
                                              (smtpmail-starttls-credentials . '(("smtp.dev.terastrm.net" 587 nil nil)))
@@ -852,6 +888,7 @@ layers configuration. You are free to put any user code."
                               email (plist-get candidate :mail))
                         (or (and name (format "%s <%s>" name email))
                           email))) clist))
+
           (defun my-message-expand-name (&optional start)
             (interactive)
             (message "my-message-expand-name called")
@@ -869,18 +906,11 @@ layers configuration. You are free to put any user code."
                 (if (not (string= user-mail-address "chopps@chopps.org"))
                   (message-add-header "Bcc: chopps@chopps.org")))
               (set-buffer-modified-p buffer-modified))
-
             ;; Outgoing mails get format=flowed.
             ;; (use-hard-newlines t 'guess)
             ;; Sign messages by default
             (mml-secure-message-sign-pgpmime))
-
-          (defun mu4e-pre-hook-udpate-command ()
-            (let ((check (% mu4e-pre-hook-count 4)))
-              (setq mu4e-get-mail-command (if (= check 0)
-                                            mu4e-full-update-mail-command
-                                            mu4e-full-update-mail-command))
-              (setq mu4e-pre-hook-count (1+ mu4e-pre-hook-count))))
+          (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
 
           ;; Mark to move to spam folder from headers view.
           (defun mu4e-headers-mark-move-to-spam ()
@@ -902,23 +932,38 @@ layers configuration. You are free to put any user code."
           (require 'mu4e-contrib)
 
           ;; XXX also add this back
+          ;;
+          ;; error in process sentinel: mu4e-alert--parse-mails: End of file during parsing
+          ;; error in process sentinel: End of file during parsing
           ;; (mu4e-alert-enable-mode-line-display)
           ;; (mu4e-alert-enable-notifications)
 
+          ;; ;; XXX disabled trying to find hang XXX THIS CAUSED IT
           (add-hook 'mu4e-headers-mode-hook
             (lambda () (progn
                          (make-local-variable 'scroll-conservatively)
                          (setq
                            show-trailing-whitespace nil
                            scroll-conservatively 0
-                           scroll-up-aggressively .8
-                           scroll-down-aggressively .8)
+                           ;; XXX These two cause hangs
+                           ;; scroll-up-aggressively .8
+                           ;; scroll-down-aggressively .8)
+                           )
                          )))
 
-          (add-hook 'mu4e-view-mode-hook
-            (lambda () (setq show-trailing-whitespace nil)))
+          ;; ;; XXX causes hangs
+          ;; (add-hook 'mu4e-headers-mode-hook (lambda () (progn (setq scroll-up-aggressively .8))))
 
-          (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
+          (add-hook 'mu4e-view-mode-hook
+                    (lambda () (setq show-trailing-whitespace nil)))
+
+          (defun mu4e-pre-hook-udpate-command ()
+            (let ((check (% mu4e-pre-hook-count 4)))
+              (setq mu4e-get-mail-command (if (= check 0)
+                                            mu4e-full-update-mail-command
+                                            mu4e-full-update-mail-command))
+              (setq mu4e-pre-hook-count (1+ mu4e-pre-hook-count))))
+
 
           (add-to-list 'mu4e-view-actions
             '("ViewInBrowser" . mu4e-action-view-in-browser))
@@ -929,6 +974,22 @@ layers configuration. You are free to put any user code."
           (define-key mu4e-view-mode-map "@" 'mu4e-view-mark-move-to-spam)
           (define-key mu4e-headers-mode-map "\\" 'mu4e-headers-mark-move-to-spam)
           (define-key mu4e-view-mode-map "\\" 'mu4e-view-mark-move-to-spam)
+
+          (spacemacs/set-leader-keys-for-major-mode 'mu4e-view-mode
+            "g" 'mu4e-view-go-to-url
+            "h" 'mu4e-view-toggle-html
+            "j" 'mu4e-view-headers-next
+            "k" 'mu4e-view-headers-prev
+            "K" 'mu4e-view-save-url
+            "n" 'mu4e-view-headers-next
+            "p" 'mu4e-view-headers-prev
+            "v" 'mu4e-view-verify-msg-popup
+            "\\" 'mu4e-view-verify-msg-popup
+            ;; "y" 'mu4e- selejjj
+            "s" 'mu4e-view-search-narrow
+            "e" 'mu4e-view-search-edit
+            "b" 'mu4e-view-bookmark-make-record
+            )
 
           (add-to-list 'mu4e-header-info-custom
             '(:list-or-dir .
@@ -1195,32 +1256,71 @@ layers configuration. You are free to put any user code."
         (define-key flycheck-mode-map (kbd "M-n") 'flycheck-next-error)
         (define-key flycheck-mode-map (kbd "M-p") 'flycheck-previous-error)
 
+        ;; Redefine flake8 checker to chain pylint
+;;         "A Python syntax and style checker using Flake8.
+
+;; Requires Flake8 2.0 or newer. See URL
+;; `https://pypi.python.org/pypi/flake8'."
+
+        ;; replace flake8 with new chaining one from above
+        (setq flycheck-checkers (cons 'python-flake8-chain (delq 'python-flake8 flycheck-checkers)))
+
+        ;; (eval-after-load 'flycheck (cons 'python-pylint (delq 'python-pylint flycheck-checkers)))
+
         (flycheck-define-checker python-pycheckers
-                                 "A python syntax and style checker using flake8 and pylint."
-                                 :command ("pycheckers.sh"
-                                           (config-file "-8" flycheck-flake8rc)
-                                           (config-file "-r" flycheck-pylintrc)
-                                           source-inplace)
-                                 :error-patterns
-                                 ((error line-start
-                                         (file-name) ":" line ":" (optional column ":") " "
-                                         (message "E" (one-or-more digit) (zero-or-more not-newline))
-                                         line-end)
-                                  (warning line-start
-                                           (file-name) ":" line ":" (optional column ":") " "
-                                           (message (or "F"            ; Pyflakes in Flake8 >= 2.0
-                                                        "W"            ; Pyflakes in Flake8 < 2.0
-                                                        "C")           ; McCabe in Flake >= 2.0
-                                                    (one-or-more digit) (zero-or-more not-newline))
-                                           line-end)
-                                  (info line-start
-                                        (file-name) ":" line ":" (optional column ":") " "
-                                        (message (or "N"              ; pep8-naming in Flake8 >= 2.0
-                                                     "R")             ; re-factor from python.
-                                                 (one-or-more digit) (zero-or-more not-newline))
-                                        line-end)
-                                  )
-                                 :modes python-mode)))
+          "A python syntax and style checker using flake8 and pylint."
+          :command ("pycheckers.sh"
+                     (config-file "-8" flycheck-flake8rc)
+                     (config-file "-r" flycheck-pylintrc)
+                     source-inplace)
+          :error-patterns
+          ((error line-start
+             (file-name) ":" line ":" (optional column ":") " "
+             (message "E" (one-or-more digit) (zero-or-more not-newline))
+             line-end)
+            (warning line-start
+              (file-name) ":" line ":" (optional column ":") " "
+              (message (or "F"            ; Pyflakes in Flake8 >= 2.0
+                         "W"            ; Pyflakes in Flake8 < 2.0
+                         "C")           ; McCabe in Flake >= 2.0
+                (one-or-more digit) (zero-or-more not-newline))
+              line-end)
+            (info line-start
+              (file-name) ":" line ":" (optional column ":") " "
+              (message (or "N"              ; pep8-naming in Flake8 >= 2.0
+                         "R")             ; re-factor from python.
+                (one-or-more digit) (zero-or-more not-newline))
+              line-end)
+            )
+          :modes python-mode)
+
+        (defun fix-flake8 (errors)
+          (let ((errors (flycheck-sanitize-errors errors)))
+            (seq-do #'flycheck-flake8-fix-error-level errors)
+            errors))
+
+        (flycheck-define-checker python-flake8-chain
+          "A Python syntax and style checker using flake8"
+          :command ("flake8"
+                     "--format=default"
+                     (config-file "--config" flycheck-flake8rc)
+                     (option "--max-complexity" flycheck-flake8-maximum-complexity nil
+                       flycheck-option-int)
+                     (option "--max-line-length" flycheck-flake8-maximum-line-length nil
+                       flycheck-option-int)
+                     "-")
+          :standard-input t
+          :error-filter fix-flake8
+          :error-patterns
+          ((warning line-start
+             "stdin:" line ":" (optional column ":") " "
+             (id (one-or-more (any alpha)) (one-or-more digit)) " "
+             (message (one-or-more not-newline))
+             line-end))
+          :next-checkers ((t . python-pylint))
+          :modes python-mode)
+        ))
+
     (when (configuration-layer/layer-usedp 'emacs-lisp)
       (with-eval-after-load "lisp-mode"
         (defun rebox-lisp-hook ()
@@ -1456,15 +1556,18 @@ layers configuration. You are free to put any user code."
           ;; (flycheck-mode t)
 
           ;; This gives and error
-          (message "select checker")
+          ;; (message "select checker")
           ;; This is required b/c for some reason it's still not loaded at this point.
           ;; (require 'flycheck)
+
+          ;; not needed now that we chain
           (flycheck-select-checker 'python-pycheckers)
-          (message "post select checker")
+          ;; (message "post select checker")
+
           ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
           ;; (message "select set exec")
-
           (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
+
           (message "Python mode hook done"))
 
         (add-hook 'python-mode-hook 'my-python-mode-hook 'append)
@@ -2514,30 +2617,30 @@ the default browser."
 
     (setq powerline-default-separator 'wave)
 
-    (defun split-window-sensibly-prefer-horizontal (&optional window)
-      "Same as `split-window-sensibly' except prefer to split horizontally first."
-      (let ((window (or window (selected-window))))
-        (or (and (window-splittable-p window t)
-                 ;; Split window horizontally.
-                 (with-selected-window window
-                   (split-window-right)))
-            (and (window-splittable-p window)
-                 ;; Split window vertically.
-                 (with-selected-window window
-                   (split-window-below)))
-            (and (eq window (frame-root-window (window-frame window)))
-                 (not (window-minibuffer-p window))
-                 ;; If WINDOW is the only window on its frame and is not the
-                 ;; minibuffer window, try to split it vertically disregarding
-                 ;; the value of `split-height-threshold'.
-                 (let ((split-height-threshold 0))
-                   (when (window-splittable-p window)
-                     (with-selected-window window
-                       (split-window-below))))))))
+    ;; (defun split-window-sensibly-prefer-horizontal (&optional window)
+    ;;   "Same as `split-window-sensibly' except prefer to split horizontally first."
+    ;;   (let ((window (or window (selected-window))))
+    ;;     (or (and (window-splittable-p window t)
+    ;;              ;; Split window horizontally.
+    ;;              (with-selected-window window
+    ;;                (split-window-right)))
+    ;;         (and (window-splittable-p window)
+    ;;              ;; Split window vertically.
+    ;;              (with-selected-window window
+    ;;                (split-window-below)))
+    ;;         (and (eq window (frame-root-window (window-frame window)))
+    ;;              (not (window-minibuffer-p window))
+    ;;              ;; If WINDOW is the only window on its frame and is not the
+    ;;              ;; minibuffer window, try to split it vertically disregarding
+    ;;              ;; the value of `split-height-threshold'.
+    ;;              (let ((split-height-threshold 0))
+    ;;                (when (window-splittable-p window)
+    ;;                  (with-selected-window window
+    ;;                    (split-window-below))))))))
 
-    (setq split-width-threshold 100)
-    (setq window-min-width 40)
-    (setq split-window-preferred-function 'split-window-sensibly-prefer-horizontal)
+    ;; (setq split-width-threshold 100)
+    ;; (setq window-min-width 40)
+    ;; (setq split-window-preferred-function 'split-window-sensibly-prefer-horizontal)
 
 
     (require 'list-timers)

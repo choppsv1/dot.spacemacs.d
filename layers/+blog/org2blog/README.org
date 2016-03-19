@@ -1,4 +1,4 @@
-#+TITLE: org2blog-wp layer
+#+TITLE: org2blog layer
 #+HTML_HEAD_EXTRA: <link rel="stylesheet" type="text/css" href="../css/readtheorg.css" />
 
 * Table of Contents                                        :TOC_4_org:noexport:
@@ -16,7 +16,7 @@ To use org2blog add it to your =~/.spacemacs= file
 
 #+begin_src emacs-lisp
   (setq-default dotspacemacs-configuration-layers
-    '((org2blog-wp :variables org2blog-name "myblog.wordpress.com")))
+    '((org2blog :variables org2blog-name "myblog.wordpress.com")))
 #+end_src
 
 Additionally add an entry for the blog in your ~.netrc~ or ~.authinfo~ file.

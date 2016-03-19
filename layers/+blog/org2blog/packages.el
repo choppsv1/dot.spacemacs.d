@@ -2,7 +2,7 @@
 ;;
 ;; Copyright (c) 2012-2016 Sylvain Benner & Contributors
 ;;
-;; Author:  <chopps@tops.chopps.org>
+;; Author: Christian E. Hopps <chopps@gmail.com>
 ;; URL: https://github.com/syl20bnr/spacemacs
 ;;
 ;; This file is not part of GNU Emacs.
@@ -11,31 +11,15 @@
 
 ;;; Commentary:
 
-;; See the Spacemacs documentation and FAQs for instructions on how to implement
-;; a new layer:
-;;
-;;   SPC h SPC layers RET
-;;
-;;
-;; Briefly, each package to be installed or configured by this layer should be
-;; added to `org2blog-packages'. Then, for each package PACKAGE:
-;;
-;; - If PACKAGE is not referenced by any other Spacemacs layer, define a
-;;   function `org2blog/init-PACKAGE' to load and initialize the package.
-
-;; - Otherwise, PACKAGE is already referenced by another Spacemacs layer, so
-;;   define the functions `org2blog/pre-init-PACKAGE' and/or
-;;   `org2blog/post-init-PACKAGE' to customize the package as it is loaded.
+;; Org2blog layer.
 
 ;;; Code:
 
 (defconst org2blog-packages
-  '(
-     (org2blog :location (recipe :fetcher github :repo "punchagan/org2blog"))
+  '((org2blog :location (recipe :fetcher github :repo "punchagan/org2blog"))
      org
      metaweblog
-     xml-rpc
-     ))
+     xml-rpc))
 
 (defun org2blog/init-xml-rpc ()
   (use-package xml-rpc))
@@ -45,14 +29,9 @@
 
 (defun org2blog/init-org2blog ()
   (use-package org2blog
-    ;; Do we want to defer how does it know about orgblog in org files then
-    :commands (org2blog/wp-mode
-                org2blog/wp-new-entry
-                org2blog/wp-login)
+    :commands (org2blog/wp-mode org2blog/wp-new-entry org2blog/wp-login)
     :init
-    (progn
-      (spacemacs/set-leader-keys
-        "ob" 'org2blog/wp-new-entry))
+      (spacemacs/set-leader-keys "ob" 'org2blog/wp-new-entry)
     :config
     (progn
       ;; Map emacs languages to HTML recognized ones.
@@ -63,12 +42,9 @@
           `((,org2blog-name
               :url ,(concat "http://" org2blog-name "/xmlrpc.php")
               :username ,(car (auth-source-user-and-password org2blog-name))
-              :password ,(cadr (auth-source-user-and-password org2blog-name)))))))
-    )
-  )
+              :password ,(cadr (auth-source-user-and-password org2blog-name)))))))))
 
 (defun org2blog/post-init-org ()
-  (message "XXX org2blog/post-init-org")
   (spacemacs/set-leader-keys-for-major-mode 'org-mode
     "Bx" 'org2blog/wp-delete-entry
     "BX" 'org2blog/wp-delete-page

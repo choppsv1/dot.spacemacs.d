@@ -1,0 +1,21 @@
+# -*- mode: snippet -*-
+# name: WGLC
+# expand-env: ((require 'ietf-docs) (require 'calendar))
+# key: wglc
+# --
+To: isis-wg@ietf.org
+Cc: isis-chairs@ietf.org, isis-ads@ietf.org
+Subject: WG Last Call for $1
+
+Hi Folks,
+
+We are starting a WG Last Call on the following draft.
+
+""
+https://datatracker.ietf.org/doc/$1/
+
+
+The LC is set to expire ${3:2} weeks from now on ${3:$(calendar-date-string (calendar-current-date (* 7 (string-to-number (substring-no-properties yas-text)))))}.
+
+Thanks,
+Chris & Hannes.
