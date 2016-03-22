@@ -28,7 +28,8 @@ values."
       spacemacs-helm
       (auto-completion :variables
                        auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets"
-                       auto-completion-tab-key-behavior 'complete
+                       ;; auto-completion-tab-key-behavior 'complete
+                       auto-completion-tab-key-behavior 'cycle
                        )
       ;; (auto-completion :variables
       ;;   auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets"
@@ -39,8 +40,6 @@ values."
       ;; company-complete vs complete-at-point
 
 
-      ;; old comment from me indicating eyebrows blows away layouts.
-      eyebrowse
       (osx :variables
         osx-use-option-as-meta t)
       ;; ;; better-defaults
@@ -60,27 +59,8 @@ values."
       spell-checking
       ;; spotify
       syntax-checking
+      theming
       ;; version-control
-
-      ;; ;; Langs
-      ;; c-c++
-      ;; emacs-lisp
-      ;; ;; erlang
-      ;; git
-      ;; ;; go
-      ;; html
-      ;; ;; java
-      ;; javascript
-      ;; (latex :variables
-      ;;        latex-build-command "latexmk")
-      ;; lua
-      ;; ;; markdown
-      ;; ;; php
-      ;; (python :variables
-      ;;         python-fill-column 120)
-      ;; ;; ruby
-      ;; shell-scripts
-      ;; yaml
 
       ;;(ietf :variables ietf-docs-cache "~/ietf-docs-cache")
       ietf
@@ -159,8 +139,13 @@ values."
    ;; section of the documentation for details on available variables.
    ;; (default 'vim)
    dotspacemacs-editing-style '(hybrid :variables
-                                       hybrid-mode-enable-hjkl-bindings t
+                                       ;; if t then some modes will use motion inplace of normal
+                                       ;; hjkl commands
+                                       hybrid-mode-enable-hjkl-bindings nil
+                                       ;; if nil this forces evil-emacs-state when trying to enter
+                                       ;; evilified state
                                        hybrid-mode-enable-evilified-state t
+                                       ;; Default evil state when hybrid editing is enabled
                                        hybrid-mode-default-state 'normal)
    ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
    dotspacemacs-verbose-loading t
@@ -378,13 +363,20 @@ user code here.  The exception is org related code, which should be placed in `d
    org-directory "~/Dropbox/org-mode"
    org-agenda-files '("~/Dropbox/org-mode")
    org-protocol-default-template-key "t"
-   rebox-style-loop '(71 72 73))
+   rebox-style-loop '(71 72 73)
 
+  ;; (with-eval-after-load "evil-evilified-state"
+  ;;   (define-key evil-evilified-state-map-original "H" 'evil-window-top)
+  ;;   (define-key evil-evilified-state-map-original "L" 'evil-window-bottom)
+  ;;   (define-key evil-evilified-state-map-original "M" 'evil-window-middle))
 
-  (with-eval-after-load "evil-evilified-state"
-    (define-key evil-evilified-state-map-original "H" 'evil-window-top)
-    (define-key evil-evilified-state-map-original "L" 'evil-window-bottom)
-    (define-key evil-evilified-state-map-original "M" 'evil-window-middle))
+   theming-modifications '((misterioso (erc-input-face :foreground "cornflowerblue")
+                                       (font-lock-comment-face :foreground "DarkGrey" :slant italic)
+                                       (font-lock-comment-delimiter-face :foreground "grey33"))
+                           (molokai (font-lock-comment-face :foreground "DarkGrey")
+                                    (font-lock-comment-delimiter-face :foreground "grey30"))
+                           )
+   )
 
 
   ;; XXX what we want actually is to advise this function and temporarily change
@@ -508,7 +500,6 @@ layers configuration. You are free to put any user code."
     ;;       (dolist (x (cdr c)) (setq-default x 8))
     ;;     (setq-default (cdr c) 8)))
 
-
     (dolist (e spacemacs--indent-variable-alist)
       (if (symbolp (cdr e))
           (if (not (eq 'lisp-indent-offset (cdr e)))
@@ -524,7 +515,10 @@ layers configuration. You are free to put any user code."
 
     (run-hook-with-args 'spacemacs--hjkl-completion-navigation-functions
                         (member dotspacemacs-editing-style '(vim)))
-    (setq spacemacs--hjkl-completion-navigation-functions nil)
+    (setq
+     spacemacs--hjkl-completion-navigation-functions nil
+     tab-always-indent t
+     )
 
     ;; =======
     ;; Display
@@ -543,6 +537,7 @@ layers configuration. You are free to put any user code."
 
                   (setq spaceline-window-numbers-unicode nil
                         spaceline-workspace-numbers-unicode nil)
+
                   )
 
     ;; =======
@@ -645,6 +640,8 @@ layers configuration. You are free to put any user code."
                       (spacemacs/set-leader-keys key1 map2 key2 map1)))
                   (dear-leader/swap-keys "am" "aM")
                   (global-set-key (kbd "C-\\") 'spacemacs//layouts-persp-next-C-l)
+
+                  (global-set-key (kbd "C-]") 'ggtags-find-tag-dwim)
 
                   )
 
@@ -1471,8 +1468,10 @@ layers configuration. You are free to put any user code."
                                (cpp-macro             . -1000)
                                ))))
         ))
+
     (when (configuration-layer/layer-usedp 'python)
       (with-eval-after-load "python-mode"
+        (require 'pyfixers)
         (setq python-fill-docstring-style 'symmetric
               python-fill-string-function 'my-python-fill-string-function)
 
@@ -1480,31 +1479,18 @@ layers configuration. You are free to put any user code."
           (let ((fill-column 80))
             (python-fill-comment justify)))
 
-        ;; (define-key python-mode-map (kbd "C-c Ta") 'nosetests-all)
-        ;; (define-key python-mode-map (kbd "C-c Tm") 'nosetests-module)
-        ;; (define-key python-mode-map (kbd "C-c To") 'nosetests-one)
-        ;; (define-key python-mode-map (kbd "C-c Tpa") 'nosetests-pdb-all)
-        ;; (define-key python-mode-map (kbd "C-c Tpm") 'nosetests-pdb-module)
-        ;; (define-key python-mode-map (kbd "C-c Tpo") 'nosetests-pdb-one)
-        ;; (define-key python-mode-map (kbd "C-c ta") 'pytest-all)
-        ;; (define-key python-mode-map (kbd "C-c tm") 'pytest-module)
-        ;; (define-key python-mode-map (kbd "C-c to") 'pytest-one)
-        ;; (define-key python-mode-map (kbd "C-c td") 'pytest-directory)
-        ;; (define-key python-mode-map (kbd "C-c tpa") 'pytest-pdb-all)
-        ;; (define-key python-mode-map (kbd "C-c tpm") 'pytest-pdb-module)
-        ;; (define-key python-mode-map (kbd "C-c tpo") 'pytest-pdb-one)
-        ;; SPC m e i[gnore]
-        ;; SPC m e f[ix]
+        (spacemacs/declare-prefix-for-mode 'python-mode "e" "errors-prefix")
         ;; (define-key python-mode-map (kbd "C-c M-\\") 'pyfixer:ignore-current-line)
+        ;; SPC m e i[gnore]
+        (spacemacs/set-leader-keys-for-major-mode 'python-mode "ei" 'pyfixer:ignore-current-line)
         ;; (define-key python-mode-map (kbd "C-c C-\\") 'pyfixer:fix-current-line)
+        ;; SPC m e f[ix]
+        (spacemacs/set-leader-keys-for-major-mode 'python-mode "ef" 'pyfixer:fix-current-line)
         ;; (define-key python-mode-map (kbd "C-c C-M-\\") 'pyfixer:fix-all-errors)
         ;; (define-key python-mode-map (kbd "C-c 8") 'pyfixer:fix-all-errors)
+        (spacemacs/set-leader-keys-for-major-mode 'python-mode "eF" 'pyfixer:fix-all-errors)
         ;; (bind-key "C-c C-h" 'pylookup-lookup python-mode-map)
 
-        (spacemacs/declare-prefix-for-mode 'python-mode "e" "errors-prefix")
-        (spacemacs/set-leader-keys-for-major-mode 'python-mode "ei" 'pyfixer:ignore-current-line)
-        (spacemacs/set-leader-keys-for-major-mode 'python-mode "ef" 'pyfixer:fix-current-line)
-        (spacemacs/set-leader-keys-for-major-mode 'python-mode "eF" 'pyfixer:fix-all-errors)
         (spacemacs/set-leader-keys-for-major-mode 'python-mode "en" 'flycheck-next-error)
         (spacemacs/set-leader-keys-for-major-mode 'python-mode "ep" 'flycheck-prev-error)
 
@@ -1547,13 +1533,7 @@ layers configuration. You are free to put any user code."
                     (insert bigstr)))))))
 
         (defun my-python-mode-hook ()
-          (require 'pyfixers)
           (setq comment-column 60)
-
-          ;; spacemacs does?
-          ;; (highlight-indentation-mode -1)
-          ;; (flyspell-prog-mode)
-          ;; (flycheck-mode t)
 
           ;; This gives and error
           ;; (message "select checker")
@@ -1561,12 +1541,12 @@ layers configuration. You are free to put any user code."
           ;; (require 'flycheck)
 
           ;; not needed now that we chain
-          (flycheck-select-checker 'python-pycheckers)
+          ;; (flycheck-select-checker 'python-pycheckers)
           ;; (message "post select checker")
 
           ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
           ;; (message "select set exec")
-          (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
+          ;; (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
 
           (message "Python mode hook done"))
 
@@ -1969,6 +1949,9 @@ the default browser."
           (add-to-list 'org-file-apps '("\\.pdf\\'" . emacs))
           (require 'ox-latex))
 
+        ;; (with-eval-after-load "org-agenda"
+        ;;   (define-key org-agenda-mode-map (kbd "RET") 'org-agenda-switch-to))
+
         (defun my-org-mode-hook ()
           (if debug-init-msg
               (message "Org-mode-hook"))
@@ -1984,6 +1967,7 @@ the default browser."
           (define-key org-mode-map (kbd "C-c e E") 'org-encrypt-entry)
           (define-key org-mode-map (kbd "C-c e d") 'org-decrypt-entries)
           (define-key org-mode-map (kbd "C-c e D") 'org-decrypt-entry)
+
           )
 
         ;; (setq TeX-view-program-selection
@@ -2018,17 +2002,21 @@ the default browser."
          org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
          org-src-fontify-natively t
          org-default-notes-file (concat org-directory "/notes.org")
-         ;; display
+         ;; Display
          org-display-inline-images t
 
+         ;; General
          ;; org-agenda-start-day "-8d"
          org-agenda-start-on-weekday 1
-         org-src-window-setup 'current-window
-         org-log-done 'time
          org-hide-leading-stars t
-         org-refile-use-outline-path 'file
+         org-log-done 'time
          org-outline-path-complete-in-steps t
          org-plantuml-jar-path "/opt/plantuml/plantuml.jar"
+         org-refile-use-outline-path 'file
+         org-src-tab-acts-natively t
+         org-src-window-setup 'current-window
+
+         ;; Exports
          org-export-latex-emphasis-alist (quote (("*" "\\textbf{%s}" nil)
                                                  ("/" "\\emph{%s}" nil)
                                                  ("_" "\\underline{%s}" nil)
@@ -2083,10 +2071,10 @@ the default browser."
             "* NOTE %?\n%u\n")
 
            ("x" "Tramdose 100mg" entry (file+datetree (concat org-directory "/medicine.org") "Tramadol")
-            "* NOTE 100mg\nCreated: %U" :immediate-finish)
+            "* NOTE 100mg\nCreated: %U\nPain Level: 3" :immediate-finish)
 
            ("X" "Tramdose" entry (file+datetree (concat org-directory "/medicine.org") "Tramadol")
-            "* NOTE %?\nCreated: %U")
+            "* NOTE %?\nCreated: %U\nPain Level: 3")
 
            ("g" "Google Calendars")
            ("gh" "Todo" entry (file (concat org-directory "/goog-home.org"))
@@ -2317,24 +2305,29 @@ the default browser."
       ;; USERNAME: j2nmb305oqb7n6428m4pf1rctk%40group.calendar.google.com/
       ;; PRIVATE: private-c46e82d6b4bae1f85fe4415a769d225b/basic.ics
       ;; ID: j2nmb305oqb7n6428m4pf1rctk@group.calendar.google.com
-      (setq org-caldav-url "https://www.google.com/calendar/dav"
-            org-icalendar-timezone "US/Eastern"
-            org-caldav-calendar-id "naqenfju9vq9tr0r4nnh7eaiic@group.calendar.google.com"
-            org-caldav-inbox "/home/chopps/org/goog-work.org"
-            org-caldav-files '()
+      (setq org-icalendar-timezone "US/Eastern"
+            ;; org-caldav-url "https://www.google.com/calendar/dav"
+            ;; org-caldav-calendar-id "naqenfju9vq9tr0r4nnh7eaiic@group.calendar.google.com"
+            ;; org-caldav-inbox "/home/chopps/Dropbox/org-mode/goog-work.org"
+            ;; org-caldav-files '()
             org-caldav-calendars
-            '(;;(:calendar-id "f1jltqbvdp88o8htcjkbg920sc@group.calendar.google.com"
+            '((:calendar-id "naqenfju9vq9tr0r4nnh7eaiic@group.calendar.google.com"
+                            :url "https://www.google.com/calendar/dav"
+                            :files ()
+                            :inbox "/home/chopps/Dropbox/org-mode/goog-work.org")
+              (:calendar-id "l8cjg3irk2h5a8gk5ch9mtp6ls@group.calendar.google.com"
+                            :url "https://www.google.com/calendar/dav"
+                            :files ()
+                            :inbox "/home/chopps/Dropbox/org-mode/goog-family.org")
+              ;;(:calendar-id "f1jltqbvdp88o8htcjkbg920sc@group.calendar.google.com"
               ;;              :files ()
               ;;              :inbox "~/org/goog-home.org")
-              (:calendar-id "naqenfju9vq9tr0r4nnh7eaiic@group.calendar.google.com"
-                            :files ()
-                            :inbox "~/org/goog-work.org")
-              (:calendar-id "l8cjg3irk2h5a8gk5ch9mtp6ls@group.calendar.google.com"
-                            :files ()
-                            :inbox "~/org/goog-family.org")
               ;;(:calendar-id "v8eda33vlrn98c9oj2hefjld7s@group.calendar.google.com"
               ;;              :files ()
               ;;              :inbox "~/org/goog-ietf.org")
+              ;; (:calendar-id "v8eda33vlrn98c9oj2hefjld7s@group.calendar.google.com"
+              ;;               :files ()
+              ;;               :inbox "/home/chopps/Dropbox/org-mode/goog-ietf.org")
               )
             ))
 
