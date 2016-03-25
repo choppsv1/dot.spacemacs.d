@@ -355,4 +355,9 @@
     (switch-to-buffer nbuffer)
     (shell-command (concat "curl -s " url) nbuffer)))
 
+
+(defun org-todo-last-week-done ()
+  (interactive)
+  (org-tags-view nil "CLOSED>=\"<-1w>\""))
+
 (provide 'generic-lisp)

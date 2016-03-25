@@ -10,8 +10,8 @@ values."
    ;; or `spacemacs'. (default 'spacemacs)
    dotspacemacs-distribution 'spacemacs
    ;; If non-nil layers with lazy install support are lazy installed.
-   ;; (default nil)
-   dotspacemacs-enable-lazy-installation nil
+   ;; (default t)
+   dotspacemacs-enable-lazy-installation t
    ;; List of additional paths where to look for configuration layers.
    ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
    dotspacemacs-configuration-layer-path '()
@@ -191,7 +191,15 @@ values."
    ;;                             :weight normal
    ;;                             :width normal
    ;;                             :powerline-scale 1.1)
-   dotspacemacs-default-font '("Ubuntu Mono" :size 11.0 :weight normal :width normal :powerline-scale 1.4)
+   ;; Thinner
+   ;; dotspacemacs-default-font '("Liberation Mono" :size 12.0 :weight normal :width normal :powerline-scale 1.4)
+   ;; More fun shaped
+   ;; dotspacemacs-default-font '("Ubuntu Mono" :size 13.0 :weight normal :width normal :powerline-scale 1.4)
+   ;; Not sure
+   ;; dotspacemacs-default-font '("Droid Sans Mono" :size 12.0 :weight normal :width normal :powerline-scale 1.4)
+   ;; Thicker
+   dotspacemacs-default-font '("DejaVu Sans Mono" :size 11.5 :weight normal :width normal :powerline-scale 1.4)
+   ;; dotspacemacs-default-font '("Source Code Pro Medium" :size 12.0 :weight normal :width normal :powerline-scale 1.4)
     ;; dotspacemacs-default-font '("Source Code Pro"
     ;;                              :size 16.0
     ;;                              :weight normal
@@ -509,6 +517,8 @@ layers configuration. You are free to put any user code."
     ;; (setq-default lisp-indent-offset nil)
       ;; (setq emacs-lisp-mode lisp-mode) . lisp-indent-offset)
 
+    ;; overrides
+    (setq-default nxml-child-indent 2)
 
     ;; tabs are 8 characters wide!
     (setq-default tab-width 8)
@@ -1990,6 +2000,7 @@ the default browser."
           (not (or (string= lang "ditaa")
                    (string= lang "dot2tex")
                    (string= lang "dot")
+                   (string= lang "gnuplot")
                    (string= lang "plantuml")
                    )))
         ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
@@ -2151,7 +2162,7 @@ the default browser."
          '((ditaa . t)
            (emacs-lisp . t)
            (dot . t)
-           (gnuplot . nil)
+           (gnuplot . t)
            (latex . t)
            (pic . t)
            (plantuml . t)
