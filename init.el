@@ -2398,40 +2398,12 @@ the default browser."
                   (setq evil-shift-round nil
                         evil-search-wrap nil
                         evil-want-C-i-jump nil)
-                  (if (display-graphic-p)
+                  (when (display-graphic-p)
                       (setq evil-esc-delay 0))
-
-                  ;; ;; Remove RET and SPC from motion map so they can be overridden by various modes
-                  ;; (defun my-move-key (keymap-from keymap-to key)
-                  ;;   "Moves key binding from one keymap to another, deleting from the old location. "
-                  ;;   (define-key keymap-to key (lookup-key keymap-from key))
-                  ;;   (define-key keymap-from key nil))
-                  ;; (my-move-key evil-motion-state-map evil-normal-state-map (kbd "RET"))
-                  ;; (my-move-key evil-motion-state-map evil-normal-state-map " ")
-
-                  ;; ;; Check what escape does without this.
-                  ;; (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
-                  ;; (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
-                  ;; (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
-                  ;; (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
-                  ;; (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
-
-                  ;; Configure some modes to start in emacs mode.
-                  (dolist (mode '(artist-mode
-                                  ;; These should be taken care of by spacemacs evilification now.
-                                  ;; gud-minor-mode
-                                  ;; gud-mode
-                                  ;; gud
-                                  ;; pylookup
-                                  ;; pylookup-mode
-                                  ))
-                    (evil-set-initial-state mode 'emacs))
-
-                  ;; Configure some modes to start in insert mode.
+                  ;; Configure some modes to start in different modes.
+                  (evil-set-initial-state 'artist-mode 'emacs)
                   (evil-set-initial-state 'mu4e-compose-mode 'insert)
                   )
-
-    ;; (global-set-key (kbd "C-c i o") 'ietf-docs-open-at-point)
 
     (autoload 'yang-mode "yang-mode")
     (add-to-list 'auto-mode-alist '("\\.yang\\'" . yang-mode))
