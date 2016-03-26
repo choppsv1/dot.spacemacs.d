@@ -170,17 +170,17 @@ values."
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(
                          misterioso
-                          molokai
-                          monokai
-                          quasi-monochrome
-                          phoenix-dark-pink
-                          phoenix-dark-mono
-                          spacemacs-dark
-                          spacemacs-light
-                          ;; solarized-light
-                          solarized-dark
-                          leuven
-                          zenburn
+                         leuven
+                         molokai
+                         monokai
+                         quasi-monochrome
+                         ;; phoenix-dark-pink
+                         ;; phoenix-dark-mono
+                         spacemacs-dark
+                         spacemacs-light
+                         ;; solarized-light
+                         solarized-dark
+                         zenburn
                          )
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
@@ -198,7 +198,7 @@ values."
    ;; Not sure
    ;; dotspacemacs-default-font '("Droid Sans Mono" :size 12.0 :weight normal :width normal :powerline-scale 1.4)
    ;; Thicker
-   dotspacemacs-default-font '("DejaVu Sans Mono" :size 11.5 :weight normal :width normal :powerline-scale 1.4)
+   dotspacemacs-default-font '("DejaVu Sans Mono" :size 10.5 :weight normal :width normal :powerline-scale 1.4)
    ;; dotspacemacs-default-font '("Source Code Pro Medium" :size 12.0 :weight normal :width normal :powerline-scale 1.4)
     ;; dotspacemacs-default-font '("Source Code Pro"
     ;;                              :size 16.0
@@ -358,7 +358,7 @@ user code here.  The exception is org related code, which should be placed in `d
   (auto-insert-mode)
 
   (setq
-   debug-init-msg t
+   debug-init-msg nil
    dropbox-directory "~/Dropbox"
    evil-search-wrap nil
    evil-want-C-i-jump nil
@@ -378,13 +378,23 @@ user code here.  The exception is org related code, which should be placed in `d
   ;;   (define-key evil-evilified-state-map-original "L" 'evil-window-bottom)
   ;;   (define-key evil-evilified-state-map-original "M" 'evil-window-middle))
 
-   theming-modifications '((misterioso (erc-input-face :foreground "cornflowerblue")
-                                       (font-lock-comment-face :foreground "DarkGrey" :slant italic)
-                                       (font-lock-comment-delimiter-face :foreground "grey33"))
-                           (molokai (font-lock-comment-face :foreground "DarkGrey")
-                                    (font-lock-comment-delimiter-face :foreground "grey30"))
-                           )
    )
+  (setq theming-modifications '((misterioso (erc-input-face :foreground "cornflowerblue")
+                                            (font-lock-comment-face :foreground "DarkGrey" :slant italic)
+                                            (font-lock-comment-delimiter-face :foreground "grey33"))
+                                (molokai (font-lock-comment-face :foreground "DarkGrey")
+                                         (font-lock-comment-delimiter-face :foreground "grey30"))
+                                (monokai (font-lock-comment-face :foreground "#A5A17E" :slant italic)
+                                         (font-lock-doc-face :foreground "#A5A17E" :slant italic)
+                                         (font-lock-comment-delimiter-face :foreground "#55513E"))
+                                (quasi-monochrome (font-lock-string-face :foreground "DarkGrey" :slant italic)
+                                                  (font-lock-comment-delimiter-face :foreground "darkslategray"))
+                                (leuven ;; (default :background "#F0F0E0")
+                                        (default :background "#F0F0E5")
+                                        (font-lock-doc-face :foreground "#036A07" :slant italic)
+                                        (font-lock-comment-face :foreground "#6D6D64" :slant italic)
+                                        (font-lock-comment-delimiter-face :foreground "#BDBDA4"))
+                                ))
 
 
   ;; XXX what we want actually is to advise this function and temporarily change
@@ -393,7 +403,7 @@ user code here.  The exception is org related code, which should be placed in `d
   (defun _evil-visual-update-x-selection (&optional buffer)
     "Update the X selection with the current visual region."
     (let ((buf (or buffer (current-buffer))))
-      (message "XXXVISUALSELECT1")
+      ;; (message "XXXVISUALSELECT1")
       (when (buffer-live-p buf)
         (with-current-buffer buf
           (when (and (evil-visual-state-p)
@@ -405,7 +415,7 @@ user code here.  The exception is org related code, which should be placed in `d
                                   evil-visual-beginning
                                   evil-visual-end))
             ;; is this last thing right?
-            (message "XXXVISUALSELECT2")
+            ;; (message "XXXVISUALSELECT2")
             (setq x-last-selected-text-primary )
             )))))
 
@@ -482,6 +492,10 @@ user code here.  The exception is org related code, which should be placed in `d
   ;; Programming Modes
   ;; =================
 
+  ;; (when (and (configuration-layer/layer-usedp 'python)
+  ;;            (configuration-layer/layer-usedp 'gtags))
+  ;;            (configuration-layer/layer-usedp 'gtags))
+
   ;; (spacemacs|use-package-add-hook rebox2
   ;;   :post-init
   ;;   (progn
@@ -502,6 +516,11 @@ This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
 
   (progn
+    (when (and (configuration-layer/layer-usedp 'python)
+               (configuration-layer/layer-usedp 'gtags))
+      (message "XXXX DOIT")
+      (add-hook 'python-mode-hook '(lambda () (ggtags-mode 1))))
+
     ;; Everything uses 4 space indent
     ;; (dolist (c spacemacs--indent-variable-alist)
     ;;   (if (listp (cdr c))
@@ -557,16 +576,17 @@ layers configuration. You are free to put any user code."
     (fold-section "layouts"
       (defun persp-mode-buffer-assoc (buffer layout-name)
         (let* ((npersp (or (persp-get-by-name layout-name)
-                         (and (message "XXX Adding new persp %s" layout-name)
-                           (persp-add-new layout-name))))
+                           ;;(and (message "XXX Adding new persp %s" layout-name)
+                           ;;     (persp-add-new layout-name))))
+                           (persp-add-new layout-name)))
                 (cpersp (get-frame-persp)))
 
-          (message "XXX persp-mode-buffer-assoc current layout: %s target layout %s target name %s buffer: %s"
-            (persp-name cpersp) (persp-name npersp) layout-name buffer)
+          ;; (message "XXX persp-mode-buffer-assoc current layout: %s target layout %s target name %s buffer: %s"
+          ;;  (persp-name cpersp) (persp-name npersp) layout-name buffer)
           ;; Add to correct perspective
           (if (memq buffer (persp-buffers npersp))
-            (message "XXX buffer %s already in %s" buffer npersp)
-            (message "XXX Adding buffer %s to %s" buffer (persp-name npersp))
+            ;; (message "XXX buffer %s already in %s" buffer npersp)
+            ;; (message "XXX Adding buffer %s to %s" buffer (persp-name npersp))
             (persp-add-buffer buffer npersp t))))
 
       (spacemacs|define-custom-layout "agenda"
@@ -644,16 +664,20 @@ layers configuration. You are free to put any user code."
     ;; ===========
 
     (fold-section "bindings"
+                  (defun chopps-redefine-key (key func)
+                    (let ((map (lookup-key spacemacs-default-map key)))
+                      (if map
+                          (define-key map key func)
+                        (global-set-key key func))))
+
                   (defun dear-leader/swap-keys (key1 key2)
                     (let ((map1 (lookup-key spacemacs-default-map key1))
                           (map2 (lookup-key spacemacs-default-map key2)))
                       (spacemacs/set-leader-keys key1 map2 key2 map1)))
                   (dear-leader/swap-keys "am" "aM")
-                  (global-set-key (kbd "C-\\") 'spacemacs//layouts-persp-next-C-l)
 
-                  (global-set-key (kbd "C-]") 'ggtags-find-tag-dwim)
-
-                  )
+                  (global-set-key (kbd "C-\\") 'spacemacs/layouts-transient-state/persp-next)
+                  (global-set-key (kbd "C-]") 'ggtags-find-tag-dwim))
 
     ;; ==========
     ;; Messaging
@@ -898,7 +922,7 @@ layers configuration. You are free to put any user code."
 
           (defun my-message-expand-name (&optional start)
             (interactive)
-            (message "my-message-expand-name called")
+            ;; (message "my-message-expand-name called")
             (helm :prompt "contact:" :sources
               (helm-build-sync-source "mu4e contacts"
                 :candidates mu4e~contact-list :candidate-transformer 'ch:ct)))
@@ -909,9 +933,10 @@ layers configuration. You are free to put any user code."
             ;; Add chopps@chopps.org to Bcc if not sending from @chopps.org
             (let ((buffer-modified (buffer-modified-p)))
               (save-excursion
-                (message-add-header (concat "Cc: " user-mail-address))
+                ;; (message-add-header (concat "Cc: " user-mail-address))
                 (if (not (string= user-mail-address "chopps@chopps.org"))
-                  (message-add-header "Bcc: chopps@chopps.org")))
+                    ;; (message-add-header "Bcc: chopps@chopps.org")
+                  ))
               (set-buffer-modified-p buffer-modified))
             ;; Outgoing mails get format=flowed.
             ;; (use-hard-newlines t 'guess)
@@ -930,7 +955,7 @@ layers configuration. You are free to put any user code."
             (interactive)
             (mu4e~view-in-headers-context
               (mu4e-headers-mark-move-to-spam)))
-          (message "post-init end mu4e eval after load")
+          ;; (message "post-init end mu4e eval after load")
 
           ;; XXX these aren't defined
           ;; (define-key mu4e-headers-mode-map (kbd "C-c c") 'org-mu4e-store-and-capture)
@@ -1169,7 +1194,7 @@ layers configuration. You are free to put any user code."
         (interactive)
         (when (string= (buffer-name) "&bitlbee")
           (let ((pass (erc-acct-get-password (erc-current-nick) erc-session-server "bitlbee")))
-            (message "Sending privmsg to &bitlbee server %s" erc-session-server)
+            ;; (message "Sending privmsg to &bitlbee server %s" erc-session-server)
             (erc-message "PRIVMSG"
                          (format "%s identify %s"
                                  (erc-default-target)
@@ -1943,7 +1968,8 @@ the default browser."
 
     (when (configuration-layer/layer-usedp 'org)
       (progn
-        (message "post-init-start")
+        (if debug-init-msg
+            (message "post-init-start"))
 
         ;; Do we want this?
         (add-hook 'org-mode-hook #'yas-minor-mode)
@@ -1957,6 +1983,9 @@ the default browser."
           ;;   (evil-define-key estate org-mode-map "M" nil)
           ;;   (evil-define-key estate org-mode-map "L" nil))
           (add-to-list 'org-file-apps '("\\.pdf\\'" . emacs))
+
+          (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+
           (require 'ox-latex))
 
         ;; (with-eval-after-load "org-agenda"
@@ -2126,7 +2155,7 @@ the default browser."
         ;; (add-to-list 'org-babel-load-languages '(dot . t))
         ;; (add-to-list 'org-babel-load-languages '(ditaa . t))
         ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
-        (message "post-init-end")
+        ;; (message "post-init-end")
 
         ;;   ;; XXX latex
         ;;   ;; (require 'ob-latex)
@@ -2366,75 +2395,53 @@ the default browser."
 
     (fold-section "evil"
                   (setq-default evil-shift-width 4)
+                  (setq evil-shift-round nil
+                        evil-search-wrap nil
+                        evil-want-C-i-jump nil)
+                  (if (display-graphic-p)
+                      (setq evil-esc-delay 0))
 
-                  (setq
-                   evil-shift-round nil
-                   evil-search-wrap nil
-                   evil-want-C-i-jump nil
-                   evil-esc-delay 0.001
-                   )
-                  (fold-section "Evil"
-                                (defun evil-undefine ()
-                                  (interactive)
-                                  (let (evil-mode-map-alist)
-                                    (call-interactively (key-binding (this-command-keys)))))
+                  ;; ;; Remove RET and SPC from motion map so they can be overridden by various modes
+                  ;; (defun my-move-key (keymap-from keymap-to key)
+                  ;;   "Moves key binding from one keymap to another, deleting from the old location. "
+                  ;;   (define-key keymap-to key (lookup-key keymap-from key))
+                  ;;   (define-key keymap-from key nil))
+                  ;; (my-move-key evil-motion-state-map evil-normal-state-map (kbd "RET"))
+                  ;; (my-move-key evil-motion-state-map evil-normal-state-map " ")
 
-                                ;; What does this do?
-                                ;; (define-key evil-normal-state-map [escape] 'keyboard-quit)
-                                ;; (define-key evil-visual-state-map [escape] 'keyboard-quit)
-                                ;; (define-key evil-normal-state-map (kbd "TAB") 'evil-undefine)
+                  ;; ;; Check what escape does without this.
+                  ;; (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
+                  ;; (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
+                  ;; (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
+                  ;; (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
+                  ;; (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
 
-                                ;; Undefine vi keys in all modes.
-                                ;; Is this screwing us with C-S keys
-                                ;; (let ((undef '("\C-a" "\C-e" "\C-n" "\C-p")))
-                                ;;   (while undef
-                                ;;     (define-key evil-normal-state-map (car undef) 'evil-undefine)
-                                ;;     (define-key evil-visual-state-map (car undef) 'evil-undefine)
-                                ;;     (define-key evil-insert-state-map (car undef) 'evil-undefine)
-                                ;;     (setq undef (cdr undef))))
+                  ;; Configure some modes to start in emacs mode.
+                  (dolist (mode '(artist-mode
+                                  ;; These should be taken care of by spacemacs evilification now.
+                                  ;; gud-minor-mode
+                                  ;; gud-mode
+                                  ;; gud
+                                  ;; pylookup
+                                  ;; pylookup-mode
+                                  ))
+                    (evil-set-initial-state mode 'emacs))
 
-                                ;; Undefine vi keys in insert mode.
-                                (let ((undef '("\C-k")))
-                                  (while undef
-                                    (define-key evil-insert-state-map (car undef) 'evil-undefine)
-                                    (setq undef (cdr undef))))
-
-                                ;; Remove RET and SPC from motion map so they can be overridden by various modes
-                                (defun my-move-key (keymap-from keymap-to key)
-                                  "Moves key binding from one keymap to another, deleting from the old location. "
-                                  (define-key keymap-to key (lookup-key keymap-from key))
-                                  (define-key keymap-from key nil))
-                                (my-move-key evil-motion-state-map evil-normal-state-map (kbd "RET"))
-
-                                ;; (my-move-key evil-motion-state-map evil-normal-state-map " ")
-
-                                ;; Check what escape does without this.
-                                ;; (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
-                                ;; (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
-                                ;; (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
-                                ;; (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
-                                ;; (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
-
-                                ;; Configure some modes to start in emacs mode.
-                                (dolist (mode '(artist-mode
-                                                gud-minor-mode
-                                                gud-mode
-                                                gud
-                                                pylookup
-                                                pylookup-mode
-                                                ))
-                                  (evil-set-initial-state mode 'emacs))
-                                ;; Configure some modes to start in insert mode.
-                                (evil-set-initial-state 'mu4e-compose-mode 'insert)
-                                )
+                  ;; Configure some modes to start in insert mode.
+                  (evil-set-initial-state 'mu4e-compose-mode 'insert)
                   )
 
-    (global-set-key (kbd "C-c i o") 'ietf-docs-open-at-point)
+    ;; (global-set-key (kbd "C-c i o") 'ietf-docs-open-at-point)
 
     (autoload 'yang-mode "yang-mode")
     (add-to-list 'auto-mode-alist '("\\.yang\\'" . yang-mode))
 
     (add-hook 'org-mode-hook 'evil-normalize-keymaps)
+
+    ;; Use ggtags not generic evil-jump-to-tag, would be nice to simply undefine
+    (define-key evil-normal-state-map (kbd "C-]") 'ggtags-find-tag-dwim)
+    ;; Map it everywhere else as well.
+    (global-set-key (kbd "C-]") 'ggtags-find-tag-dwim)
 
     ;; ---------------------
     ;; Auto insert templates
