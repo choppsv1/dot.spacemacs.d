@@ -9,9 +9,20 @@ values."
    ;; `+distribution'. For now available distributions are `spacemacs-base'
    ;; or `spacemacs'. (default 'spacemacs)
    dotspacemacs-distribution 'spacemacs
+   ;; Lazy installation of layers (i.e. layers are installed only when a file
+   ;; with a supported type is opened). Possible values are `all', `unused'
+   ;; and `nil'. `unused' will lazy install only unused layers (i.e. layers
+   ;; not listed in variable `dotspacemacs-configuration-layers'), `all' will
+   ;; lazy install any layer that support lazy installation even the layers
+   ;; listed in `dotspacemacs-configuration-layers'. `nil' disable the lazy
+   ;; installation feature and you have to explicitly list a layer in the
+   ;; variable `dotspacemacs-configuration-layers' to install it.
+   ;; (default 'unused)
+   dotspacemacs-enable-lazy-installation 'unused
+   ;; If non-nil then Spacemacs will ask for confirmation before installing
+   ;; a layer lazily. (default t)
+   dotspacemacs-ask-for-lazy-installation t
    ;; If non-nil layers with lazy install support are lazy installed.
-   ;; (default t)
-   dotspacemacs-enable-lazy-installation t
    ;; List of additional paths where to look for configuration layers.
    ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
    dotspacemacs-configuration-layer-path '()
@@ -19,6 +30,7 @@ values."
    ;; of a list then all discovered layers will be installed.
    dotspacemacs-configuration-layers
    '(
+     csv
       ;; ----------------------------------------------------------------
       ;; Example of useful layers you may want to use right away.
       ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
@@ -50,7 +62,7 @@ values."
       graphviz
       org
       (org2blog :variables org2blog-name "hoppsjots.org")
-      pandoc
+      ;; pandoc
       pdf-tools
       ranger
 
@@ -72,12 +84,10 @@ values."
       git
       html
       javascript
-      (latex :variables
-        latex-build-command "latexmk")
+      (latex :variables latex-build-command "latexmk")
       lua
       markdown
-      (python :variables
-        python-fill-column 120)
+      (python :variables python-fill-column 120)
       shell-scripts
       yaml
 
@@ -93,7 +103,7 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(org-caldav)
+   dotspacemacs-additional-packages '(org-caldav persistent-scratch)
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages
    '(
@@ -117,6 +127,19 @@ This function is called at the very startup of Spacemacs initialization
 before layers configuration.
 You should not put any user code in there besides modifying the variable
 values."
+  ;; mDetermine display size to pick font size
+  (setq ch-def-height 10.0)
+  (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
+        ;; (yres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* [0-9]*x\\([0-9]*\\) .*/\\1/'")))
+        )
+    (setq xres (replace-regexp-in-string "\n\\'" "" xres))
+    ;; (setq yres (replace-regexp-in-string "\n\\'" "" yres))
+
+    (when (<= (string-to-number xres) 3000)
+      (setq ch-def-height 9.0)))
+
+  (message "def height %s" ch-def-height)
+
   ;; This setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
   (setq-default
@@ -171,9 +194,9 @@ values."
    dotspacemacs-themes '(
                          misterioso
                          leuven
+                         ;; quasi-monochrome
                          molokai
                          monokai
-                         quasi-monochrome
                          ;; phoenix-dark-pink
                          ;; phoenix-dark-mono
                          spacemacs-dark
@@ -198,7 +221,7 @@ values."
    ;; Not sure
    ;; dotspacemacs-default-font '("Droid Sans Mono" :size 12.0 :weight normal :width normal :powerline-scale 1.4)
    ;; Thicker
-   dotspacemacs-default-font '("DejaVu Sans Mono" :size 10.5 :weight normal :width normal :powerline-scale 1.4)
+   dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; dotspacemacs-default-font '("Source Code Pro Medium" :size 12.0 :weight normal :width normal :powerline-scale 1.4)
     ;; dotspacemacs-default-font '("Source Code Pro"
     ;;                              :size 16.0
@@ -379,7 +402,7 @@ user code here.  The exception is org related code, which should be placed in `d
   ;;   (define-key evil-evilified-state-map-original "M" 'evil-window-middle))
 
    )
-  (setq theming-modifications '((misterioso (erc-input-face :foreground "cornflowerblue")
+  (setq theming-modifications `((misterioso (erc-input-face :foreground "cornflowerblue")
                                             (font-lock-comment-face :foreground "DarkGrey" :slant italic)
                                             (font-lock-comment-delimiter-face :foreground "grey33"))
                                 (molokai (font-lock-comment-face :foreground "DarkGrey")
@@ -387,10 +410,12 @@ user code here.  The exception is org related code, which should be placed in `d
                                 (monokai (font-lock-comment-face :foreground "#A5A17E" :slant italic)
                                          (font-lock-doc-face :foreground "#A5A17E" :slant italic)
                                          (font-lock-comment-delimiter-face :foreground "#55513E"))
-                                (quasi-monochrome (font-lock-string-face :foreground "DarkGrey" :slant italic)
+                                (quasi-monochrome (default :height ,(* ch-def-height 10))
+                                                  (font-lock-string-face :foreground "DarkGrey" :slant italic)
                                                   (font-lock-comment-delimiter-face :foreground "darkslategray"))
                                 (leuven ;; (default :background "#F0F0E0")
-                                        (default :background "#F0F0E5")
+                                 (default :background "#ede8da")
+                                        ;;(default :background "#F0F0E5")
                                         (font-lock-doc-face :foreground "#036A07" :slant italic)
                                         (font-lock-comment-face :foreground "#6D6D64" :slant italic)
                                         (font-lock-comment-delimiter-face :foreground "#BDBDA4"))
@@ -449,6 +474,7 @@ user code here.  The exception is org related code, which should be placed in `d
   (fold-section "Keybindings"
                 (define-key isearch-mode-map [remap isearch-delete-char] 'isearch-del-char)
 
+
                 (global-set-key (kbd "M-W") 'kill-region-to-ssh)
                 (global-set-key (kbd "M-Y") 'yank-from-ssh)
                 ;; (global-set-key (kbd "M-Q") 'rebox-dwim)
@@ -468,6 +494,7 @@ user code here.  The exception is org related code, which should be placed in `d
                 (global-set-key (kbd "C-M-5") 'eyebrowse-switch-to-window-config-5)
 
                 (spacemacs/set-leader-keys
+                  "w1" 'delete-other-windows
                   "oa" 'org-agenda
                   ;; "og" 'helm-org-agenda-files-headings
                   ;; "oo" 'org-clock-out
@@ -516,10 +543,14 @@ This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
 
   (progn
-    (when (and (configuration-layer/layer-usedp 'python)
-               (configuration-layer/layer-usedp 'gtags))
-      (message "XXXX DOIT")
-      (add-hook 'python-mode-hook '(lambda () (ggtags-mode 1))))
+    (persistent-scratch-setup-default)
+  ;;   (when (and (configuration-layer/layer-usedp 'python)
+  ;;              (configuration-layer/layer-usedp 'gtags))
+  ;;     (add-hook 'python-mode-hook '(lambda () (ggtags-mode 1))))
+
+  ;;   (when (and (configuration-layer/layer-usedp 'emacs-lisp)
+  ;;              (configuration-layer/layer-usedp 'gtags))
+  ;;     (add-hook 'emacs-lisp-mode-hook '(lambda () (ggtags-mode 1))))
 
     ;; Everything uses 4 space indent
     ;; (dolist (c spacemacs--indent-variable-alist)
@@ -531,7 +562,7 @@ layers configuration. You are free to put any user code."
       (if (symbolp (cdr e))
           (if (not (eq 'lisp-indent-offset (cdr e)))
               (set-default (cdr e) 4))
-        (dolist (x (cdr e)) (setq-default x 4))))
+        (dolist (x (cdr e)) (set-default x 4))))
 
     ;; (setq-default lisp-indent-offset nil)
       ;; (setq emacs-lisp-mode lisp-mode) . lisp-indent-offset)
@@ -593,6 +624,11 @@ layers configuration. You are free to put any user code."
         :binding "a"
         :body
         (org-agenda-list))
+
+      (spacemacs|define-custom-layout "emacs"
+        :binding "E"
+        :body
+        (find-file "~/.emacs.d/"))
 
       (spacemacs|define-custom-layout "mail"
         :binding "m"
@@ -935,7 +971,7 @@ layers configuration. You are free to put any user code."
               (save-excursion
                 ;; (message-add-header (concat "Cc: " user-mail-address))
                 (if (not (string= user-mail-address "chopps@chopps.org"))
-                    ;; (message-add-header "Bcc: chopps@chopps.org")
+                    (message-add-header "Bcc: chopps@chopps.org")
                   ))
               (set-buffer-modified-p buffer-modified))
             ;; Outgoing mails get format=flowed.
