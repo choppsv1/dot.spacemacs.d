@@ -208,13 +208,6 @@ values."
                          )
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
-   ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
-   ;; size to make separators look not too crappy.
-   ;; dotspacemacs-default-font '("DejaVu Sans Mono"
-   ;;                             :size 28
-   ;;                             :weight normal
-   ;;                             :width normal
-   ;;                             :powerline-scale 1.1)
    ;;
    ;; Bit wider than Ubuntu, pretty good as well though in being more courier/serif like
    dotspacemacs-default-font `("Cousine" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
@@ -2352,6 +2345,16 @@ layers configuration. You are free to put any user code."
     )
   )
 
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
+ '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil))))
+ '(erc-input-face ((t (:foreground "cornflowerblue"))))
+ '(font-lock-comment-delimiter-face ((t (:foreground "grey33"))))
+ '(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic)))))
 ;; Local Variables:
 ;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
 ;; End:
@@ -2375,4 +2378,5 @@ layers configuration. You are free to put any user code."
             (projectile-project-root)
             "make test" projectile-test-cmd-map))
      (org-confirm-babel-evaluate)
-     (eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")))))
+     (eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)"))))
+ '(send-mail-function (quote smtpmail-send-it)))
