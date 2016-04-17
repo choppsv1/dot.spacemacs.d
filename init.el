@@ -30,6 +30,7 @@ values."
    ;; of a list then all discovered layers will be installed.
    dotspacemacs-configuration-layers
    '(
+     php
      csv
       ;; ----------------------------------------------------------------
       ;; Example of useful layers you may want to use right away.
@@ -81,6 +82,7 @@ values."
 
       c-c++
       emacs-lisp
+      semantic
       git
       go
       html
@@ -104,7 +106,7 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(org-caldav persistent-scratch)
+   dotspacemacs-additional-packages '(monky org-caldav persistent-scratch)
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages
    '(
@@ -627,7 +629,7 @@ layers configuration. You are free to put any user code."
         (org-agenda-list))
 
       (spacemacs|define-custom-layout "emacs"
-        :binding "E"
+        :binding "^E"
         :body
         (find-file "~/.emacs.d/"))
 
@@ -636,18 +638,18 @@ layers configuration. You are free to put any user code."
         :body
         (mu4e))
 
-      (spacemacs|define-custom-layout "IRC"
+      (spacemacs|define-custom-layout "ERC"
         :binding "i"
         :body
         (progn
           (add-hook 'erc-connect-pre-hook '(lambda (x)
                                              (persp-mode-buffer-assoc x "IRC")))
-          ;;(launch-irc-jabber)
+          (launch-irc-jabber)
           ;;(launch-irc-netbsd)
           ;;(split-window-right)
           ;;(launch-irc-freenode)
           ;;(split-window-right)
-          (launch-irc-gitter)
+          ;;(launch-irc-gitter)
           )
         )
       (spacemacs|define-custom-layout "notes"
@@ -741,6 +743,7 @@ layers configuration. You are free to put any user code."
         ;; mu4e-quick-update-mail-command "bash -c '(cd && offlineimap -q -l /Users/chopps/.offlineimap/logfile)'"
 
         ;; mu4e-update-pre-hook 'mu4e-pre-hook-udpate-command
+        mu4e-change-filenames-when-moving t
         mu4e-mu-binary (executable-find "mu")
         mu4e-update-interval nil
         mu4e-headers-include-related nil
@@ -1322,6 +1325,8 @@ layers configuration. You are free to put any user code."
     (when (configuration-layer/layer-usedp 'syntax-checking)
       (with-eval-after-load "flycheck"
 
+        (setq flycheck-highlighting-mode 'lines)
+
         (define-key flycheck-mode-map (kbd "M-n") 'flycheck-next-error)
         (define-key flycheck-mode-map (kbd "M-p") 'flycheck-previous-error)
 
@@ -1395,6 +1400,11 @@ layers configuration. You are free to put any user code."
         (defun rebox-lisp-hook ()
           (message "rebox lisp hook")
           (setq-default rebox-style-loop '(81 82 83)))
+
+        ;; hyphens are words in emacs lisp
+        (modify-syntax-entry ?- "w" lisp-mode-syntax-table)
+        (modify-syntax-entry ?- "w" emacs-lisp-mode-syntax-table)
+
         (add-hook 'lisp-mode-hook 'rebox-lisp-hook)
         (add-hook 'emacs-lisp-mode-hook 'rebox-lisp-hook)))
     (when (configuration-layer/layer-usedp 'c-c++)
@@ -1542,15 +1552,16 @@ layers configuration. You are free to put any user code."
         ))
 
     (when (configuration-layer/layer-usedp 'python)
-      (with-eval-after-load "python-mode"
+      (with-eval-after-load 'python
+
+        ;; (setq python-fill-docstring-style 'symmetric
+        ;;       python-fill-string-function 'my-python-fill-string-function)
+
+        ;; (defun my-python-fill-comment-function (&optional justify)
+        ;;   (let ((fill-column 80))
+        ;;     (python-fill-comment justify)))
+
         (require 'pyfixers)
-        (setq python-fill-docstring-style 'symmetric
-              python-fill-string-function 'my-python-fill-string-function)
-
-        (defun my-python-fill-comment-function (&optional justify)
-          (let ((fill-column 80))
-            (python-fill-comment justify)))
-
         (spacemacs/declare-prefix-for-mode 'python-mode "e" "errors-prefix")
         ;; (define-key python-mode-map (kbd "C-c M-\\") 'pyfixer:ignore-current-line)
         ;; SPC m e i[gnore]
@@ -1604,25 +1615,25 @@ layers configuration. You are free to put any user code."
                     (goto-char impstart)
                     (insert bigstr)))))))
 
-        (defun my-python-mode-hook ()
-          (setq comment-column 60)
+        ;; (defun my-python-mode-hook ()
+        ;;   (setq comment-column 60)
 
-          ;; This gives and error
-          ;; (message "select checker")
-          ;; This is required b/c for some reason it's still not loaded at this point.
-          ;; (require 'flycheck)
+        ;;   ;; This gives and error
+        ;;   ;; (message "select checker")
+        ;;   ;; This is required b/c for some reason it's still not loaded at this point.
+        ;;   ;; (require 'flycheck)
 
-          ;; not needed now that we chain
-          ;; (flycheck-select-checker 'python-pycheckers)
-          ;; (message "post select checker")
+        ;;   ;; not needed now that we chain
+        ;;   ;; (flycheck-select-checker 'python-pycheckers)
+        ;;   ;; (message "post select checker")
 
-          ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
-          ;; (message "select set exec")
-          ;; (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
+        ;;   ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
+        ;;   ;; (message "select set exec")
+        ;;   ;; (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
 
-          (message "Python mode hook done"))
+        ;;   (message "Python mode hook done"))
 
-        (add-hook 'python-mode-hook 'my-python-mode-hook 'append)
+        ;; (add-hook 'python-mode-hook 'my-python-mode-hook 'append)
         )
       )
 
@@ -2118,6 +2129,8 @@ layers configuration. You are free to put any user code."
                   (evil-set-initial-state 'artist-mode 'emacs)
                   (evil-set-initial-state 'mu4e-compose-mode 'insert)
                   )
+
+    (add-hook 'persp-activated-hook (lambda () (persp-add-buffer "*Messages*")))
 
     (autoload 'yang-mode "yang-mode")
     (add-to-list 'auto-mode-alist '("\\.yang\\'" . yang-mode))
