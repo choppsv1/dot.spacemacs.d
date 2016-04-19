@@ -69,6 +69,12 @@ values."
 
       rebox
 
+      (shell :variables
+              shell-default-shell 'shell
+              ;; shell-default-position 'bottom
+              ;; shell-default-height 30
+              )
+
       spell-checking
       ;; spotify
       syntax-checking
@@ -80,7 +86,9 @@ values."
 
       ;; Languages
 
-      c-c++
+      (c-c++ :variables
+             c-c++-default-mode-for-headers 'c-mode
+             c-c++-enable-clang-support t)
       emacs-lisp
       semantic
       git
@@ -212,9 +220,10 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    ;;
    ;; Bit wider than Ubuntu, pretty good as well though in being more courier/serif like
-   dotspacemacs-default-font `("Cousine" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
+   ;; dotspacemacs-default-font `("Cousine" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
+   ;; dotspacemacs-default-font `("Courier" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Perfect UTF-8, good sans serif
-   ;; dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
+   dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Droid has odd spaced UTF-8
    ;; dotspacemacs-default-font `("Droid Sans Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Monoid has odd spaced UTF-8
@@ -370,9 +379,9 @@ values."
 It is called immediately after `dotspacemacs/init'.  You are free to put almost any
 user code here.  The exception is org related code, which should be placed in `dotspacemacs/user-config'."
 
-  ;; =========
+  ;; ---------
   ;; User-init
-  ;; =========
+  ;; ---------
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp"))
   (add-to-list 'load-path (concat "~/p/ietf-docs"))
@@ -397,6 +406,8 @@ user code here.  The exception is org related code, which should be placed in `d
    org-directory "~/Dropbox/org-mode"
    org-agenda-files '("~/Dropbox/org-mode")
    org-protocol-default-template-key "t"
+
+   ;; This really should be a file local variable.
    rebox-style-loop '(71 72 73)
 
   ;; (with-eval-after-load "evil-evilified-state"
@@ -1397,16 +1408,14 @@ layers configuration. You are free to put any user code."
 
     (when (configuration-layer/layer-usedp 'emacs-lisp)
       (with-eval-after-load "lisp-mode"
-        (defun rebox-lisp-hook ()
-          (message "rebox lisp hook")
-          (setq-default rebox-style-loop '(81 82 83)))
-
         ;; hyphens are words in emacs lisp
         (modify-syntax-entry ?- "w" lisp-mode-syntax-table)
         (modify-syntax-entry ?- "w" emacs-lisp-mode-syntax-table)
-
+        (defun rebox-lisp-hook ()
+          (set (make-local-variable 'rebox-style-loop) '(81 82 83)))
         (add-hook 'lisp-mode-hook 'rebox-lisp-hook)
-        (add-hook 'emacs-lisp-mode-hook 'rebox-lisp-hook)))
+        (add-hook 'emacs-lisp-mode-hook 'rebox-lisp-hook)
+        ))
     (when (configuration-layer/layer-usedp 'c-c++)
       (setq c-font-lock-extra-types
             (quote
@@ -2130,7 +2139,13 @@ layers configuration. You are free to put any user code."
                   (evil-set-initial-state 'mu4e-compose-mode 'insert)
                   )
 
-    (add-hook 'persp-activated-hook (lambda () (persp-add-buffer "*Messages*")))
+    (defun persp-add-buffers-to-all ()
+      (progn
+        (message "Adding buffers")
+        (persp-add-buffer "*Messages*")
+        (persp-add-buffer "*scratch*")))
+
+    (add-hook 'persp-activated-hook 'persp-add-buffers-to-all)
 
     (autoload 'yang-mode "yang-mode")
     (add-to-list 'auto-mode-alist '("\\.yang\\'" . yang-mode))
