@@ -1648,8 +1648,8 @@ layers configuration. You are free to put any user code."
 
         ;; Custom Agenda View
         (setq org-agenda-custom-commands
-              '(((kbd " ") . "Custom searches") ; describe prefix "h"
-                (" c" "Closed in the last week" tags "CLOSED>=\"<-1w>\"")))
+              '(("c" . "Custom searches") ; describe prefix "h"
+                ("cc" "Closed in the last week" tags "CLOSED>=\"<-1w>\"")))
 
         ;; key desc (cmd1 cmd2 ...) settings-for-whole-set files
 
