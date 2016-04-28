@@ -825,7 +825,7 @@ layers configuration. You are free to put any user code."
                ("date:24h..now" "Today's messages" ?d)
                ("date:today..now" "Today's messages" ?t)
                ("date:7d..now" "Last 7 days" ?w)
-               ("mime:7d..now" "Last 7 days" ?w)
+               ("date:7d..now from:chopps" "Last 7 days sent" ?W)
                ("mime:*pdf" "Messages with PDF" 112)
                ("mime:*vcs" "Messages with VCS" 113))))
 
@@ -1049,7 +1049,45 @@ layers configuration. You are free to put any user code."
 
 
           (add-to-list 'mu4e-view-actions
-            '("ViewInBrowser" . mu4e-action-view-in-browser))
+                       '("ViewInBrowser" . mu4e-action-view-in-browser))
+
+          (add-to-list 'mu4e-view-actions
+                       '("GoogleCalendar" . mu4e-action-add-to-gcal))
+
+          (defun mu4e-action-add-to-gcal (msg)
+            "Add to a calendar"
+            (interactive)
+            (let* ((calendar "Work")    ; fix this to query user or have default I guess
+                   (count (hash-table-count mu4e~view-attach-map))
+                   (attachnums (mu4e-split-ranges-to-numbers "a" count)))
+              (dolist (num attachnums)
+                (let* ((att (mu4e~view-get-attach msg num))
+                       (name (plist-get att :name))
+                       (index (plist-get att :index)))
+                  (if (s-suffix? ".vcs" name)
+                      (mu4e-view-pipe-attachment msg num (concat "gcalcli import --calendar=" calendar)))))))
+
+                      ;; (let* ((save-info (mu4e~view-temp-action
+                      ;;                    (mu4e-message-field msg :docid) index))
+                      ;;        (path (plist-get save-info :path))
+                      ;;        (calendar "Work"))
+                      ;;   (message (concat "gcalcli import --calendar=" calendar " " path))
+                      ;;   (message (shell-command-to-string (concat "gcalcli import --calendar=" calendar " " path)))))))))
+
+            ;; (let ((calendar "Work"))
+            ;;   (shell-command-to-string (concat "gcalcli import --calendar=" calendar " " file))
+
+            ;;   (let* ((html (mu4e-message-field msg :body-html))
+            ;;          (txt (mu4e-message-field msg :body-txt))
+            ;;          (tmpfile (format "%s%x.html" temporary-file-directory (random t))))
+            ;;     (unless (or html txt)
+            ;;       (mu4e-error "No body part for this message"))
+            ;;     (with-temp-buffer
+            ;;       ;; simplistic -- but note that it's only an example...
+            ;;       (insert (or html (concat "<pre>" txt "</pre>")))
+            ;;       (write-file tmpfile)
+            ;;       (browse-url (concat "file://" tmpfile)))))))
+
 
           (define-key mu4e-headers-mode-map "d" 'mu4e-headers-mark-for-read)
           (define-key mu4e-view-mode-map "d" 'mu4e-view-mark-for-read)
@@ -1335,76 +1373,15 @@ layers configuration. You are free to put any user code."
 
     (when (configuration-layer/layer-usedp 'syntax-checking)
       (with-eval-after-load "flycheck"
-
         (setq flycheck-highlighting-mode 'lines)
+        ;; the pos-tip window doesn't seem to work with my awesome setup (anymore)
+        (setq flycheck-display-errors-function #'flycheck-display-error-messages)
+
+        ;; Chain pylint after flake8 to get benefit of both.
+        (flycheck-add-next-checker 'python-flake8 'python-pylint)
 
         (define-key flycheck-mode-map (kbd "M-n") 'flycheck-next-error)
-        (define-key flycheck-mode-map (kbd "M-p") 'flycheck-previous-error)
-
-        ;; Redefine flake8 checker to chain pylint
-;;         "A Python syntax and style checker using Flake8.
-
-;; Requires Flake8 2.0 or newer. See URL
-;; `https://pypi.python.org/pypi/flake8'."
-
-        ;; replace flake8 with new chaining one from above
-        (setq flycheck-checkers (cons 'python-flake8-chain (delq 'python-flake8 flycheck-checkers)))
-
-        ;; (eval-after-load 'flycheck (cons 'python-pylint (delq 'python-pylint flycheck-checkers)))
-
-        (flycheck-define-checker python-pycheckers
-          "A python syntax and style checker using flake8 and pylint."
-          :command ("pycheckers.sh"
-                     (config-file "-8" flycheck-flake8rc)
-                     (config-file "-r" flycheck-pylintrc)
-                     source-inplace)
-          :error-patterns
-          ((error line-start
-             (file-name) ":" line ":" (optional column ":") " "
-             (message "E" (one-or-more digit) (zero-or-more not-newline))
-             line-end)
-            (warning line-start
-              (file-name) ":" line ":" (optional column ":") " "
-              (message (or "F"            ; Pyflakes in Flake8 >= 2.0
-                         "W"            ; Pyflakes in Flake8 < 2.0
-                         "C")           ; McCabe in Flake >= 2.0
-                (one-or-more digit) (zero-or-more not-newline))
-              line-end)
-            (info line-start
-              (file-name) ":" line ":" (optional column ":") " "
-              (message (or "N"              ; pep8-naming in Flake8 >= 2.0
-                         "R")             ; re-factor from python.
-                (one-or-more digit) (zero-or-more not-newline))
-              line-end)
-            )
-          :modes python-mode)
-
-        (defun fix-flake8 (errors)
-          (let ((errors (flycheck-sanitize-errors errors)))
-            (seq-do #'flycheck-flake8-fix-error-level errors)
-            errors))
-
-        (flycheck-define-checker python-flake8-chain
-          "A Python syntax and style checker using flake8"
-          :command ("flake8"
-                     "--format=default"
-                     (config-file "--config" flycheck-flake8rc)
-                     (option "--max-complexity" flycheck-flake8-maximum-complexity nil
-                       flycheck-option-int)
-                     (option "--max-line-length" flycheck-flake8-maximum-line-length nil
-                       flycheck-option-int)
-                     "-")
-          :standard-input t
-          :error-filter fix-flake8
-          :error-patterns
-          ((warning line-start
-             "stdin:" line ":" (optional column ":") " "
-             (id (one-or-more (any alpha)) (one-or-more digit)) " "
-             (message (one-or-more not-newline))
-             line-end))
-          :next-checkers ((t . python-pylint))
-          :modes python-mode)
-        ))
+        (define-key flycheck-mode-map (kbd "M-p") 'flycheck-previous-error)))
 
     (when (configuration-layer/layer-usedp 'emacs-lisp)
       (with-eval-after-load "lisp-mode"
@@ -1668,6 +1645,14 @@ layers configuration. You are free to put any user code."
 
         ;; Do we want this?
         (add-hook 'org-mode-hook #'yas-minor-mode)
+
+        ;; Custom Agenda View
+        (setq org-agenda-custom-commands
+              '(((kbd " ") . "Custom searches") ; describe prefix "h"
+                (" c" "Closed in the last week" tags "CLOSED>=\"<-1w>\"")))
+
+        ;; key desc (cmd1 cmd2 ...) settings-for-whole-set files
+
 
         ;; This is for using xelatex
         (with-eval-after-load "org"
