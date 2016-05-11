@@ -79,6 +79,7 @@ values."
       ;; spotify
       syntax-checking
       theming
+      themes-megapack
       ;; version-control
 
       ;;(ietf :variables ietf-docs-cache "~/ietf-docs-cache")
@@ -215,6 +216,400 @@ values."
                          ;; solarized-light
                          solarized-dark
                          zenburn
+                         ;; ;; theme-test
+                         ;; aalto-dark
+                         ;; aalto-light
+                         ;; abyss
+                         ;; afternoon
+                         ;; alect-black-alt
+                         ;; alect-black
+                         ;; alect-dark-alt
+                         ;; alect-dark
+                         ;; alect-light-alt
+                         ;; alect-light
+                         ;; aliceblue
+                         ;; Amelie
+                         ;; ample-flat
+                         ;; ample-light
+                         ;; ample
+                         ;; ample-zen
+                         ;; andreas
+                         ;; anti-zenburn
+                         ;; arjen-grey
+                         ;; arjen
+                         ;; assemblage
+                         ;; atom-one-dark
+                         ;; aurora
+                         ;; autumn-light
+                         ;; badger
+                         ;; badwolf
+                         ;; base16-3024-dark
+                         ;; base16-3024-light
+                         ;; base16-apathy-dark
+                         ;; base16-apathy-light
+                         ;; base16-ashes-dark
+                         ;; base16-ashes-light
+                         ;; base16-ateliercave-dark
+                         ;; base16-ateliercave-light
+                         ;; base16-atelierdune-dark
+                         ;; base16-atelierdune-light
+                         ;; base16-atelierestuary-dark
+                         ;; base16-atelierestuary-light
+                         ;; base16-atelierforest-dark
+                         ;; base16-atelierforest-light
+                         ;; base16-atelierheath-dark
+                         ;; base16-atelierheath-light
+                         ;; base16-atelierlakeside-dark
+                         ;; base16-atelierlakeside-light
+                         ;; base16-atelierplateau-dark
+                         ;; base16-atelierplateau-light
+                         ;; base16-ateliersavanna-dark
+                         ;; base16-ateliersavanna-light
+                         ;; base16-atelierseaside-dark
+                         ;; base16-atelierseaside-light
+                         ;; base16-ateliersulphurpool-dark
+                         ;; base16-ateliersulphurpool-light
+                         ;; base16-bespin-dark
+                         ;; base16-bespin-light
+                         ;; base16-brewer-dark
+                         ;; base16-brewer-light
+                         ;; base16-bright-dark
+                         ;; base16-bright-light
+                         ;; base16-chalk-dark
+                         ;; base16-chalk-light
+                         ;; base16-codeschool-dark
+                         ;; base16-codeschool-light
+                         ;; base16-colors-dark
+                         ;; base16-colors-light
+                         ;; base16-darktooth-dark
+                         ;; base16-darktooth-light
+                         ;; base16-default-dark
+                         ;; base16-default-light
+                         ;; base16-eighties-dark
+                         ;; base16-eighties-light
+                         ;; base16-embers-dark
+                         ;; base16-embers-light
+                         ;; base16-flat-dark
+                         ;; base16-flat-light
+                         ;; base16-google-dark
+                         ;; base16-google-light
+                         ;; base16-grayscale-dark
+                         ;; base16-grayscale-light
+                         ;; base16-greenscreen-dark
+                         ;; base16-greenscreen-light
+                         ;; base16-harmonic16-dark
+                         ;; base16-harmonic16-light
+                         ;; base16-hopscotch-dark
+                         ;; base16-hopscotch-light
+                         ;; base16-irblack-dark
+                         ;; base16-irblack-light
+                         ;; base16-isotope-dark
+                         ;; base16-isotope-light
+                         ;; base16-londontube-dark
+                         ;; base16-londontube-light
+                         ;; base16-macintosh-dark
+                         ;; base16-macintosh-light
+                         ;; base16-marrakesh-dark
+                         ;; base16-marrakesh-light
+                         ;; base16-mocha-dark
+                         ;; base16-mocha-light
+                         ;; base16-monokai-dark
+                         ;; base16-monokai-light
+                         ;; base16-ocean-dark
+                         ;; base16-oceanicnext-dark
+                         ;; base16-oceanicnext-light
+                         ;; base16-ocean-light
+                         ;; base16-paraiso-dark
+                         ;; base16-paraiso-light
+                         ;; base16-phd-dark
+                         ;; base16-phd-light
+                         ;; base16-pop-dark
+                         ;; base16-pop-light
+                         ;; base16-railscasts-dark
+                         ;; base16-railscasts-light
+                         ;; base16-setiui-dark
+                         ;; base16-setiui-light
+                         ;; base16-shapeshifter-dark
+                         ;; base16-shapeshifter-light
+                         ;; base16-solarized-dark
+                         ;; base16-solarized-light
+                         ;; base16-summerfruit-dark
+                         ;; base16-summerfruit-light
+                         ;; base16-tomorrow-dark
+                         ;; base16-tomorrow-light
+                         ;; base16-twilight-dark
+                         ;; base16-twilight-light
+                         ;; base16-yesterdaybright-dark
+                         ;; base16-yesterdaybright-light
+                         ;; base16-yesterday-dark
+                         ;; base16-yesterday-light
+                         ;; base16-yesterdaynight-dark
+                         ;; base16-yesterdaynight-light
+                         ;; beige-diff
+                         ;; beige-eshell
+                         ;; bharadwaj-slate
+                         ;; bharadwaj
+                         ;; billw
+                         ;; birds-of-paradise-plus
+                         ;; blackboard
+                         ;; black-on-gray
+                         ;; blippblopp
+                         ;; bliss
+                         ;; blue-erc
+                         ;; blue-eshell
+                         ;; blue-gnus
+                         ;; blue-mood
+                         ;; blue-sea
+                         ;; borland-blue
+                         ;; boron
+                         ;; brin
+                         ;; bubbleberry
+                         ;; busybee
+                         ;; calmer-forest
+                         ;; calm-forest
+                         ;; caroline
+                         ;; charcoal-black
+                         ;; cherry-blossom
+                         ;; clarity
+                         ;; classic
+                         ;; clues
+                         ;; cobalt
+                         ;; colonoscopy
+                         ;; colorsarenice-dark
+                         ;; colorsarenice-light
+                         ;; comidia
+                         ;; cyberpunk
+                         ;; dakrone
+                         ;; dark-blue2
+                         ;; dark-blue
+                         ;; darkburn
+                         ;; dark-erc
+                         ;; dark-font-lock
+                         ;; dark-gnus
+                         ;; dark-green
+                         ;; dark-info
+                         ;; dark-krystal
+                         ;; dark-laptop
+                         ;; dark-mint
+                         ;; darktooth
+                         ;; deep-blue
+                         ;; deep-thought
+                         ;; desert
+                         ;; Deviant
+                         ;; digital-ofs1
+                         ;; distinguished
+                         ;; django
+                         ;; dorsey
+                         ;; dracula
+                         ;; dream
+                         ;; eltbus
+                         ;; emacs-21
+                         ;; emacs-nw
+                         ;; erosiond
+                         ;; euphoria
+                         ;; evenhold
+                         ;; faff
+                         ;; farmhouse-dark
+                         ;; farmhouse-light
+                         ;; feng-shui
+                         ;; firebelly
+                         ;; firecode
+                         ;; fischmeister
+                         ;; flatland-black
+                         ;; flatland
+                         ;; flatui
+                         ;; fogus
+                         ;; gandalf
+                         ;; github
+                         ;; gnome2
+                         ;; gnome
+                         ;; goldenrod
+                         ;; gotham
+                         ;; graham
+                         ;; grandshell
+                         ;; granger
+                         ;; gray1
+                         ;; gray30
+                         ;; green-phosphor
+                         ;; greiner
+                         ;; greymatters
+                         ;; gruber-darker
+                         ;; gruvbox
+                         ;; gtk-ide
+                         ;; hemisu-dark
+                         ;; hemisu-light
+                         ;; hemisu
+                         ;; heroku
+                         ;; hickey
+                         ;; high-contrast
+                         ;; hipster
+                         ;; hober
+                         ;; hydandata-light
+                         ;; idea-darkula
+                         ;; infodoc
+                         ;; inkpot
+                         ;; iodine
+                         ;; ir-black
+                         ;; jazz
+                         ;; jbeans
+                         ;; jb-simple
+                         ;; jedit-grey
+                         ;; jonadabian-slate
+                         ;; jonadabian
+                         ;; jsc-dark
+                         ;; jsc-light2
+                         ;; jsc-light
+                         ;; julie
+                         ;; junio
+                         ;; katester
+                         ;; kingsajz
+                         ;; kooten
+                         ;; late-night
+                         ;; lavender
+                         ;; lawrence
+                         ;; ld-dark
+                         ;; lethe
+                         ;; leuven
+                         ;; light-soap
+                         ;; lush
+                         ;; mac-classic
+                         ;; majapahit-dark
+                         ;; majapahit-light
+                         ;; marine
+                         ;; marquardt
+                         ;; material-light
+                         ;; material
+                         ;; matrix
+                         ;; mbo70s
+                         ;; mccarthy
+                         ;; meacupla
+                         ;; mellow
+                         ;; midnight
+                         ;; minimal-light
+                         ;; minimal
+                         ;; mistyday
+                         ;; moe-dark
+                         ;; moe-light
+                         ;; moe
+                         ;; molokai
+                         ;; monochrome-bright
+                         ;; monochrome
+                         ;; monokai
+                         ;; montz
+                         ;; mustang
+                         ;; mustard
+                         ;; my-solarized-dark
+                         ;; my-solarized-light
+                         ;; naquadah
+                         ;; niflheim
+                         ;; noctilux
+                         ;; obsidian
+                         ;; occidental
+                         ;; odersky
+                         ;; oldlace
+                         ;; organic-green
+                         ;; oswald
+                         ;; paper
+                         ;; parus
+                         ;; pastelmac
+                         ;; pastels-on-dark
+                         ;; peacock
+                         ;; phoenix-dark-mono
+                         ;; phoenix-dark-pink
+                         ;; pierson
+                         ;; planet
+                         ;; pok-wob
+                         ;; pok-wog
+                         ;; professional
+                         ;; purple-haze
+                         ;; quasi-monochrome
+                         ;; radiance
+                         ;; railscasts
+                         ;; railscast
+                         ;; ramangalahy
+                         ;; raspopovic
+                         ;; renegade
+                         ;; resolve
+                         ;; retro-green
+                         ;; retro-orange
+                         ;; reverse
+                         ;; reykjavik
+                         ;; rippedcasts
+                         ;; ritchie
+                         ;; robin-hood
+                         ;; rotor
+                         ;; ryerson
+                         ;; salmon-diff
+                         ;; salmon-font-lock
+                         ;; sanityinc-tomorrow-blue
+                         ;; sanityinc-tomorrow-bright
+                         ;; sanityinc-tomorrow-day
+                         ;; sanityinc-tomorrow-eighties
+                         ;; sanityinc-tomorrow-night
+                         ;; scintilla
+                         ;; seoul256
+                         ;; seti
+                         ;; shaman
+                         ;; simple-1
+                         ;; sitaramv-nt
+                         ;; sitaramv-solaris
+                         ;; slime
+                         ;; smyx
+                         ;; snowish
+                         ;; snow
+                         ;; soft-charcoal
+                         ;; soft-morning
+                         ;; soft-stone
+                         ;; solarized-dark
+                         ;; solarized-light
+                         ;; solarized
+                         ;; soothe
+                         ;; spacegray
+                         ;; spolsky
+                         ;; standard-ediff
+                         ;; standard
+                         ;; stekene-dark
+                         ;; stekene-light
+                         ;; subatomic256
+                         ;; subatomic
+                         ;; subdued
+                         ;; subtle-blue
+                         ;; subtle-hacker
+                         ;; sunburst
+                         ;; sunny-day
+                         ;; suscolors
+                         ;; taming-mr-arneson
+                         ;; tango-2
+                         ;; tango-plus
+                         ;; tangotango
+                         ;; tao-yang
+                         ;; tao-yin
+                         ;; taylor
+                         ;; tommyh
+                         ;; tomorrow-night-paradise
+                         ;; tronesque
+                         ;; tron
+                         ;; tty-dark
+                         ;; twilight-bright
+                         ;; twilight
+                         ;; ubuntu
+                         ;; ujelly
+                         ;; underwater
+                         ;; vim-colors
+                         ;; waher
+                         ;; warm-night
+                         ;; whateveryouwant
+                         ;; wheat
+                         ;; white-sand
+                         ;; wilson
+                         ;; word-perfect
+                         ;; xemacs
+                         ;; xp
+                         ;; zen-and-art
+                         ;; zenburn
+                         ;; zonokai-blue
+                         ;; zonokai-red
+                         ;; zonokai
                          )
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
@@ -234,7 +629,7 @@ values."
    ;; dotspacemacs-default-font `("Liberation Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; dotspacemacs-default-font `("Source Code Pro for Powerline" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Very condensed -- pretty good for coding -- same odd shapes offs UTF as Liberation Mono
-   ;; dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
+   ;;  dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
     ;; dotspacemacs-default-font '("Source Code Pro"
     ;;                              :size 16.0
     ;;                              :weight normal
@@ -384,6 +779,8 @@ user code here.  The exception is org related code, which should be placed in `d
   ;; ---------
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp"))
+  (add-to-list 'load-path (concat dotspacemacs-directory "theme-test"))
+  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "theme-test"))
   (add-to-list 'load-path (concat "~/p/ietf-docs"))
   ;;(require 'iterm-custom-keys)
   (require 'iterm-xterm-extra)
@@ -746,6 +1143,15 @@ layers configuration. You are free to put any user code."
         :type '(string :tag "Folder name")
         :group 'mu4e-folders)
 
+      ;; REMOVE ME XXXX
+      (defun mu4e-clear-caches ()
+        "Clear any cached resources."
+        (progn
+          (message "XXX mu4e-clear-caches called")
+          (setq
+           mu4e-maildir-list nil
+           mu4e~contacts nil)))
+
 
       (setq mu4e-maildir "~/Documents/imap-accounts"
         ;; Updating
@@ -759,6 +1165,8 @@ layers configuration. You are free to put any user code."
         mu4e-update-interval nil
         mu4e-headers-include-related nil
 
+        ;; Stop mu4e from blowing away message buffer all the time
+        mu4e-hide-index-messages t
 
         mu4e-context-policy 'pick-first
         mu4e-compose-context-policy 'ask-if-none
@@ -1051,9 +1459,6 @@ layers configuration. You are free to put any user code."
           (add-to-list 'mu4e-view-actions
                        '("ViewInBrowser" . mu4e-action-view-in-browser))
 
-          (add-to-list 'mu4e-view-actions
-                       '("GoogleCalendar" . mu4e-action-add-to-gcal))
-
           (defun mu4e-action-add-to-gcal (msg)
             "Add to a calendar"
             (interactive)
@@ -1065,7 +1470,10 @@ layers configuration. You are free to put any user code."
                        (name (plist-get att :name))
                        (index (plist-get att :index)))
                   (if (s-suffix? ".vcs" name)
-                      (mu4e-view-pipe-attachment msg num (concat "gcalcli import --calendar=" calendar)))))))
+                      (progn
+                        (message "%s %s%s%s" "mu4e-view-pipe-attachment " num " (concat \"gcalcli import --calendar=\"" calendar)
+                        (mu4e-view-pipe-attachment msg num (concat "gcalcli import --calendar=" calendar)))
+                    (message "No .vcs attachment"))))))
 
                       ;; (let* ((save-info (mu4e~view-temp-action
                       ;;                    (mu4e-message-field msg :docid) index))
@@ -1073,6 +1481,9 @@ layers configuration. You are free to put any user code."
                       ;;        (calendar "Work"))
                       ;;   (message (concat "gcalcli import --calendar=" calendar " " path))
                       ;;   (message (shell-command-to-string (concat "gcalcli import --calendar=" calendar " " path)))))))))
+
+          (add-to-list 'mu4e-view-actions
+                       '("GoogleCalendar" . mu4e-action-add-to-gcal))
 
             ;; (let ((calendar "Work"))
             ;;   (shell-command-to-string (concat "gcalcli import --calendar=" calendar " " file))
@@ -2384,7 +2795,8 @@ layers configuration. You are free to put any user code."
  '(magit-diff-use-overlays nil)
  '(safe-local-variable-values
    (quote
-    ((eval progn
+    ((evil-shift-width . 2)
+     (eval progn
            (require
             (quote projectile))
            (puthash
