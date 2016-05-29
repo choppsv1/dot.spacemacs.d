@@ -104,8 +104,16 @@ values."
       yaml
 
       ;; Let's keep this later.
-      erc
-      bb-erc
+      (erc :variables
+           erc-server-list
+           '(("irc.freenode.net"
+              :port "6697"
+              :ssl t
+              :nick "chopps"
+             ))
+       )
+      ;; bb-erc
+
       ;; rcirc
       ;; (rcirc :variables
       ;;        rcirc-enable-authinfo-support t)
@@ -204,7 +212,9 @@ values."
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(
+                         ;; colorsarenice-light
                          misterioso
+                         mandm
                          leuven
                          ;; quasi-monochrome
                          molokai
@@ -375,7 +385,7 @@ values."
                          ;; clues
                          ;; cobalt
                          ;; colonoscopy
-                         ;; colorsarenice-dark
+                         colorsarenice-dark
                          ;; colorsarenice-light
                          ;; comidia
                          ;; cyberpunk
@@ -607,9 +617,9 @@ values."
                          ;; xp
                          ;; zen-and-art
                          ;; zenburn
-                         ;; zonokai-blue
+                         zonokai-blue
                          ;; zonokai-red
-                         ;; zonokai
+                         zonokai
                          )
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
@@ -779,8 +789,8 @@ user code here.  The exception is org related code, which should be placed in `d
   ;; ---------
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp"))
-  (add-to-list 'load-path (concat dotspacemacs-directory "theme-test"))
-  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "theme-test"))
+  (add-to-list 'load-path (concat dotspacemacs-directory "themes-test/"))
+  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "themes-test/"))
   (add-to-list 'load-path (concat "~/p/ietf-docs"))
   ;;(require 'iterm-custom-keys)
   (require 'iterm-xterm-extra)
@@ -813,7 +823,8 @@ user code here.  The exception is org related code, which should be placed in `d
   ;;   (define-key evil-evilified-state-map-original "M" 'evil-window-middle))
 
    )
-  (setq theming-modifications `((misterioso (erc-input-face :foreground "cornflowerblue")
+  (setq theming-modifications `(
+                                (misterioso (erc-input-face :foreground "cornflowerblue")
                                             (font-lock-comment-face :foreground "DarkGrey" :slant italic)
                                             (font-lock-comment-delimiter-face :foreground "grey33"))
                                 (molokai (font-lock-comment-face :foreground "DarkGrey")
@@ -830,6 +841,13 @@ user code here.  The exception is org related code, which should be placed in `d
                                         (font-lock-doc-face :foreground "#036A07" :slant italic)
                                         (font-lock-comment-face :foreground "#6D6D64" :slant italic)
                                         (font-lock-comment-delimiter-face :foreground "#BDBDA4"))
+                                (colorsarenice-light (erc-input-face :foreground "cornflowerblue")
+                                                     (spacemacs-micro-state-header-face :foreground "Black")
+                                                     (powerline-active1 :background "DarkSlateGrey" :foreground "LightBlue")
+                                                     (powerline-inactive2 :background "DarkSlateGrey" :foreground "LightRed")
+                                                     (powerline-inactive1 :background "DarkSlateGrey" :foreground "LightGrey")
+                                                      (font-lock-comment-face :foreground "grey44" :slant italic)
+                                                      (font-lock-comment-delimiter-face :foreground "grey77"))
                                 ))
 
 
@@ -988,6 +1006,7 @@ layers configuration. You are free to put any user code."
                         (member dotspacemacs-editing-style '(vim)))
     (setq
      spacemacs--hjkl-completion-navigation-functions nil
+     browse-url-new-window-flag t
      tab-always-indent t
      )
 
@@ -1037,7 +1056,7 @@ layers configuration. You are free to put any user code."
         (org-agenda-list))
 
       (spacemacs|define-custom-layout "emacs"
-        :binding "^E"
+        :binding "^e"
         :body
         (find-file "~/.emacs.d/"))
 
@@ -1046,16 +1065,16 @@ layers configuration. You are free to put any user code."
         :body
         (mu4e))
 
-      (spacemacs|define-custom-layout "ERC"
+      (spacemacs|define-custom-layout "@ERC"
         :binding "i"
         :body
         (progn
           (add-hook 'erc-connect-pre-hook '(lambda (x)
-                                             (persp-mode-buffer-assoc x "IRC")))
-          (launch-irc-jabber)
+                                             (persp-mode-buffer-assoc x "@ERC")))
+          ;; (launch-irc-jabber)
           ;;(launch-irc-netbsd)
           ;;(split-window-right)
-          ;;(launch-irc-freenode)
+          (launch-irc-freenode)
           ;;(split-window-right)
           ;;(launch-irc-gitter)
           )
@@ -1133,9 +1152,245 @@ layers configuration. You are free to put any user code."
     (defun my-erc-perspective ()
       "Switch or create to a perspective called 'erc' and connect to IRC"
       (interactive)
-      (select-frame (make-frame '((name . "ERC") (minibuffer . t))))
+      (select-frame (make-frame '((name . "@ERC") (minibuffer . t))))
       (persp-switch "freenode.net")
-      (erc :server "asimov.freenode.net" :port "6667" :nick "chopps"))
+      (erc :server "irc.freenode.net" :port "6667" :nick "chopps"))
+
+    (when (configuration-layer/layer-usedp 'erc)
+      (setq erc-prompt-for-nickserv-password nil
+            erc-autojoin-channels-alist '(("irc.gitter.im" "#syl20bnr/spacemacs")
+                                          ("mollari.netbsd.org" "#NetBSD")
+                                          ("freenode.net" "#alpine-linux")
+                                          )
+            erc-auto-query 'window
+            erc-fill-mode nil
+            ;; erc-hl-nicks-minimum-contrast-ratio 3.5
+            ;; erc-hl-nicks-color-contrast-strategy 'contrast
+            ;; erc-hl-nicks-color-contrast-strategy 'invert
+            erc-hl-nicks-skip-nicks '("gitter")
+            erc-join-buffer 'bury
+
+            ;; Logging
+            erc-log-channels-directory "~/Dropbox/logs/erclogs"
+            ;; erc-log-all-but-server-buffers t
+            erc-log-insert-log-on-open nil ;; this inserts after the prompt which is scary as it
+            ;; might send
+            erc-save-buffer-on-part nil
+            erc-save-queries-on-quit nil
+            erc-log-write-after-send t
+            erc-log-write-after-insert t
+
+            ;; Notifcations
+            erc-notifications-icon (concat user-emacs-directory "./layers/+chat/rcirc/img/irc.png")
+            erc-spelling-mode t
+
+            erc-track-switch-direction 'importance
+            )
+      ;; We want to be in normal state most of the time so we can flip in and out.
+      (evil-set-initial-state 'erc-mode 'normal)
+
+      ;; Simplify this function so it works
+      (with-eval-after-load 'erc-log
+        (defun erc-log-all-but-server-buffers (buffer)
+          (not (erc-server-buffer-p buffer))))
+
+
+      ;; Actually we really only want this when we move away from the buffer?
+      ;; (add-hook 'erc-send-post-hook 'evil-normal-state)
+      ;; (remove-hook 'erc-send-post-hook 'evil-normal-state)
+
+
+      ;; '(erc-autoaway-idle-seconds 600)
+      ;; '(erc-autojoin-mode t)
+      ;; '(erc-button-mode t)
+      ;; '(erc-current-nick-highlight-type (quote all))
+      ;; '(erc-fill-mode t)
+      ;; '(erc-hl-nicks-mode t)
+      ;; '(erc-hl-nicks-trim-nick-for-face nil)
+      ;; '(erc-irccontrols-mode t)
+      ;; '(erc-kill-buffer-on-part t)
+      ;; '(erc-kill-queries-on-quit t)
+      ;; '(erc-kill-server-buffer-on-quit t)
+      ;; '(erc-list-mode t)
+      ;; '(erc-log-channels-directory "/Users/chopps/Dropbox/erclogs" t)
+      ;; '(erc-log-mode t)
+      ;; '(erc-match-mode t)
+      ;; '(erc-menu-mode t)
+      ;; '(erc-move-to-prompt-mode t)
+      ;; '(erc-netsplit-mode t)
+      ;; '(erc-networks-mode t)
+      ;; '(erc-noncommands-mode t)
+      ;; '(erc-pcomplete-mode t)
+      ;; '(erc-prompt (lambda nil (concat "[" (buffer-name) "]")))
+      ;; '(erc-readonly-mode t)
+      ;; '(erc-ring-mode t)
+      ;; '(erc-server-coding-system (quote (utf-8 . utf-8)))
+      ;; '(erc-services-mode t)
+      ;; '(erc-social-graph-dynamic-graph t)
+      ;; '(erc-stamp-mode t)
+      ;; '(erc-track-minor-mode t)
+      ;; '(erc-track-mode t)
+      ;; '(erc-youtube-mode t)
+
+      (defun erc-acct-get-password (user host port)
+        (let* ((auth-source-creation-defaults nil)
+               (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
+               (secret (plist-get (nth 0 (auth-source-search
+                                          :type 'netrc
+                                          :max 1
+                                          :host host
+                                          :user user
+                                          :port port))
+                                  :secret))
+               (password (if (functionp secret)
+                             (funcall secret)
+                           secret)))))
+
+      (with-eval-after-load 'erc
+       (setq erc-nickserv-passwords
+             `((freenode (("chopps" . ,(erc-acct-get-password "chopps" "freenode.net" "nickserv"))))
+               (localhost (("chopps" . ,(erc-acct-get-password "chopps" "localhost" "bitlbee")))))))
+
+      (defun launch-irc-gitter ()
+        "Launch irc connection to giter.im"
+        (interactive)
+        (erc :server "localhost" :port 6669 :nick "choppsv1"
+            :password (erc-acct-get-password "choppsv1" "192.168.1.5" 6669)))
+        ;; (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1"
+        ;;         :password (erc-acct-get-password "choppsv1" "irc.gitter.im" 6667)))
+
+      (defun launch-irc-netbsd ()
+        "Launch irc connection to netbsd"
+        (interactive)
+        (erc-tls :server "mollari.netbsd.org" :port 7001 :nick "chopps" :full-name "Christian E. Hopps"))
+
+      (defun launch-irc-freenode ()
+        "Launch irc connection to freenode"
+        (interactive)
+        (erc-tls :server "irc.freenode.net" :port 6697 :nick "chopps"
+                 :password (erc-acct-get-password "chopps" "freenode.net" 6697)))
+
+      (defun launch-irc-jabber ()
+        "Launch irc connection to jabber"
+        (interactive)
+        (erc :server "localhost" :port 6667 :nick "chopps" :full-name "Christian E. Hopps"))
+
+      (defun launch-erc ()
+        "Launch all our connections to IRC"
+        (interactive)
+        (launch-irc-gitter)
+        (launch-irc-freenode)
+        (launch-irc-netbsd)
+        (launch-irc-jabber))
+
+      (spacemacs/set-leader-keys
+        "aif" 'launch-irc-freenode
+        "aij" 'launch-irc-jabber
+        "ain" 'launch-irc-netbsd
+        "aig" 'launch-irc-gitter
+        "aiL" 'launch-erc)
+
+      (defun bitlbee-netrc-identify ()
+        "Auto-identify for Bitlbee channels using authinfo or netrc.
+
+        The entries that we look for in netrc or authinfo files
+        have their 'port' set to 'bitlbee', their 'login' or
+        'user' set to the current nickname and 'server' set to
+        the current IRC server's name. A sample value that works
+        for authenticating as user 'keramida' on server
+        'localhost' is:
+
+            machine localhost port bitlbee login keramida password supersecret"
+
+        (interactive)
+        (when (string= (buffer-name) "&bitlbee")
+          (let ((pass (erc-acct-get-password (erc-current-nick) erc-session-server "bitlbee")))
+            ;; (message "Sending privmsg to &bitlbee server %s" erc-session-server)
+            (erc-message "PRIVMSG"
+                         (format "%s identify %s"
+                                 (erc-default-target)
+                                 pass)))))
+      (add-hook 'erc-join-hook 'bitlbee-netrc-identify)
+
+      ;; We only need this if we aren't using our local bridge
+      ;; ;; add a user to the current channel
+      ;; (defun add-nick-insert-pre-hook (line)
+      ;;   "Add user to ERC channel list"
+      ;;   (when (string= erc-session-server "irc.gitter.im")
+      ;;     (save-match-data
+      ;;       (when (string-match "^<\\([^>]+\\)> .*" line)
+      ;;         (let ((nick (match-string 1 line)))
+      ;;           (erc-update-current-channel-member nick nick 'add-if-new))))))
+      ;; (add-hook 'erc-insert-pre-hook 'add-nick-insert-pre-hook)
+
+      ;; (setq erc-modules (delete 'fill erc-modules))
+
+      (defvar evil-normal-state-on-unfocus-modes
+        '(erc-mode))
+      (defun evil-normal-state-on-unfocus ()
+        "Return to normal state when a buffer in a given major mode is unfocussed"
+        (when (member major-mode evil-normal-state-on-unfocus-modes)
+          (evil-normal-state)))
+
+      (add-hook 'unfocus-buffer-hook 'evil-normal-state-on-unfocus)
+
+      (with-eval-after-load 'erc
+        (erc-fill-disable)
+        ;; (erc-log-enable)
+        (setq erc-modules (cons 'log (delete 'fill erc-modules))))
+        ;; (erc-services-mode 1)
+        ;; (erc-spelling-mode 1))
+      )
+
+    (when (configuration-layer/layer-usedp 'rcirc)
+      (defun get-gitter-password ()
+        (let* ((auth-source-creation-defaults nil)
+               (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
+               (sec (plist-get (nth 0 (auth-source-search
+                                       :type 'netrc
+                                       :max 1
+                                       :host "irc.gitter.im"
+                                       :port 6667
+                                       :user "choppsv1"))
+                               :secret)))
+          (if (functionp sec)
+              (funcall sec)
+            sec)))
+      (setq
+       rcirc-log-directory "~/Dropbox/logs/rcirclogs"
+       rcirc-time-format "%H:%M "
+       rcirc-server-alist
+       `(
+         ("127.0.0.1"
+          :user "choppsv1"
+          :port "6669"
+          :password ,(get-gitter-password)
+          ;; :encryption tls
+          :channels ("#syl20bnr/spacemacs"))
+         ("asimov.freenode.net"
+          :user "chopps"
+          :port "6697"
+          :encryption tls
+          :channels ("#org-mode")
+          )
+         ;; ("mollari.netbsd.org"
+         ;;  :user "chopps"
+         ;;  :port "7001"
+         ;;  :encryption tls
+         ;;  :channels ("#netbsd")
+         ;; )
+         ("localhost"
+          :user "chopps"
+          :port "6667"
+          ;; :channels ("#ts")
+          )
+         )
+       )
+      )
+
+    ;; ======
+    ;; Email
+    ;; ======
 
     (when (configuration-layer/layer-usedp 'mu4e)
       (defcustom mu4e-spam-folder "/chopps.org/spam-train"
@@ -1235,7 +1490,7 @@ layers configuration. You are free to put any user code."
                ("date:7d..now" "Last 7 days" ?w)
                ("date:7d..now from:chopps" "Last 7 days sent" ?W)
                ("mime:*pdf" "Messages with PDF" 112)
-               ("mime:*vcs" "Messages with VCS" 113))))
+               ("mime:*cs" "Messages with VCS" 113))))
 
 
         ;; [j]ump shortcuts
@@ -1469,11 +1724,11 @@ layers configuration. You are free to put any user code."
                 (let* ((att (mu4e~view-get-attach msg num))
                        (name (plist-get att :name))
                        (index (plist-get att :index)))
-                  (if (s-suffix? ".vcs" name)
+                  (if (or (s-suffix? ".vcs" name) (s-suffix? ".ics" name))
                       (progn
                         (message "%s %s%s%s" "mu4e-view-pipe-attachment " num " (concat \"gcalcli import --calendar=\"" calendar)
                         (mu4e-view-pipe-attachment msg num (concat "gcalcli import --calendar=" calendar)))
-                    (message "No .vcs attachment"))))))
+                    (message "No .[iv]cs attachment"))))))
 
                       ;; (let* ((save-info (mu4e~view-temp-action
                       ;;                    (mu4e-message-field msg :docid) index))
@@ -1545,239 +1800,6 @@ layers configuration. You are free to put any user code."
           )
         )
       )
-
-    (when (configuration-layer/layer-usedp 'erc)
-      (setq erc-prompt-for-nickserv-password nil
-            erc-autojoin-channels-alist '(("irc.gitter.im" "#syl20bnr/spacemacs")
-                                          ("mollari.netbsd.org" "#NetBSD")
-                                          ("freenode.net" "#org-mode"))
-            erc-auto-query 'window
-            erc-fill-mode nil
-            ;; erc-hl-nicks-minimum-contrast-ratio 3.5
-            ;; erc-hl-nicks-color-contrast-strategy 'contrast
-            ;; erc-hl-nicks-color-contrast-strategy 'invert
-            erc-hl-nicks-skip-nicks '("gitter")
-            erc-join-buffer 'bury
-
-            ;; Logging
-            erc-log-channels-directory "~/Dropbox/logs/erclogs"
-            ;; erc-log-all-but-server-buffers t
-            erc-log-insert-log-on-open nil ;; this inserts after the prompt which is scary as it
-            ;; might send
-            erc-save-buffer-on-part nil
-            erc-save-queries-on-quit nil
-            erc-log-write-after-send t
-            erc-log-write-after-insert t
-
-            ;; Notifcations
-            erc-notifications-icon (concat user-emacs-directory "./layers/+irc/rcirc/img/irc.png")
-            erc-spelling-mode t
-
-            erc-track-switch-direction 'importance
-            )
-      ;; We want to be in normal state most of the time so we can flip in and out.
-      (evil-set-initial-state 'erc-mode 'normal)
-
-      ;; Simplify this function so it works
-      (with-eval-after-load 'erc-log
-        (defun erc-log-all-but-server-buffers (buffer)
-          (not (erc-server-buffer-p buffer))))
-
-
-      ;; Actually we really only want this when we move away from the buffer?
-      ;; (add-hook 'erc-send-post-hook 'evil-normal-state)
-      ;; (remove-hook 'erc-send-post-hook 'evil-normal-state)
-
-
-        ;; '(erc-autoaway-idle-seconds 600)
-        ;; '(erc-autojoin-mode t)
-        ;; '(erc-button-mode t)
-        ;; '(erc-current-nick-highlight-type (quote all))
-        ;; '(erc-fill-mode t)
-        ;; '(erc-hl-nicks-mode t)
-        ;; '(erc-hl-nicks-trim-nick-for-face nil)
-        ;; '(erc-irccontrols-mode t)
-        ;; '(erc-kill-buffer-on-part t)
-        ;; '(erc-kill-queries-on-quit t)
-        ;; '(erc-kill-server-buffer-on-quit t)
-        ;; '(erc-list-mode t)
-        ;; '(erc-log-channels-directory "/Users/chopps/Dropbox/erclogs" t)
-        ;; '(erc-log-mode t)
-        ;; '(erc-match-mode t)
-        ;; '(erc-menu-mode t)
-        ;; '(erc-move-to-prompt-mode t)
-        ;; '(erc-netsplit-mode t)
-        ;; '(erc-networks-mode t)
-        ;; '(erc-noncommands-mode t)
-        ;; '(erc-pcomplete-mode t)
-        ;; '(erc-prompt (lambda nil (concat "[" (buffer-name) "]")))
-        ;; '(erc-readonly-mode t)
-        ;; '(erc-ring-mode t)
-        ;; '(erc-server-coding-system (quote (utf-8 . utf-8)))
-        ;; '(erc-services-mode t)
-        ;; '(erc-social-graph-dynamic-graph t)
-        ;; '(erc-stamp-mode t)
-        ;; '(erc-track-minor-mode t)
-        ;; '(erc-track-mode t)
-        ;; '(erc-youtube-mode t)
-
-      (defun erc-acct-get-password (user host port)
-        (let* ((auth-source-creation-defaults nil)
-               (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
-               (secret (plist-get (nth 0 (auth-source-search
-                                          :type 'netrc
-                                          :max 1
-                                          :host host
-                                          :user user
-                                          :port port))
-                                  :secret))
-               (password (if (functionp secret)
-                             (funcall secret)
-                           secret)))))
-
-      (with-eval-after-load 'erc
-       (setq erc-nickserv-passwords
-             `((freenode (("chopps" . ,(erc-acct-get-password "chopps" "freenode.net" "nickserv"))))
-               (localhost (("chopps" . ,(erc-acct-get-password "chopps" "localhost" "bitlbee")))))))
-
-      (defun launch-irc-gitter ()
-        "Launch irc connection to giter.im"
-        (interactive)
-        (erc :server "localhost" :port 6669 :nick "choppsv1"
-            :password (erc-acct-get-password "choppsv1" "192.168.1.5" 6669)))
-        ;; (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1"
-        ;;         :password (erc-acct-get-password "choppsv1" "irc.gitter.im" 6667)))
-
-      (defun launch-irc-netbsd ()
-        "Launch irc connection to netbsd"
-        (interactive)
-        (erc-tls :server "mollari.netbsd.org" :port 7001 :nick "chopps" :full-name "Christian E. Hopps"))
-
-      (defun launch-irc-freenode ()
-        "Launch irc connection to freenode"
-        (interactive)
-        (erc-tls :server "asimov.freenode.net" :port 6697 :nick "chopps"
-                 :password (erc-acct-get-password "chopps" "freenode.net" 6697)))
-
-      (defun launch-irc-jabber ()
-        "Launch irc connection to jabber"
-        (interactive)
-        (erc :server "localhost" :port 6667 :nick "chopps" :full-name "Christian E. Hopps"))
-
-      (defun launch-erc ()
-        "Launch all our connections to IRC"
-        (interactive)
-        (launch-irc-gitter)
-        (launch-irc-freenode)
-        (launch-irc-netbsd)
-        (launch-irc-jabber))
-
-      (spacemacs/set-leader-keys
-        "aif" 'launch-irc-freenode
-        "aij" 'launch-irc-jabber
-        "ain" 'launch-irc-netbsd
-        "aig" 'launch-irc-gitter
-        "aiL" 'launch-erc)
-
-      (defun bitlbee-netrc-identify ()
-        "Auto-identify for Bitlbee channels using authinfo or netrc.
-
-        The entries that we look for in netrc or authinfo files
-        have their 'port' set to 'bitlbee', their 'login' or
-        'user' set to the current nickname and 'server' set to
-        the current IRC server's name. A sample value that works
-        for authenticating as user 'keramida' on server
-        'localhost' is:
-
-            machine localhost port bitlbee login keramida password supersecret"
-
-        (interactive)
-        (when (string= (buffer-name) "&bitlbee")
-          (let ((pass (erc-acct-get-password (erc-current-nick) erc-session-server "bitlbee")))
-            ;; (message "Sending privmsg to &bitlbee server %s" erc-session-server)
-            (erc-message "PRIVMSG"
-                         (format "%s identify %s"
-                                 (erc-default-target)
-                                 pass)))))
-      (add-hook 'erc-join-hook 'bitlbee-netrc-identify)
-
-      ;; We only need this if we aren't using our local bridge
-      ;; ;; add a user to the current channel
-      ;; (defun add-nick-insert-pre-hook (line)
-      ;;   "Add user to ERC channel list"
-      ;;   (when (string= erc-session-server "irc.gitter.im")
-      ;;     (save-match-data
-      ;;       (when (string-match "^<\\([^>]+\\)> .*" line)
-      ;;         (let ((nick (match-string 1 line)))
-      ;;           (erc-update-current-channel-member nick nick 'add-if-new))))))
-      ;; (add-hook 'erc-insert-pre-hook 'add-nick-insert-pre-hook)
-
-      ;; (setq erc-modules (delete 'fill erc-modules))
-
-      (defvar evil-normal-state-on-unfocus-modes
-        '(erc-mode))
-      (defun evil-normal-state-on-unfocus ()
-        "Return to normal state when a buffer in a given major mode is unfocussed"
-        (when (member major-mode evil-normal-state-on-unfocus-modes)
-          (evil-normal-state)))
-
-      (add-hook 'unfocus-buffer-hook 'evil-normal-state-on-unfocus)
-
-      (with-eval-after-load 'erc
-        (erc-fill-disable)
-        ;; (erc-log-enable)
-        (setq erc-modules (cons 'log (delete 'fill erc-modules))))
-        ;; (erc-services-mode 1)
-        ;; (erc-spelling-mode 1))
-      )
-
-
-    (when (configuration-layer/layer-usedp 'rcirc)
-      (defun get-gitter-password ()
-        (let* ((auth-source-creation-defaults nil)
-               (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
-               (sec (plist-get (nth 0 (auth-source-search
-                                       :type 'netrc
-                                       :max 1
-                                       :host "irc.gitter.im"
-                                       :port 6667
-                                       :user "choppsv1"))
-                               :secret)))
-          (if (functionp sec)
-              (funcall sec)
-            sec)))
-      (setq
-       rcirc-log-directory "~/Dropbox/logs/rcirclogs"
-       rcirc-time-format "%H:%M "
-       rcirc-server-alist
-       `(
-         ("127.0.0.1"
-          :user "choppsv1"
-          :port "6669"
-          :password ,(get-gitter-password)
-          ;; :encryption tls
-          :channels ("#syl20bnr/spacemacs"))
-         ("asimov.freenode.net"
-          :user "chopps"
-          :port "6697"
-          :encryption tls
-          :channels ("#org-mode")
-          )
-         ;; ("mollari.netbsd.org"
-         ;;  :user "chopps"
-         ;;  :port "7001"
-         ;;  :encryption tls
-         ;;  :channels ("#netbsd")
-         ;; )
-         ("localhost"
-          :user "chopps"
-          :port "6667"
-          ;; :channels ("#ts")
-          )
-         )
-       )
-      )
-
     ;; =================
     ;; Programming Modes
     ;; =================
@@ -2201,8 +2223,11 @@ layers configuration. You are free to put any user code."
            ("s" "Status" entry (file+datetree (concat org-directory "/status.org"))
             "* NOTE %?\n%u\n")
 
-           ("x" "Tramdose 100mg" entry (file+datetree (concat org-directory "/medicine.org") "Tramadol")
-            "* NOTE 100mg\nCreated: %U\nPain Level: 3" :immediate-finish)
+           ("x" "Tramdose 100mg" entry (file+datetree (concat org-directory "/tramadol.org") "Tramadol")
+            "* NOTE 100mg\nCreated: %U\nPain Level: 3-4" :immediate-finish)
+
+           ("y" "Advil dose 200mg" entry (file+datetree (concat org-directory "/advil.org") "Advil")
+            "* NOTE 200mg\nCreated: %U\nPain Level: 1-2" :immediate-finish)
 
            ("X" "Tramdose" entry (file+datetree (concat org-directory "/medicine.org") "Tramadol")
             "* NOTE %?\nCreated: %U\nPain Level: 3")
@@ -2769,6 +2794,9 @@ layers configuration. You are free to put any user code."
     )
   )
 
+ ;; '(font-lock-comment-delimiter-face ((t (:foreground "grey33"))))
+ ;; '(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic)))))
+ ;; '(variable-pitch ((t (:family "DejaVu Sans Mono")))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -2792,6 +2820,7 @@ layers configuration. You are free to put any user code."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(evil-want-Y-yank-to-eol nil)
  '(magit-diff-use-overlays nil)
  '(safe-local-variable-values
    (quote
