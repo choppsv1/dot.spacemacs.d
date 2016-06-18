@@ -26,19 +26,16 @@ values."
    ;; List of additional paths where to look for configuration layers.
    ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
    dotspacemacs-configuration-layer-path '()
-   ;; List of configuration layers to load. If it is the symbol `all' instead
-   ;; of a list then all discovered layers will be installed.
+   ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
-     php
-     csv
       ;; ----------------------------------------------------------------
       ;; Example of useful layers you may want to use right away.
       ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
       ;; <M-m f e R> (Emacs style) to install them.
       ;; ----------------------------------------------------------------
       ;; spacemacs-ivy
-      spacemacs-helm
+      helm
       (auto-completion :variables
                        auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets"
                        ;; auto-completion-tab-key-behavior 'complete
@@ -55,14 +52,16 @@ values."
 
       (osx :variables
         osx-use-option-as-meta t)
-      ;; ;; better-defaults
+
+      better-defaults
+
       gtags
 
       mu4e
 
       graphviz
       org
-      (org2blog :variables org2blog-name "hoppsjots.org")
+      ;; (org2blog :variables org2blog-name "hoppsjots.org")
       ;; pandoc
       pdf-tools
       ranger
@@ -70,11 +69,12 @@ values."
       rebox
 
       (shell :variables
-              shell-default-shell 'shell
+              ;; shell-default-shell 'shell
               ;; shell-default-position 'bottom
               ;; shell-default-height 30
               )
 
+      ;; nginx
       spell-checking
       ;; spotify
       syntax-checking
@@ -86,6 +86,8 @@ values."
       ietf
 
       ;; Languages
+      php
+      csv
 
       (c-c++ :variables
              c-c++-default-mode-for-headers 'c-mode
@@ -101,6 +103,7 @@ values."
       markdown
       (python :variables python-fill-column 120)
       shell-scripts
+      systemd
       yaml
 
       ;; Let's keep this later.
@@ -118,15 +121,17 @@ values."
       ;; (rcirc :variables
       ;;        rcirc-enable-authinfo-support t)
       ;; eyebrowse blows layouts away!
+      vim-empty-lines
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(monky org-caldav persistent-scratch)
+   dotspacemacs-additional-packages '(dockerfile-mode monky org-caldav persistent-scratch)
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages
    '(
+     vi-tilde-fringe
      erc-yt
      erc-view-log
      mu4e-maildirs-extension
@@ -136,10 +141,14 @@ values."
      ;; savehist
      smartparens
      ) ; evil-org
-   ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
-   ;; are declared in a layer which is not a member of
-   ;; the list `dotspacemacs-configuration-layers'. (default t)
-   dotspacemacs-delete-orphan-packages t))
+   ;; Defines the behaviour of Spacemacs when downloading packages.
+   ;; Possible values are `used', `used-but-keep-unused' and `all'. `used' will
+   ;; download only explicitly used packages and remove any unused packages as
+   ;; well as their dependencies. `used-but-keep-unused' will download only the
+   ;; used packages but won't delete them if they become unused. `all' will
+   ;; download all the packages regardless if they are used or not and packages
+   ;; won't be deleted by Spacemacs. (default is `used')
+   dotspacemacs-download-packages 'used))
 
 (defun dotspacemacs/init ()
   "Initialization function.
@@ -148,17 +157,17 @@ before layers configuration.
 You should not put any user code in there besides modifying the variable
 values."
   ;; mDetermine display size to pick font size
+
   (setq ch-def-height 10.5)
   (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
         ;; (yres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* [0-9]*x\\([0-9]*\\) .*/\\1/'")))
         )
     (setq xres (replace-regexp-in-string "\n\\'" "" xres))
     ;; (setq yres (replace-regexp-in-string "\n\\'" "" yres))
-
     (when (<= (string-to-number xres) 3000)
       (setq ch-def-height 10.0)))
+  ;; (message "def height %s" ch-def-height)
 
-  (message "def height %s" ch-def-height)
 
   ;; This setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
@@ -669,6 +678,12 @@ values."
    dotspacemacs-distinguish-gui-tab nil
    ;; If non nil `Y' is remapped to `y$' in Evil states. (default nil)
    dotspacemacs-remap-Y-to-y$ nil
+   ;; If non-nil, the shift mappings `<' and `>' retain visual state if used
+   ;; there. (default t)
+   dotspacemacs-retain-visual-state-on-shift t
+   ;; If non-nil, J and K move lines up and down when in visual mode.
+   ;; (default nil)
+   dotspacemacs-visual-line-move-text nil
    ;; If non nil, inverse the meaning of `g' in `:substitute' Evil ex-command.
    ;; (default nil)
    dotspacemacs-ex-substitute-global nil
@@ -746,6 +761,9 @@ values."
    ;; derivatives. If set to `relative', also turns on relative line numbers.
    ;; (default nil)
    dotspacemacs-line-numbers nil
+   ;; Code folding method. Possible values are `evil' and `origami'.
+   ;; (default 'evil)
+   dotspacemacs-folding-method 'evil
    ;; If non-nil smartparens-strict-mode will be enabled in programming modes.
    ;; (default nil)
    dotspacemacs-smartparens-strict-mode nil
@@ -2061,6 +2079,10 @@ layers configuration. You are free to put any user code."
       (with-eval-after-load 'lua-mode
         (setq-default lua-indent-level 4)))
 
+    ;;   (progn
+    ;;     (delq (assoc "^\t+#" makefile-font-lock-keywords) makefile-font-lock-keywords)))
+    (with-eval-after-load 'make-mode
+      (delq (assoc "^\t+#" makefile-font-lock-keywords) makefile-font-lock-keywords))
 
     ;; ============
     ;; Org Exports
@@ -2515,7 +2537,7 @@ layers configuration. You are free to put any user code."
       )
 
     ;; XXX need to change this
-    (when (daemonp)
+    (when (or (daemonp) (server-running-p))
       (require 'org-notify)
       (defun org-notify-action-notify-urgency (plist)
         "Pop up a notification window."
@@ -2824,7 +2846,8 @@ layers configuration. You are free to put any user code."
  '(magit-diff-use-overlays nil)
  '(safe-local-variable-values
    (quote
-    ((evil-shift-width . 2)
+    ((docker-image-name . "hyperv")
+     (evil-shift-width . 2)
      (eval progn
            (require
             (quote projectile))
