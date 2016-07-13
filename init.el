@@ -121,7 +121,7 @@ values."
       ;; (rcirc :variables
       ;;        rcirc-enable-authinfo-support t)
       ;; eyebrowse blows layouts away!
-      vim-empty-lines
+      ;; vim-empty-lines
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -131,7 +131,7 @@ values."
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages
    '(
-     vi-tilde-fringe
+     ;; vi-tilde-fringe
      erc-yt
      erc-view-log
      mu4e-maildirs-extension
@@ -1053,20 +1053,6 @@ layers configuration. You are free to put any user code."
     ;; =======
 
     (fold-section "layouts"
-      (defun persp-mode-buffer-assoc (buffer layout-name)
-        (let* ((npersp (or (persp-get-by-name layout-name)
-                           ;;(and (message "XXX Adding new persp %s" layout-name)
-                           ;;     (persp-add-new layout-name))))
-                           (persp-add-new layout-name)))
-                (cpersp (get-frame-persp)))
-
-          ;; (message "XXX persp-mode-buffer-assoc current layout: %s target layout %s target name %s buffer: %s"
-          ;;  (persp-name cpersp) (persp-name npersp) layout-name buffer)
-          ;; Add to correct perspective
-          (if (memq buffer (persp-buffers npersp))
-            ;; (message "XXX buffer %s already in %s" buffer npersp)
-            ;; (message "XXX Adding buffer %s to %s" buffer (persp-name npersp))
-            (persp-add-buffer buffer npersp t))))
 
       (spacemacs|define-custom-layout "agenda"
         :binding "a"
@@ -1083,20 +1069,34 @@ layers configuration. You are free to put any user code."
         :body
         (mu4e))
 
-      (spacemacs|define-custom-layout "@ERC"
-        :binding "i"
-        :body
-        (progn
-          (add-hook 'erc-connect-pre-hook '(lambda (x)
-                                             (persp-mode-buffer-assoc x "@ERC")))
-          ;; (launch-irc-jabber)
-          ;;(launch-irc-netbsd)
-          ;;(split-window-right)
-          (launch-irc-freenode)
-          ;;(split-window-right)
-          ;;(launch-irc-gitter)
-          )
-        )
+      ;; (defun persp-mode-buffer-assoc (buffer layout-name)
+      ;;   (let* ((npersp (or (persp-get-by-name layout-name)
+      ;;                      ;;(and (message "XXX Adding new persp %s" layout-name)
+      ;;                      ;;     (persp-add-new layout-name))))
+      ;;                      (persp-add-new layout-name)))
+      ;;          (cpersp (get-frame-persp)))
+      ;;     ;; (message "XXX persp-mode-buffer-assoc current layout: %s target layout %s target name %s buffer: %s"
+      ;;     ;;  (persp-name cpersp) (persp-name npersp) layout-name buffer)
+      ;;     ;; Add to correct perspective
+      ;;     (if (memq buffer (persp-buffers npersp))
+      ;;         ;; (message "XXX buffer %s already in %s" buffer npersp)
+      ;;         ;; (message "XXX Adding buffer %s to %s" buffer (persp-name npersp))
+      ;;         (persp-add-buffer buffer npersp t))))
+      ;; (spacemacs|define-custom-layout "@ERC"
+      ;;   :binding "i"
+      ;;   :body
+      ;;   (progn
+      ;;     (add-hook 'erc-connect-pre-hook '(lambda (x)
+      ;;                                        (persp-mode-buffer-assoc x "@ERC")))
+      ;;     ;; (launch-irc-jabber)
+      ;;     ;; (launch-irc-netbsd)
+      ;;     ;; (split-window-right)
+      ;;     ;; (launch-irc-freenode)
+      ;;     ;; (split-window-right)
+      ;;     ;; (launch-irc-gitter)
+      ;;     )
+      ;;   )
+
       (spacemacs|define-custom-layout "notes"
         :binding "n"
         :body
@@ -1167,18 +1167,19 @@ layers configuration. You are free to put any user code."
     ;; Messaging
     ;; ==========
 
-    (defun my-erc-perspective ()
-      "Switch or create to a perspective called 'erc' and connect to IRC"
-      (interactive)
-      (select-frame (make-frame '((name . "@ERC") (minibuffer . t))))
-      (persp-switch "freenode.net")
-      (erc :server "irc.freenode.net" :port "6667" :nick "chopps"))
+    ;; (defun my-erc-perspective ()
+    ;;   "Switch or create to a perspective called 'erc' and connect to IRC"
+    ;;   (interactive)
+    ;;   (select-frame (make-frame '((name . "@ERC") (minibuffer . t))))
+    ;;   (persp-switch "freenode.net")
+    ;;   (erc :server "irc.freenode.net" :port "6667" :nick "chopps"))
 
     (when (configuration-layer/layer-usedp 'erc)
       (setq erc-prompt-for-nickserv-password nil
             erc-autojoin-channels-alist '(("irc.gitter.im" "#syl20bnr/spacemacs")
+                                          ("192.168.1.6" "#syl20bnr/spacemacs")
                                           ("mollari.netbsd.org" "#NetBSD")
-                                          ("freenode.net" "#alpine-linux")
+                                          ("freenode.net" "#choppstest")
                                           )
             erc-auto-query 'window
             erc-fill-mode nil
@@ -1259,10 +1260,10 @@ layers configuration. You are free to put any user code."
                                           :host host
                                           :user user
                                           :port port))
-                                  :secret))
-               (password (if (functionp secret)
-                             (funcall secret)
-                           secret)))))
+                                  :secret)))
+               (if (functionp secret)
+                   (funcall secret)
+                 secret)))
 
       (with-eval-after-load 'erc
        (setq erc-nickserv-passwords
@@ -1273,7 +1274,7 @@ layers configuration. You are free to put any user code."
         "Launch irc connection to giter.im"
         (interactive)
         (erc :server "localhost" :port 6669 :nick "choppsv1"
-            :password (erc-acct-get-password "choppsv1" "192.168.1.5" 6669)))
+            :password (erc-acct-get-password "choppsv1" "192.168.1.6" 6669)))
         ;; (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1"
         ;;         :password (erc-acct-get-password "choppsv1" "irc.gitter.im" 6667)))
 
@@ -1355,9 +1356,26 @@ layers configuration. You are free to put any user code."
       (with-eval-after-load 'erc
         (erc-fill-disable)
         ;; (erc-log-enable)
+        (add-to-list 'erc-modules 'notifications)
         (setq erc-modules (cons 'log (delete 'fill erc-modules))))
         ;; (erc-services-mode 1)
         ;; (erc-spelling-mode 1))
+      (with-eval-after-load 'erc-desktop-notifications
+        ;; Redefine this so that we can set a timeout
+        ;; normally it uses the server and we use awesome so it would be nice to
+        ;; fix that there.
+        (defun erc-notifications-notify (nick msg)
+          "Notify that NICK send some MSG.
+This will replace the last notification sent with this function."
+          (dbus-ignore-errors
+            (setq erc-notifications-last-notification
+                  (notifications-notify :title (xml-escape-string nick)
+                                        :timeout 0
+                                        :body (xml-escape-string msg)
+                                        :replaces-id erc-notifications-last-notification
+                                        :app-icon erc-notifications-icon))))
+
+        )
       )
 
     (when (configuration-layer/layer-usedp 'rcirc)
@@ -1507,8 +1525,10 @@ layers configuration. You are free to put any user code."
                ("date:today..now" "Today's messages" ?t)
                ("date:7d..now" "Last 7 days" ?w)
                ("date:7d..now from:chopps" "Last 7 days sent" ?W)
-               ("mime:*pdf" "Messages with PDF" 112)
-               ("mime:*cs" "Messages with VCS" 113))))
+               ("mime:*pdf" "Messages with PDF" ?p)
+               ("mime:*calendar" "Messages with calendar" ?q)
+               ("mime:*cs" "Messages with VCS" ?Q)
+               )))
 
 
         ;; [j]ump shortcuts

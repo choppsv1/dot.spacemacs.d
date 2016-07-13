@@ -360,4 +360,14 @@
   (interactive)
   (org-tags-view nil "CLOSED>=\"<-1w>\""))
 
+(defun dumpvals (regex)
+  "Dump all variables and their values from a given regexp"
+  (let ((variables (mapcar (lambda (x) (car x))
+                           (remove-if-not (lambda (x) (not (functionp (car x))))
+                                          (apropos regex)))))
+    (dolist (var variables)
+      (if (boundp var)
+          (message "%s: \"%s\"" var (eval var t))
+        (message "%s: unbound" var)))))
+
 (provide 'generic-lisp)
