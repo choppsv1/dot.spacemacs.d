@@ -61,7 +61,7 @@ values."
 
       graphviz
       org
-      ;; (org2blog :variables org2blog-name "hoppsjots.org")
+      (org2blog :variables org2blog-name "hoppsjots.org")
       ;; pandoc
       pdf-tools
       ranger
@@ -2390,6 +2390,7 @@ This will replace the last notification sent with this function."
          (plantuml . t)
          (python . t)
          (sh . t)
+         ;; this can't be evaluated. (yang . nil)
          )
        )
       ;;  (dot2tex . t))
