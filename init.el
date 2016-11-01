@@ -59,6 +59,7 @@ values."
 
       mu4e
 
+      github
       graphviz
       org
       (org2blog :variables org2blog-name "hoppsjots.org")
@@ -1487,7 +1488,7 @@ This will replace the last notification sent with this function."
 
         mu4e-inbox-mailbox '("maildir:/gmail.com/INBOX"
                               "maildir:/chopps.org/INBOX"
-                              ;; "maildir:/dev.terastrm.net/INBOX"
+                              "maildir:/dev.terastrm.net/INBOX"
                               "maildir:/chopps.org/a-terastream")
 
         mu4e-imp-mailbox '("maildir:/chopps.org/ietf-chairs"
@@ -1497,6 +1498,10 @@ This will replace the last notification sent with this function."
                             "maildir:/chopps.org/ietf-rtg-yang-dt"
                             "maildir:/chopps.org/ietf-wg-isis"
                             "maildir:/chopps.org/ietf-wg-netmod")
+
+        mu4e-drafts-mailbox '("maildir:/chopps.org/ietf-announce"
+                              "maildir:/chopps.org/ietf-ann-proto-action"
+                              "maildir:/chopps.org/ietf-ann-id-actions")
 
         mu4e-junk-mailbox '("maildir:/gmail.com/[Gmail].Spam"
                              "maildir:/chopps.org/spam-probable"
@@ -1570,11 +1575,11 @@ This will replace the last notification sent with this function."
         mu4e-headers-visible-columns 80
 
         ;; XXX Try running w/o this to see if hangs go away.
-        ;; mu4e-html2text-command 'mu4e-shr2text
+        mu4e-html2text-command 'mu4e-shr2text
 
         ;; used ofr HTML in email ;; <#part type="message/rfc822" filename="/home/chopps/Documents/imap-accounts/chopps.org/sw-common/cur/1460249763.39525_8697.tops,U=242:2,S" disposition=attachment description="Re: Mail not correctly displayed"> <#/part>
 
-        mu4e-html2text-command "w3m -dump -cols 120 -T text/html"
+        ;; mu4e-html2text-command "w3m -dump -cols 120 -T text/html"
 
         ;; make work better in dark themes
         ;; [[mu4e:msgid:87vb7ng3tn.fsf@djcbsoftware.nl][Re: I find html2markdown the best value for mu4e-html2text-command]]
@@ -1683,10 +1688,14 @@ This will replace the last notification sent with this function."
                                              (smtpmail-smtp-server          . "smtp.gmail.com")
                                              (smtpmail-smtp-service . 587)))))
 
+
+          ;; Mu4E Keyboard extras
+
           (bind-key (kbd "'") 'mu4e-headers-next 'mu4e-headers-mode-map)
           (bind-key (kbd "\"") 'mu4e-headers-prev 'mu4e-headers-mode-map)
           (bind-key (kbd "\"") 'mu4e-view-headers-prev 'mu4e-view-mode-map)
           (bind-key (kbd "f") 'mu4e-view-go-to-url 'mu4e-view-mode-map)
+
 
           (defun ch:ct (clist)
             "Transform candidate into (display . real)"
@@ -1717,6 +1726,11 @@ This will replace the last notification sent with this function."
             ;; Outgoing mails get format=flowed.
             ;; (use-hard-newlines t 'guess)
             ;; Sign messages by default
+
+            ;; If we have no contacts try filling them again.
+            (if (not mu4e~contacts)
+                (mu4e~request-contacts))
+
             (mml-secure-message-sign-pgpmime))
           (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
 
@@ -1853,10 +1867,10 @@ This will replace the last notification sent with this function."
           (setq
             ;; "Date         Flgs   List       From                   Subject
             mu4e-headers-fields (quote (
-                                         (:flags          .  5)
-                                         (:human-date     . 15)
-                                         (:from           . 26)
-                                         (:list-or-dir    . 30)
+                                         (:flags          .  4)
+                                         (:human-date     . 12)
+                                         (:from           . 18)
+                                         ;; (:list-or-dir    . 30)
                                          (:thread-subject . nil))))
 
           )
@@ -2067,6 +2081,9 @@ This will replace the last notification sent with this function."
         ;; (if (file-exists-p "/usr/local/bin/python"  )
         ;; (setenv "PYMACS_PYTHON" "/usr/local/bin/python"))
 
+        ;; XXX Hack to get rid of warning, need to fix this differently.
+        (setq python-shell-completion-native-enable nil)
+
         (defun python-sort-import-list ()
           "Split an single import lines with multiple module imports into separate lines sort results"
           (interactive)
@@ -2235,6 +2252,21 @@ This will replace the last notification sent with this function."
          org-src-tab-acts-natively t
          org-src-window-setup 'current-window
 
+
+
+         (defun org-update-inline-images ()
+           (when org-inline-image-overlays
+             (org-redisplay-inline-images)))
+         (add-hook 'org-babel-after-execute-hook 'org-update-inline-images)
+
+         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+         ;; Refile Or Delete Me, from my grpahiv file.
+         (defun _graphviz/post-init-org ()
+           (with-eval-after-load 'org
+             (message "XXXRAN")
+             (add-to-list 'org-src-lang-modes  '("dot" . graphviz-dot))))
+         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
          ;; Exports
          org-export-latex-emphasis-alist (quote (("*" "\\textbf{%s}" nil)
                                                  ("/" "\\emph{%s}" nil)
@@ -2269,13 +2301,26 @@ This will replace the last notification sent with this function."
          ;; org-icalendar-use-scheduled '(event-if-todo event-if-not-todo todo-start)
          ;; org-icalendar-with-timestamps t
 
+         ;; (setq org-capture-templates
+         ;; '(
+         ;;   ("m" "Mail options")
+
+         ;;   ("mt" "mailtodo"
+         ;;    entry (file+datetree "~/s/notes/tasks.org")
+         ;;    "* TODO %^{Task} : %:subject %^G\nSCHEDULED: %t\n- From :: %:from\n- Subject :: %:subject\n- Email :: %a\n\n%?" :kill-buffer t)
+
+         ;;   ("mn" "mailnote"
+         ;;    entry (file+headline "~/s/notes/notes.org" "general notes and tasks")
+         ;;    "* %^{Title} : %:subject %^G\n- From :: %:from\n- Subject :: %:subject\n- Email :: %a\n\n%?\n\n%U")
+         ;;   ))
+
          org-capture-templates
          '(
            ("t" "Todo" entry (file+headline (concat org-directory "/notes.org") "Tasks")
             "* TODO %?\nCreated: %t\nAnnotation: %a\n")
 
            ("m" "Mail Followup" entry (file+headline (concat org-directory "/notes.org") "Mail")
-            "* Mail TODO Read Mail%? ([f: %:fromname]: %:subject)\n%U\nMessage: %a\n")
+            "* Mail TODO Read Mail %^{Title} %? ([%:from]: %:subject)\n%U\nMessage: %a\n\n%?\n\n%U")
 
            ("c" "Code Todo" entry (file+headline (concat org-directory "/notes.org") "Code Todo")
             "* Code TODO %?\nCreated: %t\nAnnotation: %a\n")
@@ -2869,6 +2914,9 @@ This will replace the last notification sent with this function."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(erc-input-face ((t (:foreground "cornflowerblue"))))
+ '(font-lock-comment-delimiter-face ((t (:foreground "grey33"))))
+ '(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic))))
  '(irfc-head-name-face ((t (:inherit org-level-1))))
  '(irfc-head-number-face ((t (:inherit org-level-1))))
  '(irfc-rfc-link-face ((t (:inherit org-link)))))
@@ -2889,7 +2937,7 @@ This will replace the last notification sent with this function."
  '(magit-diff-use-overlays nil)
  '(package-selected-packages
    (quote
-    (zonokai-theme zenburn-theme zen-and-art-theme yapfify yaml-mode xterm-color ws-butler window-numbering which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme tronesque-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd sunny-day-theme sublime-themes subatomic256-theme subatomic-theme stickyfunc-enhance stekene-theme srefactor spacemacs-theme spaceline powerline spacegray-theme soothe-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs rebox2 ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme professional-theme popwin planet-theme pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools tablist pcre2el pbcopy pastels-on-dark-theme paradox spinner osx-trash osx-dictionary orgit organic-green-theme org2blog org-projectile org-present org-pomodoro org-plus-contrib org-download org-caldav org org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme niflheim-theme neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert ht alert log4e gntp move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme metaweblog xml-rpc material-theme markdown-toc markdown-mode majapahit-theme magit-gitflow macrostep lush-theme lua-mode lorem-ipsum livid-mode skewer-mode simple-httpd live-py-mode linum-relative link-hint light-soap-theme less-css-mode launchctl json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jbeans-theme jazz-theme jade-mode irfc ir-black-theme inkpot-theme info+ indent-guide ietf-docs ido-vertical-mode hydra hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation heroku-theme hemisu-theme help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make projectile helm-gtags helm-gitignore request helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag hc-zenburn-theme haml-mode gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate golden-ratio go-eldoc gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md ggtags gandalf-theme flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck pkg-info epl flx-ido flx flatui-theme flatland-theme fish-mode firebelly-theme fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit magit magit-popup git-commit with-editor evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight espresso-theme eshell-z eshell-prompt-extras esh-help erc-social-graph erc-image erc-hl-nicks emmet-mode elisp-slime-nav dumb-jump drupal-mode php-mode dracula-theme dockerfile-mode django-theme disaster diminish darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode company-web web-completion-data company-tern dash-functional tern company-statistics company-shell company-go go-mode company-c-headers company-auctex company-anaconda company column-enforce-mode colorsarenice-theme color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode cmake-mode clues-theme clean-aindent-mode clang-format cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme bind-map bind-key badwolf-theme auto-yasnippet yasnippet auto-highlight-symbol auto-dictionary auto-compile packed auctex apropospriate-theme anti-zenburn-theme anaconda-mode pythonic f dash s ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core async ac-ispell auto-complete popup quelpa package-build)))
+    (go-guru sourcerer-theme insert-shebang hide-comnt helm-purpose window-purpose imenu-list pug-mode magit-gh-pulls github-search github-clone github-browse-file gist gh marshal logito pcache zonokai-theme zenburn-theme zen-and-art-theme yapfify yaml-mode xterm-color ws-butler window-numbering which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme tronesque-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd sunny-day-theme sublime-themes subatomic256-theme subatomic-theme stickyfunc-enhance stekene-theme srefactor spacemacs-theme spaceline powerline spacegray-theme soothe-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs rebox2 ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme professional-theme popwin planet-theme pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools tablist pcre2el pbcopy pastels-on-dark-theme paradox spinner osx-trash osx-dictionary orgit organic-green-theme org2blog org-projectile org-present org-pomodoro org-plus-contrib org-download org-caldav org org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme niflheim-theme neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert ht alert log4e gntp move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme metaweblog xml-rpc material-theme markdown-toc markdown-mode majapahit-theme magit-gitflow macrostep lush-theme lua-mode lorem-ipsum livid-mode skewer-mode simple-httpd live-py-mode linum-relative link-hint light-soap-theme less-css-mode launchctl json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jbeans-theme jazz-theme jade-mode irfc ir-black-theme inkpot-theme info+ indent-guide ietf-docs ido-vertical-mode hydra hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation heroku-theme hemisu-theme help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make projectile helm-gtags helm-gitignore request helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag hc-zenburn-theme haml-mode gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate golden-ratio go-eldoc gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md ggtags gandalf-theme flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck pkg-info epl flx-ido flx flatui-theme flatland-theme fish-mode firebelly-theme fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit magit magit-popup git-commit with-editor evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight espresso-theme eshell-z eshell-prompt-extras esh-help erc-social-graph erc-image erc-hl-nicks emmet-mode elisp-slime-nav dumb-jump drupal-mode php-mode dracula-theme dockerfile-mode django-theme disaster diminish darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode company-web web-completion-data company-tern dash-functional tern company-statistics company-shell company-go go-mode company-c-headers company-auctex company-anaconda company column-enforce-mode colorsarenice-theme color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode cmake-mode clues-theme clean-aindent-mode clang-format cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme bind-map bind-key badwolf-theme auto-yasnippet yasnippet auto-highlight-symbol auto-dictionary auto-compile packed auctex apropospriate-theme anti-zenburn-theme anaconda-mode pythonic f dash s ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core async ac-ispell auto-complete popup quelpa package-build)))
  '(safe-local-variable-values
    (quote
     ((docker-image-name . "hyperv")
