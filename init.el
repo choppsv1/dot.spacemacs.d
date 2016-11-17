@@ -29,13 +29,10 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
-      ;; ----------------------------------------------------------------
-      ;; Example of useful layers you may want to use right away.
-      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
-      ;; <M-m f e R> (Emacs style) to install them.
-      ;; ----------------------------------------------------------------
-      ;; spacemacs-ivy
+      ;; Choose either ivy or helm as completion framework
+      ;; ivy
       helm
+
       (auto-completion :variables
                        auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets"
                        ;; auto-completion-tab-key-behavior 'complete
@@ -48,22 +45,19 @@ values."
       ;;   auto-completion-tab-key-behavior 'complete
       ;;   )
       ;; company-complete vs complete-at-point
-
-
-      (osx :variables
-        osx-use-option-as-meta t)
-
       better-defaults
-
-      gtags
-
-      mu4e
-
       github
       graphviz
+      gtags
+      ;;(ietf :variables ietf-docs-cache "~/ietf-docs-cache")
+      ietf
+      jabber
+      mu4e
       org
       (org2blog :variables org2blog-name "hoppsjots.org")
       ;; pandoc
+      (osx :variables
+           osx-use-option-as-meta t)
       pdf-tools
       ranger
 
@@ -83,18 +77,16 @@ values."
       themes-megapack
       ;; version-control
 
-      ;;(ietf :variables ietf-docs-cache "~/ietf-docs-cache")
-      ietf
-
+      ;; ---------
       ;; Languages
-      php
-      csv
+      ;; ---------
 
+      php ;; this is here I think to avoid a bug if we put it in alpha order
+      csv
       (c-c++ :variables
              c-c++-default-mode-for-headers 'c-mode
              c-c++-enable-clang-support t)
       emacs-lisp
-      semantic
       git
       go
       html
@@ -103,11 +95,17 @@ values."
       lua
       markdown
       (python :variables python-fill-column 120)
+      ;; disable emacs-lisp due to completionion in comments parsing tons
+      ;; of .el files https://github.com/syl20bnr/spacemacs/issues/7038
+      (semantic :disabled-for emacs-lisp)
       shell-scripts
       systemd
       yaml
 
-      ;; Let's keep this later.
+
+      ;; -----------------------------
+      ;; Let's keep this later. (why?)
+      ;; -----------------------------
       (erc :variables
            erc-server-list
            '(("irc.freenode.net"
@@ -168,7 +166,7 @@ values."
     (setq xres (replace-regexp-in-string "\n\\'" "" xres))
     ;; (setq yres (replace-regexp-in-string "\n\\'" "" yres))
     (when (<= (string-to-number xres) 3000)
-      (setq ch-def-height 10.0)))
+      (setq ch-def-height 9.0)))
   ;; (message "def height %s" ch-def-height)
 
 
@@ -406,7 +404,7 @@ values."
                          ;; clues
                          ;; cobalt
                          ;; colonoscopy
-                         colorsarenice-dark
+                         ;; colorsarenice-dark
                          ;; colorsarenice-light
                          ;; comidia
                          ;; cyberpunk
@@ -876,13 +874,13 @@ user code here.  The exception is org related code, which should be placed in `d
                                         (font-lock-doc-face :foreground "#036A07" :slant italic)
                                         (font-lock-comment-face :foreground "#6D6D64" :slant italic)
                                         (font-lock-comment-delimiter-face :foreground "#BDBDA4"))
-                                (colorsarenice-light (erc-input-face :foreground "cornflowerblue")
-                                                     (spacemacs-micro-state-header-face :foreground "Black")
-                                                     (powerline-active1 :background "DarkSlateGrey" :foreground "LightBlue")
-                                                     (powerline-inactive2 :background "DarkSlateGrey" :foreground "LightRed")
-                                                     (powerline-inactive1 :background "DarkSlateGrey" :foreground "LightGrey")
-                                                      (font-lock-comment-face :foreground "grey44" :slant italic)
-                                                      (font-lock-comment-delimiter-face :foreground "grey77"))
+                                ;; (colorsarenice-light (erc-input-face :foreground "cornflowerblue")
+                                ;;                      (spacemacs-micro-state-header-face :foreground "Black")
+                                ;;                      (powerline-active1 :background "DarkSlateGrey" :foreground "LightBlue")
+                                ;;                      (powerline-inactive2 :background "DarkSlateGrey" :foreground "LightRed")
+                                ;;                      (powerline-inactive1 :background "DarkSlateGrey" :foreground "LightGrey")
+                                ;;                       (font-lock-comment-face :foreground "grey44" :slant italic)
+                                ;;                       (font-lock-comment-delimiter-face :foreground "grey77"))
                                 ))
 
 
@@ -1017,12 +1015,14 @@ layers configuration. You are free to put any user code."
   ;;              (configuration-layer/layer-usedp 'gtags))
   ;;     (add-hook 'emacs-lisp-mode-hook '(lambda () (ggtags-mode 1))))
 
-    ;; Everything uses 4 space indent
-    ;; (dolist (c spacemacs--indent-variable-alist)
-    ;;   (if (listp (cdr c))
-    ;;       (dolist (x (cdr c)) (setq-default x 8))
-    ;;     (setq-default (cdr c) 8)))
 
+
+    ;; have to allow-emacs-pinentry in gpg-agent.conf?
+    ;; (setenv "INSIDE_EMACS" (format "%s,comint" emacs-version))
+    ;; (pinentry-start)
+
+    ;; Most everything use 4 space indent. This variable is a collection of
+    ;; the values used by various modes join-line
     (dolist (e spacemacs--indent-variable-alist)
       (if (symbolp (cdr e))
           (if (not (eq 'lisp-indent-offset (cdr e)))
@@ -1177,6 +1177,9 @@ layers configuration. You are free to put any user code."
                           (map2 (lookup-key spacemacs-default-map key2)))
                       (spacemacs/set-leader-keys key1 map2 key2 map1)))
                   (dear-leader/swap-keys "am" "aM")
+
+                  (global-set-key (kbd "M-n") 'next-error)
+                  (global-set-key (kbd "M-p") 'previous-error)
 
                   (global-set-key (kbd "C-\\") 'spacemacs/layouts-transient-state/persp-next)
                   (global-set-key (kbd "C-]") 'ggtags-find-tag-dwim))
@@ -1442,6 +1445,17 @@ This will replace the last notification sent with this function."
        )
       )
 
+    (when (configuration-layer/layer-usedp 'jabber)
+      (setq ssl-program-name "gnutls-cli"
+            ssl-program-arguments '("--insecure" "-p" service host)
+            ssl-certificate-verification-policy 1)
+
+      (setq jabber-account-list '(("choppsv2@localhost"
+                                   (:port . 5222)
+                                   (:password . "foobar"))))
+                                   ;;(:connection-type . ssl))))
+      )
+
     ;; ======
     ;; Email
     ;; ======
@@ -1481,6 +1495,7 @@ This will replace the last notification sent with this function."
 
         mu4e-context-policy 'pick-first
         mu4e-compose-context-policy 'ask-if-none
+        mu4e-compose-complete-only-after "2015-01-01"
 
         ;; -----------
         ;; [b]ookmarks
@@ -1647,6 +1662,7 @@ This will replace the last notification sent with this function."
                                     :match-func (lambda (msg)
                                                   (and msg (string-match "/chopps.org/.*" (mu4e-message-field msg :maildir))))
                                     :vars '((user-mail-address  . "chopps@chopps.org")
+                                            (user-full-name . "Christian Hopps")
                                              ;; mu4e
                                              (mu4e-sent-folder   . "/chopps.org/Sent Messages")
                                              (mu4e-trash-folder  . "/chopps.org/Deleted Messages")
@@ -1662,6 +1678,7 @@ This will replace the last notification sent with this function."
                                     :match-func (lambda (msg)
                                                   (and msg (string-match "/dev.terastrm.net/.*" (mu4e-message-field msg :maildir))))
                                     :vars '((user-mail-address  . "chopps@dev.terastrm.net")
+                                            (user-full-name . "Christian Hopps")
                                              ;; mu4e
                                              (mu4e-sent-folder   . "/dev.terastrm.net/Sent Messages")
                                              (mu4e-trash-folder  . "/dev.terastrm.net/Deleted Messages")
@@ -1677,6 +1694,7 @@ This will replace the last notification sent with this function."
                                     :match-func (lambda (msg)
                                                   (and msg (string-match "/gmail.com/.*" (mu4e-message-field msg :maildir))))
                                     :vars '((user-mail-address  . "chopps@gmail.com")
+                                            (user-full-name . "Christian Hopps")
                                              ;; mu4e
                                              (mu4e-drafts-folder . "/gmail.com/[Gmail].Drafts")
                                              (mu4e-sent-folder   . "/gmail.com/[Gmail].Sent Mail")
@@ -1870,12 +1888,14 @@ This will replace the last notification sent with this function."
                                          (:flags          .  4)
                                          (:human-date     . 12)
                                          (:from           . 18)
-                                         ;; (:list-or-dir    . 30)
-                                         (:thread-subject . nil))))
+                                         (:list-or-dir    . 20)
+                                         (:thread-subject . nil)
+                                         )))
 
           )
         )
       )
+
     ;; =================
     ;; Programming Modes
     ;; =================
@@ -1902,6 +1922,7 @@ This will replace the last notification sent with this function."
         (add-hook 'lisp-mode-hook 'rebox-lisp-hook)
         (add-hook 'emacs-lisp-mode-hook 'rebox-lisp-hook)
         ))
+
     (when (configuration-layer/layer-usedp 'c-c++)
       (setq c-font-lock-extra-types
             (quote
@@ -2252,21 +2273,6 @@ This will replace the last notification sent with this function."
          org-src-tab-acts-natively t
          org-src-window-setup 'current-window
 
-
-
-         (defun org-update-inline-images ()
-           (when org-inline-image-overlays
-             (org-redisplay-inline-images)))
-         (add-hook 'org-babel-after-execute-hook 'org-update-inline-images)
-
-         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-         ;; Refile Or Delete Me, from my grpahiv file.
-         (defun _graphviz/post-init-org ()
-           (with-eval-after-load 'org
-             (message "XXXRAN")
-             (add-to-list 'org-src-lang-modes  '("dot" . graphviz-dot))))
-         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
          ;; Exports
          org-export-latex-emphasis-alist (quote (("*" "\\textbf{%s}" nil)
                                                  ("/" "\\emph{%s}" nil)
@@ -2293,7 +2299,7 @@ This will replace the last notification sent with this function."
 
          ;; capture the search instead of the highlighted message in
          ;; headers view
-         org-mu4e-link-query-in-headers-mode t
+         org-mu4e-link-query-in-headers-mode nil
 
          ;; XXX investigate this more
          ;; org-icalendar-include-todo t
@@ -2317,19 +2323,19 @@ This will replace the last notification sent with this function."
          org-capture-templates
          '(
            ("t" "Todo" entry (file+headline (concat org-directory "/notes.org") "Tasks")
-            "* TODO %?\nCreated: %t\nAnnotation: %a\n")
+            "* TODO %^{Title}%?\nDEADLINE: %^t CREATED: %u\nAnnotation: %a\n\n")
 
-           ("m" "Mail Followup" entry (file+headline (concat org-directory "/notes.org") "Mail")
-            "* Mail TODO Read Mail %^{Title} %? ([%:from]: %:subject)\n%U\nMessage: %a\n\n%?\n\n%U")
+           ("m" "Mail Todo" entry (file+headline (concat org-directory "/notes.org") "Mail")
+            "* TODO [Mail] %^{Title|%:subject}%? ([%:from])\nDEADLINE: %^t CREATED: %u\nMessage: %a\n\n")
 
            ("c" "Code Todo" entry (file+headline (concat org-directory "/notes.org") "Code Todo")
-            "* Code TODO %?\nCreated: %t\nAnnotation: %a\n")
-
-           ("L" "Mac Link Note" entry (file+headline (concat org-directory "/notes.org") "Notes")
-            "* NOTE %?\n%u\n%(org-mac-safari-get-frontmost-url)\n")
+            "* TODO [Code] %^{Title}\nDEADLINE: %^t\nCREATED: %u\nAnnotation: %a\n%?\n\n")
 
            ("n" "Generic Note" entry (file+headline (concat org-directory "/notes.org") "Notes")
             "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
+
+           ("L" "Mac Link Note" entry (file+headline (concat org-directory "/notes.org") "Notes")
+            "* NOTE %?\n%u\n%(org-mac-safari-get-frontmost-url)\n")
 
            ("s" "Status" entry (file+datetree (concat org-directory "/status.org"))
             "* NOTE %?\n%u\n")
@@ -2373,6 +2379,20 @@ This will replace the last notification sent with this function."
            ("wn" "Generic Note" entry (file+headline (concat org-directory "/work.org") "Notes")
             "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
            ))
+
+        (defun org-update-inline-images ()
+          (when org-inline-image-overlays
+            (org-redisplay-inline-images)))
+        (add-hook 'org-babel-after-execute-hook 'org-update-inline-images)
+
+        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        ;; Refile Or Delete Me, from my grpahiv file.
+        (defun _graphviz/post-init-org ()
+          (with-eval-after-load 'org
+            (message "XXXRAN")
+            (add-to-list 'org-src-lang-modes  '("dot" . graphviz-dot))))
+         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
         ;; not defined
         ;; (org-crypt-use-before-save-magic)
@@ -2920,6 +2940,7 @@ This will replace the last notification sent with this function."
  '(irfc-head-name-face ((t (:inherit org-level-1))))
  '(irfc-head-number-face ((t (:inherit org-level-1))))
  '(irfc-rfc-link-face ((t (:inherit org-link)))))
+
 ;; Local Variables:
 ;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
 ;; End:
@@ -2937,7 +2958,7 @@ This will replace the last notification sent with this function."
  '(magit-diff-use-overlays nil)
  '(package-selected-packages
    (quote
-    (go-guru sourcerer-theme insert-shebang hide-comnt helm-purpose window-purpose imenu-list pug-mode magit-gh-pulls github-search github-clone github-browse-file gist gh marshal logito pcache zonokai-theme zenburn-theme zen-and-art-theme yapfify yaml-mode xterm-color ws-butler window-numbering which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme tronesque-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd sunny-day-theme sublime-themes subatomic256-theme subatomic-theme stickyfunc-enhance stekene-theme srefactor spacemacs-theme spaceline powerline spacegray-theme soothe-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs rebox2 ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme professional-theme popwin planet-theme pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools tablist pcre2el pbcopy pastels-on-dark-theme paradox spinner osx-trash osx-dictionary orgit organic-green-theme org2blog org-projectile org-present org-pomodoro org-plus-contrib org-download org-caldav org org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme niflheim-theme neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert ht alert log4e gntp move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme metaweblog xml-rpc material-theme markdown-toc markdown-mode majapahit-theme magit-gitflow macrostep lush-theme lua-mode lorem-ipsum livid-mode skewer-mode simple-httpd live-py-mode linum-relative link-hint light-soap-theme less-css-mode launchctl json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jbeans-theme jazz-theme jade-mode irfc ir-black-theme inkpot-theme info+ indent-guide ietf-docs ido-vertical-mode hydra hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation heroku-theme hemisu-theme help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make projectile helm-gtags helm-gitignore request helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag hc-zenburn-theme haml-mode gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate golden-ratio go-eldoc gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md ggtags gandalf-theme flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck pkg-info epl flx-ido flx flatui-theme flatland-theme fish-mode firebelly-theme fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit magit magit-popup git-commit with-editor evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight espresso-theme eshell-z eshell-prompt-extras esh-help erc-social-graph erc-image erc-hl-nicks emmet-mode elisp-slime-nav dumb-jump drupal-mode php-mode dracula-theme dockerfile-mode django-theme disaster diminish darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode company-web web-completion-data company-tern dash-functional tern company-statistics company-shell company-go go-mode company-c-headers company-auctex company-anaconda company column-enforce-mode colorsarenice-theme color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode cmake-mode clues-theme clean-aindent-mode clang-format cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme bind-map bind-key badwolf-theme auto-yasnippet yasnippet auto-highlight-symbol auto-dictionary auto-compile packed auctex apropospriate-theme anti-zenburn-theme anaconda-mode pythonic f dash s ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core async ac-ispell auto-complete popup quelpa package-build)))
+    (jabber fsm go-guru sourcerer-theme insert-shebang hide-comnt helm-purpose window-purpose imenu-list pug-mode magit-gh-pulls github-search github-clone github-browse-file gist gh marshal logito pcache zonokai-theme zenburn-theme zen-and-art-theme yapfify yaml-mode xterm-color ws-butler window-numbering which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme tronesque-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd sunny-day-theme sublime-themes subatomic256-theme subatomic-theme stickyfunc-enhance stekene-theme srefactor spacemacs-theme spaceline powerline spacegray-theme soothe-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs rebox2 ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme professional-theme popwin planet-theme pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools tablist pcre2el pbcopy pastels-on-dark-theme paradox spinner osx-trash osx-dictionary orgit organic-green-theme org2blog org-projectile org-present org-pomodoro org-plus-contrib org-download org-caldav org org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme niflheim-theme neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert ht alert log4e gntp move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme metaweblog xml-rpc material-theme markdown-toc markdown-mode majapahit-theme magit-gitflow macrostep lush-theme lua-mode lorem-ipsum livid-mode skewer-mode simple-httpd live-py-mode linum-relative link-hint light-soap-theme less-css-mode launchctl json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jbeans-theme jazz-theme jade-mode irfc ir-black-theme inkpot-theme info+ indent-guide ietf-docs ido-vertical-mode hydra hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation heroku-theme hemisu-theme help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make projectile helm-gtags helm-gitignore request helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag hc-zenburn-theme haml-mode gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate golden-ratio go-eldoc gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md ggtags gandalf-theme flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck pkg-info epl flx-ido flx flatui-theme flatland-theme fish-mode firebelly-theme fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit magit magit-popup git-commit with-editor evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight espresso-theme eshell-z eshell-prompt-extras esh-help erc-social-graph erc-image erc-hl-nicks emmet-mode elisp-slime-nav dumb-jump drupal-mode php-mode dracula-theme dockerfile-mode django-theme disaster diminish darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode company-web web-completion-data company-tern dash-functional tern company-statistics company-shell company-go go-mode company-c-headers company-auctex company-anaconda company column-enforce-mode colorsarenice-theme color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode cmake-mode clues-theme clean-aindent-mode clang-format cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme bind-map bind-key badwolf-theme auto-yasnippet yasnippet auto-highlight-symbol auto-dictionary auto-compile packed auctex apropospriate-theme anti-zenburn-theme anaconda-mode pythonic f dash s ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core async ac-ispell auto-complete popup quelpa package-build)))
  '(safe-local-variable-values
    (quote
     ((docker-image-name . "hyperv")
@@ -2951,3 +2972,7 @@ This will replace the last notification sent with this function."
      (org-confirm-babel-evaluate)
      (eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)"))))
  '(send-mail-function (quote smtpmail-send-it)))
+
+;; Local Variables:
+;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
+;; End:
