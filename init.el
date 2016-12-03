@@ -840,7 +840,8 @@ user code here.  The exception is org related code, which should be placed in `d
   (if (file-accessible-directory-p "~/Dropbox/org-mode")
       (setq
        org-directory "~/Dropbox/org-mode"
-       org-agenda-file "~/Dropbox/org-mode"))
+       org-agenda-file "~/Dropbox/org-mode")
+    (setq org-directory "~/org"))
 
   (setq
    debug-init-msg nil
