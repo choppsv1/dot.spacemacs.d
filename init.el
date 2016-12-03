@@ -821,8 +821,9 @@ user code here.  The exception is org related code, which should be placed in `d
   ;; User-init
   ;; ---------
 
-  (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp"))
+  (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   (add-to-list 'load-path (concat dotspacemacs-directory "themes-test/"))
+  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "local-lisp/"))
   (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "themes-test/"))
   (add-to-list 'load-path (concat "~/p/ietf-docs"))
   ;;(require 'iterm-custom-keys)
