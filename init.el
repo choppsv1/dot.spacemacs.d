@@ -822,8 +822,9 @@ user code here.  The exception is org related code, which should be placed in `d
   ;; User-init
   ;; ---------
 
-  (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp"))
+  (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   (add-to-list 'load-path (concat dotspacemacs-directory "themes-test/"))
+  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "local-lisp/"))
   (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "themes-test/"))
   (add-to-list 'load-path (concat "~/p/ietf-docs"))
   ;;(require 'iterm-custom-keys)
@@ -833,9 +834,18 @@ user code here.  The exception is org related code, which should be placed in `d
 
   (auto-insert-mode)
 
+  (if (file-accessible-directory-p "~/Dropbox")
+      (setq dropbox-directory "~/Dropbox")
+    (setq dropbox-directory nil))
+
+  (if (file-accessible-directory-p "~/Dropbox/org-mode")
+      (setq
+       org-directory "~/Dropbox/org-mode"
+       org-agenda-file "~/Dropbox/org-mode")
+    (setq org-directory "~/org"))
+
   (setq
    debug-init-msg nil
-   dropbox-directory "~/Dropbox"
    evil-search-wrap nil
    evil-want-C-i-jump nil
    ;; This is very annoying to have to set, visual highlight in evil is hijacking PRIMARY selection
@@ -844,8 +854,6 @@ user code here.  The exception is org related code, which should be placed in `d
    ;; evil-esc-delay 0.001
    ;; js2-basic-offset 2
    ;; js-indent-level 1
-   org-directory "~/Dropbox/org-mode"
-   org-agenda-files '("~/Dropbox/org-mode")
    org-protocol-default-template-key "t"
 
    ;; This really should be a file local variable.
@@ -1591,18 +1599,24 @@ This will replace the last notification sent with this function."
         mu4e-headers-visible-columns 80
 
         ;; XXX Try running w/o this to see if hangs go away.
-        mu4e-html2text-command 'mu4e-shr2text
+        ;; mu4e-html2text-command 'mu4e-shr2text
+        ;; mu4e-html2text-command "html2text -nobs -utf8 -width 120"
+        ;; mu4e-html2text-command "html2text --unicode-snob | grep -v '&nbsp_place_holder;'"
+        mu4e-html2text-command "html2text -b 0 --unicode-snob"
+        ;; mu4e-html2text-command "w3m -dump -cols 120 -T text/html"
+
 
         ;; used ofr HTML in email ;; <#part type="message/rfc822" filename="/home/chopps/Documents/imap-accounts/chopps.org/sw-common/cur/1460249763.39525_8697.tops,U=242:2,S" disposition=attachment description="Re: Mail not correctly displayed"> <#/part>
 
-        ;; mu4e-html2text-command "w3m -dump -cols 120 -T text/html"
 
         ;; make work better in dark themes
         ;; [[mu4e:msgid:87vb7ng3tn.fsf@djcbsoftware.nl][Re: I find html2markdown the best value for mu4e-html2text-command]]
-        shr-color-visible-luminance-min 80
-        mu4e-view-html-plaintext-ratio-heuristic 15
 
-        ;; mu4e-html2text-command "html2text -nobs -utf8 -width 120"
+        shr-color-visible-luminance-min 80
+
+        ;; this is keeping it from toggling I think
+        ;; mu4e-view-html-plaintext-ratio-heuristic 15
+
 
 
         mu4e-use-fancy-chars nil
@@ -1731,6 +1745,12 @@ This will replace the last notification sent with this function."
               (helm-build-sync-source "mu4e contacts"
                 :candidates mu4e~contact-list :candidate-transformer 'ch:ct)))
 
+
+          (defun my-mu4e-view-hook ()
+            "Possibly switch to htlm mode"
+            t)
+          (add-hook 'mu4e-view-mode-hook 'my-mu4e-view-hook)
+
           (defun my-mu4e-compose-hook ()
             "Setup outgoing messages"
             ;; Add chopps@<account-sending-from> to CC
@@ -1797,6 +1817,7 @@ This will replace the last notification sent with this function."
 
           (add-hook 'mu4e-view-mode-hook
                     (lambda () (setq show-trailing-whitespace nil)))
+
 
           (defun mu4e-pre-hook-udpate-command ()
             (let ((check (% mu4e-pre-hook-count 4)))
@@ -2974,6 +2995,12 @@ This will replace the last notification sent with this function."
      (eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)"))))
  '(send-mail-function (quote smtpmail-send-it)))
 
+(defun dotspacemacs/emacs-custom-settings ()
+  "Emacs custom settings.
+This is an auto-generated function, do not modify its content directly, use
+Emacs customize menu instead.
+This function is called at the very end of Spacemacs initialization."
+  )
 ;; Local Variables:
 ;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
 ;; End:
