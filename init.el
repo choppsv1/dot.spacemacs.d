@@ -94,7 +94,9 @@ values."
       (latex :variables latex-build-command "latexmk")
       lua
       markdown
-      (python :variables python-fill-column 120)
+      ;; Primary test runner is pytest use 'SPC u' prefix to invoke nose
+      (python :variables python-fill-column 120
+                         python-test-runner '(pytest nose))
       ;; disable emacs-lisp due to completionion in comments parsing tons
       ;; of .el files https://github.com/syl20bnr/spacemacs/issues/7038
       (semantic :disabled-for emacs-lisp)
@@ -159,7 +161,7 @@ You should not put any user code in there besides modifying the variable
 values."
   ;; mDetermine display size to pick font size
 
-  (setq ch-def-height 10.5)
+  (setq ch-def-height 9.5)
   (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
         ;; (yres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* [0-9]*x\\([0-9]*\\) .*/\\1/'")))
         )
@@ -838,9 +840,8 @@ user code here.  The exception is org related code, which should be placed in `d
     (setq dropbox-directory nil))
 
   (if (file-accessible-directory-p "~/Dropbox/org-mode")
-      (setq
-       org-directory "~/Dropbox/org-mode"
-       org-agenda-file "~/Dropbox/org-mode")
+      (setq org-directory "~/Dropbox/org-mode"
+            org-agenda-files '("~/Dropbox/org-mode"))
     (setq org-directory "~/org"))
 
   (setq
@@ -1039,6 +1040,8 @@ layers configuration. You are free to put any user code."
 
     ;; (setq-default lisp-indent-offset nil)
       ;; (setq emacs-lisp-mode lisp-mode) . lisp-indent-offset)
+
+    (setq python-indent-offset 4)
 
     ;; overrides
     (setq-default nxml-child-indent 2)
@@ -1601,12 +1604,10 @@ This will replace the last notification sent with this function."
         ;; mu4e-html2text-command 'mu4e-shr2text
         ;; mu4e-html2text-command "html2text -nobs -utf8 -width 120"
         ;; mu4e-html2text-command "html2text --unicode-snob | grep -v '&nbsp_place_holder;'"
-        mu4e-html2text-command "html2text -b 0 --unicode-snob"
-        ;; mu4e-html2text-command "w3m -dump -cols 120 -T text/html"
-
+        ;; mu4e-html2text-command "html2text -b 0 --unicode-snob"
+        mu4e-html2text-command "w3m -dump -cols 120 -T text/html"
 
         ;; used ofr HTML in email ;; <#part type="message/rfc822" filename="/home/chopps/Documents/imap-accounts/chopps.org/sw-common/cur/1460249763.39525_8697.tops,U=242:2,S" disposition=attachment description="Re: Mail not correctly displayed"> <#/part>
-
 
         ;; make work better in dark themes
         ;; [[mu4e:msgid:87vb7ng3tn.fsf@djcbsoftware.nl][Re: I find html2markdown the best value for mu4e-html2text-command]]
@@ -1615,8 +1616,7 @@ This will replace the last notification sent with this function."
 
         ;; this is keeping it from toggling I think
         ;; mu4e-view-html-plaintext-ratio-heuristic 15
-
-
+        mu4e-view-html-plaintext-ratio-heuristic 0
 
         mu4e-use-fancy-chars nil
         ;; mu4e-headers-has-child-prefix    '(" ┬●")  ; Parent
@@ -2672,6 +2672,7 @@ This will replace the last notification sent with this function."
       (require 'org-notify)
       (defun org-notify-action-notify-urgency (plist)
         "Pop up a notification window."
+        (message "XXX org-notify-action-notify-urgency enter")
         (require 'notifications)
         (let* ((duration (plist-get plist :duration))
                (urgency (pilst-get plist :urgency))
@@ -2683,14 +2684,16 @@ This will replace the last notification sent with this function."
                     :actions   org-notify-actions
                     :on-action 'org-notify-on-action-notify)))
           (setq org-notify-on-action-map
-                (plist-put org-notify-on-action-map id plist))))
+                (plist-put org-notify-on-action-map id plist))
+          (message "XXX org-notify-action-notify-urgency exit")
+          ))
 
       (org-notify-add '('default
                          :time "1h"
                          :period "30m"
                          :duration 0
                          :urgency 'critical
-                         :app-icon (concat (configuration-layer/get-layer-path "org")
+                         :app-icon (concat (configuration-layer/get-layer-path 'org)
                                            "img/org.png")
                          :actions 'org-notify-action-notify-urgency))
       (org-notify-start)
