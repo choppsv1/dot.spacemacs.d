@@ -18,7 +18,8 @@ values."
    ;; installation feature and you have to explicitly list a layer in the
    ;; variable `dotspacemacs-configuration-layers' to install it.
    ;; (default 'unused)
-   dotspacemacs-enable-lazy-installation 'unused
+   ;; dotspacemacs-enable-lazy-installation 'unused
+   dotspacemacs-enable-lazy-installation nil ;; required for .m to not load octave mode
    ;; If non-nil then Spacemacs will ask for confirmation before installing
    ;; a layer lazily. (default t)
    dotspacemacs-ask-for-lazy-installation t
