@@ -1194,7 +1194,8 @@ layers configuration. You are free to put any user code."
                   (global-set-key (kbd "M-p") 'previous-error)
 
                   (global-set-key (kbd "C-\\") 'spacemacs/layouts-transient-state/persp-next)
-                  (global-set-key (kbd "C-]") 'ggtags-find-tag-dwim))
+                  (global-set-key (kbd "C-]") 'ggtags-find-tag-dwim)
+                  )
 
     ;; ==========
     ;; Messaging
@@ -2732,8 +2733,8 @@ This will replace the last notification sent with this function."
 
     ;; Use ggtags not generic evil-jump-to-tag, would be nice to simply undefine
     ;; Map it everywhere else as well.
+
     (define-key evil-normal-state-map (kbd "C-]") 'ggtags-find-tag-dwim)
-    (global-set-key (kbd "C-]") 'ggtags-find-tag-dwim)
 
     ;; ---------------------
     ;; Auto insert templates
