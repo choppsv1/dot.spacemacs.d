@@ -1,4 +1,6 @@
 ;; -*- mode: emacs-lisp -*-
+;; This file is loaded by Spacemacs at startup.
+;; It must be stored in your home directory.
 
 (defun dotspacemacs/layers ()
   "Configuration Layers declaration.
@@ -31,8 +33,7 @@ values."
    dotspacemacs-configuration-layers
    '(
       ;; Choose either ivy or helm as completion framework
-      ;; ivy
-      helm
+      ivy
 
       (auto-completion :variables
                        auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets"
@@ -47,6 +48,7 @@ values."
       ;;   )
       ;; company-complete vs complete-at-point
       better-defaults
+      docker
       github
       graphviz
       gtags
@@ -73,7 +75,8 @@ values."
       ;; nginx
       spell-checking
       ;; spotify
-      syntax-checking
+      (syntax-checking :variables syntax-checking-enable-tooltips t)
+
       theming
       themes-megapack
       ;; version-control
@@ -97,7 +100,9 @@ values."
       markdown
       ;; Primary test runner is pytest use 'SPC u' prefix to invoke nose
       (python :variables python-fill-column 120
-                         python-test-runner '(pytest nose))
+                         python-test-runner '(pytest nose)
+                         python-auto-set-local-pyvenv-virtualenv nil
+                         python-auto-set-local-pyenv-virtualenv nil)
       ;; disable emacs-lisp due to completionion in comments parsing tons
       ;; of .el files https://github.com/syl20bnr/spacemacs/issues/7038
       (semantic :disabled-for emacs-lisp)
@@ -129,15 +134,25 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(dockerfile-mode monky org-caldav persistent-scratch)
+   dotspacemacs-additional-packages
+   '(
+     dockerfile-mode
+     ;; rfcview
+     monky
+     org-caldav
+     package-lint
+     persistent-scratch
+     )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
    dotspacemacs-excluded-packages
    '(
      ;; vi-tilde-fringe
+     applescript-mode
      erc-yt
      erc-view-log
+     irfc
      mu4e-maildirs-extension
      ;; projectile
      ;; projectile-mode
@@ -162,21 +177,21 @@ You should not put any user code in there besides modifying the variable
 values."
   ;; mDetermine display size to pick font size
 
-  (setq ch-def-height 9.5)
+  (setq ch-def-height 11.0)
   (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
         ;; (yres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* [0-9]*x\\([0-9]*\\) .*/\\1/'")))
         )
     (setq xres (replace-regexp-in-string "\n\\'" "" xres))
     ;; (setq yres (replace-regexp-in-string "\n\\'" "" yres))
-    (when (<= (string-to-number xres) 3000)
-      (setq ch-def-height 9.0)))
+    (if (<= (string-to-number xres) 3000)
+        (setq ch-def-height 10.0)))
   ;; (message "def height %s" ch-def-height)
 
 
   ;; This setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
   (setq-default
-   ;; If non nil ELPA repositories are contacted via HTTPS whenever it's
+   ;; If non-nil ELPA repositories are contacted via HTTPS whenever it's
    ;; possible. Set it to nil if you have no way to use HTTPS in your
    ;; environment, otherwise it is strongly recommended to let it set to t.
    ;; This variable has no effect if Emacs is launched with the parameter
@@ -185,7 +200,7 @@ values."
    dotspacemacs-elpa-https t
    ;; Maximum allowed time in seconds to contact an ELPA repository.
    dotspacemacs-elpa-timeout 5
-   ;; If non nil then spacemacs will check for updates at startup
+   ;; If non-nil then spacemacs will check for updates at startup
    ;; when the current branch is not `develop'. Note that checking for
    ;; new versions works via git commands, thus it calls GitHub services
    ;; whenever you start Emacs. (default nil)
@@ -207,6 +222,8 @@ values."
                                        ;; if nil this forces evil-emacs-state when trying to enter
                                        ;; evilified state
                                        hybrid-mode-enable-evilified-state t
+                                       ;; unknown but needs to be set
+				       hybrid-mode-use-evil-search-module nil
                                        ;; Default evil state when hybrid editing is enabled
                                        hybrid-mode-default-state 'normal)
    ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
@@ -235,8 +252,8 @@ values."
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(
                          ;; colorsarenice-light
-                         misterioso
                          mandm
+                         misterioso
                          leuven
                          ;; quasi-monochrome
                          molokai
@@ -650,9 +667,10 @@ values."
    ;; dotspacemacs-default-font `("Cousine" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; dotspacemacs-default-font `("Courier" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Perfect UTF-8, good sans serif
-   dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
+   dotspacemacs-default-font `("Office Code Pro D" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
+   ;;dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Droid has odd spaced UTF-8
-   ;; dotspacemacs-default-font `("Droid Sans Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
+   ;; dotspacemacs-default-font '("Droid Sans Mono" :size 6.0)
    ;; Monoid has odd spaced UTF-8
    ;; dotspacemacs-default-font `("Monoid" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Very light strokes, can look nice but dim a bit wider again than cousine and ubuntu
@@ -661,7 +679,8 @@ values."
    ;; dotspacemacs-default-font `("Liberation Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; dotspacemacs-default-font `("Source Code Pro for Powerline" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Very condensed -- pretty good for coding -- same odd shapes offs UTF as Liberation Mono
-   ;;  dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
+   ;; dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
+   ;; dotspacemacs-default-font ("Ubuntu Mono" :size 6.0 :weight normal :width normal :powerline-scale 1.4)
     ;; dotspacemacs-default-font '("Source Code Pro"
     ;;                              :size 16.0
     ;;                              :weight normal
@@ -670,6 +689,11 @@ values."
 
    ;; The leader key
    dotspacemacs-leader-key "SPC"
+   ;; The key used for Emacs commands (M-x) (after pressing on the leader key).
+   ;; (default "SPC")
+   dotspacemacs-emacs-command-key "SPC"
+   ;; The key used for Vim Ex commands (default ":")
+   dotspacemacs-ex-command-key ":"
    ;; The leader key accessible in `emacs state' and `insert state'
    ;; (default "M-m")
    dotspacemacs-emacs-leader-key "M-m"
@@ -677,11 +701,8 @@ values."
    ;; pressing `<leader> m`. Set it to `nil` to disable it. (default ",")
    dotspacemacs-major-mode-leader-key ","
    ;; Major mode leader key accessible in `emacs state' and `insert state'.
-   ;; (default "C-M-m)
+   ;; (default "C-M-m")
    dotspacemacs-major-mode-emacs-leader-key "C-M-m"
-   ;; The key used for Emacs commands (M-x) (after pressing on the leader key).
-   ;; (default "SPC")
-   dotspacemacs-emacs-command-key "SPC"
    ;; These variables control whether separate commands are bound in the GUI to
    ;; the key pairs C-i, TAB and C-m, RET.
    ;; Setting it to a non-nil value, allows for separate commands under <C-i>
@@ -689,7 +710,7 @@ values."
    ;; In the terminal, these pairs are generally indistinguishable, so this only
    ;; works in the GUI. (default nil)
    dotspacemacs-distinguish-gui-tab nil
-   ;; If non nil `Y' is remapped to `y$' in Evil states. (default nil)
+   ;; If non-nil `Y' is remapped to `y$' in Evil states. (default nil)
    dotspacemacs-remap-Y-to-y$ nil
    ;; If non-nil, the shift mappings `<' and `>' retain visual state if used
    ;; there. (default t)
@@ -697,15 +718,15 @@ values."
    ;; If non-nil, J and K move lines up and down when in visual mode.
    ;; (default nil)
    dotspacemacs-visual-line-move-text nil
-   ;; If non nil, inverse the meaning of `g' in `:substitute' Evil ex-command.
+   ;; If non-nil, inverse the meaning of `g' in `:substitute' Evil ex-command.
    ;; (default nil)
    dotspacemacs-ex-substitute-global nil
    ;; Name of the default layout (default "Default")
    dotspacemacs-default-layout-name "Default"
-   ;; If non nil the default layout name is displayed in the mode-line.
+   ;; If non-nil the default layout name is displayed in the mode-line.
    ;; (default nil)
    dotspacemacs-display-default-layout t
-   ;; If non nil then the last auto saved layouts are resume automatically upon
+   ;; If non-nil then the last auto saved layouts are resume automatically upon
    ;; start. (default nil)
    dotspacemacs-auto-resume-layouts nil
    ;; Size (in MB) above which spacemacs will prompt to open the large file
@@ -719,9 +740,9 @@ values."
    dotspacemacs-auto-save-file-location 'cache
    ;; Maximum number of rollback slots to keep in the cache. (default 5)
    dotspacemacs-max-rollback-slots 5
-   ;; If non nil, `helm' will try to minimize the space it uses. (default nil)
+   ;; If non-nil, `helm' will try to minimize the space it uses. (default nil)
    dotspacemacs-helm-resize nil
-   ;; if non nil, the helm header is hidden when there is only one source.
+   ;; if non-nil, the helm header is hidden when there is only one source.
    ;; (default nil)
    dotspacemacs-helm-no-header nil
    ;; define the position to display `helm', options are `bottom', `top',
@@ -732,7 +753,7 @@ values."
    ;; source settings. Else, disable fuzzy matching in all sources.
    ;; (default 'always)
    dotspacemacs-helm-use-fuzzy 'always
-   ;; If non nil the paste micro-state is enabled. When enabled pressing `p`
+   ;; If non-nil the paste micro-state is enabled. When enabled pressing `p`
    ;; several times cycle between the kill ring content. (default nil)
    dotspacemacs-enable-paste-transient-state nil
    ;; Which-key delay in seconds. The which-key buffer is the popup listing
@@ -743,17 +764,23 @@ values."
    ;; right; if there is insufficient space it displays it at the bottom.
    ;; (default 'bottom)
    dotspacemacs-which-key-position 'bottom
-   ;; If non nil a progress bar is displayed when spacemacs is loading. This
+   ;; Control where `switch-to-buffer' displays the buffer. If nil,
+   ;; `switch-to-buffer' displays the buffer in the current window even if
+   ;; another same-purpose window is available. If non-nil, `switch-to-buffer'
+   ;; displays the buffer in a same-purpose window even if the buffer can be
+   ;; displayed in the current window. (default nil)
+   dotspacemacs-switch-to-buffer-prefers-purpose nil
+   ;; If non-nil a progress bar is displayed when spacemacs is loading. This
    ;; may increase the boot time on some systems and emacs builds, set it to
    ;; nil to boost the loading time. (default t)
    dotspacemacs-loading-progress-bar t
-   ;; If non nil the frame is fullscreen when Emacs starts up. (default nil)
+   ;; If non-nil the frame is fullscreen when Emacs starts up. (default nil)
    ;; (Emacs 24.4+ only)
    dotspacemacs-fullscreen-at-startup nil
-   ;; If non nil `spacemacs/toggle-fullscreen' will not use native fullscreen.
+   ;; If non-nil `spacemacs/toggle-fullscreen' will not use native fullscreen.
    ;; Use to disable fullscreen animations in OSX. (default nil)
    dotspacemacs-fullscreen-use-non-native nil
-   ;; If non nil the frame is maximized when Emacs starts up.
+   ;; If non-nil the frame is maximized when Emacs starts up.
    ;; Takes effect only if `dotspacemacs-fullscreen-at-startup' is nil.
    ;; (default nil) (Emacs 24.4+ only)
    dotspacemacs-maximized-at-startup nil
@@ -765,18 +792,28 @@ values."
    ;; the transparency level of a frame when it's inactive or deselected.
    ;; Transparency can be toggled through `toggle-transparency'. (default 90)
    dotspacemacs-inactive-transparency 90
-   ;; If non nil show the titles of transient states. (default t)
+   ;; If non-nil show the titles of transient states. (default t)
    dotspacemacs-show-transient-state-title t
-   ;; If non nil show the color guide hint for transient state keys. (default t)
+   ;; If non-nil show the color guide hint for transient state keys. (default t)
    dotspacemacs-show-transient-state-color-guide t
-   ;; If non nil unicode symbols are displayed in the mode line. (default t)
+   ;; If non-nil unicode symbols are displayed in the mode line. (default t)
    dotspacemacs-mode-line-unicode-symbols t
-   ;; If non nil smooth scrolling (native-scrolling) is enabled. Smooth
+   ;; If non-nil smooth scrolling (native-scrolling) is enabled. Smooth
    ;; scrolling overrides the default behavior of Emacs which recenters point
    ;; when it reaches the top or bottom of the screen. (default t)
    dotspacemacs-smooth-scrolling t
-   ;; If non nil line numbers are turned on in all `prog-mode' and `text-mode'
-   ;; derivatives. If set to `relative', also turns on relative line numbers.
+   ;; Control line numbers activation.
+   ;; If set to `t' or `relative' line numbers are turned on in all `prog-mode' and
+   ;; `text-mode' derivatives. If set to `relative', line numbers are relative.
+   ;; This variable can also be set to a property list for finer control:
+   ;; '(:relative nil
+   ;;   :disabled-for-modes dired-mode
+   ;;                       doc-view-mode
+   ;;                       markdown-mode
+   ;;                       org-mode
+   ;;                       pdf-view-mode
+   ;;                       text-mode
+   ;;   :size-limit-kb 1000)
    ;; (default nil)
    dotspacemacs-line-numbers nil
    ;; Code folding method. Possible values are `evil' and `origami'.
@@ -793,13 +830,13 @@ values."
    ;; `current', `all' or `nil'. Default is `all' (highlight any scope and
    ;; emphasis the current one). (default 'all)
    dotspacemacs-highlight-delimiters 'all
-   ;; If non nil, advise quit functions to keep server open when quitting.
+   ;; If non-nil, advise quit functions to keep server open when quitting.
    ;; (default nil)
    dotspacemacs-persistent-server nil
    ;; List of search tool executable names. Spacemacs uses the first installed
-   ;; tool of the list. Supported tools are `ag', `pt', `ack' and `grep'.
-   ;; (default '("ag" "pt" "ack" "grep"))
-   dotspacemacs-search-tools '("ag" "pt" "ack" "grep")
+   ;; tool of the list. Supported tools are `rg', `ag', `pt', `ack' and `grep'.
+   ;; (default '("rg" "ag" "pt" "ack" "grep"))
+   dotspacemacs-search-tools '("rg" "ag" "pt" "ack" "grep")
    ;; The default package repository used if no explicit repository has been
    ;; specified with an installed package.
    ;; Not used for now. (default nil)
@@ -817,8 +854,22 @@ values."
 
 (defun dotspacemacs/user-init ()
   "Initialization function for user code.
-It is called immediately after `dotspacemacs/init'.  You are free to put almost any
-user code here.  The exception is org related code, which should be placed in `dotspacemacs/user-config'."
+It is called immediately after `dotspacemacs/init', before layer configuration
+executes.
+ This function is mostly useful for variables that need to be set
+before packages are loaded. If you are unsure, you should try in setting them in
+`dotspacemacs/user-config' first."
+
+  ;; Copied from core/core-fonts-support.el
+
+  (let* ((font (car dotspacemacs-default-font))
+         (props (cdr dotspacemacs-default-font))
+         (scale (plist-get props :powerline-scale))
+         (font-props (spacemacs/mplist-remove
+                      (spacemacs/mplist-remove props :powerline-scale)
+                      :powerline-offset))
+         (fontspec (apply 'font-spec :name font font-props)))
+    (set-frame-font fontspec))
 
   ;; ---------
   ;; User-init
@@ -827,12 +878,16 @@ user code here.  The exception is org related code, which should be placed in `d
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   (add-to-list 'load-path (concat dotspacemacs-directory "themes-test/"))
   (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "local-lisp/"))
+  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/emacs-mandm-theme"))
   (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "themes-test/"))
   (add-to-list 'load-path (concat "~/p/ietf-docs"))
   ;;(require 'iterm-custom-keys)
   (require 'iterm-xterm-extra)
   (require 'generic-lisp)
   (require 'generic-mode-hooks)
+
+  (let ((default-directory (concat dotspacemacs-directory "repos/")))
+    (normal-top-level-add-subdirs-to-load-path))
 
   (auto-insert-mode)
 
@@ -866,6 +921,9 @@ user code here.  The exception is org related code, which should be placed in `d
   ;;   (define-key evil-evilified-state-map-original "M" 'evil-window-middle))
 
    )
+
+  (message "set debug-init-msg %s" debug-init-msg)
+
   (setq theming-modifications `(
                                 (misterioso (erc-input-face :foreground "cornflowerblue")
                                             (font-lock-comment-face :foreground "DarkGrey" :slant italic)
@@ -1026,8 +1084,7 @@ layers configuration. You are free to put any user code."
   ;;     (add-hook 'emacs-lisp-mode-hook '(lambda () (ggtags-mode 1))))
 
 
-
-    ;; have to allow-emacs-pinentry in gpg-agent.conf?
+    ;; have to allow-emacs-pinentry in qpg-agent.conf?
     ;; (setenv "INSIDE_EMACS" (format "%s,comint" emacs-version))
     ;; (pinentry-start)
 
@@ -1488,6 +1545,19 @@ This will replace the last notification sent with this function."
            mu4e-maildir-list nil
            mu4e~contacts nil)))
 
+
+      (defun my-mu4e-html2text (msg)
+        "My html2text function; shows short message inline, show
+long messages in some external browser (see `browse-url-generic-program')."
+        (let ((html (or (mu4e-message-field msg :body-html) "")))
+          (if (> (length html) 20000)
+              (progn
+                (mu4e-action-view-in-browser msg)
+                "[Viewing message in external browser]")
+            (mu4e-shr2text msg))))
+      ;; require mu-git
+      ;; (setq mu4e-html2text-command 'my-mu4e-html2text)
+
       (if (not (member ?. (string-to-list (system-name))))
           (setq smtpmail-local-domain "chopps.org"))
 
@@ -1498,10 +1568,12 @@ This will replace the last notification sent with this function."
         ;; mu4e-quick-update-mail-command "bash -c '(cd && offlineimap -q -l /Users/chopps/.offlineimap/logfile)'"
 
         ;; mu4e-update-pre-hook 'mu4e-pre-hook-udpate-command
+        mu4e-compose-in-new-frame t
         mu4e-change-filenames-when-moving t
         mu4e-mu-binary (executable-find "mu")
         mu4e-update-interval nil
         mu4e-headers-include-related nil
+
 
         ;; Stop mu4e from blowing away message buffer all the time
         mu4e-hide-index-messages t
@@ -1509,6 +1581,7 @@ This will replace the last notification sent with this function."
         mu4e-context-policy 'pick-first
         mu4e-compose-context-policy 'ask-if-none
         mu4e-compose-complete-only-after "2015-01-01"
+        mu4e-compose-complete-ignore-address-regexp "\\(no-?reply\\|@dev.terastream.net\\|phoebe.johnson\\|christian.phoebe.hopps\\|phoebe.hopps@helloinnovation.com\\)"
 
         ;; -----------
         ;; [b]ookmarks
@@ -1578,6 +1651,7 @@ This will replace the last notification sent with this function."
                ("date:today..now" "Today's messages" ?t)
                ("date:7d..now" "Last 7 days" ?w)
                ("date:7d..now from:chopps" "Last 7 days sent" ?W)
+               ("date:14d..now from:chopps" "Last 14 days sent" ?F)
                ("mime:*pdf" "Messages with PDF" ?p)
                ("mime:*calendar" "Messages with calendar" ?q)
                ("mime:*cs" "Messages with VCS" ?Q)
@@ -1603,11 +1677,14 @@ This will replace the last notification sent with this function."
         mu4e-headers-visible-columns 80
 
         ;; XXX Try running w/o this to see if hangs go away.
-        ;; mu4e-html2text-command 'mu4e-shr2text
+        mu4e-html2text-command 'mu4e-shr2text
+
+        ;; For ubuntu
         ;; mu4e-html2text-command "html2text -nobs -utf8 -width 120"
-        ;; mu4e-html2text-command "html2text --unicode-snob | grep -v '&nbsp_place_holder;'"
-        ;; mu4e-html2text-command "html2text -b 0 --unicode-snob"
-        mu4e-html2text-command "w3m -dump -cols 120 -T text/html"
+
+
+        ;; This is our last value, trying default which is shr2text I think
+        ;; mu4e-html2text-command "w3m -dump -cols 120 -T text/html"
 
         ;; used ofr HTML in email ;; <#part type="message/rfc822" filename="/home/chopps/Documents/imap-accounts/chopps.org/sw-common/cur/1460249763.39525_8697.tops,U=242:2,S" disposition=attachment description="Re: Mail not correctly displayed"> <#/part>
 
@@ -1661,7 +1738,7 @@ This will replace the last notification sent with this function."
         mu4e-compose-signature-auto-include nil
         mu4e-compose-complete-addresses t
         message-completion-alistp '(("^\\(Newsgroups\\|Followup-To\\|Posted-To\\|Gcc\\):" . message-expand-group)
-                                     ("^\\(Resent-\\)?\\(To\\|B?Cc\\):" . my-message-expand-name)
+                                     ("^\\(Resent-\\)?\\(To\\|B?Cc\\):" . message-expand-name)
                                      ("^\\(Reply-To\\|From\\|Mail-Followup-To\\|Mail-Copies-To\\):" . message-expand-name)
                                      ("^\\(Disposition-Notification-To\\|Return-Receipt-To\\):" . message-expand-name))
 
@@ -1739,12 +1816,13 @@ This will replace the last notification sent with this function."
                         (or (and name (format "%s <%s>" name email))
                           email))) clist))
 
-          (defun my-message-expand-name (&optional start)
-            (interactive)
-            ;; (message "my-message-expand-name called")
-            (helm :prompt "contact:" :sources
-              (helm-build-sync-source "mu4e contacts"
-                :candidates mu4e~contact-list :candidate-transformer 'ch:ct)))
+          (when (configuration-layer/package-usedp 'helm)
+            (defun my-message-expand-name (&optional start)
+              ((interactive "P"))
+              ;; (message "my-message-expand-name called")
+              (helm :prompt "; commentntact:" :sources
+                    (helm-build-sync-source "mu4e contacts"
+                                            :candidates mu4e~contact-list :candidate-transformer 'ch:ct))))
 
 
           (defun my-mu4e-view-hook ()
@@ -1827,6 +1905,8 @@ This will replace the last notification sent with this function."
                                             mu4e-full-update-mail-command))
               (setq mu4e-pre-hook-count (1+ mu4e-pre-hook-count))))
 
+          ;; Need exit hook from headers mode to do an immediate index update.
+          (add-hook 'mu4e-main-mode-hook (lambda () (mu4e-update-index)))
 
           (add-to-list 'mu4e-view-actions
                        '("ViewInBrowser" . mu4e-action-view-in-browser))
@@ -1879,6 +1959,8 @@ This will replace the last notification sent with this function."
           (define-key mu4e-headers-mode-map "\\" 'mu4e-headers-mark-move-to-spam)
           (define-key mu4e-view-mode-map "\\" 'mu4e-view-mark-move-to-spam)
 
+          (define-key mu4e-main-mode-map "u" 'mu4e-update-index)
+
           (spacemacs/set-leader-keys-for-major-mode 'mu4e-view-mode
             "g" 'mu4e-view-go-to-url
             "h" 'mu4e-view-toggle-html
@@ -1930,7 +2012,9 @@ This will replace the last notification sent with this function."
         (setq flycheck-display-errors-function #'flycheck-display-error-messages)
 
         ;; Chain pylint after flake8 to get benefit of both.
-        (flycheck-add-next-checker 'python-flake8 'python-pylint)
+        ;; (flycheck-add-next-checker 'python-flake8 'python-pylint)
+
+        (setq flycheck-checks (cons 'python-pylint (delq 'python-pylint flycheck-checkers)))
 
         (define-key flycheck-mode-map (kbd "M-n") 'flycheck-next-error)
         (define-key flycheck-mode-map (kbd "M-p") 'flycheck-previous-error)))
@@ -2228,6 +2312,7 @@ This will replace the last notification sent with this function."
 
           (require 'ox-latex))
 
+
         ;; (with-eval-after-load "org-agenda"
         ;;   (define-key org-agenda-mode-map (kbd "RET") 'org-agenda-switch-to))
 
@@ -2360,7 +2445,7 @@ This will replace the last notification sent with this function."
            ("L" "Mac Link Note" entry (file+headline (concat org-directory "/notes.org") "Notes")
             "* NOTE %?\n%u\n%(org-mac-safari-get-frontmost-url)\n")
 
-           ("s" "Status" entry (file+datetree (concat org-directory "/status.org"))
+           ("s" "Status" entry (file+weektree (concat org-directory "/status.org"))
             "* NOTE %?\n%u\n")
 
            ("x" "Tramdose 100mg" entry (file+datetree (concat org-directory "/tramadol.org") "Tramadol")
@@ -2373,13 +2458,13 @@ This will replace the last notification sent with this function."
             "* NOTE %?\nCreated: %U\nPain Level: 3")
 
            ("g" "Google Calendars")
-           ("gh" "Todo" entry (file (concat org-directory "/goog-home.org"))
+           ("gh" "Todo" entry (file (concat org-directory "/calendar/goog-home.org"))
             "* TODO %?\n%T\nAnnotation: %a\n")
 
-           ("gf" "Todo" entry (file (concat org-directory "/goog-family.org"))
+           ("gf" "Todo" entry (file (concat org-directory "/calendar/goog-family.org"))
             "* TODO %?\n%T\nAnnotation: %a\n")
 
-           ("gw" "Todo" entry (file (concat org-directory "/goog-work.org"))
+           ("gw" "Todo" entry (file (concat org-directory "/calendar/goog-work.org"))
             "* TODO %?\n%T\nAnnotation: %a\n")
 
 
@@ -2487,24 +2572,25 @@ This will replace the last notification sent with this function."
                         chopps/org-latex-packages-alist-post-hyperref))
           )
 
-        )
-
 
       ;; Languages to interpret in begin_src blocks
-      (org-babel-do-load-languages
-       'org-babel-load-languages
-       '((ditaa . t)
-         (emacs-lisp . t)
-         (dot . t)
-         (gnuplot . t)
-         (latex . t)
-         (pic . t)
-         (plantuml . t)
-         (python . t)
-         (sh . t)
-         ;; this can't be evaluated. (yang . nil)
-         )
-       )
+
+
+        ;; (org-babel-do-load-languages
+        ;;  'org-babel-load-languages
+        ;;  '((ditaa . t)
+        ;;    (emacs-lisp . t)
+        ;;    (dot . t)
+        ;;    (gnuplot . t)
+        ;;    (latex . t)
+        ;;    (pic . t)
+        ;;    (plantuml . t)
+        ;;    (python . t)
+        ;;    (sh . t)
+        ;;    ;; this can't be evaluated. (yang . nil)
+        ;;    )
+        ;;  )
+
       ;;  (dot2tex . t))
 
       ;; (eval-after-load "org"
@@ -2552,25 +2638,25 @@ This will replace the last notification sent with this function."
 
       ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-cmd)
 
-      (defun org-refile-to-datetree ()
-        "Refile a subtree to a datetree corresponding to it's timestamp."
-        (interactive)
-        (let* ((datetree-date (org-entry-get nil "TIMESTAMP" t))
-               (date (org-date-to-gregorian datetree-date)))
-          (when date
-            (save-excursion
-              (org-cut-subtree)
-              (org-datetree-find-date-create date)
-              (org-narrow-to-subtree)
-              (show-subtree)
-              (org-end-of-subtree t)
-              (newline)
-              (goto-char (point-max))
-              (org-paste-subtree 4)
-              (widen)
+        (defun org-refile-to-datetree ()
+          "Refile a subtree to a datetree corresponding to it's timestamp."
+          (interactive)
+          (let* ((datetree-date (org-entry-get nil "TIMESTAMP" t))
+                 (date (org-date-to-gregorian datetree-date)))
+            (when date
+              (save-excursion
+                (org-cut-subtree)
+                (org-datetree-find-date-create date)
+                (org-narrow-to-subtree)
+                (show-subtree)
+                (org-end-of-subtree t)
+                (newline)
+                (goto-char (point-max))
+                (org-paste-subtree 4)
+                (widen)
+                )
               )
-            )
-          ))
+            ))
 
       ;; Specify default packages to be included in every tex file, whether pdflatex or xelatex
       ;; XXX latex
@@ -2614,47 +2700,46 @@ This will replace the last notification sent with this function."
       ;;                     ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
       ;;                   org-latex-classes))))
 
-      ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
-      (with-eval-after-load "org-caldav"
-        ;;https://calendar.google.com/calendar/ical/j2nmb305oqb7n6428m4pf1rctk%40group.calendar.google.com/private-c46e82d6b4bae1f85fe4415a769d225b/basic.ics
-        ;;https://calendar.google.com/calendar/ical/
-        ;; USERNAME: j2nmb305oqb7n6428m4pf1rctk%40group.calendar.google.com/
-        ;; PRIVATE: private-c46e82d6b4bae1f85fe4415a769d225b/basic.ics
-        ;; ID: j2nmb305oqb7n6428m4pf1rctk@group.calendar.google.com
-        (setq org-icalendar-timezone "US/Eastern"
-              ;; org-caldav-url "https://www.google.com/calendar/dav"
-              ;; org-caldav-calendar-id "naqenfju9vq9tr0r4nnh7eaiic@group.calendar.google.com"
-              ;; org-caldav-inbox "/home/chopps/Dropbox/org-mode/goog-work.org"
-              ;; org-caldav-files '()
-              org-caldav-calendars
-              '((:calendar-id "naqenfju9vq9tr0r4nnh7eaiic@group.calendar.google.com"
-                              :url "https://www.google.com/calendar/dav"
-                              :files ()
-                              :inbox "/home/chopps/Dropbox/org-mode/goog-work.org")
-                (:calendar-id "l8cjg3irk2h5a8gk5ch9mtp6ls@group.calendar.google.com"
-                              :url "https://www.google.com/calendar/dav"
-                              :files ()
-                              :inbox "/home/chopps/Dropbox/org-mode/goog-family.org")
-                ;;(:calendar-id "f1jltqbvdp88o8htcjkbg920sc@group.calendar.google.com"
-                ;;              :files ()
-                ;;              :inbox "~/org/goog-home.org")
-                ;;(:calendar-id "v8eda33vlrn98c9oj2hefjld7s@group.calendar.google.com"
-                ;;              :files ()
-                ;;              :inbox "~/org/goog-ietf.org")
-                ;; (:calendar-id "v8eda33vlrn98c9oj2hefjld7s@group.calendar.google.com"
-                ;;               :files ()
-                ;;               :inbox "/home/chopps/Dropbox/org-mode/goog-ietf.org")
+        ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
+        (with-eval-after-load "org-caldav"
+          ;;https://calendar.google.com/calendar/ical/j2nmb305oqb7n6428m4pf1rctk%40group.calendar.google.com/private-c46e82d6b4bae1f85fe4415a769d225b/basic.ics
+          ;;https://calendar.google.com/calendar/ical/
+          ;; USERNAME: j2nmb305oqb7n6428m4pf1rctk%40group.calendar.google.com/
+          ;; PRIVATE: private-c46e82d6b4bae1f85fe4415a769d225b/basic.ics
+          ;; ID: j2nmb305oqb7n6428m4pf1rctk@group.calendar.google.com
+          (setq org-icalendar-timezone "US/Eastern"
+                ;; org-caldav-url "https://www.google.com/calendar/dav"
+                ;; org-caldav-calendar-id "naqenfju9vq9tr0r4nnh7eaiic@group.calendar.google.com"
+                ;; org-caldav-inbox "/home/chopps/Dropbox/org-mode/calendar/goog-work.org"
+                ;; org-caldav-files '()
+                org-caldav-calendars
+                '((:calendar-id "naqenfju9vq9tr0r4nnh7eaiic@group.calendar.google.com"
+                                :url "https://www.google.com/calendar/dav"
+                                :files ()
+                                :inbox "/home/chopps/Dropbox/org-mode/calendar/goog-work.org")
+                  (:calendar-id "l8cjg3irk2h5a8gk5ch9mtp6ls@group.calendar.google.com"
+                                :url "https://www.google.com/calendar/dav"
+                                :files ()
+                                :inbox "/home/chopps/Dropbox/org-mode/calendar/goog-family.org")
+                  ;;(:calendar-id "f1jltqbvdp88o8htcjkbg920sc@group.calendar.google.com"
+                  ;;              :files ()
+                  ;;              :inbox "~/org/calendar/goog-home.org")
+                  ;;(:calendar-id "v8eda33vlrn98c9oj2hefjld7s@group.calendar.google.com"
+                  ;;              :files ()
+                  ;;              :inbox "~/org/calendar/goog-ietf.org")
+                  ;; (:calendar-id "v8eda33vlrn98c9oj2hefjld7s@group.calendar.google.com"
+                  ;;               :files ()
+                  ;;               :inbox "/home/chopps/Dropbox/org-mode/calendar/goog-ietf.org")
+                  )
                 )
-              )
-        ;; (setq org-caldav-principal-url "https://p25-caldav.icloud.com/65837734/principal"
-        ;;       org-caldav-url "https://p25-caldav.icloud.com/65837734/calendars"
-        ;;       org-caldav-calendar-id "AF7013C4-D5A4-4885-BF8B-0B11FB3A1488"
-        ;;       org-caldav-inbox "/home/chopps/org/orgmode-caldav.org"
-        ;;       org-caldav-files '()
-        ;;       org-icalendar-timezone "US/Eastern"))
+          ;; (setq org-caldav-principal-url "https://p25-caldav.icloud.com/65837734/principal"
+          ;;       org-caldav-url "https://p25-caldav.icloud.com/65837734/calendars"
+          ;;       org-caldav-calendar-id "AF7013C4-D5A4-4885-BF8B-0B11FB3A1488"
+          ;;       org-caldav-inbox "/home/chopps/org/orgmode-caldav.org"
+          ;;       org-caldav-files '()
+          ;;       org-icalendar-timezone "US/Eastern"))
 
-        )
-
+          ))
 
       (when (configuration-layer/layer-usedp 'org2blog)
         (with-eval-after-load "org2blog"
@@ -2667,39 +2752,37 @@ This will replace the last notification sent with this function."
           )
         )
 
-      )
+      ;; XXX need to change this
+      (when (or (daemonp) (server-running-p))
+        (require 'org-notify)
+        (defun org-notify-action-notify-urgency (plist)
+          "Pop up a notification window."
+          (message "XXX org-notify-action-notify-urgency enter")
+          (require 'notifications)
+          (let* ((duration (plist-get plist :duration))
+                 (urgency (pilst-get plist :urgency))
+                 (id (notifications-notify
+                      :title     (plist-get plist :heading)
+                      :body      (org-notify-body-text plist)
+                      :urgency   (or urgency 'normal)
+                      :timeout   (if duration (* duration 1000))
+                      :actions   org-notify-actions
+                      :on-action 'org-notify-on-action-notify)))
+            (setq org-notify-on-action-map
+                  (plist-put org-notify-on-action-map id plist))
+            (message "XXX org-notify-action-notify-urgency exit")
+            ))
 
-    ;; XXX need to change this
-    (when (or (daemonp) (server-running-p))
-      (require 'org-notify)
-      (defun org-notify-action-notify-urgency (plist)
-        "Pop up a notification window."
-        (message "XXX org-notify-action-notify-urgency enter")
-        (require 'notifications)
-        (let* ((duration (plist-get plist :duration))
-               (urgency (pilst-get plist :urgency))
-               (id (notifications-notify
-                    :title     (plist-get plist :heading)
-                    :body      (org-notify-body-text plist)
-                    :urgency   (or urgency 'normal)
-                    :timeout   (if duration (* duration 1000))
-                    :actions   org-notify-actions
-                    :on-action 'org-notify-on-action-notify)))
-          (setq org-notify-on-action-map
-                (plist-put org-notify-on-action-map id plist))
-          (message "XXX org-notify-action-notify-urgency exit")
-          ))
-
-      (org-notify-add '('default
-                         :time "1h"
-                         :period "30m"
-                         :duration 0
-                         :urgency 'critical
-                         :app-icon (concat (configuration-layer/get-layer-path 'org)
-                                           "img/org.png")
-                         :actions 'org-notify-action-notify-urgency))
-      (org-notify-start)
-      )
+        (org-notify-add '('default
+                           :time "1h"
+                           :period "30m"
+                           :duration 0
+                           :urgency 'critical
+                           :app-icon (concat (configuration-layer/get-layer-path 'org)
+                                             "img/org.png")
+                           :actions 'org-notify-action-notify-urgency))
+        (org-notify-start)
+        ))
 
     ;; ====
     ;; Evil
@@ -2726,15 +2809,24 @@ This will replace the last notification sent with this function."
 
     (add-hook 'persp-activated-hook 'persp-add-buffers-to-all)
 
-    (autoload 'yang-mode "yang-mode")
-    (add-to-list 'auto-mode-alist '("\\.yang\\'" . yang-mode))
-
     (add-hook 'org-mode-hook 'evil-normalize-keymaps)
 
     ;; Use ggtags not generic evil-jump-to-tag, would be nice to simply undefine
     ;; Map it everywhere else as well.
 
     (define-key evil-normal-state-map (kbd "C-]") 'ggtags-find-tag-dwim)
+
+    (fold-section "yang"
+                  (autoload 'yang-mode "yang-mode")
+                  (add-to-list 'auto-mode-alist '("\\.yang\\'" . yang-mode))
+                  (defun my-yang-mode-hook ()
+                    "Configuration for YANG Mode. Add this to `yang-mode-hook'."
+                    (c-set-style "BSD")
+                    (setq indent-tabs-mode nil)
+                    (setq c-basic-offset 2)
+                    (setq font-lock-maximum-decoration t)
+                    (font-lock-mode t))
+                  (add-hook 'yang-mode-hook 'my-yang-mode-hook))
 
     ;; ---------------------
     ;; Auto insert templates
@@ -2946,7 +3038,6 @@ This will replace the last notification sent with this function."
     ;; (setq window-min-width 40)
     ;; (setq split-window-preferred-function 'split-window-sensibly-prefer-horizontal)
 
-
     (require 'list-timers)
     (evil-set-initial-state 'timers-menu-mode 'insert)
     )
@@ -2975,6 +3066,11 @@ This will replace the last notification sent with this function."
 ;; auto-generate custom variable definitions.
 
 
+(defun dotspacemacs/emacs-custom-settings ()
+  "Emacs custom settings.
+This is an auto-generated function, do not modify its content directly, use
+Emacs customize menu instead.
+This function is called at the very end of Spacemacs initialization."
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -2982,9 +3078,6 @@ This will replace the last notification sent with this function."
  ;; If there is more than one, they won't work right.
  '(evil-want-Y-yank-to-eol nil)
  '(magit-diff-use-overlays nil)
- '(package-selected-packages
-   (quote
-    (jabber fsm go-guru sourcerer-theme insert-shebang hide-comnt helm-purpose window-purpose imenu-list pug-mode magit-gh-pulls github-search github-clone github-browse-file gist gh marshal logito pcache zonokai-theme zenburn-theme zen-and-art-theme yapfify yaml-mode xterm-color ws-butler window-numbering which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme tronesque-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd sunny-day-theme sublime-themes subatomic256-theme subatomic-theme stickyfunc-enhance stekene-theme srefactor spacemacs-theme spaceline powerline spacegray-theme soothe-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs rebox2 ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme professional-theme popwin planet-theme pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools tablist pcre2el pbcopy pastels-on-dark-theme paradox spinner osx-trash osx-dictionary orgit organic-green-theme org2blog org-projectile org-present org-pomodoro org-plus-contrib org-download org-caldav org org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme niflheim-theme neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert ht alert log4e gntp move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme metaweblog xml-rpc material-theme markdown-toc markdown-mode majapahit-theme magit-gitflow macrostep lush-theme lua-mode lorem-ipsum livid-mode skewer-mode simple-httpd live-py-mode linum-relative link-hint light-soap-theme less-css-mode launchctl json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jbeans-theme jazz-theme jade-mode irfc ir-black-theme inkpot-theme info+ indent-guide ietf-docs ido-vertical-mode hydra hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation heroku-theme hemisu-theme help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make projectile helm-gtags helm-gitignore request helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag hc-zenburn-theme haml-mode gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate golden-ratio go-eldoc gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md ggtags gandalf-theme flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck pkg-info epl flx-ido flx flatui-theme flatland-theme fish-mode firebelly-theme fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit magit magit-popup git-commit with-editor evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight espresso-theme eshell-z eshell-prompt-extras esh-help erc-social-graph erc-image erc-hl-nicks emmet-mode elisp-slime-nav dumb-jump drupal-mode php-mode dracula-theme dockerfile-mode django-theme disaster diminish darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode company-web web-completion-data company-tern dash-functional tern company-statistics company-shell company-go go-mode company-c-headers company-auctex company-anaconda company column-enforce-mode colorsarenice-theme color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode cmake-mode clues-theme clean-aindent-mode clang-format cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme bind-map bind-key badwolf-theme auto-yasnippet yasnippet auto-highlight-symbol auto-dictionary auto-compile packed auctex apropospriate-theme anti-zenburn-theme anaconda-mode pythonic f dash s ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core async ac-ispell auto-complete popup quelpa package-build)))
  '(safe-local-variable-values
    (quote
     ((docker-image-name . "hyperv")
@@ -2998,13 +3091,18 @@ This will replace the last notification sent with this function."
      (org-confirm-babel-evaluate)
      (eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)"))))
  '(send-mail-function (quote smtpmail-send-it)))
-
-(defun dotspacemacs/emacs-custom-settings ()
-  "Emacs custom settings.
-This is an auto-generated function, do not modify its content directly, use
-Emacs customize menu instead.
-This function is called at the very end of Spacemacs initialization."
-  )
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(erc-input-face ((t (:foreground "cornflowerblue"))))
+ '(font-lock-comment-delimiter-face ((t (:foreground "grey33"))))
+ '(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic))))
+ '(irfc-head-name-face ((t (:inherit org-level-1))))
+ '(irfc-head-number-face ((t (:inherit org-level-1))))
+ '(irfc-rfc-link-face ((t (:inherit org-link)))))
+)
 ;; Local Variables:
 ;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
 ;; End:
