@@ -57,7 +57,7 @@ values."
       jabber
       mu4e
       org
-      (org2blog :variables org2blog-name "hoppsjots.org")
+      ;; (org2blog :variables org2blog-name "hoppsjots.org")
       ;; pandoc
       (osx :variables
            osx-use-option-as-meta t)
@@ -139,6 +139,7 @@ values."
      dockerfile-mode
      ;; rfcview
      monky
+     nhexl-mode
      org-caldav
      package-lint
      persistent-scratch
@@ -152,6 +153,7 @@ values."
      applescript-mode
      erc-yt
      erc-view-log
+     evil-mc
      irfc
      mu4e-maildirs-extension
      ;; projectile
@@ -177,7 +179,7 @@ You should not put any user code in there besides modifying the variable
 values."
   ;; mDetermine display size to pick font size
 
-  (setq ch-def-height 11.0)
+  (setq ch-def-height 10.0)
   (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
         ;; (yres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* [0-9]*x\\([0-9]*\\) .*/\\1/'")))
         )
@@ -925,6 +927,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (message "set debug-init-msg %s" debug-init-msg)
 
   (setq theming-modifications `(
+                                (mandm (default :background "#011827"))
                                 (misterioso (erc-input-face :foreground "cornflowerblue")
                                             (font-lock-comment-face :foreground "DarkGrey" :slant italic)
                                             (font-lock-comment-delimiter-face :foreground "grey33"))
@@ -1596,13 +1599,15 @@ long messages in some external browser (see `browse-url-generic-program')."
                             "maildir:/chopps.org/ietf-chairs-rtg"
                             "maildir:/chopps.org/ietf-dt-netmod-ds"
                             "maildir:/chopps.org/ietf-rtg-dir"
+                            "maildir:/chopps.org/ietf-rtg-dir"
                             "maildir:/chopps.org/ietf-rtg-yang-dt"
                             "maildir:/chopps.org/ietf-wg-isis"
-                            "maildir:/chopps.org/ietf-wg-netmod")
+                            "maildir:/chopps.org/ietf-wg-netmod"
+                            "maildir:/chopps.org/ietf-wg-rtg")
 
-        mu4e-drafts-mailbox '("maildir:/chopps.org/ietf-announce"
-                              "maildir:/chopps.org/ietf-ann-proto-action"
-                              "maildir:/chopps.org/ietf-ann-id-actions")
+        mu4e-ietf-drafts-mailbox '("maildir:/chopps.org/ietf-announce"
+                                   "maildir:/chopps.org/ietf-ann-proto-action"
+                                   "maildir:/chopps.org/ietf-ann-id-actions")
 
         mu4e-junk-mailbox '("maildir:/gmail.com/[Gmail].Spam"
                              "maildir:/chopps.org/spam-probable"
@@ -2306,7 +2311,10 @@ long messages in some external browser (see `browse-url-generic-program')."
           ;;   (evil-define-key estate org-mode-map "H" nil)
           ;;   (evil-define-key estate org-mode-map "M" nil)
           ;;   (evil-define-key estate org-mode-map "L" nil))
-          (add-to-list 'org-file-apps '("\\.pdf\\'" . emacs))
+
+          ;;
+          ;; XXX add back
+          ;; (add-to-list 'org-file-apps '("\\.pdf\\'" . emacs))
 
           (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
 
@@ -3078,6 +3086,9 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(evil-want-Y-yank-to-eol nil)
  '(magit-diff-use-overlays nil)
+ '(package-selected-packages
+   (quote
+    (nhexl-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl browse-at-remote powerline spinner org-plus-contrib alert log4e gntp metaweblog xml-rpc markdown-mode skewer-mode simple-httpd multiple-cursors js2-mode fsm window-purpose imenu-list hydra parent-mode gh marshal logito pcache ht flyspell-correct pos-tip flycheck flx magit git-commit with-editor smartparens iedit anzu evil goto-chg undo-tree highlight php-mode json-mode tablist magit-popup docker-tramp json-snatcher json-reformat diminish autothemer projectile pkg-info epl counsel swiper dash-functional tern go-mode company bind-map bind-key yasnippet packed auctex async anaconda-mode pythonic f dash s avy auto-complete popup haml-mode web-completion-data link-hint helm ivy zonokai-theme zenburn-theme zen-and-art-theme yapfify yaml-mode xterm-color ws-butler winum which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme tronesque-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd sunny-day-theme sublime-themes subatomic256-theme subatomic-theme stickyfunc-enhance srefactor spaceline spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin planet-theme pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools pcre2el pbcopy pastels-on-dark-theme paradox package-lint osx-trash osx-dictionary orgit organic-green-theme org2blog org-projectile org-present org-pomodoro org-download org-caldav org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme niflheim-theme neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc mandm-theme majapahit-theme magithub magit-gitflow magit-gh-pulls madhat2r-theme macrostep lush-theme lua-mode lorem-ipsum livid-mode live-py-mode linum-relative light-soap-theme less-css-mode launchctl js2-refactor js-doc jbeans-theme jazz-theme jabber ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme info+ indent-guide ietf-docs hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt heroku-theme hemisu-theme help-fns+ helm-make helm-core hc-zenburn-theme gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate golden-ratio go-guru go-eldoc gnuplot gitignore-mode github-search github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh-md ggtags gandalf-theme fuzzy flyspell-correct-ivy flycheck-pos-tip flx-ido flatui-theme flatland-theme fish-mode firebelly-theme fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help erc-social-graph erc-image erc-hl-nicks emmet-mode elisp-slime-nav dumb-jump drupal-mode dracula-theme dockerfile-mode docker django-theme disaster darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode counsel-projectile company-web company-tern company-statistics company-shell company-go company-c-headers company-auctex company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode cmake-mode clues-theme clean-aindent-mode clang-format cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link ac-ispell)))
  '(safe-local-variable-values
    (quote
     ((docker-image-name . "hyperv")
