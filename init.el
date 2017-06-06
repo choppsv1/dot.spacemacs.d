@@ -138,6 +138,7 @@ values."
    '(
      dockerfile-mode
      ;; rfcview
+     base16-theme
      monky
      nhexl-mode
      org-caldav
@@ -179,14 +180,14 @@ You should not put any user code in there besides modifying the variable
 values."
   ;; mDetermine display size to pick font size
 
-  (setq ch-def-height 10.0)
+  (setq ch-def-height 12.0)
   (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
         ;; (yres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* [0-9]*x\\([0-9]*\\) .*/\\1/'")))
         )
     (setq xres (replace-regexp-in-string "\n\\'" "" xres))
     ;; (setq yres (replace-regexp-in-string "\n\\'" "" yres))
-    (if (<= (string-to-number xres) 3000)
-        (setq ch-def-height 10.0)))
+    (if (<= (string-to-number xres) 5000)
+        (setq ch-def-height 9.0)))
   ;; (message "def height %s" ch-def-height)
 
 
@@ -250,7 +251,7 @@ values."
    ;; Default major mode of the scratch buffer (default `text-mode')
    dotspacemacs-scratch-mode 'lisp-interaction-mode
    ;; List of themes, the first of the list is loaded when spacemacs starts.
-   ;; Press <SPC> T n to cycle to the next theme in the list (works great
+   ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(
                          ;; colorsarenice-light
@@ -669,8 +670,8 @@ values."
    ;; dotspacemacs-default-font `("Cousine" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; dotspacemacs-default-font `("Courier" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Perfect UTF-8, good sans serif
-   dotspacemacs-default-font `("Office Code Pro D" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
-   ;;dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
+   ;; dotspacemacs-default-font `("Office Code Pro D" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
+   dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Droid has odd spaced UTF-8
    ;; dotspacemacs-default-font '("Droid Sans Mono" :size 6.0)
    ;; Monoid has odd spaced UTF-8
@@ -706,9 +707,9 @@ values."
    ;; (default "C-M-m")
    dotspacemacs-major-mode-emacs-leader-key "C-M-m"
    ;; These variables control whether separate commands are bound in the GUI to
-   ;; the key pairs C-i, TAB and C-m, RET.
-   ;; Setting it to a non-nil value, allows for separate commands under <C-i>
-   ;; and TAB or <C-m> and RET.
+   ;; the key pairs `C-i', `TAB' and `C-m', `RET'.
+   ;; Setting it to a non-nil value, allows for separate commands under `C-i'
+   ;; and TAB or `C-m' and `RET'.
    ;; In the terminal, these pairs are generally indistinguishable, so this only
    ;; works in the GUI. (default nil)
    dotspacemacs-distinguish-gui-tab nil
@@ -717,7 +718,7 @@ values."
    ;; If non-nil, the shift mappings `<' and `>' retain visual state if used
    ;; there. (default t)
    dotspacemacs-retain-visual-state-on-shift t
-   ;; If non-nil, J and K move lines up and down when in visual mode.
+   ;; If non-nil, `J' and `K' move lines up and down when in visual mode.
    ;; (default nil)
    dotspacemacs-visual-line-move-text nil
    ;; If non-nil, inverse the meaning of `g' in `:substitute' Evil ex-command.
@@ -728,7 +729,7 @@ values."
    ;; If non-nil the default layout name is displayed in the mode-line.
    ;; (default nil)
    dotspacemacs-display-default-layout t
-   ;; If non-nil then the last auto saved layouts are resume automatically upon
+   ;; If non-nil then the last auto saved layouts are resumed automatically upon
    ;; start. (default nil)
    dotspacemacs-auto-resume-layouts nil
    ;; Size (in MB) above which spacemacs will prompt to open the large file
@@ -755,7 +756,7 @@ values."
    ;; source settings. Else, disable fuzzy matching in all sources.
    ;; (default 'always)
    dotspacemacs-helm-use-fuzzy 'always
-   ;; If non-nil the paste micro-state is enabled. When enabled pressing `p`
+   ;; If non-nil the paste micro-state is enabled. When enabled pressing `p'
    ;; several times cycle between the kill ring content. (default nil)
    dotspacemacs-enable-paste-transient-state nil
    ;; Which-key delay in seconds. The which-key buffer is the popup listing
@@ -821,7 +822,7 @@ values."
    ;; Code folding method. Possible values are `evil' and `origami'.
    ;; (default 'evil)
    dotspacemacs-folding-method 'evil
-   ;; If non-nil smartparens-strict-mode will be enabled in programming modes.
+   ;; If non-nil `smartparens-strict-mode' will be enabled in programming modes.
    ;; (default nil)
    dotspacemacs-smartparens-strict-mode nil
    ;; If non-nil pressing the closing parenthesis `)' key in insert mode passes
@@ -845,14 +846,14 @@ values."
    dotspacemacs-default-package-repository nil
    ;; Delete whitespace while saving buffer. Possible values are `all'
    ;; to aggressively delete empty line and long sequences of whitespace,
-   ;; `trailing' to delete only the whitespace at end of lines, `changed'to
+   ;; `trailing' to delete only the whitespace at end of lines, `changed' to
    ;; delete only whitespace for changed lines or `nil' to disable cleanup.
    ;; (default nil)
    dotspacemacs-whitespace-cleanup 'changed
-   ;; Allow for adding to use package configuration.
-   ;; use-package-inject-hooks t
-   )
-  )
+   ;; Either nil or a number of seconds. If non-nil zone out after the specified
+   ;; number of seconds. (default nil)
+   dotspacemacs-zone-out-when-idle nil
+   ))
 
 (defun dotspacemacs/user-init ()
   "Initialization function for user code.
@@ -1029,6 +1030,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
                 (spacemacs/set-leader-keys
                   "w0" 'delete-window
                   "w1" 'delete-other-windows
+                  "w@" 'make-frame-command
                   "oa" 'org-agenda
                   ;; "og" 'helm-org-agenda-files-headings
                   ;; "oo" 'org-clock-out
@@ -1106,6 +1108,10 @@ layers configuration. You are free to put any user code."
 
     ;; overrides
     (setq-default nxml-child-indent 2)
+    (setq-default yaml-indent-offset 2)
+
+    ;; This is annoying it's used for json and js need to split up
+    (setq-default js-indent-level 2)
 
     ;; tabs are 8 characters wide!
     (setq-default tab-width 8)
@@ -2035,6 +2041,11 @@ long messages in some external browser (see `browse-url-generic-program')."
         (add-hook 'emacs-lisp-mode-hook 'rebox-lisp-hook)
         ))
 
+    (when (configuration-layer/layer-usedp 'yaml)
+      (add-hook 'yaml-mode-hook (function (lambda ()
+                                            (flyspell-prog-mode)))))
+
+
     (when (configuration-layer/layer-usedp 'c-c++)
       (setq c-font-lock-extra-types
             (quote
@@ -2781,14 +2792,14 @@ long messages in some external browser (see `browse-url-generic-program')."
             (message "XXX org-notify-action-notify-urgency exit")
             ))
 
-        (org-notify-add '('default
-                           :time "1h"
-                           :period "30m"
-                           :duration 0
-                           :urgency 'critical
-                           :app-icon (concat (configuration-layer/get-layer-path 'org)
-                                             "img/org.png")
-                           :actions 'org-notify-action-notify-urgency))
+        (org-notify-add 'default
+                        '(:time "15m"
+                                :period "15m"
+                                :duration 0
+                                :urgency 'critical
+                                :app-icon (concat (configuration-layer/get-layer-path 'org)
+                                                  "img/org.png")
+                                :actions 'org-notify-action-notify-urgency))
         (org-notify-start)
         ))
 
@@ -3088,10 +3099,11 @@ This function is called at the very end of Spacemacs initialization."
  '(magit-diff-use-overlays nil)
  '(package-selected-packages
    (quote
-    (nhexl-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl browse-at-remote powerline spinner org-plus-contrib alert log4e gntp metaweblog xml-rpc markdown-mode skewer-mode simple-httpd multiple-cursors js2-mode fsm window-purpose imenu-list hydra parent-mode gh marshal logito pcache ht flyspell-correct pos-tip flycheck flx magit git-commit with-editor smartparens iedit anzu evil goto-chg undo-tree highlight php-mode json-mode tablist magit-popup docker-tramp json-snatcher json-reformat diminish autothemer projectile pkg-info epl counsel swiper dash-functional tern go-mode company bind-map bind-key yasnippet packed auctex async anaconda-mode pythonic f dash s avy auto-complete popup haml-mode web-completion-data link-hint helm ivy zonokai-theme zenburn-theme zen-and-art-theme yapfify yaml-mode xterm-color ws-butler winum which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme tronesque-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd sunny-day-theme sublime-themes subatomic256-theme subatomic-theme stickyfunc-enhance srefactor spaceline spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin planet-theme pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools pcre2el pbcopy pastels-on-dark-theme paradox package-lint osx-trash osx-dictionary orgit organic-green-theme org2blog org-projectile org-present org-pomodoro org-download org-caldav org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme niflheim-theme neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc mandm-theme majapahit-theme magithub magit-gitflow magit-gh-pulls madhat2r-theme macrostep lush-theme lua-mode lorem-ipsum livid-mode live-py-mode linum-relative light-soap-theme less-css-mode launchctl js2-refactor js-doc jbeans-theme jazz-theme jabber ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme info+ indent-guide ietf-docs hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt heroku-theme hemisu-theme help-fns+ helm-make helm-core hc-zenburn-theme gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate golden-ratio go-guru go-eldoc gnuplot gitignore-mode github-search github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh-md ggtags gandalf-theme fuzzy flyspell-correct-ivy flycheck-pos-tip flx-ido flatui-theme flatland-theme fish-mode firebelly-theme fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help erc-social-graph erc-image erc-hl-nicks emmet-mode elisp-slime-nav dumb-jump drupal-mode dracula-theme dockerfile-mode docker django-theme disaster darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode counsel-projectile company-web company-tern company-statistics company-shell company-go company-c-headers company-auctex company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode cmake-mode clues-theme clean-aindent-mode clang-format cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link ac-ispell)))
+    (company-php ac-php-core xcscope godoctor flycheck-bashate evil-lion editorconfig password-generator realgud test-simple loc-changes load-relative company-lua base16-theme white-sand-theme string-inflection rebecca-theme go-rename symon nhexl-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl browse-at-remote powerline spinner org-plus-contrib alert log4e gntp metaweblog xml-rpc markdown-mode skewer-mode simple-httpd multiple-cursors js2-mode fsm window-purpose imenu-list hydra parent-mode gh marshal logito pcache ht flyspell-correct pos-tip flycheck flx magit git-commit with-editor smartparens iedit anzu evil goto-chg undo-tree highlight php-mode json-mode tablist magit-popup docker-tramp json-snatcher json-reformat diminish autothemer projectile pkg-info epl counsel swiper dash-functional tern go-mode company bind-map bind-key yasnippet packed auctex async anaconda-mode pythonic f dash s avy auto-complete popup haml-mode web-completion-data link-hint helm ivy zonokai-theme zenburn-theme zen-and-art-theme yapfify yaml-mode xterm-color ws-butler winum which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme tronesque-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd sunny-day-theme sublime-themes subatomic256-theme subatomic-theme stickyfunc-enhance srefactor spaceline spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin planet-theme pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools pcre2el pbcopy pastels-on-dark-theme paradox package-lint osx-trash osx-dictionary orgit organic-green-theme org2blog org-projectile org-present org-pomodoro org-download org-caldav org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme niflheim-theme neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc mandm-theme majapahit-theme magithub magit-gitflow magit-gh-pulls madhat2r-theme macrostep lush-theme lua-mode lorem-ipsum livid-mode live-py-mode linum-relative light-soap-theme less-css-mode launchctl js2-refactor js-doc jbeans-theme jazz-theme jabber ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme info+ indent-guide ietf-docs hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt heroku-theme hemisu-theme help-fns+ helm-make helm-core hc-zenburn-theme gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate golden-ratio go-guru go-eldoc gnuplot gitignore-mode github-search github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh-md ggtags gandalf-theme fuzzy flyspell-correct-ivy flycheck-pos-tip flx-ido flatui-theme flatland-theme fish-mode firebelly-theme fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help erc-social-graph erc-image erc-hl-nicks emmet-mode elisp-slime-nav dumb-jump drupal-mode dracula-theme dockerfile-mode docker django-theme disaster darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode counsel-projectile company-web company-tern company-statistics company-shell company-go company-c-headers company-auctex company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode cmake-mode clues-theme clean-aindent-mode clang-format cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link ac-ispell)))
  '(safe-local-variable-values
    (quote
-    ((docker-image-name . "hyperv")
+    ((docker-image-name . "dockeng")
+     (docker-image-name . "hyperv")
      (evil-shift-width . 2)
      (eval progn
            (require
@@ -3107,6 +3119,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(default ((t (:background nil))))
  '(erc-input-face ((t (:foreground "cornflowerblue"))))
  '(font-lock-comment-delimiter-face ((t (:foreground "grey33"))))
  '(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic))))
