@@ -6,7 +6,9 @@
   "Configuration Layers declaration.
 You should not put any user code in this function besides modifying the variable
 values."
+  (setq load-prefer-newer t)
   (setq-default
+   load-prefer-newer t
    ;; Base distribution to use. This is a layer contained in the directory
    ;; `+distribution'. For now available distributions are `spacemacs-base'
    ;; or `spacemacs'. (default 'spacemacs)
@@ -34,6 +36,7 @@ values."
    '(
       ;; Choose either ivy or helm as completion framework
       ivy
+      ;; helm
 
       (auto-completion :variables
                        auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets"
@@ -49,7 +52,8 @@ values."
       ;; company-complete vs complete-at-point
       better-defaults
       docker
-      github
+      ;; this causing github login and errors for all git projects even private non-github ones).
+      ;; github
       graphviz
       gtags
       ;;(ietf :variables ietf-docs-cache "~/ietf-docs-cache")
@@ -80,6 +84,10 @@ values."
       theming
       themes-megapack
       ;; version-control
+      (version-control :variables
+                       version-control-diff-tool 'git-gutter
+                       version-control-diff-side 'left
+                       version-control-global-margin t)
 
       ;; ---------
       ;; Languages
@@ -109,7 +117,6 @@ values."
       shell-scripts
       systemd
       yaml
-
 
       ;; -----------------------------
       ;; Let's keep this later. (why?)
@@ -180,14 +187,14 @@ You should not put any user code in there besides modifying the variable
 values."
   ;; mDetermine display size to pick font size
 
-  (setq ch-def-height 12.0)
+  (setq ch-def-height 11.5)
   (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
         ;; (yres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* [0-9]*x\\([0-9]*\\) .*/\\1/'")))
         )
     (setq xres (replace-regexp-in-string "\n\\'" "" xres))
     ;; (setq yres (replace-regexp-in-string "\n\\'" "" yres))
     (if (<= (string-to-number xres) 5000)
-        (setq ch-def-height 9.0)))
+        (setq ch-def-height 11.5)))
   ;; (message "def height %s" ch-def-height)
 
 
@@ -669,8 +676,8 @@ values."
    ;; Bit wider than Ubuntu, pretty good as well though in being more courier/serif like
    ;; dotspacemacs-default-font `("Cousine" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; dotspacemacs-default-font `("Courier" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
-   ;; Perfect UTF-8, good sans serif
    ;; dotspacemacs-default-font `("Office Code Pro D" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
+   ;; Perfect UTF-8, good sans serif
    dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Droid has odd spaced UTF-8
    ;; dotspacemacs-default-font '("Droid Sans Mono" :size 6.0)
@@ -682,7 +689,7 @@ values."
    ;; dotspacemacs-default-font `("Liberation Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; dotspacemacs-default-font `("Source Code Pro for Powerline" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Very condensed -- pretty good for coding -- same odd shapes offs UTF as Liberation Mono
-   ;; dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
+   ;; dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.2)
    ;; dotspacemacs-default-font ("Ubuntu Mono" :size 6.0 :weight normal :width normal :powerline-scale 1.4)
     ;; dotspacemacs-default-font '("Source Code Pro"
     ;;                              :size 16.0
@@ -889,6 +896,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (require 'generic-lisp)
   (require 'generic-mode-hooks)
 
+  (fringe-mode '(16 . 16))
   (let ((default-directory (concat dotspacemacs-directory "repos/")))
     (normal-top-level-add-subdirs-to-load-path))
 
@@ -1116,11 +1124,14 @@ layers configuration. You are free to put any user code."
     ;; tabs are 8 characters wide!
     (setq-default tab-width 8)
 
+    ;; take out 
+    (setq magithub-debug-mode t)
+
     (run-hook-with-args 'spacemacs--hjkl-completion-navigation-functions
                         (member dotspacemacs-editing-style '(vim)))
     (setq
      spacemacs--hjkl-completion-navigation-functions nil
-     browse-url-new-window-flag t
+     browse-url-new-window-flag nil
      tab-always-indent t
      )
 
@@ -1689,6 +1700,10 @@ long messages in some external browser (see `browse-url-generic-program')."
 
         ;; XXX Try running w/o this to see if hangs go away.
         mu4e-html2text-command 'mu4e-shr2text
+        shr-color-visible-luminance-min 80
+        ;; gnus-w3m
+
+        ;; mu4e-html2text-command "html2markdown | grep -v '&nbsp_place_holder;'"
 
         ;; For ubuntu
         ;; mu4e-html2text-command "html2text -nobs -utf8 -width 120"
@@ -1702,11 +1717,10 @@ long messages in some external browser (see `browse-url-generic-program')."
         ;; make work better in dark themes
         ;; [[mu4e:msgid:87vb7ng3tn.fsf@djcbsoftware.nl][Re: I find html2markdown the best value for mu4e-html2text-command]]
 
-        shr-color-visible-luminance-min 80
 
         ;; this is keeping it from toggling I think
         ;; mu4e-view-html-plaintext-ratio-heuristic 15
-        mu4e-view-html-plaintext-ratio-heuristic 0
+        ;; mu4e-view-html-plaintext-ratio-heuristic 0
 
         mu4e-use-fancy-chars nil
         ;; mu4e-headers-has-child-prefix    '(" ┬●")  ; Parent
@@ -2018,7 +2032,8 @@ long messages in some external browser (see `browse-url-generic-program')."
 
     (when (configuration-layer/layer-usedp 'syntax-checking)
       (with-eval-after-load "flycheck"
-        (setq flycheck-highlighting-mode 'lines)
+        ;; (setq flycheck-highlighting-mode 'lines)
+        (setq flycheck-highlighting-mode 'sexps)
         ;; the pos-tip window doesn't seem to work with my awesome setup (anymore)
         (setq flycheck-display-errors-function #'flycheck-display-error-messages)
 
@@ -2284,6 +2299,9 @@ long messages in some external browser (see `browse-url-generic-program')."
       (with-eval-after-load 'lua-mode
         (setq-default lua-indent-level 4)))
 
+    (with-eval-after-load 'magit-mode
+      (magit-define-popup-switch 'magit-push-popup ?t "Push associated annotated tags" "--follow-tags")
+      )
     ;;   (progn
     ;;     (delq (assoc "^\t+#" makefile-font-lock-keywords) makefile-font-lock-keywords)))
     (with-eval-after-load 'make-mode
@@ -2779,7 +2797,7 @@ long messages in some external browser (see `browse-url-generic-program')."
           (message "XXX org-notify-action-notify-urgency enter")
           (require 'notifications)
           (let* ((duration (plist-get plist :duration))
-                 (urgency (pilst-get plist :urgency))
+                 (urgency (plist-get plist :urgency))
                  (id (notifications-notify
                       :title     (plist-get plist :heading)
                       :body      (org-notify-body-text plist)
@@ -2799,7 +2817,7 @@ long messages in some external browser (see `browse-url-generic-program')."
                                 :urgency 'critical
                                 :app-icon (concat (configuration-layer/get-layer-path 'org)
                                                   "img/org.png")
-                                :actions 'org-notify-action-notify-urgency))
+                                :actions org-notify-action-notify-urgency))
         (org-notify-start)
         ))
 
@@ -3060,6 +3078,38 @@ long messages in some external browser (see `browse-url-generic-program')."
     (require 'list-timers)
     (evil-set-initial-state 'timers-menu-mode 'insert)
     )
+
+  ;; custom graphics that works nice with half-width fringes
+  (with-eval-after-load 'git-gutter-fringe
+    (fringe-helper-define 'git-gutter-fr:added nil
+      "...XXXX...."
+      "...XXXX...."
+      "...XXXX...."
+      "XXXXXXXXXXX"
+      "XXXXXXXXXXX"
+      "XXXXXXXXXXX"
+      "...XXXX...."
+      "...XXXX...."
+      "...XXXX...."
+      )
+    (fringe-helper-define 'git-gutter-fr:deleted nil
+      "..........."
+      "..........."
+      "..........."
+      "XXXXXXXXXXX"
+      "XXXXXXXXXXX"
+      "XXXXXXXXXXX"
+      "..........."
+      "..........."
+      "..........."
+      )
+    (fringe-helper-define 'git-gutter-fr:modified nil
+      "..X...."
+      ".XXX..."
+      "XX.XX.."
+      ".XXX..."
+      "..X....")
+    )
   )
 
  ;; '(font-lock-comment-delimiter-face ((t (:foreground "grey33"))))
@@ -3084,7 +3134,6 @@ long messages in some external browser (see `browse-url-generic-program')."
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
 
-
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.
 This is an auto-generated function, do not modify its content directly, use
@@ -3099,10 +3148,11 @@ This function is called at the very end of Spacemacs initialization."
  '(magit-diff-use-overlays nil)
  '(package-selected-packages
    (quote
-    (company-php ac-php-core xcscope godoctor flycheck-bashate evil-lion editorconfig password-generator realgud test-simple loc-changes load-relative company-lua base16-theme white-sand-theme string-inflection rebecca-theme go-rename symon nhexl-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl browse-at-remote powerline spinner org-plus-contrib alert log4e gntp metaweblog xml-rpc markdown-mode skewer-mode simple-httpd multiple-cursors js2-mode fsm window-purpose imenu-list hydra parent-mode gh marshal logito pcache ht flyspell-correct pos-tip flycheck flx magit git-commit with-editor smartparens iedit anzu evil goto-chg undo-tree highlight php-mode json-mode tablist magit-popup docker-tramp json-snatcher json-reformat diminish autothemer projectile pkg-info epl counsel swiper dash-functional tern go-mode company bind-map bind-key yasnippet packed auctex async anaconda-mode pythonic f dash s avy auto-complete popup haml-mode web-completion-data link-hint helm ivy zonokai-theme zenburn-theme zen-and-art-theme yapfify yaml-mode xterm-color ws-butler winum which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme tronesque-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd sunny-day-theme sublime-themes subatomic256-theme subatomic-theme stickyfunc-enhance srefactor spaceline spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin planet-theme pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools pcre2el pbcopy pastels-on-dark-theme paradox package-lint osx-trash osx-dictionary orgit organic-green-theme org2blog org-projectile org-present org-pomodoro org-download org-caldav org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme niflheim-theme neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc mandm-theme majapahit-theme magithub magit-gitflow magit-gh-pulls madhat2r-theme macrostep lush-theme lua-mode lorem-ipsum livid-mode live-py-mode linum-relative light-soap-theme less-css-mode launchctl js2-refactor js-doc jbeans-theme jazz-theme jabber ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme info+ indent-guide ietf-docs hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt heroku-theme hemisu-theme help-fns+ helm-make helm-core hc-zenburn-theme gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate golden-ratio go-guru go-eldoc gnuplot gitignore-mode github-search github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh-md ggtags gandalf-theme fuzzy flyspell-correct-ivy flycheck-pos-tip flx-ido flatui-theme flatland-theme fish-mode firebelly-theme fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help erc-social-graph erc-image erc-hl-nicks emmet-mode elisp-slime-nav dumb-jump drupal-mode dracula-theme dockerfile-mode docker django-theme disaster darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode counsel-projectile company-web company-tern company-statistics company-shell company-go company-c-headers company-auctex company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode cmake-mode clues-theme clean-aindent-mode clang-format cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link ac-ispell)))
+    (exotica-theme cmake-ide levenshtein org-category-capture helm-themes helm-swoop helm-purpose helm-projectile helm-mode-manager helm-flx helm-descbinds helm-ag flyspell-correct-helm ace-jump-helm-line ghub+ apiwrap ghub helm-pydoc helm-gtags helm-gitignore helm-css-scss helm-company helm-c-yasnippet impatient-mode org-brain add-node-modules-path evil-org company-php ac-php-core xcscope godoctor flycheck-bashate evil-lion editorconfig password-generator realgud test-simple loc-changes load-relative company-lua base16-theme white-sand-theme string-inflection rebecca-theme go-rename symon nhexl-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl browse-at-remote powerline spinner org-plus-contrib alert log4e gntp metaweblog xml-rpc markdown-mode skewer-mode simple-httpd multiple-cursors js2-mode fsm window-purpose imenu-list hydra parent-mode gh marshal logito pcache ht flyspell-correct pos-tip flycheck flx magit git-commit with-editor smartparens iedit anzu evil goto-chg undo-tree highlight php-mode json-mode tablist magit-popup docker-tramp json-snatcher json-reformat diminish autothemer projectile pkg-info epl counsel swiper dash-functional tern go-mode company bind-map bind-key yasnippet packed auctex async anaconda-mode pythonic f dash s avy auto-complete popup haml-mode web-completion-data link-hint helm ivy zonokai-theme zenburn-theme zen-and-art-theme yapfify yaml-mode xterm-color ws-butler winum which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme tronesque-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd sunny-day-theme sublime-themes subatomic256-theme subatomic-theme stickyfunc-enhance srefactor spaceline spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin planet-theme pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools pcre2el pbcopy pastels-on-dark-theme paradox package-lint osx-trash osx-dictionary orgit organic-green-theme org2blog org-projectile org-present org-pomodoro org-download org-caldav org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme niflheim-theme neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc mandm-theme majapahit-theme magithub magit-gitflow magit-gh-pulls madhat2r-theme macrostep lush-theme lua-mode lorem-ipsum livid-mode live-py-mode linum-relative light-soap-theme less-css-mode launchctl js2-refactor js-doc jbeans-theme jazz-theme jabber ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme info+ indent-guide ietf-docs hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt heroku-theme hemisu-theme help-fns+ helm-make helm-core hc-zenburn-theme gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate golden-ratio go-guru go-eldoc gnuplot gitignore-mode github-search github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh-md ggtags gandalf-theme fuzzy flyspell-correct-ivy flycheck-pos-tip flx-ido flatui-theme flatland-theme fish-mode firebelly-theme fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help erc-social-graph erc-image erc-hl-nicks emmet-mode elisp-slime-nav dumb-jump drupal-mode dracula-theme dockerfile-mode docker django-theme disaster darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode counsel-projectile company-web company-tern company-statistics company-shell company-go company-c-headers company-auctex company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode cmake-mode clues-theme clean-aindent-mode clang-format cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link ac-ispell)))
  '(safe-local-variable-values
    (quote
-    ((docker-image-name . "dockeng")
+    ((docker-image-name . "ubuntu-kvm")
+     (docker-image-name . "dockeng")
      (docker-image-name . "hyperv")
      (evil-shift-width . 2)
      (eval progn
@@ -3119,14 +3169,12 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:background nil))))
  '(erc-input-face ((t (:foreground "cornflowerblue"))))
- '(font-lock-comment-delimiter-face ((t (:foreground "grey33"))))
- '(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic))))
  '(irfc-head-name-face ((t (:inherit org-level-1))))
  '(irfc-head-number-face ((t (:inherit org-level-1))))
  '(irfc-rfc-link-face ((t (:inherit org-link)))))
 )
+
 ;; Local Variables:
 ;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
 ;; End:
