@@ -2466,62 +2466,68 @@ long messages in some external browser (see `browse-url-generic-program')."
          ;;   ))
 
          org-capture-templates
-         '(
-           ("t" "Todo" entry (file+headline (concat org-directory "/notes.org") "Tasks")
+         `(
+           ("t" "Todo" entry (file+headline ,(concat org-directory "/notes.org") "Tasks")
             "* TODO %^{Title}%?\nDEADLINE: %^t CREATED: %u\nAnnotation: %a\n\n")
 
-           ("m" "Mail Todo" entry (file+headline (concat org-directory "/notes.org") "Mail")
+           ("m" "Mail Todo" entry (file+headline ,(concat org-directory "/notes.org") "Mail")
             "* TODO [Mail] %^{Title|%:subject}%? ([%:from])\nDEADLINE: %^t CREATED: %u\nMessage: %a\n\n")
 
-           ("c" "Code Todo" entry (file+headline (concat org-directory "/notes.org") "Code Todo")
+           ("c" "Code Todo" entry (file+headline ,(concat org-directory "/notes.org") "Code Todo")
             "* TODO [Code] %^{Title}\nDEADLINE: %^t\nCREATED: %u\nAnnotation: %a\n%?\n\n")
 
-           ("n" "Generic Note" entry (file+headline (concat org-directory "/notes.org") "Notes")
+           ("n" "Generic Note" entry (file+headline ,(concat org-directory "/notes.org") "Notes")
             "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
 
-           ("L" "Mac Link Note" entry (file+headline (concat org-directory "/notes.org") "Notes")
+           ("L" "Mac Link Note" entry (file+headline ,(concat org-directory "/notes.org") "Notes")
             "* NOTE %?\n%u\n%(org-mac-safari-get-frontmost-url)\n")
 
-           ("s" "Status" entry (file+weektree (concat org-directory "/status.org"))
+           ("s" "Status" entry (file+weektree ,(concat org-directory "/status.org"))
             "* NOTE %?\n%u\n")
 
-           ("x" "Tramdose 100mg" entry (file+datetree (concat org-directory "/tramadol.org") "Tramadol")
-            "* NOTE 100mg\nCreated: %U\nPain Level: 3-4" :immediate-finish)
+           ("y" "Advil dose 200mg" entry (file+datetree ,(concat org-directory "/advil.org") "Advil")
+            "* NOTE 200mg\nCreated: %U\nPain Level: 1-2" :immediate-finish t)
 
-           ("y" "Advil dose 200mg" entry (file+datetree (concat org-directory "/advil.org") "Advil")
-            "* NOTE 200mg\nCreated: %U\nPain Level: 1-2" :immediate-finish)
+           ("x" "Tramadol")
+           ;; ("x" "Tramdose 100mg" entry (file+olp+datetree "/tramadol.org"))
+           ;;  "* NOTE 100mg\nCreated: %U\nPain Level: 3-4" :immediate-finish)
+           ("x1" "Tramdose 100mg" entry (file+datetree ,(concat org-directory "/tramadol.org"))
+            "* NOTE 100mg\nCreated: %U\nPain Level: 3-4" :immediate-finish t)
 
-           ("X" "Tramdose" entry (file+datetree (concat org-directory "/medicine.org") "Tramadol")
-            "* NOTE %?\nCreated: %U\nPain Level: 3")
+           ("x." "Tramdose 100mg" entry (file+datetree ,(concat org-directory "/tramadol.org"))
+            "* NOTE 50mg\nCreated: %U\nPain Level: 3-4" :immediate-finish t)
+
+           ;; ("X" "Tramdose" entry (file+datetree ,(concat org-directory "/medicine.org") "Tramadol")
+           ;;  "* NOTE %?\nCreated: %U\nPain Level: 3")
 
            ("g" "Google Calendars")
-           ("gh" "Todo" entry (file (concat org-directory "/calendar/goog-home.org"))
+           ("gh" "Todo" entry (file ,(concat org-directory "/calendar/goog-home.org"))
             "* TODO %?\n%T\nAnnotation: %a\n")
 
-           ("gf" "Todo" entry (file (concat org-directory "/calendar/goog-family.org"))
+           ("gf" "Todo" entry (file ,(concat org-directory "/calendar/goog-family.org"))
             "* TODO %?\n%T\nAnnotation: %a\n")
 
-           ("gw" "Todo" entry (file (concat org-directory "/calendar/goog-work.org"))
+           ("gw" "Todo" entry (file ,(concat org-directory "/calendar/goog-work.org"))
             "* TODO %?\n%T\nAnnotation: %a\n")
 
 
            ("i" "IETF related")
            ;;; XXX these are exact copies of the generic ones different file.
-           ("it" "Todo" entry (file+headline (concat org-directory "/ietf.org") "Tasks")
+           ("it" "Todo" entry (file+headline ,(concat org-directory "/ietf.org") "Tasks")
             "* TODO %?\nCreated: %t\nAnnotation: %a\n")
 
-           ("in" "Generic Note" entry (file+headline (concat org-directory "/ietf.org") "Notes")
+           ("in" "Generic Note" entry (file+headline ,(concat org-directory "/ietf.org") "Notes")
             "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
 
            ("w" "Work related")
            ;;; XXX these are exact copies of the generic ones different file.
-           ("wt" "Todo" entry (file+headline (concat org-directory "/work.org") "Tasks")
+           ("wt" "Todo" entry (file+headline ,(concat org-directory "/work.org") "Tasks")
             "* TODO %?\nCreated: %t\nAnnotation: %a\n")
 
-           ("wc" "Code Todo" entry (file+headline (concat org-directory "/work.org") "Code Todo")
+           ("wc" "Code Todo" entry (file+headline ,(concat org-directory "/work.org") "Code Todo")
             "* Code TODO %?\nCreated: %t\nAnnotation: %a\n")
 
-           ("wn" "Generic Note" entry (file+headline (concat org-directory "/work.org") "Notes")
+           ("wn" "Generic Note" entry (file+headline ,(concat org-directory "/work.org") "Notes")
             "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
            ))
 
