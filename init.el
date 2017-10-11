@@ -104,7 +104,7 @@ values."
       html
       javascript
       (latex :variables latex-build-command "latexmk")
-      lua
+      (lua :variables lua-default-application "lua5.1")
       markdown
       ;; Primary test runner is pytest use 'SPC u' prefix to invoke nose
       (python :variables python-fill-column 120
@@ -187,14 +187,14 @@ You should not put any user code in there besides modifying the variable
 values."
   ;; mDetermine display size to pick font size
 
-  (setq ch-def-height 11.5)
+  (setq ch-def-height 11.0)
   (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
         ;; (yres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* [0-9]*x\\([0-9]*\\) .*/\\1/'")))
         )
     (setq xres (replace-regexp-in-string "\n\\'" "" xres))
     ;; (setq yres (replace-regexp-in-string "\n\\'" "" yres))
     (if (<= (string-to-number xres) 5000)
-        (setq ch-def-height 11.5)))
+        (setq ch-def-height 11.0)))
   ;; (message "def height %s" ch-def-height)
 
 
@@ -262,8 +262,10 @@ values."
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(
                          ;; colorsarenice-light
+                         zenburn
                          mandm
                          misterioso
+                         material-light
                          leuven
                          ;; quasi-monochrome
                          molokai
@@ -274,7 +276,6 @@ values."
                          spacemacs-light
                          ;; solarized-light
                          solarized-dark
-                         zenburn
                          ;; ;; theme-test
                          ;; aalto-dark
                          ;; aalto-light
@@ -950,10 +951,14 @@ before packages are loaded. If you are unsure, you should try in setting them in
                                                   (font-lock-comment-delimiter-face :foreground "darkslategray"))
                                 (leuven ;; (default :background "#F0F0E0")
                                  (default :background "#ede8da")
-                                        ;;(default :background "#F0F0E5")
-                                        (font-lock-doc-face :foreground "#036A07" :slant italic)
-                                        (font-lock-comment-face :foreground "#6D6D64" :slant italic)
-                                        (font-lock-comment-delimiter-face :foreground "#BDBDA4"))
+                                 ;;(default :background "#F0F0E5")
+                                 (font-lock-doc-face :foreground "#036A07" :slant italic)
+                                 (font-lock-comment-face :foreground "#6D6D64" :slant italic)
+                                 (font-lock-comment-delimiter-face :foreground "#BDBDA4"))
+                                (solarized-light
+                                 (font-lock-doc-face :foreground "#036A07" :slant italic)
+                                 (font-lock-comment-face :foreground "#6D6D64" :slant italic)
+                                 (font-lock-comment-delimiter-face :foreground "#BDBDA4"))
                                 ;; (colorsarenice-light (erc-input-face :foreground "cornflowerblue")
                                 ;;                      (spacemacs-micro-state-header-face :foreground "Black")
                                 ;;                      (powerline-active1 :background "DarkSlateGrey" :foreground "LightBlue")
@@ -1170,6 +1175,15 @@ layers configuration. You are free to put any user code."
         :binding "^e"
         :body
         (find-file "~/.emacs.d/"))
+
+      (spacemacs|define-custom-layout "dot"
+        :binding "d"
+        :body
+        (progn
+          (find-file "~/homeroot/dot.files/dot.profile")
+          (split-window-right)
+          (find-file "~/homeroot/dot.files/dot.bashrc")
+          ))
 
       (spacemacs|define-custom-layout "mail"
         :binding "m"
@@ -1674,6 +1688,7 @@ long messages in some external browser (see `browse-url-generic-program')."
                ("date:7d..now" "Last 7 days" ?w)
                ("date:7d..now from:chopps" "Last 7 days sent" ?W)
                ("date:14d..now from:chopps" "Last 14 days sent" ?F)
+               ("mime:*zip" "Messages with ZIP" ?z)
                ("mime:*pdf" "Messages with PDF" ?p)
                ("mime:*calendar" "Messages with calendar" ?q)
                ("mime:*cs" "Messages with VCS" ?Q)
@@ -2058,6 +2073,7 @@ long messages in some external browser (see `browse-url-generic-program')."
 
     (when (configuration-layer/layer-usedp 'yaml)
       (add-hook 'yaml-mode-hook (function (lambda ()
+                                            (rebox-mode)
                                             (flyspell-prog-mode)))))
 
 
@@ -2485,20 +2501,15 @@ long messages in some external browser (see `browse-url-generic-program')."
            ("s" "Status" entry (file+weektree ,(concat org-directory "/status.org"))
             "* NOTE %?\n%u\n")
 
-           ("y" "Advil dose 200mg" entry (file+datetree ,(concat org-directory "/advil.org") "Advil")
+           ("y" "Advil dose 200mg" entry (file+olp+datetree ,(concat org-directory "/advil.org") "Advil")
             "* NOTE 200mg\nCreated: %U\nPain Level: 1-2" :immediate-finish t)
 
            ("x" "Tramadol")
-           ;; ("x" "Tramdose 100mg" entry (file+olp+datetree "/tramadol.org"))
-           ;;  "* NOTE 100mg\nCreated: %U\nPain Level: 3-4" :immediate-finish)
-           ("x1" "Tramdose 100mg" entry (file+datetree ,(concat org-directory "/tramadol.org"))
+           ("x1" "Tramdose 100mg" entry (file+olp+datetree ,(concat org-directory "/tramadol.org"))
             "* NOTE 100mg\nCreated: %U\nPain Level: 3-4" :immediate-finish t)
 
-           ("x." "Tramdose 100mg" entry (file+datetree ,(concat org-directory "/tramadol.org"))
+           ("x." "Tramdose 50mg" entry (file+olp+datetree ,(concat org-directory "/tramadol.org"))
             "* NOTE 50mg\nCreated: %U\nPain Level: 3-4" :immediate-finish t)
-
-           ;; ("X" "Tramdose" entry (file+datetree ,(concat org-directory "/medicine.org") "Tramadol")
-           ;;  "* NOTE %?\nCreated: %U\nPain Level: 3")
 
            ("g" "Google Calendars")
            ("gh" "Todo" entry (file ,(concat org-directory "/calendar/goog-home.org"))
