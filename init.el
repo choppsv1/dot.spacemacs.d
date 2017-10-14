@@ -1134,6 +1134,9 @@ layers configuration. You are free to put any user code."
 
     (run-hook-with-args 'spacemacs--hjkl-completion-navigation-functions
                         (member dotspacemacs-editing-style '(vim)))
+
+    (define-key dired-mode-map "e" 'ora-ediff-files)
+
     (setq
      spacemacs--hjkl-completion-navigation-functions nil
      browse-url-new-window-flag nil
@@ -2054,8 +2057,10 @@ long messages in some external browser (see `browse-url-generic-program')."
 
         ;; Chain pylint after flake8 to get benefit of both.
         ;; (flycheck-add-next-checker 'python-flake8 'python-pylint)
+        (flycheck-add-next-checker 'python-pylint 'python-pycompile)
 
-        (setq flycheck-checks (cons 'python-pylint (delq 'python-pylint flycheck-checkers)))
+        ;; (setq flycheck-checkers (delq 'python-pycompile flycheck-checkers))
+        (setq flycheck-checkers (cons 'python-pylint (delq 'python-pylint flycheck-checkers)))
 
         (define-key flycheck-mode-map (kbd "M-n") 'flycheck-next-error)
         (define-key flycheck-mode-map (kbd "M-p") 'flycheck-previous-error)))
