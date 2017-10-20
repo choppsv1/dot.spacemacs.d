@@ -1135,7 +1135,7 @@ layers configuration. You are free to put any user code."
     (run-hook-with-args 'spacemacs--hjkl-completion-navigation-functions
                         (member dotspacemacs-editing-style '(vim)))
 
-    (define-key dired-mode-map "e" 'ora-ediff-files)
+    (define-key dired-mode-map "e" 'dired-ediff-files)
 
     (setq
      spacemacs--hjkl-completion-navigation-functions nil
@@ -1664,7 +1664,8 @@ long messages in some external browser (see `browse-url-generic-program')."
         mu4e-bookmarks
         (append
           (list (list (concat "flag:unread AND NOT flag:trashed AND " mu4e-inbox-filter-base) "Unread [i]NBOX messages" ?i)
-            (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-*") "Unread IETF messages" ?I)
+            (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-isis") "Unread IS-IS messages" ?I)
+            (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-*") "Unread IETF messages" ?E)
 
             (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
             (list (concat "flag:flagged AND NOT flag:trashed AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "[F]lagged Non-INBOX messages" ?F)
@@ -1713,6 +1714,7 @@ long messages in some external browser (see `browse-url-generic-program')."
 
         ;; Visuals
         mu4e-view-show-addresses t
+        mu4e-headers-results-limit 4000
         mu4e-headers-visible-lines 15
         mu4e-headers-visible-columns 80
 
@@ -1892,7 +1894,9 @@ long messages in some external browser (see `browse-url-generic-program')."
             (if (not mu4e~contacts)
                 (mu4e~request-contacts))
 
-            (mml-secure-message-sign-pgpmime))
+            ;; XXX hate that this is the case, but DT is horrible with this crap.
+            ;; (mml-secure-message-sign-pgpmime)
+            )
           (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
 
           ;; Mark to move to spam folder from headers view.
