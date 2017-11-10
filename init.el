@@ -195,7 +195,7 @@ values."
     (setq xres (replace-regexp-in-string "\n\\'" "" xres))
     ;; (setq yres (replace-regexp-in-string "\n\\'" "" yres))
     (if (<= (string-to-number xres) 5000)
-        (setq ch-def-height 9.0)))
+        (setq ch-def-height 11.0)))
   ;; (message "def height %s" ch-def-height)
 
 
@@ -261,417 +261,421 @@ values."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
+
    dotspacemacs-themes '(
-                         ;; colorsarenice-light
-                         zenburn
-                         mandm
                          misterioso
-                         material-light
-                         leuven
-                         ;; quasi-monochrome
+                         classic
                          molokai
-                         monokai
-                         ;; phoenix-dark-pink
-                         ;; phoenix-dark-mono
-                         spacemacs-dark
-                         spacemacs-light
-                         ;; solarized-light
-                         solarized-dark
-                         ;; ;; theme-test
-                         ;; aalto-dark
-                         ;; aalto-light
-                         ;; abyss
-                         ;; afternoon
-                         ;; alect-black-alt
-                         ;; alect-black
-                         ;; alect-dark-alt
-                         ;; alect-dark
-                         ;; alect-light-alt
-                         ;; alect-light
-                         ;; aliceblue
-                         ;; Amelie
-                         ;; ample-flat
-                         ;; ample-light
-                         ;; ample
-                         ;; ample-zen
-                         ;; andreas
-                         ;; anti-zenburn
-                         ;; arjen-grey
-                         ;; arjen
-                         ;; assemblage
-                         ;; atom-one-dark
-                         ;; aurora
-                         ;; autumn-light
-                         ;; badger
-                         ;; badwolf
-                         ;; base16-3024-dark
-                         ;; base16-3024-light
-                         ;; base16-apathy-dark
-                         ;; base16-apathy-light
-                         ;; base16-ashes-dark
-                         ;; base16-ashes-light
-                         ;; base16-ateliercave-dark
-                         ;; base16-ateliercave-light
-                         ;; base16-atelierdune-dark
-                         ;; base16-atelierdune-light
-                         ;; base16-atelierestuary-dark
-                         ;; base16-atelierestuary-light
-                         ;; base16-atelierforest-dark
-                         ;; base16-atelierforest-light
-                         ;; base16-atelierheath-dark
-                         ;; base16-atelierheath-light
-                         ;; base16-atelierlakeside-dark
-                         ;; base16-atelierlakeside-light
-                         ;; base16-atelierplateau-dark
-                         ;; base16-atelierplateau-light
-                         ;; base16-ateliersavanna-dark
-                         ;; base16-ateliersavanna-light
-                         ;; base16-atelierseaside-dark
-                         ;; base16-atelierseaside-light
-                         ;; base16-ateliersulphurpool-dark
-                         ;; base16-ateliersulphurpool-light
-                         ;; base16-bespin-dark
-                         ;; base16-bespin-light
-                         ;; base16-brewer-dark
-                         ;; base16-brewer-light
-                         ;; base16-bright-dark
-                         ;; base16-bright-light
-                         ;; base16-chalk-dark
-                         ;; base16-chalk-light
-                         ;; base16-codeschool-dark
-                         ;; base16-codeschool-light
-                         ;; base16-colors-dark
-                         ;; base16-colors-light
-                         ;; base16-darktooth-dark
-                         ;; base16-darktooth-light
-                         ;; base16-default-dark
-                         ;; base16-default-light
-                         ;; base16-eighties-dark
-                         ;; base16-eighties-light
-                         ;; base16-embers-dark
-                         ;; base16-embers-light
-                         ;; base16-flat-dark
-                         ;; base16-flat-light
-                         ;; base16-google-dark
-                         ;; base16-google-light
-                         ;; base16-grayscale-dark
-                         ;; base16-grayscale-light
-                         ;; base16-greenscreen-dark
-                         ;; base16-greenscreen-light
-                         ;; base16-harmonic16-dark
-                         ;; base16-harmonic16-light
-                         ;; base16-hopscotch-dark
-                         ;; base16-hopscotch-light
-                         ;; base16-irblack-dark
-                         ;; base16-irblack-light
-                         ;; base16-isotope-dark
-                         ;; base16-isotope-light
-                         ;; base16-londontube-dark
-                         ;; base16-londontube-light
-                         ;; base16-macintosh-dark
-                         ;; base16-macintosh-light
-                         ;; base16-marrakesh-dark
-                         ;; base16-marrakesh-light
-                         ;; base16-mocha-dark
-                         ;; base16-mocha-light
-                         ;; base16-monokai-dark
-                         ;; base16-monokai-light
-                         ;; base16-ocean-dark
-                         ;; base16-oceanicnext-dark
-                         ;; base16-oceanicnext-light
-                         ;; base16-ocean-light
-                         ;; base16-paraiso-dark
-                         ;; base16-paraiso-light
-                         ;; base16-phd-dark
-                         ;; base16-phd-light
-                         ;; base16-pop-dark
-                         ;; base16-pop-light
-                         ;; base16-railscasts-dark
-                         ;; base16-railscasts-light
-                         ;; base16-setiui-dark
-                         ;; base16-setiui-light
-                         ;; base16-shapeshifter-dark
-                         ;; base16-shapeshifter-light
-                         ;; base16-solarized-dark
-                         ;; base16-solarized-light
-                         ;; base16-summerfruit-dark
-                         ;; base16-summerfruit-light
-                         ;; base16-tomorrow-dark
-                         ;; base16-tomorrow-light
-                         ;; base16-twilight-dark
-                         ;; base16-twilight-light
-                         ;; base16-yesterdaybright-dark
-                         ;; base16-yesterdaybright-light
-                         ;; base16-yesterday-dark
-                         ;; base16-yesterday-light
-                         ;; base16-yesterdaynight-dark
-                         ;; base16-yesterdaynight-light
-                         ;; beige-diff
-                         ;; beige-eshell
-                         ;; bharadwaj-slate
-                         ;; bharadwaj
-                         ;; billw
-                         ;; birds-of-paradise-plus
-                         ;; blackboard
-                         ;; black-on-gray
-                         ;; blippblopp
-                         ;; bliss
-                         ;; blue-erc
-                         ;; blue-eshell
-                         ;; blue-gnus
-                         ;; blue-mood
-                         ;; blue-sea
-                         ;; borland-blue
-                         ;; boron
-                         ;; brin
-                         ;; bubbleberry
-                         ;; busybee
-                         ;; calmer-forest
-                         ;; calm-forest
-                         ;; caroline
-                         ;; charcoal-black
-                         ;; cherry-blossom
-                         ;; clarity
-                         ;; classic
-                         ;; clues
-                         ;; cobalt
-                         ;; colonoscopy
-                         ;; colorsarenice-dark
-                         ;; colorsarenice-light
-                         ;; comidia
-                         ;; cyberpunk
-                         ;; dakrone
-                         ;; dark-blue2
-                         ;; dark-blue
-                         ;; darkburn
-                         ;; dark-erc
-                         ;; dark-font-lock
-                         ;; dark-gnus
-                         ;; dark-green
-                         ;; dark-info
-                         ;; dark-krystal
-                         ;; dark-laptop
-                         ;; dark-mint
-                         ;; darktooth
-                         ;; deep-blue
-                         ;; deep-thought
-                         ;; desert
-                         ;; Deviant
-                         ;; digital-ofs1
-                         ;; distinguished
-                         ;; django
-                         ;; dorsey
-                         ;; dracula
-                         ;; dream
-                         ;; eltbus
-                         ;; emacs-21
-                         ;; emacs-nw
-                         ;; erosiond
-                         ;; euphoria
-                         ;; evenhold
-                         ;; faff
-                         ;; farmhouse-dark
-                         ;; farmhouse-light
-                         ;; feng-shui
-                         ;; firebelly
-                         ;; firecode
-                         ;; fischmeister
-                         ;; flatland-black
-                         ;; flatland
-                         ;; flatui
-                         ;; fogus
-                         ;; gandalf
-                         ;; github
-                         ;; gnome2
-                         ;; gnome
-                         ;; goldenrod
-                         ;; gotham
-                         ;; graham
-                         ;; grandshell
-                         ;; granger
-                         ;; gray1
-                         ;; gray30
-                         ;; green-phosphor
-                         ;; greiner
-                         ;; greymatters
-                         ;; gruber-darker
-                         ;; gruvbox
-                         ;; gtk-ide
-                         ;; hemisu-dark
-                         ;; hemisu-light
-                         ;; hemisu
-                         ;; heroku
-                         ;; hickey
-                         ;; high-contrast
-                         ;; hipster
-                         ;; hober
-                         ;; hydandata-light
-                         ;; idea-darkula
-                         ;; infodoc
-                         ;; inkpot
-                         ;; iodine
-                         ;; ir-black
-                         ;; jazz
-                         ;; jbeans
-                         ;; jb-simple
-                         ;; jedit-grey
-                         ;; jonadabian-slate
-                         ;; jonadabian
-                         ;; jsc-dark
-                         ;; jsc-light2
-                         ;; jsc-light
-                         ;; julie
-                         ;; junio
-                         ;; katester
-                         ;; kingsajz
-                         ;; kooten
-                         ;; late-night
-                         ;; lavender
-                         ;; lawrence
-                         ;; ld-dark
-                         ;; lethe
-                         ;; leuven
-                         ;; light-soap
-                         ;; lush
-                         ;; mac-classic
-                         ;; majapahit-dark
-                         ;; majapahit-light
-                         ;; marine
-                         ;; marquardt
-                         ;; material-light
-                         ;; material
-                         ;; matrix
-                         ;; mbo70s
-                         ;; mccarthy
-                         ;; meacupla
-                         ;; mellow
-                         ;; midnight
-                         ;; minimal-light
-                         ;; minimal
-                         ;; mistyday
-                         ;; moe-dark
-                         ;; moe-light
-                         ;; moe
-                         ;; molokai
-                         ;; monochrome-bright
-                         ;; monochrome
-                         ;; monokai
-                         ;; montz
-                         ;; mustang
-                         ;; mustard
-                         ;; my-solarized-dark
-                         ;; my-solarized-light
-                         ;; naquadah
-                         ;; niflheim
-                         ;; noctilux
-                         ;; obsidian
-                         ;; occidental
-                         ;; odersky
-                         ;; oldlace
-                         ;; organic-green
-                         ;; oswald
-                         ;; paper
-                         ;; parus
-                         ;; pastelmac
-                         ;; pastels-on-dark
-                         ;; peacock
-                         ;; phoenix-dark-mono
-                         ;; phoenix-dark-pink
-                         ;; pierson
-                         ;; planet
-                         ;; pok-wob
-                         ;; pok-wog
-                         ;; professional
-                         ;; purple-haze
-                         ;; quasi-monochrome
-                         ;; radiance
-                         ;; railscasts
-                         ;; railscast
-                         ;; ramangalahy
-                         ;; raspopovic
-                         ;; renegade
-                         ;; resolve
-                         ;; retro-green
-                         ;; retro-orange
-                         ;; reverse
-                         ;; reykjavik
-                         ;; rippedcasts
-                         ;; ritchie
-                         ;; robin-hood
-                         ;; rotor
-                         ;; ryerson
-                         ;; salmon-diff
-                         ;; salmon-font-lock
-                         ;; sanityinc-tomorrow-blue
-                         ;; sanityinc-tomorrow-bright
-                         ;; sanityinc-tomorrow-day
-                         ;; sanityinc-tomorrow-eighties
-                         ;; sanityinc-tomorrow-night
-                         ;; scintilla
-                         ;; seoul256
-                         ;; seti
-                         ;; shaman
-                         ;; simple-1
-                         ;; sitaramv-nt
-                         ;; sitaramv-solaris
-                         ;; slime
-                         ;; smyx
-                         ;; snowish
-                         ;; snow
-                         ;; soft-charcoal
-                         ;; soft-morning
-                         ;; soft-stone
-                         ;; solarized-dark
-                         ;; solarized-light
-                         ;; solarized
-                         ;; soothe
-                         ;; spacegray
-                         ;; spolsky
-                         ;; standard-ediff
-                         ;; standard
-                         ;; stekene-dark
-                         ;; stekene-light
-                         ;; subatomic256
-                         ;; subatomic
-                         ;; subdued
-                         ;; subtle-blue
-                         ;; subtle-hacker
-                         ;; sunburst
-                         ;; sunny-day
-                         ;; suscolors
-                         ;; taming-mr-arneson
-                         ;; tango-2
-                         ;; tango-plus
-                         ;; tangotango
-                         ;; tao-yang
-                         ;; tao-yin
-                         ;; taylor
-                         ;; tommyh
-                         ;; tomorrow-night-paradise
-                         ;; tronesque
-                         ;; tron
-                         ;; tty-dark
-                         ;; twilight-bright
-                         ;; twilight
-                         ;; ubuntu
-                         ;; ujelly
-                         ;; underwater
-                         ;; vim-colors
-                         ;; waher
-                         ;; warm-night
-                         ;; whateveryouwant
-                         ;; wheat
-                         ;; white-sand
-                         ;; wilson
-                         ;; word-perfect
-                         ;; xemacs
-                         ;; xp
-                         ;; zen-and-art
-                         ;; zenburn
-                         zonokai-blue
-                         ;; zonokai-red
-                         zonokai
+                         mandm
+                         classic
+                         cobalt
+                         leuven
                          )
+   ;;                       ;; ;; colorsarenice-light
+
+                         ;; zenburn
+                         ;; material-light
+                         ;; ;; quasi-monochrome
+                         ;; monokai
+                         ;; ;; phoenix-dark-pink
+                         ;; ;; phoenix-dark-mono
+                         ;; spacemacs-dark
+                         ;; spacemacs-light
+                         ;; ;; solarized-light
+                         ;; solarized-dark
+                         ;; ;; ;; theme-test
+                         ;; ;; aalto-dark
+                         ;; ;; aalto-light
+                         ;; ;; abyss
+                         ;; ;; afternoon
+                         ;; ;; alect-black-alt
+                         ;; ;; alect-black
+                         ;; ;; alect-dark-alt
+                         ;; ;; alect-dark
+                         ;; ;; alect-light-alt
+                         ;; ;; alect-light
+                         ;; ;; aliceblue
+                         ;; ;; Amelie
+                         ;; ;; ample-flat
+                         ;; ;; ample-light
+                         ;; ;; ample
+                         ;; ;; ample-zen
+                         ;; ;; andreas
+                         ;; ;; anti-zenburn
+                         ;; ;; arjen-grey
+                         ;; ;; arjen
+                         ;; ;; assemblage
+                         ;; ;; atom-one-dark
+                         ;; ;; aurora
+                         ;; ;; autumn-light
+                         ;; ;; badger
+                         ;; ;; badwolf
+                         ;; ;; base16-3024-dark
+                         ;; ;; base16-3024-light
+                         ;; ;; base16-apathy-dark
+                         ;; ;; base16-apathy-light
+                         ;; ;; base16-ashes-dark
+                         ;; ;; base16-ashes-light
+                         ;; ;; base16-ateliercave-dark
+                         ;; ;; base16-ateliercave-light
+                         ;; ;; base16-atelierdune-dark
+                         ;; ;; base16-atelierdune-light
+                         ;; ;; base16-atelierestuary-dark
+                         ;; ;; base16-atelierestuary-light
+                         ;; ;; base16-atelierforest-dark
+                         ;; ;; base16-atelierforest-light
+                         ;; ;; base16-atelierheath-dark
+                         ;; ;; base16-atelierheath-light
+                         ;; ;; base16-atelierlakeside-dark
+                         ;; ;; base16-atelierlakeside-light
+                         ;; ;; base16-atelierplateau-dark
+                         ;; ;; base16-atelierplateau-light
+                         ;; ;; base16-ateliersavanna-dark
+                         ;; ;; base16-ateliersavanna-light
+                         ;; ;; base16-atelierseaside-dark
+                         ;; ;; base16-atelierseaside-light
+                         ;; ;; base16-ateliersulphurpool-dark
+                         ;; ;; base16-ateliersulphurpool-light
+                         ;; ;; base16-bespin-dark
+                         ;; ;; base16-bespin-light
+                         ;; ;; base16-brewer-dark
+                         ;; ;; base16-brewer-light
+                         ;; ;; base16-bright-dark
+                         ;; ;; base16-bright-light
+                         ;; ;; base16-chalk-dark
+                         ;; ;; base16-chalk-light
+                         ;; ;; base16-codeschool-dark
+                         ;; ;; base16-codeschool-light
+                         ;; ;; base16-colors-dark
+                         ;; ;; base16-colors-light
+                         ;; ;; base16-darktooth-dark
+                         ;; ;; base16-darktooth-light
+                         ;; ;; base16-default-dark
+                         ;; ;; base16-default-light
+                         ;; ;; base16-eighties-dark
+                         ;; ;; base16-eighties-light
+                         ;; ;; base16-embers-dark
+                         ;; ;; base16-embers-light
+                         ;; ;; base16-flat-dark
+                         ;; ;; base16-flat-light
+                         ;; ;; base16-google-dark
+                         ;; ;; base16-google-light
+                         ;; ;; base16-grayscale-dark
+                         ;; ;; base16-grayscale-light
+                         ;; ;; base16-greenscreen-dark
+                         ;; ;; base16-greenscreen-light
+                         ;; ;; base16-harmonic16-dark
+                         ;; ;; base16-harmonic16-light
+                         ;; ;; base16-hopscotch-dark
+                         ;; ;; base16-hopscotch-light
+                         ;; ;; base16-irblack-dark
+                         ;; ;; base16-irblack-light
+                         ;; ;; base16-isotope-dark
+                         ;; ;; base16-isotope-light
+                         ;; ;; base16-londontube-dark
+                         ;; ;; base16-londontube-light
+                         ;; ;; base16-macintosh-dark
+                         ;; ;; base16-macintosh-light
+                         ;; ;; base16-marrakesh-dark
+                         ;; ;; base16-marrakesh-light
+                         ;; ;; base16-mocha-dark
+                         ;; ;; base16-mocha-light
+                         ;; ;; base16-monokai-dark
+                         ;; ;; base16-monokai-light
+                         ;; ;; base16-ocean-dark
+                         ;; ;; base16-oceanicnext-dark
+                         ;; ;; base16-oceanicnext-light
+                         ;; ;; base16-ocean-light
+                         ;; ;; base16-paraiso-dark
+                         ;; ;; base16-paraiso-light
+                         ;; ;; base16-phd-dark
+                         ;; ;; base16-phd-light
+                         ;; ;; base16-pop-dark
+                         ;; ;; base16-pop-light
+                         ;; ;; base16-railscasts-dark
+                         ;; ;; base16-railscasts-light
+                         ;; ;; base16-setiui-dark
+                         ;; ;; base16-setiui-light
+                         ;; ;; base16-shapeshifter-dark
+                         ;; ;; base16-shapeshifter-light
+                         ;; ;; base16-solarized-dark
+                         ;; ;; base16-solarized-light
+                         ;; ;; base16-summerfruit-dark
+                         ;; ;; base16-summerfruit-light
+                         ;; ;; base16-tomorrow-dark
+                         ;; ;; base16-tomorrow-light
+                         ;; ;; base16-twilight-dark
+                         ;; ;; base16-twilight-light
+                         ;; ;; base16-yesterdaybright-dark
+                         ;; ;; base16-yesterdaybright-light
+                         ;; ;; base16-yesterday-dark
+                         ;; ;; base16-yesterday-light
+                         ;; ;; base16-yesterdaynight-dark
+                         ;; ;; base16-yesterdaynight-light
+                         ;; ;; beige-diff
+                         ;; ;; beige-eshell
+                         ;; ;; bharadwaj-slate
+                         ;; ;; bharadwaj
+                         ;; ;; billw
+                         ;; ;; birds-of-paradise-plus
+                         ;; ;; blackboard
+                         ;; ;; black-on-gray
+                         ;; ;; blippblopp
+                         ;; ;; bliss
+                         ;; ;; blue-erc
+                         ;; ;; blue-eshell
+                         ;; ;; blue-gnus
+                         ;; ;; blue-mood
+                         ;; ;; blue-sea
+                         ;; ;; borland-blue
+                         ;; ;; boron
+                         ;; ;; brin
+                         ;; ;; bubbleberry
+                         ;; ;; busybee
+                         ;; ;; calmer-forest
+                         ;; ;; calm-forest
+                         ;; ;; caroline
+                         ;; ;; charcoal-black
+                         ;; ;; cherry-blossom
+                         ;; ;; clarity
+                         ;; ;; clues
+                         ;; ;; colonoscopy
+                         ;; ;; colorsarenice-dark
+                         ;; ;; colorsarenice-light
+                         ;; ;; comidia
+                         ;; ;; cyberpunk
+                         ;; ;; dakrone
+                         ;; ;; dark-blue2
+                         ;; ;; dark-blue
+                         ;; ;; darkburn
+                         ;; ;; dark-erc
+                         ;; ;; dark-font-lock
+                         ;; ;; dark-gnus
+                         ;; ;; dark-green
+                         ;; ;; dark-info
+                         ;; ;; dark-krystal
+                         ;; ;; dark-laptop
+                         ;; ;; dark-mint
+                         ;; ;; darktooth
+                         ;; ;; deep-blue
+                         ;; ;; deep-thought
+                         ;; ;; desert
+                         ;; ;; Deviant
+                         ;; ;; digital-ofs1
+                         ;; ;; distinguished
+                         ;; ;; django
+                         ;; ;; dorsey
+                         ;; ;; dracula
+                         ;; ;; dream
+                         ;; ;; eltbus
+                         ;; ;; emacs-21
+                         ;; ;; emacs-nw
+                         ;; ;; erosiond
+                         ;; ;; euphoria
+                         ;; ;; evenhold
+                         ;; ;; faff
+                         ;; ;; farmhouse-dark
+                         ;; ;; farmhouse-light
+                         ;; ;; feng-shui
+                         ;; ;; firebelly
+                         ;; ;; firecode
+                         ;; ;; fischmeister
+                         ;; ;; flatland-black
+                         ;; ;; flatland
+                         ;; ;; flatui
+                         ;; ;; fogus
+                         ;; ;; gandalf
+                         ;; ;; github
+                         ;; ;; gnome2
+                         ;; ;; gnome
+                         ;; ;; goldenrod
+                         ;; ;; gotham
+                         ;; ;; graham
+                         ;; ;; grandshell
+                         ;; ;; granger
+                         ;; ;; gray1
+                         ;; ;; gray30
+                         ;; ;; green-phosphor
+                         ;; ;; greiner
+                         ;; ;; greymatters
+                         ;; ;; gruber-darker
+                         ;; ;; gruvbox
+                         ;; ;; gtk-ide
+                         ;; ;; hemisu-dark
+                         ;; ;; hemisu-light
+                         ;; ;; hemisu
+                         ;; ;; heroku
+                         ;; ;; hickey
+                         ;; ;; high-contrast
+                         ;; ;; hipster
+                         ;; ;; hober
+                         ;; ;; hydandata-light
+                         ;; ;; idea-darkula
+                         ;; ;; infodoc
+                         ;; ;; inkpot
+                         ;; ;; iodine
+                         ;; ;; ir-black
+                         ;; ;; jazz
+                         ;; ;; jbeans
+                         ;; ;; jb-simple
+                         ;; ;; jedit-grey
+                         ;; ;; jonadabian-slate
+                         ;; ;; jonadabian
+                         ;; ;; jsc-dark
+                         ;; ;; jsc-light2
+                         ;; ;; jsc-light
+                         ;; ;; julie
+                         ;; ;; junio
+                         ;; ;; katester
+                         ;; ;; kingsajz
+                         ;; ;; kooten
+                         ;; ;; late-night
+                         ;; ;; lavender
+                         ;; ;; lawrence
+                         ;; ;; ld-dark
+                         ;; ;; lethe
+                         ;; ;; leuven
+                         ;; ;; light-soap
+                         ;; ;; lush
+                         ;; ;; mac-classic
+                         ;; ;; majapahit-dark
+                         ;; ;; majapahit-light
+                         ;; ;; marine
+                         ;; ;; marquardt
+                         ;; ;; material-light
+                         ;; ;; material
+                         ;; ;; matrix
+                         ;; ;; mbo70s
+                         ;; ;; mccarthy
+                         ;; ;; meacupla
+                         ;; ;; mellow
+                         ;; ;; midnight
+                         ;; ;; minimal-light
+                         ;; ;; minimal
+                         ;; ;; mistyday
+                         ;; ;; moe-dark
+                         ;; ;; moe-light
+                         ;; ;; moe
+                         ;; ;; molokai
+                         ;; ;; monochrome-bright
+                         ;; ;; monochrome
+                         ;; ;; monokai
+                         ;; ;; montz
+                         ;; ;; mustang
+                         ;; ;; mustard
+                         ;; ;; my-solarized-dark
+                         ;; ;; my-solarized-light
+                         ;; ;; naquadah
+                         ;; ;; niflheim
+                         ;; ;; noctilux
+                         ;; ;; obsidian
+                         ;; ;; occidental
+                         ;; ;; odersky
+                         ;; ;; oldlace
+                         ;; ;; organic-green
+                         ;; ;; oswald
+                         ;; ;; paper
+                         ;; ;; parus
+                         ;; ;; pastelmac
+                         ;; ;; pastels-on-dark
+                         ;; ;; peacock
+                         ;; ;; phoenix-dark-mono
+                         ;; ;; phoenix-dark-pink
+                         ;; ;; pierson
+                         ;; ;; planet
+                         ;; ;; pok-wob
+                         ;; ;; pok-wog
+                         ;; ;; professional
+                         ;; ;; purple-haze
+                         ;; ;; quasi-monochrome
+                         ;; ;; radiance
+                         ;; ;; railscasts
+                         ;; ;; railscast
+                         ;; ;; ramangalahy
+                         ;; ;; raspopovic
+                         ;; ;; renegade
+                         ;; ;; resolve
+                         ;; ;; retro-green
+                         ;; ;; retro-orange
+                         ;; ;; reverse
+                         ;; ;; reykjavik
+                         ;; ;; rippedcasts
+                         ;; ;; ritchie
+                         ;; ;; robin-hood
+                         ;; ;; rotor
+                         ;; ;; ryerson
+                         ;; ;; salmon-diff
+                         ;; ;; salmon-font-lock
+                         ;; ;; sanityinc-tomorrow-blue
+                         ;; ;; sanityinc-tomorrow-bright
+                         ;; ;; sanityinc-tomorrow-day
+                         ;; ;; sanityinc-tomorrow-eighties
+                         ;; ;; sanityinc-tomorrow-night
+                         ;; ;; scintilla
+                         ;; ;; seoul256
+                         ;; ;; seti
+                         ;; ;; shaman
+                         ;; ;; simple-1
+                         ;; ;; sitaramv-nt
+                         ;; ;; sitaramv-solaris
+                         ;; ;; slime
+                         ;; ;; smyx
+                         ;; ;; snowish
+                         ;; ;; snow
+                         ;; ;; soft-charcoal
+                         ;; ;; soft-morning
+                         ;; ;; soft-stone
+                         ;; ;; solarized-dark
+                         ;; ;; solarized-light
+                         ;; ;; solarized
+                         ;; ;; soothe
+                         ;; ;; spacegray
+                         ;; ;; spolsky
+                         ;; ;; standard-ediff
+                         ;; ;; standard
+                         ;; ;; stekene-dark
+                         ;; ;; stekene-light
+                         ;; ;; subatomic256
+                         ;; ;; subatomic
+                         ;; ;; subdued
+                         ;; ;; subtle-blue
+                         ;; ;; subtle-hacker
+                         ;; ;; sunburst
+                         ;; ;; sunny-day
+                         ;; ;; suscolors
+                         ;; ;; taming-mr-arneson
+                         ;; ;; tango-2
+                         ;; ;; tango-plus
+                         ;; ;; tangotango
+                         ;; ;; tao-yang
+                         ;; ;; tao-yin
+                         ;; ;; taylor
+                         ;; ;; tommyh
+                         ;; ;; tomorrow-night-paradise
+                         ;; ;; tronesque
+                         ;; ;; tron
+                         ;; ;; tty-dark
+                         ;; ;; twilight-bright
+                         ;; ;; twilight
+                         ;; ;; ubuntu
+                         ;; ;; ujelly
+                         ;; ;; underwater
+                         ;; ;; vim-colors
+                         ;; ;; waher
+                         ;; ;; warm-night
+                         ;; ;; whateveryouwant
+                         ;; ;; wheat
+                         ;; ;; white-sand
+                         ;; ;; wilson
+                         ;; ;; word-perfect
+                         ;; ;; xemacs
+                         ;; ;; xp
+                         ;; ;; zen-and-art
+                         ;; ;; zenburn
+                         ;; ;; zonokai-red
+                         ;; ;; zonokai-blue
+                         ;; ;; zonokai
+                         ;; )
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
    ;;
@@ -680,7 +684,7 @@ values."
    ;; dotspacemacs-default-font `("Courier" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; dotspacemacs-default-font `("Office Code Pro D" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Perfect UTF-8, good sans serif
-   dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
+   ;; dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Droid has odd spaced UTF-8
    ;; dotspacemacs-default-font '("Droid Sans Mono" :size 6.0)
    ;; Monoid has odd spaced UTF-8
@@ -691,7 +695,7 @@ values."
    ;; dotspacemacs-default-font `("Liberation Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; dotspacemacs-default-font `("Source Code Pro for Powerline" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Very condensed -- pretty good for coding -- same odd shapes offs UTF as Liberation Mono
-   ;; dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.2)
+   dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.2)
    ;; dotspacemacs-default-font ("Ubuntu Mono" :size 6.0 :weight normal :width normal :powerline-scale 1.4)
     ;; dotspacemacs-default-font '("Source Code Pro"
     ;;                              :size 16.0
@@ -1093,6 +1097,8 @@ This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
 
   (progn
+
+    (setq dotspacemacs-themes (mapcar (lambda (package) (intern (string-remove-suffix "-theme" (symbol-name package)))) themes-megapack-packages))
     (persistent-scratch-setup-default)
   ;;   (when (and (configuration-layer/layer-usedp 'python)
   ;;              (configuration-layer/layer-usedp 'gtags))
@@ -2067,13 +2073,14 @@ long messages in some external browser (see `browse-url-generic-program')."
         (setq flycheck-highlighting-mode 'sexps)
         ;; the pos-tip window doesn't seem to work with my awesome setup (anymore)
         (setq flycheck-display-errors-function #'flycheck-display-error-messages)
+        (setq-default flycheck-pylint-use-symbolic-id nil)
 
         ;; Chain pylint after flake8 to get benefit of both.
-        ;; (flycheck-add-next-checker 'python-flake8 'python-pylint)
-        (flycheck-add-next-checker 'python-pylint 'python-pycompile)
+        (flycheck-add-next-checker 'python-flake8 'python-pylint)
+        ;; (flycheck-add-next-checker 'python-pylint 'python-pycompile)
 
         ;; (setq flycheck-checkers (delq 'python-pycompile flycheck-checkers))
-        (setq flycheck-checkers (cons 'python-pylint (delq 'python-pylint flycheck-checkers)))
+        ;; (setq flycheck-checkers (cons 'python-pylint (delq 'python-pylint flycheck-checkers)))
 
         (define-key flycheck-mode-map (kbd "M-n") 'flycheck-next-error)
         (define-key flycheck-mode-map (kbd "M-p") 'flycheck-previous-error)))
@@ -2309,25 +2316,25 @@ long messages in some external browser (see `browse-url-generic-program')."
                     (goto-char impstart)
                     (insert bigstr)))))))
 
-        ;; (defun my-python-mode-hook ()
-        ;;   (setq comment-column 60)
+        (defun my-python-mode-hook ()
+          (setq comment-column 60)
 
-        ;;   ;; This gives and error
-        ;;   ;; (message "select checker")
-        ;;   ;; This is required b/c for some reason it's still not loaded at this point.
-        ;;   ;; (require 'flycheck)
+          ;;   ;; This gives and error
+          ;;   ;; (message "select checker")
+          ;;   ;; This is required b/c for some reason it's still not loaded at this point.
+          ;;   ;; (require 'flycheck)
 
-        ;;   ;; not needed now that we chain
-        ;;   ;; (flycheck-select-checker 'python-pycheckers)
-        ;;   ;; (message "post select checker")
+          ;;   ;; not needed now that we chain
+          ;;   ;; (flycheck-select-checker 'python-pycheckers)
+          ;;   ;; (message "post select checker")
 
-        ;;   ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
-        ;;   ;; (message "select set exec")
-        ;;   ;; (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
+          ;;   ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
+          ;;   ;; (message "select set exec")
+          ;;   ;; (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
 
-        ;;   (message "Python mode hook done"))
+          (message "Python mode hook done"))
 
-        ;; (add-hook 'python-mode-hook 'my-python-mode-hook 'append)
+        (add-hook 'python-mode-hook 'my-python-mode-hook)
         )
       )
 
@@ -3183,35 +3190,15 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(evil-want-Y-yank-to-eol nil)
- '(magit-diff-use-overlays nil)
  '(package-selected-packages
    (quote
-    (xclip exotica-theme cmake-ide levenshtein org-category-capture helm-themes helm-swoop helm-purpose helm-projectile helm-mode-manager helm-flx helm-descbinds helm-ag flyspell-correct-helm ace-jump-helm-line ghub+ apiwrap ghub helm-pydoc helm-gtags helm-gitignore helm-css-scss helm-company helm-c-yasnippet impatient-mode org-brain add-node-modules-path evil-org company-php ac-php-core xcscope godoctor flycheck-bashate evil-lion editorconfig password-generator realgud test-simple loc-changes load-relative company-lua base16-theme white-sand-theme string-inflection rebecca-theme go-rename symon nhexl-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl browse-at-remote powerline spinner org-plus-contrib alert log4e gntp metaweblog xml-rpc markdown-mode skewer-mode simple-httpd multiple-cursors js2-mode fsm window-purpose imenu-list hydra parent-mode gh marshal logito pcache ht flyspell-correct pos-tip flycheck flx magit git-commit with-editor smartparens iedit anzu evil goto-chg undo-tree highlight php-mode json-mode tablist magit-popup docker-tramp json-snatcher json-reformat diminish autothemer projectile pkg-info epl counsel swiper dash-functional tern go-mode company bind-map bind-key yasnippet packed auctex async anaconda-mode pythonic f dash s avy auto-complete popup haml-mode web-completion-data link-hint helm ivy zonokai-theme zenburn-theme zen-and-art-theme yapfify yaml-mode xterm-color ws-butler winum which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme tronesque-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd sunny-day-theme sublime-themes subatomic256-theme subatomic-theme stickyfunc-enhance srefactor spaceline spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin planet-theme pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools pcre2el pastels-on-dark-theme paradox package-lint osx-trash osx-dictionary orgit organic-green-theme org2blog org-projectile org-present org-pomodoro org-download org-caldav org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme niflheim-theme neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc mandm-theme majapahit-theme magithub magit-gitflow magit-gh-pulls madhat2r-theme macrostep lush-theme lua-mode lorem-ipsum livid-mode live-py-mode linum-relative light-soap-theme less-css-mode launchctl js2-refactor js-doc jbeans-theme jazz-theme jabber ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme info+ indent-guide ietf-docs hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt heroku-theme hemisu-theme help-fns+ helm-make helm-core hc-zenburn-theme gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate golden-ratio go-guru go-eldoc gnuplot gitignore-mode github-search github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh-md ggtags gandalf-theme fuzzy flyspell-correct-ivy flycheck-pos-tip flx-ido flatui-theme flatland-theme fish-mode firebelly-theme fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help erc-social-graph erc-image erc-hl-nicks emmet-mode elisp-slime-nav dumb-jump drupal-mode dracula-theme dockerfile-mode docker django-theme disaster darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode counsel-projectile company-web company-tern company-statistics company-shell company-go company-c-headers company-auctex company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode cmake-mode clues-theme clean-aindent-mode clang-format cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link ac-ispell)))
- '(safe-local-variable-values
-   (quote
-    ((docker-image-name . "ubuntu-kvm")
-     (docker-image-name . "dockeng")
-     (docker-image-name . "hyperv")
-     (evil-shift-width . 2)
-     (eval progn
-           (require
-            (quote projectile))
-           (puthash
-            (projectile-project-root)
-            "make test" projectile-test-cmd-map))
-     (org-confirm-babel-evaluate)
-     (eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)"))))
- '(send-mail-function (quote smtpmail-send-it)))
+    (zenburn-theme zen-and-art-theme yapfify yaml-mode xterm-color xclip ws-butler winum white-sand-theme which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd symon sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection stickyfunc-enhance srefactor spaceline powerline spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 rebecca-theme realgud test-simple loc-changes load-relative ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin planet-theme pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools pcre2el pbcopy password-generator paradox spinner package-lint osx-trash osx-dictionary orgit organic-green-theme org-projectile org-category-capture org-present org-pomodoro org-download org-caldav org-bullets org-brain open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme nhexl-mode neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert ht alert log4e gntp move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc markdown-mode mandm-theme majapahit-theme magit-gitflow madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode skewer-mode live-py-mode linum-relative link-hint light-soap-theme less-css-mode launchctl js2-refactor multiple-cursors js2-mode js-doc jbeans-theme jazz-theme jabber fsm ivy-purpose window-purpose imenu-list ivy-hydra ir-black-theme insert-shebang inkpot-theme info+ indent-guide impatient-mode simple-httpd ietf-docs hydra hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt heroku-theme hemisu-theme help-fns+ helm-make helm helm-core hc-zenburn-theme haml-mode gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate golden-ratio godoctor go-rename go-guru go-eldoc gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md ggtags gandalf-theme fuzzy flyspell-correct-ivy flyspell-correct flycheck-pos-tip pos-tip flycheck-bashate flycheck flx-ido flx flatui-theme flatland-theme fish-mode fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exotica-theme exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org org-plus-contrib evil-numbers evil-nerd-commenter evil-matchit evil-magit magit git-commit with-editor evil-lisp-state smartparens evil-lion evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight espresso-theme eshell-z eshell-prompt-extras esh-help erc-social-graph erc-image erc-hl-nicks emmet-mode elisp-slime-nav editorconfig dumb-jump drupal-mode dracula-theme dockerfile-mode docker json-mode tablist magit-popup docker-tramp json-snatcher json-reformat django-theme disaster diminish diff-hl darktooth-theme autothemer darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode counsel-projectile projectile pkg-info epl counsel swiper ivy company-web web-completion-data company-tern dash-functional tern company-statistics company-shell company-php ac-php-core xcscope php-mode company-lua lua-mode company-go go-mode company-c-headers company-auctex company-anaconda company column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode cmake-mode cmake-ide levenshtein clues-theme clean-aindent-mode clang-format cherry-blossom-theme busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme bind-map bind-key base16-theme badwolf-theme auto-yasnippet yasnippet auto-highlight-symbol auto-dictionary auto-compile packed auctex async apropospriate-theme anti-zenburn-theme anaconda-mode pythonic f dash s ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link avy ac-ispell auto-complete popup))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:background nil))))
- '(erc-input-face ((t (:foreground "cornflowerblue"))))
- '(font-lock-comment-delimiter-face ((t (:foreground "grey33"))))
- '(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic))))
  '(irfc-head-name-face ((t (:inherit org-level-1))))
  '(irfc-head-number-face ((t (:inherit org-level-1))))
  '(irfc-rfc-link-face ((t (:inherit org-link)))))
