@@ -1563,8 +1563,6 @@ long messages in some external browser (see `browse-url-generic-program')."
           ;; (mu4e-alert-enable-mode-line-display)
           ;; (mu4e-alert-enable-notifications)
 
-          (mu4e-alert-disable-mode-line-display)
-
           ;; ;; XXX disabled trying to find hang XXX THIS CAUSED IT
           (add-hook 'mu4e-headers-mode-hook
             (lambda () (progn
