@@ -107,10 +107,11 @@ values."
       (lua :variables lua-default-application "lua5.1")
       markdown
       ;; Primary test runner is pytest use 'SPC u' prefix to invoke nose
-      (python :variables python-fill-column 120
-                         python-test-runner '(pytest nose)
-                         python-auto-set-local-pyvenv-virtualenv nil
-                         python-auto-set-local-pyenv-virtualenv nil)
+      (python :variables python-fill-column 100
+                         python-test-runner '(nose pytest)
+                         ;; python-auto-set-local-pyvenv-virtualenv on-visit
+                         ;; python-auto-set-local-pyenv-virtualenv nil
+                         python-enable-yapf-format-on-save nil)
       ;; disable emacs-lisp due to completionion in comments parsing tons
       ;; of .el files https://github.com/syl20bnr/spacemacs/issues/7038
       (semantic :disabled-for emacs-lisp)
@@ -188,14 +189,14 @@ You should not put any user code in there besides modifying the variable
 values."
   ;; mDetermine display size to pick font size
 
-  (setq ch-def-height 10.0)
+  (setq ch-def-height 12.0)
   (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
         ;; (yres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* [0-9]*x\\([0-9]*\\) .*/\\1/'")))
         )
     (setq xres (replace-regexp-in-string "\n\\'" "" xres))
     ;; (setq yres (replace-regexp-in-string "\n\\'" "" yres))
     (if (<= (string-to-number xres) 5000)
-        (setq ch-def-height 11.0)))
+        (setq ch-def-height 12.0)))
   ;; (message "def height %s" ch-def-height)
 
 
@@ -264,418 +265,13 @@ values."
 
    dotspacemacs-themes '(
                          misterioso
-                         classic
+                         ;; classic
                          molokai
                          mandm
-                         classic
-                         cobalt
+                         ;; classic
+                         ;; cobalt
                          leuven
                          )
-   ;;                       ;; ;; colorsarenice-light
-
-                         ;; zenburn
-                         ;; material-light
-                         ;; ;; quasi-monochrome
-                         ;; monokai
-                         ;; ;; phoenix-dark-pink
-                         ;; ;; phoenix-dark-mono
-                         ;; spacemacs-dark
-                         ;; spacemacs-light
-                         ;; ;; solarized-light
-                         ;; solarized-dark
-                         ;; ;; ;; theme-test
-                         ;; ;; aalto-dark
-                         ;; ;; aalto-light
-                         ;; ;; abyss
-                         ;; ;; afternoon
-                         ;; ;; alect-black-alt
-                         ;; ;; alect-black
-                         ;; ;; alect-dark-alt
-                         ;; ;; alect-dark
-                         ;; ;; alect-light-alt
-                         ;; ;; alect-light
-                         ;; ;; aliceblue
-                         ;; ;; Amelie
-                         ;; ;; ample-flat
-                         ;; ;; ample-light
-                         ;; ;; ample
-                         ;; ;; ample-zen
-                         ;; ;; andreas
-                         ;; ;; anti-zenburn
-                         ;; ;; arjen-grey
-                         ;; ;; arjen
-                         ;; ;; assemblage
-                         ;; ;; atom-one-dark
-                         ;; ;; aurora
-                         ;; ;; autumn-light
-                         ;; ;; badger
-                         ;; ;; badwolf
-                         ;; ;; base16-3024-dark
-                         ;; ;; base16-3024-light
-                         ;; ;; base16-apathy-dark
-                         ;; ;; base16-apathy-light
-                         ;; ;; base16-ashes-dark
-                         ;; ;; base16-ashes-light
-                         ;; ;; base16-ateliercave-dark
-                         ;; ;; base16-ateliercave-light
-                         ;; ;; base16-atelierdune-dark
-                         ;; ;; base16-atelierdune-light
-                         ;; ;; base16-atelierestuary-dark
-                         ;; ;; base16-atelierestuary-light
-                         ;; ;; base16-atelierforest-dark
-                         ;; ;; base16-atelierforest-light
-                         ;; ;; base16-atelierheath-dark
-                         ;; ;; base16-atelierheath-light
-                         ;; ;; base16-atelierlakeside-dark
-                         ;; ;; base16-atelierlakeside-light
-                         ;; ;; base16-atelierplateau-dark
-                         ;; ;; base16-atelierplateau-light
-                         ;; ;; base16-ateliersavanna-dark
-                         ;; ;; base16-ateliersavanna-light
-                         ;; ;; base16-atelierseaside-dark
-                         ;; ;; base16-atelierseaside-light
-                         ;; ;; base16-ateliersulphurpool-dark
-                         ;; ;; base16-ateliersulphurpool-light
-                         ;; ;; base16-bespin-dark
-                         ;; ;; base16-bespin-light
-                         ;; ;; base16-brewer-dark
-                         ;; ;; base16-brewer-light
-                         ;; ;; base16-bright-dark
-                         ;; ;; base16-bright-light
-                         ;; ;; base16-chalk-dark
-                         ;; ;; base16-chalk-light
-                         ;; ;; base16-codeschool-dark
-                         ;; ;; base16-codeschool-light
-                         ;; ;; base16-colors-dark
-                         ;; ;; base16-colors-light
-                         ;; ;; base16-darktooth-dark
-                         ;; ;; base16-darktooth-light
-                         ;; ;; base16-default-dark
-                         ;; ;; base16-default-light
-                         ;; ;; base16-eighties-dark
-                         ;; ;; base16-eighties-light
-                         ;; ;; base16-embers-dark
-                         ;; ;; base16-embers-light
-                         ;; ;; base16-flat-dark
-                         ;; ;; base16-flat-light
-                         ;; ;; base16-google-dark
-                         ;; ;; base16-google-light
-                         ;; ;; base16-grayscale-dark
-                         ;; ;; base16-grayscale-light
-                         ;; ;; base16-greenscreen-dark
-                         ;; ;; base16-greenscreen-light
-                         ;; ;; base16-harmonic16-dark
-                         ;; ;; base16-harmonic16-light
-                         ;; ;; base16-hopscotch-dark
-                         ;; ;; base16-hopscotch-light
-                         ;; ;; base16-irblack-dark
-                         ;; ;; base16-irblack-light
-                         ;; ;; base16-isotope-dark
-                         ;; ;; base16-isotope-light
-                         ;; ;; base16-londontube-dark
-                         ;; ;; base16-londontube-light
-                         ;; ;; base16-macintosh-dark
-                         ;; ;; base16-macintosh-light
-                         ;; ;; base16-marrakesh-dark
-                         ;; ;; base16-marrakesh-light
-                         ;; ;; base16-mocha-dark
-                         ;; ;; base16-mocha-light
-                         ;; ;; base16-monokai-dark
-                         ;; ;; base16-monokai-light
-                         ;; ;; base16-ocean-dark
-                         ;; ;; base16-oceanicnext-dark
-                         ;; ;; base16-oceanicnext-light
-                         ;; ;; base16-ocean-light
-                         ;; ;; base16-paraiso-dark
-                         ;; ;; base16-paraiso-light
-                         ;; ;; base16-phd-dark
-                         ;; ;; base16-phd-light
-                         ;; ;; base16-pop-dark
-                         ;; ;; base16-pop-light
-                         ;; ;; base16-railscasts-dark
-                         ;; ;; base16-railscasts-light
-                         ;; ;; base16-setiui-dark
-                         ;; ;; base16-setiui-light
-                         ;; ;; base16-shapeshifter-dark
-                         ;; ;; base16-shapeshifter-light
-                         ;; ;; base16-solarized-dark
-                         ;; ;; base16-solarized-light
-                         ;; ;; base16-summerfruit-dark
-                         ;; ;; base16-summerfruit-light
-                         ;; ;; base16-tomorrow-dark
-                         ;; ;; base16-tomorrow-light
-                         ;; ;; base16-twilight-dark
-                         ;; ;; base16-twilight-light
-                         ;; ;; base16-yesterdaybright-dark
-                         ;; ;; base16-yesterdaybright-light
-                         ;; ;; base16-yesterday-dark
-                         ;; ;; base16-yesterday-light
-                         ;; ;; base16-yesterdaynight-dark
-                         ;; ;; base16-yesterdaynight-light
-                         ;; ;; beige-diff
-                         ;; ;; beige-eshell
-                         ;; ;; bharadwaj-slate
-                         ;; ;; bharadwaj
-                         ;; ;; billw
-                         ;; ;; birds-of-paradise-plus
-                         ;; ;; blackboard
-                         ;; ;; black-on-gray
-                         ;; ;; blippblopp
-                         ;; ;; bliss
-                         ;; ;; blue-erc
-                         ;; ;; blue-eshell
-                         ;; ;; blue-gnus
-                         ;; ;; blue-mood
-                         ;; ;; blue-sea
-                         ;; ;; borland-blue
-                         ;; ;; boron
-                         ;; ;; brin
-                         ;; ;; bubbleberry
-                         ;; ;; busybee
-                         ;; ;; calmer-forest
-                         ;; ;; calm-forest
-                         ;; ;; caroline
-                         ;; ;; charcoal-black
-                         ;; ;; cherry-blossom
-                         ;; ;; clarity
-                         ;; ;; clues
-                         ;; ;; colonoscopy
-                         ;; ;; colorsarenice-dark
-                         ;; ;; colorsarenice-light
-                         ;; ;; comidia
-                         ;; ;; cyberpunk
-                         ;; ;; dakrone
-                         ;; ;; dark-blue2
-                         ;; ;; dark-blue
-                         ;; ;; darkburn
-                         ;; ;; dark-erc
-                         ;; ;; dark-font-lock
-                         ;; ;; dark-gnus
-                         ;; ;; dark-green
-                         ;; ;; dark-info
-                         ;; ;; dark-krystal
-                         ;; ;; dark-laptop
-                         ;; ;; dark-mint
-                         ;; ;; darktooth
-                         ;; ;; deep-blue
-                         ;; ;; deep-thought
-                         ;; ;; desert
-                         ;; ;; Deviant
-                         ;; ;; digital-ofs1
-                         ;; ;; distinguished
-                         ;; ;; django
-                         ;; ;; dorsey
-                         ;; ;; dracula
-                         ;; ;; dream
-                         ;; ;; eltbus
-                         ;; ;; emacs-21
-                         ;; ;; emacs-nw
-                         ;; ;; erosiond
-                         ;; ;; euphoria
-                         ;; ;; evenhold
-                         ;; ;; faff
-                         ;; ;; farmhouse-dark
-                         ;; ;; farmhouse-light
-                         ;; ;; feng-shui
-                         ;; ;; firebelly
-                         ;; ;; firecode
-                         ;; ;; fischmeister
-                         ;; ;; flatland-black
-                         ;; ;; flatland
-                         ;; ;; flatui
-                         ;; ;; fogus
-                         ;; ;; gandalf
-                         ;; ;; github
-                         ;; ;; gnome2
-                         ;; ;; gnome
-                         ;; ;; goldenrod
-                         ;; ;; gotham
-                         ;; ;; graham
-                         ;; ;; grandshell
-                         ;; ;; granger
-                         ;; ;; gray1
-                         ;; ;; gray30
-                         ;; ;; green-phosphor
-                         ;; ;; greiner
-                         ;; ;; greymatters
-                         ;; ;; gruber-darker
-                         ;; ;; gruvbox
-                         ;; ;; gtk-ide
-                         ;; ;; hemisu-dark
-                         ;; ;; hemisu-light
-                         ;; ;; hemisu
-                         ;; ;; heroku
-                         ;; ;; hickey
-                         ;; ;; high-contrast
-                         ;; ;; hipster
-                         ;; ;; hober
-                         ;; ;; hydandata-light
-                         ;; ;; idea-darkula
-                         ;; ;; infodoc
-                         ;; ;; inkpot
-                         ;; ;; iodine
-                         ;; ;; ir-black
-                         ;; ;; jazz
-                         ;; ;; jbeans
-                         ;; ;; jb-simple
-                         ;; ;; jedit-grey
-                         ;; ;; jonadabian-slate
-                         ;; ;; jonadabian
-                         ;; ;; jsc-dark
-                         ;; ;; jsc-light2
-                         ;; ;; jsc-light
-                         ;; ;; julie
-                         ;; ;; junio
-                         ;; ;; katester
-                         ;; ;; kingsajz
-                         ;; ;; kooten
-                         ;; ;; late-night
-                         ;; ;; lavender
-                         ;; ;; lawrence
-                         ;; ;; ld-dark
-                         ;; ;; lethe
-                         ;; ;; leuven
-                         ;; ;; light-soap
-                         ;; ;; lush
-                         ;; ;; mac-classic
-                         ;; ;; majapahit-dark
-                         ;; ;; majapahit-light
-                         ;; ;; marine
-                         ;; ;; marquardt
-                         ;; ;; material-light
-                         ;; ;; material
-                         ;; ;; matrix
-                         ;; ;; mbo70s
-                         ;; ;; mccarthy
-                         ;; ;; meacupla
-                         ;; ;; mellow
-                         ;; ;; midnight
-                         ;; ;; minimal-light
-                         ;; ;; minimal
-                         ;; ;; mistyday
-                         ;; ;; moe-dark
-                         ;; ;; moe-light
-                         ;; ;; moe
-                         ;; ;; molokai
-                         ;; ;; monochrome-bright
-                         ;; ;; monochrome
-                         ;; ;; monokai
-                         ;; ;; montz
-                         ;; ;; mustang
-                         ;; ;; mustard
-                         ;; ;; my-solarized-dark
-                         ;; ;; my-solarized-light
-                         ;; ;; naquadah
-                         ;; ;; niflheim
-                         ;; ;; noctilux
-                         ;; ;; obsidian
-                         ;; ;; occidental
-                         ;; ;; odersky
-                         ;; ;; oldlace
-                         ;; ;; organic-green
-                         ;; ;; oswald
-                         ;; ;; paper
-                         ;; ;; parus
-                         ;; ;; pastelmac
-                         ;; ;; pastels-on-dark
-                         ;; ;; peacock
-                         ;; ;; phoenix-dark-mono
-                         ;; ;; phoenix-dark-pink
-                         ;; ;; pierson
-                         ;; ;; planet
-                         ;; ;; pok-wob
-                         ;; ;; pok-wog
-                         ;; ;; professional
-                         ;; ;; purple-haze
-                         ;; ;; quasi-monochrome
-                         ;; ;; radiance
-                         ;; ;; railscasts
-                         ;; ;; railscast
-                         ;; ;; ramangalahy
-                         ;; ;; raspopovic
-                         ;; ;; renegade
-                         ;; ;; resolve
-                         ;; ;; retro-green
-                         ;; ;; retro-orange
-                         ;; ;; reverse
-                         ;; ;; reykjavik
-                         ;; ;; rippedcasts
-                         ;; ;; ritchie
-                         ;; ;; robin-hood
-                         ;; ;; rotor
-                         ;; ;; ryerson
-                         ;; ;; salmon-diff
-                         ;; ;; salmon-font-lock
-                         ;; ;; sanityinc-tomorrow-blue
-                         ;; ;; sanityinc-tomorrow-bright
-                         ;; ;; sanityinc-tomorrow-day
-                         ;; ;; sanityinc-tomorrow-eighties
-                         ;; ;; sanityinc-tomorrow-night
-                         ;; ;; scintilla
-                         ;; ;; seoul256
-                         ;; ;; seti
-                         ;; ;; shaman
-                         ;; ;; simple-1
-                         ;; ;; sitaramv-nt
-                         ;; ;; sitaramv-solaris
-                         ;; ;; slime
-                         ;; ;; smyx
-                         ;; ;; snowish
-                         ;; ;; snow
-                         ;; ;; soft-charcoal
-                         ;; ;; soft-morning
-                         ;; ;; soft-stone
-                         ;; ;; solarized-dark
-                         ;; ;; solarized-light
-                         ;; ;; solarized
-                         ;; ;; soothe
-                         ;; ;; spacegray
-                         ;; ;; spolsky
-                         ;; ;; standard-ediff
-                         ;; ;; standard
-                         ;; ;; stekene-dark
-                         ;; ;; stekene-light
-                         ;; ;; subatomic256
-                         ;; ;; subatomic
-                         ;; ;; subdued
-                         ;; ;; subtle-blue
-                         ;; ;; subtle-hacker
-                         ;; ;; sunburst
-                         ;; ;; sunny-day
-                         ;; ;; suscolors
-                         ;; ;; taming-mr-arneson
-                         ;; ;; tango-2
-                         ;; ;; tango-plus
-                         ;; ;; tangotango
-                         ;; ;; tao-yang
-                         ;; ;; tao-yin
-                         ;; ;; taylor
-                         ;; ;; tommyh
-                         ;; ;; tomorrow-night-paradise
-                         ;; ;; tronesque
-                         ;; ;; tron
-                         ;; ;; tty-dark
-                         ;; ;; twilight-bright
-                         ;; ;; twilight
-                         ;; ;; ubuntu
-                         ;; ;; ujelly
-                         ;; ;; underwater
-                         ;; ;; vim-colors
-                         ;; ;; waher
-                         ;; ;; warm-night
-                         ;; ;; whateveryouwant
-                         ;; ;; wheat
-                         ;; ;; white-sand
-                         ;; ;; wilson
-                         ;; ;; word-perfect
-                         ;; ;; xemacs
-                         ;; ;; xp
-                         ;; ;; zen-and-art
-                         ;; ;; zenburn
-                         ;; ;; zonokai-red
-                         ;; ;; zonokai-blue
-                         ;; ;; zonokai
-                         ;; )
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
    ;;
@@ -878,6 +474,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   ;; Copied from core/core-fonts-support.el
 
+  ;; XXX debug disappearing modeline
   (let* ((font (car dotspacemacs-default-font))
          (props (cdr dotspacemacs-default-font))
          (scale (plist-get props :powerline-scale))
@@ -1149,7 +746,9 @@ layers configuration. You are free to put any user code."
 
     (xclip-mode 1)
     (when (not (display-graphic-p))
-      (turn-on-xclip))
+      (condition-case err
+          (turn-on-xclip)
+        (void-function nil)))
 
     (setq
      spacemacs--hjkl-completion-navigation-functions nil
@@ -1173,8 +772,28 @@ layers configuration. You are free to put any user code."
                   (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u299A))
                   (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u2503))
 
+                  (spaceline-toggle-minor-modes-off)
+
                   (setq spaceline-window-numbers-unicode nil
                         spaceline-workspace-numbers-unicode nil)
+
+
+                  ;; ;; We can dump this in a while when spaceline is fixed to not blank the modeline
+                  ;; ;; with very long buffer names
+                  ;; (defun spaceline-spacemacs-theme (&rest additional-segments)
+                  ;;   "Install the modeline used by Spacemacs.
+                  ;;    ADDITIONAL-SEGMENTS are inserted on the right, between `global' and
+                  ;;    `buffer-position'."
+                  ;;   (apply 'spaceline--theme
+                  ;;          '((persp-name
+                  ;;             workspace-number
+                  ;;             window-number)
+                  ;;            :fallback evil-state
+                  ;;            :face highlight-face
+                  ;;            :priority 0)
+                  ;;          '((buffer-modified buffer-size buffer-id remote-host)
+                  ;;            :priority 5)
+                  ;;          additional-segments))
 
                   )
 
@@ -1487,14 +1106,14 @@ layers configuration. You are free to put any user code."
 
       ;; (setq erc-modules (delete 'fill erc-modules))
 
-      (defvar evil-normal-state-on-unfocus-modes
-        '(erc-mode))
-      (defun evil-normal-state-on-unfocus ()
-        "Return to normal state when a buffer in a given major mode is unfocussed"
-        (when (member major-mode evil-normal-state-on-unfocus-modes)
-          (evil-normal-state)))
-
-      (add-hook 'unfocus-buffer-hook 'evil-normal-state-on-unfocus)
+      ;; XXX debug mode-line muckup
+      ;; (defvar evil-normal-state-on-unfocus-modes
+      ;;   '(erc-mode))
+      ;; (defun evil-normal-state-on-unfocus ()
+      ;;   "Return to normal state when a buffer in a given major mode is unfocussed"
+      ;;   (when (member major-mode evil-normal-state-on-unfocus-modes)
+      ;;     (evil-normal-state)))
+      ;; (add-hook 'unfocus-buffer-hook 'evil-normal-state-on-unfocus)
 
       (with-eval-after-load 'erc
         (erc-fill-disable)
@@ -1610,6 +1229,7 @@ long messages in some external browser (see `browse-url-generic-program')."
       ;; require mu-git
       ;; (setq mu4e-html2text-command 'my-mu4e-html2text)
 
+      ;; if system-name has no dot in it?
       (if (not (member ?. (string-to-list (system-name))))
           (setq smtpmail-local-domain "chopps.org"))
 
@@ -1698,20 +1318,21 @@ long messages in some external browser (see `browse-url-generic-program')."
             (list (concat mu4e-unread-filter         mu4e-not-junk-folder-filter) "Unread messages" ?a)
             (list (concat mu4e-unread-flagged-filter mu4e-not-junk-folder-filter) "Unread-flagged messages" ?A)
 
-            (list "maildir:/chopps.org/spam-probable" "Probable spam messages" ?s))
-          (mapcar (lambda (x) (cons (concat (car x) mu4e-not-junk-folder-filter) (cdr x)))
-            '(("flag:unread AND NOT flag:trashed" "Unread messages" ?u)
-               ("date:1h..now" "Last hours messages" ?h)
-               ("date:24h..now" "Today's messages" ?d)
-               ("date:today..now" "Today's messages" ?t)
-               ("date:7d..now" "Last 7 days" ?w)
-               ("date:7d..now from:chopps" "Last 7 days sent" ?W)
-               ("date:14d..now from:chopps" "Last 14 days sent" ?F)
-               ("mime:*zip" "Messages with ZIP" ?z)
-               ("mime:*pdf" "Messages with PDF" ?p)
-               ("mime:*calendar" "Messages with calendar" ?q)
-               ("mime:*cs" "Messages with VCS" ?Q)
-               )))
+            (list "(maildir:/chopps.org/spam-probable                                              )" "Probable spam messages" ?s))
+          ;; (mapcar (lambda (x) (cons (concat (car x) mu4e-not-junk-folder-filter) (cdr x)))
+          ;;   '(("flag:unread AND NOT flag:trashed" "Unread messages" ?u)
+          ;;      ("date:1h..now" "Last hours messages" ?h)
+          ;;      ("date:24h..now" "Today's messages" ?d)
+          ;;      ("date:today..now" "Today's messages" ?t)
+          ;;      ("date:7d..now" "Last 7 days" ?w)
+          ;;      ("date:7d..now from:chopps" "Last 7 days sent" ?W)
+          ;;      ("date:14d..now from:chopps" "Last 14 days sent" ?F)
+          ;;      ("mime:*zip" "Messages with ZIP" ?z)
+          ;;      ("mime:*pdf" "Messages with PDF" ?p)
+          ;;      ("mime:*calendar" "Messages with calendar" ?q)
+          ;;      ("mime:*cs" "Messages with VCS" ?Q)
+          ;;      ))
+          )
 
 
         ;; [j]ump shortcuts
@@ -1727,32 +1348,28 @@ long messages in some external browser (see `browse-url-generic-program')."
                                   ("/chopps.org/spam-train" . ?S)
                                   ("/chopps.org/spam-probable" . ?s))
 
-        ;; Visuals
         mu4e-view-show-addresses t
-        mu4e-headers-results-limit 1000
+        ;;; XXXSTART
+        ;; ;; Visuals
+        ;; mu4e-headers-results-limit 1000
         mu4e-headers-visible-lines 15
         mu4e-headers-visible-columns 80
 
+        ;; ----
+        ;; HTML
+        ;; ----
         ;; XXX Try running w/o this to see if hangs go away.
         mu4e-html2text-command 'mu4e-shr2text
         shr-color-visible-luminance-min 80
         ;; gnus-w3m
-
         ;; mu4e-html2text-command "html2markdown | grep -v '&nbsp_place_holder;'"
-
         ;; For ubuntu
         ;; mu4e-html2text-command "html2text -nobs -utf8 -width 120"
-
-
         ;; This is our last value, trying default which is shr2text I think
         ;; mu4e-html2text-command "w3m -dump -cols 120 -T text/html"
-
         ;; used ofr HTML in email ;; <#part type="message/rfc822" filename="/home/chopps/Documents/imap-accounts/chopps.org/sw-common/cur/1460249763.39525_8697.tops,U=242:2,S" disposition=attachment description="Re: Mail not correctly displayed"> <#/part>
-
         ;; make work better in dark themes
         ;; [[mu4e:msgid:87vb7ng3tn.fsf@djcbsoftware.nl][Re: I find html2markdown the best value for mu4e-html2text-command]]
-
-
         ;; this is keeping it from toggling I think
         ;; mu4e-view-html-plaintext-ratio-heuristic 15
         ;; mu4e-view-html-plaintext-ratio-heuristic 0
@@ -1860,11 +1477,17 @@ long messages in some external browser (see `browse-url-generic-program')."
                                              (smtpmail-smtp-service . 587)))))
 
 
+          ;; Work around a bug with too long names in the spaceline/modeline
+          (defun trim-modeline-string-chopps (str)
+            (substring str 0 39))
+          (add-function :filter-return (symbol-function 'mu4e~quote-for-modeline) 'trim-modeline-string-chopps)
+
           ;; Mu4E Keyboard extras
 
           (bind-key (kbd "'") 'mu4e-headers-next 'mu4e-headers-mode-map)
-          (bind-key (kbd "\"") 'mu4e-headers-prev 'mu4e-headers-mode-map)
-          (bind-key (kbd "\"") 'mu4e-view-headers-prev 'mu4e-view-mode-map)
+          ;; XXXerror with vimification
+          ;; (bind-key (kbd "\"") 'mu4e-headers-prev 'mu4e-headers-mode-map)
+          ;; (bind-key (kbd "\"") 'mu4e-view-headers-prev 'mu4e-view-mode-map)
           (bind-key (kbd "f") 'mu4e-view-go-to-url 'mu4e-view-mode-map)
 
 
@@ -1939,6 +1562,9 @@ long messages in some external browser (see `browse-url-generic-program')."
           ;; error in process sentinel: End of file during parsing
           ;; (mu4e-alert-enable-mode-line-display)
           ;; (mu4e-alert-enable-notifications)
+
+          ;; XXXmodeline
+          ;; (mu4e-alert-disable-mode-line-display)
 
           ;; ;; XXX disabled trying to find hang XXX THIS CAUSED IT
           (add-hook 'mu4e-headers-mode-hook
@@ -2018,8 +1644,10 @@ long messages in some external browser (see `browse-url-generic-program')."
           (define-key mu4e-view-mode-map "d" 'mu4e-view-mark-for-read)
           (define-key mu4e-headers-mode-map "@" 'mu4e-headers-mark-move-to-spam)
           (define-key mu4e-view-mode-map "@" 'mu4e-view-mark-move-to-spam)
-          (define-key mu4e-headers-mode-map "\\" 'mu4e-headers-mark-move-to-spam)
-          (define-key mu4e-view-mode-map "\\" 'mu4e-view-mark-move-to-spam)
+
+          ;; XXXerror with auto vimification
+          ;; (define-key mu4e-headers-mode-map "\\" 'mu4e-headers-mark-move-to-spam)
+          ;; (define-key mu4e-view-mode-map "\\" 'mu4e-view-mark-move-to-spam)
 
           (define-key mu4e-main-mode-map "u" 'mu4e-update-index)
 
@@ -2039,15 +1667,16 @@ long messages in some external browser (see `browse-url-generic-program')."
             "b" 'mu4e-view-bookmark-make-record
             )
 
-          (add-to-list 'mu4e-header-info-custom
-            '(:list-or-dir .
-               (:name "ML or maildir" ;; long name, as seen in message view
-                 :shortname "ML-D"     ;; short name, as seen in the headers view
-                 :help "Mailing list or maildir if not set"
-                 :function
-                 (lambda (msg)
-                   (or (mu4e-message-field msg :mailing-list)
-                     (mu4e-message-field msg :maildir))))))
+          ;; XXXSLOW
+          ;; (add-to-list 'mu4e-header-info-custom
+          ;;   '(:list-or-dir .
+          ;;      (:name "ML or maildir" ;; long name, as seen in message view
+          ;;        :shortname "ML-D"     ;; short name, as seen in the headers view
+          ;;        :help "Mailing list or maildir if not set"
+          ;;        :function
+          ;;        (lambda (msg)
+          ;;          (or (mu4e-message-field msg :mailing-list)
+          ;;            (mu4e-message-field msg :maildir))))))
 
           (setq
             ;; "Date         Flgs   List       From                   Subject
@@ -2055,10 +1684,11 @@ long messages in some external browser (see `browse-url-generic-program')."
                                          (:flags          .  4)
                                          (:human-date     . 12)
                                          (:from           . 18)
-                                         (:list-or-dir    . 20)
+                                         ;; (:list-or-dir    . 20)
+                                         (:maildir    . 20)
                                          (:thread-subject . nil)
                                          )))
-
+          ;; XXXSLOW
           )
         )
       )
@@ -2076,7 +1706,7 @@ long messages in some external browser (see `browse-url-generic-program')."
         (setq-default flycheck-pylint-use-symbolic-id nil)
 
         ;; Chain pylint after flake8 to get benefit of both.
-        (flycheck-add-next-checker 'python-flake8 'python-pylint)
+        ;; (flycheck-add-next-checker 'python-flake8 'python-pylint)
         ;; (flycheck-add-next-checker 'python-pylint 'python-pycompile)
 
         ;; (setq flycheck-checkers (delq 'python-pycompile flycheck-checkers))
@@ -2096,11 +1726,17 @@ long messages in some external browser (see `browse-url-generic-program')."
         (add-hook 'emacs-lisp-mode-hook 'rebox-lisp-hook)
         ))
 
+    (when (configuration-layer/layer-usedp 'go)
+      (with-eval-after-load "go-mode"
+        (defun rebox-go-hook ()
+          (set (make-local-variable 'rebox-style-loop) '(81 82 83)))
+        (add-hook 'go-mode-hook 'rebox-go-hook)
+        ))
+
     (when (configuration-layer/layer-usedp 'yaml)
       (add-hook 'yaml-mode-hook (function (lambda ()
                                             (rebox-mode)
                                             (flyspell-prog-mode)))))
-
 
     (when (configuration-layer/layer-usedp 'c-c++)
       (setq c-font-lock-extra-types
@@ -2318,6 +1954,10 @@ long messages in some external browser (see `browse-url-generic-program')."
 
         (defun my-python-mode-hook ()
           (setq comment-column 60)
+          (setq flycheck-checker 'python-pylint)
+
+                ;; flycheck-checker-error-threshold 900
+                ;; flycheck-pylintrc "~/.pylintrc")))
 
           ;;   ;; This gives and error
           ;;   ;; (message "select checker")
@@ -3190,20 +2830,35 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-term-color-vector
+   [unspecified "#14191f" "#d15120" "#81af34" "#deae3e" "#7e9fc9" "#a878b5" "#7e9fc9" "#dcdddd"])
+ '(evil-want-Y-yank-to-eol nil)
+ '(fci-rule-character-color "#192028")
+ '(fci-rule-color "#192028")
  '(package-selected-packages
    (quote
-    (zenburn-theme zen-and-art-theme yapfify yaml-mode xterm-color xclip ws-butler winum white-sand-theme which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd symon sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection stickyfunc-enhance srefactor spaceline powerline spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 rebecca-theme realgud test-simple loc-changes load-relative ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin planet-theme pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools pcre2el pbcopy password-generator paradox spinner package-lint osx-trash osx-dictionary orgit organic-green-theme org-projectile org-category-capture org-present org-pomodoro org-download org-caldav org-bullets org-brain open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme nhexl-mode neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert ht alert log4e gntp move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc markdown-mode mandm-theme majapahit-theme magit-gitflow madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode skewer-mode live-py-mode linum-relative link-hint light-soap-theme less-css-mode launchctl js2-refactor multiple-cursors js2-mode js-doc jbeans-theme jazz-theme jabber fsm ivy-purpose window-purpose imenu-list ivy-hydra ir-black-theme insert-shebang inkpot-theme info+ indent-guide impatient-mode simple-httpd ietf-docs hydra hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt heroku-theme hemisu-theme help-fns+ helm-make helm helm-core hc-zenburn-theme haml-mode gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate golden-ratio godoctor go-rename go-guru go-eldoc gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md ggtags gandalf-theme fuzzy flyspell-correct-ivy flyspell-correct flycheck-pos-tip pos-tip flycheck-bashate flycheck flx-ido flx flatui-theme flatland-theme fish-mode fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exotica-theme exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org org-plus-contrib evil-numbers evil-nerd-commenter evil-matchit evil-magit magit git-commit with-editor evil-lisp-state smartparens evil-lion evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight espresso-theme eshell-z eshell-prompt-extras esh-help erc-social-graph erc-image erc-hl-nicks emmet-mode elisp-slime-nav editorconfig dumb-jump drupal-mode dracula-theme dockerfile-mode docker json-mode tablist magit-popup docker-tramp json-snatcher json-reformat django-theme disaster diminish diff-hl darktooth-theme autothemer darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode counsel-projectile projectile pkg-info epl counsel swiper ivy company-web web-completion-data company-tern dash-functional tern company-statistics company-shell company-php ac-php-core xcscope php-mode company-lua lua-mode company-go go-mode company-c-headers company-auctex company-anaconda company column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode cmake-mode cmake-ide levenshtein clues-theme clean-aindent-mode clang-format cherry-blossom-theme busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme bind-map bind-key base16-theme badwolf-theme auto-yasnippet yasnippet auto-highlight-symbol auto-dictionary auto-compile packed auctex async apropospriate-theme anti-zenburn-theme anaconda-mode pythonic f dash s ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link avy ac-ispell auto-complete popup))))
+    (use-package fill-column-indicator ace-window counsel avy markdown-mode magit ghub ivy zenburn-theme zen-and-art-theme yapfify yaml-mode xterm-color xclip ws-butler winum white-sand-theme which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen unfill underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd symon swiper sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection stickyfunc-enhance srefactor spaceline spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 rebecca-theme realgud ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin planet-theme pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools pcre2el pbcopy password-generator paradox package-lint osx-trash osx-dictionary orgit organic-green-theme org-projectile org-present org-pomodoro org-download org-caldav org-bullets org-brain open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme nhexl-mode neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc mandm-theme majapahit-theme magit-gitflow madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode live-py-mode linum-relative link-hint light-soap-theme less-css-mode launchctl js2-refactor js-doc jbeans-theme jazz-theme jabber ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme info+ indent-guide impatient-mode ietf-docs hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt heroku-theme hemisu-theme help-fns+ helm-make hc-zenburn-theme gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate golden-ratio godoctor go-rename go-guru go-eldoc gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags gandalf-theme fuzzy flyspell-correct-ivy flycheck-pos-tip flycheck-bashate flx-ido flatui-theme flatland-theme fish-mode farmhouse-theme fancy-battery eyebrowse expand-region exotica-theme exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help erc-social-graph erc-image erc-hl-nicks emmet-mode elisp-slime-nav editorconfig dumb-jump drupal-mode dracula-theme dockerfile-mode docker django-theme disaster diminish diff-hl darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode counsel-projectile company-web company-tern company-statistics company-shell company-php company-lua company-go company-c-headers company-auctex company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode cmake-mode cmake-ide clues-theme clean-aindent-mode clang-format cherry-blossom-theme busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme bind-key base16-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-link ac-ispell)))
+ '(safe-local-variable-values
+   (quote
+    ((eval progn
+           (require
+            (quote projectile))
+           (puthash
+            (projectile-project-root)
+            "make test" projectile-test-cmd-map))
+     (python-sort-imports-on-save . t)
+     (python-enable-yapf-format-on-save . t))))
+ '(send-mail-function (quote smtpmail-send-it)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:background nil))))
+ '(erc-input-face ((t (:foreground "cornflowerblue"))))
+ '(font-lock-comment-delimiter-face ((t (:foreground "grey33"))))
+ '(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic))))
+ '(font-lock-doc-face ((t (:foreground "#036A07" :slant italic))))
  '(irfc-head-name-face ((t (:inherit org-level-1))))
  '(irfc-head-number-face ((t (:inherit org-level-1))))
  '(irfc-rfc-link-face ((t (:inherit org-link)))))
 )
-
-;; Local Variables:
-;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)")
-;; End:
