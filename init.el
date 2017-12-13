@@ -188,14 +188,14 @@ You should not put any user code in there besides modifying the variable
 values."
   ;; mDetermine display size to pick font size
 
-  (setq ch-def-height 10.0)
+  (setq ch-def-height 12.0)
   (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
         ;; (yres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* [0-9]*x\\([0-9]*\\) .*/\\1/'")))
         )
     (setq xres (replace-regexp-in-string "\n\\'" "" xres))
     ;; (setq yres (replace-regexp-in-string "\n\\'" "" yres))
     (if (<= (string-to-number xres) 5000)
-        (setq ch-def-height 10.0)))
+        (setq ch-def-height 12.0)))
   ;; (message "def height %s" ch-def-height)
 
 
@@ -1318,19 +1318,19 @@ long messages in some external browser (see `browse-url-generic-program')."
             (list (concat mu4e-unread-flagged-filter mu4e-not-junk-folder-filter) "Unread-flagged messages" ?A)
 
             (list "(maildir:/chopps.org/spam-probable                                              )" "Probable spam messages" ?s))
-          ;; (mapcar (lambda (x) (cons (concat (car x) mu4e-not-junk-folder-filter) (cdr x)))
-          ;;   '(("flag:unread AND NOT flag:trashed" "Unread messages" ?u)
-          ;;      ("date:1h..now" "Last hours messages" ?h)
-          ;;      ("date:24h..now" "Today's messages" ?d)
-          ;;      ("date:today..now" "Today's messages" ?t)
-          ;;      ("date:7d..now" "Last 7 days" ?w)
-          ;;      ("date:7d..now from:chopps" "Last 7 days sent" ?W)
-          ;;      ("date:14d..now from:chopps" "Last 14 days sent" ?F)
-          ;;      ("mime:*zip" "Messages with ZIP" ?z)
-          ;;      ("mime:*pdf" "Messages with PDF" ?p)
-          ;;      ("mime:*calendar" "Messages with calendar" ?q)
-          ;;      ("mime:*cs" "Messages with VCS" ?Q)
-          ;;      ))
+          (mapcar (lambda (x) (cons (concat (car x) mu4e-not-junk-folder-filter) (cdr x)))
+                  '(("flag:unread AND NOT flag:trashed" "Unread messages" ?u)
+               ("date:1h..now" "Last hours messages" ?h)
+               ("date:24h..now" "Today's messages" ?d)
+               ("date:today..now" "Today's messages" ?t)
+               ("date:7d..now" "Last 7 days" ?w)
+               ("date:7d..now from:chopps" "Last 7 days sent" ?W)
+               ("date:14d..now from:chopps" "Last 14 days sent" ?F)
+               ("mime:*zip" "Messages with ZIP" ?z)
+               ("mime:*pdf" "Messages with PDF" ?p)
+               ("mime:*calendar" "Messages with calendar" ?q)
+               ("mime:*cs" "Messages with VCS" ?Q)
+               ))
           )
 
 
@@ -1348,7 +1348,6 @@ long messages in some external browser (see `browse-url-generic-program')."
                                   ("/chopps.org/spam-probable" . ?s))
 
         mu4e-view-show-addresses t
-        ;;; XXXSTART
         ;; ;; Visuals
         ;; mu4e-headers-results-limit 1000
         mu4e-headers-visible-lines 15
@@ -1532,6 +1531,7 @@ long messages in some external browser (see `browse-url-generic-program')."
                 (mu4e~request-contacts))
 
             ;; XXX hate that this is the case, but DT is horrible with this crap.
+            ;; XXX need to do this only if not DT
             ;; (mml-secure-message-sign-pgpmime)
             )
           (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
