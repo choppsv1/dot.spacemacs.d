@@ -118,6 +118,10 @@ values."
       shell-scripts
       systemd
       yaml
+      (yang :variables
+            yang-pyang-rules "lint"
+            yang-pyang-extra-args "--max-line-length=79"
+            )
 
       ;; -----------------------------
       ;; Let's keep this later. (why?)
@@ -166,6 +170,7 @@ values."
      evil-mc
      irfc
      mu4e-maildirs-extension
+     nameless
      ;; projectile
      ;; projectile-mode
      ;; recentf
@@ -542,10 +547,16 @@ before packages are loaded. If you are unsure, you should try in setting them in
                                 (mandm (default :background "#011827"))
                                 (misterioso (erc-input-face :foreground "cornflowerblue")
                                             (font-lock-comment-face :foreground "DarkGrey" :slant italic)
+                                            (evil-search-highlight-persist-highlight-face :background "#338f86")
+                                            (lazy-highlight-face :background "#338f86")
                                             (font-lock-comment-delimiter-face :foreground "grey33"))
                                 (molokai (font-lock-comment-face :foreground "DarkGrey")
+                                         (evil-search-highlight-persist-highlight-face :background "#338f86")
+                                         (lazy-highlight-face :background "#338f86")
                                          (font-lock-comment-delimiter-face :foreground "grey30"))
                                 (monokai (font-lock-comment-face :foreground "#A5A17E" :slant italic)
+                                         (evil-search-highlight-persist-highlight-face :background "#338f86")
+                                         (lazy-highlight-face :background "#338f86")
                                          (font-lock-doc-face :foreground "#A5A17E" :slant italic)
                                          (font-lock-comment-delimiter-face :foreground "#55513E"))
                                 (quasi-monochrome (default :height ,(* ch-def-height 10))
@@ -652,7 +663,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
                   "oc" 'org-capture
                   "oC" 'helm-org-capture-templates ;requires templates to be defined.
                   "ol" 'org-store-link
-                  "aL" 'lisp-interaction-mode
+                  ;; "aL" 'lisp-interaction-mode
                   )
                 )
 
@@ -1686,6 +1697,18 @@ long messages in some external browser (see `browse-url-generic-program')."
                                          (:thread-subject . nil)
                                          )))
           ;; XXXSLOW
+
+          (defun compose-attach-marked-files ()
+            "Compose mail and attach all the marked files from a dired buffer."
+            (interactive)
+            (let ((files (dired-get-marked-files)))
+              (compose-mail nil nil nil t)
+              (dolist (file files)
+                (if (file-regular-p file)
+                    (mml-attach-file file
+                                     (mm-default-file-encoding file)
+                                     nil "attachment")
+                  (message "skipping non-regular file %s" file)))))
           )
         )
       )
@@ -2535,18 +2558,19 @@ long messages in some external browser (see `browse-url-generic-program')."
 
     (define-key evil-normal-state-map (kbd "C-]") 'ggtags-find-tag-dwim)
 
-    (fold-section "yang"
-                  (autoload 'yang-mode "yang-mode")
-                  (add-to-list 'auto-mode-alist '("\\.yang\\'" . yang-mode))
-                  (defun my-yang-mode-hook ()
-                    "Configuration for YANG Mode. Add this to `yang-mode-hook'."
-                    ; (c-set-style "BSD")
-                    (c-set-style "BSD")
-                    (setq indent-tabs-mode nil)
-                    (setq c-basic-offset 2)
-                    (setq font-lock-maximum-decoration t)
-                    (font-lock-mode t))
-                  (add-hook 'yang-mode-hook 'my-yang-mode-hook))
+    ;; (fold-section "yang"
+    ;;               ;; (autoload 'yang-mode "yang-mode")
+    ;;               ;; (add-to-list 'auto-mode-alist '("\\.yang\\'" . yang-mode))
+    ;;               (defun my-yang-mode-hook ()
+    ;;                 "Configuration for YANG Mode. Add this to `yang-mode-hook'."
+    ;;                 ; (c-set-style "BSD")
+    ;;                 (c-set-style "BSD")
+    ;;                 ;; (flycheck-mode 1)
+    ;;                 (setq indent-tabs-mode nil)
+    ;;                 (setq c-basic-offset 2)
+    ;;                 (setq font-lock-maximum-decoration t)
+    ;;                 (font-lock-mode t))
+    ;;               (add-hook 'yang-mode-hook 'my-yang-mode-hook))
 
     ;; ---------------------
     ;; Auto insert templates
@@ -2647,16 +2671,23 @@ long messages in some external browser (see `browse-url-generic-program')."
                         > ".." \n
                         > _ ))
                     (define-auto-insert
+                      '("\\.go\\'" . "Home Go skeleton")
+                      '("Short description: "
+                        "//" \n
+                        > "// -*- coding: utf-8 -*-" \n
+                        > "//" \n
+                        > "// " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > "//" \n
+                        > "//" \n
+                        > "package " _))
+                    (define-auto-insert
                       '("\\.\\(h\\|c\\|CC?\\|cc\\|cxx\\|cpp\\|c++\\|m\\)\\'" . "Home C-style skeleton")
                       '("Short description: "
                         "/*" \n
-                        > " * " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > " * -*- coding: utf-8 -*-"
                         > "*" \n
-                        > "* Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
-                        > "* All rights reserved." \n
+                        > "* " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
                         > "*" \n
-                        > "* REDISTRIBUTION IN ANY FORM PROHIBITED WITHOUT PRIOR WRITTEN" \n
-                        > "* CONSENT OF THE AUTHOR." \n
                         > "*/" \n
                         > _ ))
 
@@ -2827,17 +2858,10 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-term-color-vector
-   [unspecified "#14191f" "#d15120" "#81af34" "#deae3e" "#7e9fc9" "#a878b5" "#7e9fc9" "#dcdddd"])
- '(evil-want-Y-yank-to-eol nil)
- '(fci-rule-character-color "#192028")
- '(fci-rule-color "#192028")
  '(package-selected-packages
    (quote
-    (which-key use-package realgud pug-mode org-brain mmm-mode live-py-mode jbeans-theme fill-column-indicator exotica-theme evil-surround editorconfig company-php ac-php-core cmake-ide clang-format bind-key base16-theme ace-window auctex counsel evil avy markdown-mode org-plus-contrib magit ghub let-alist js2-mode ivy zenburn-theme zen-and-art-theme yapfify yaml-mode xterm-color xcscope xclip ws-butler winum white-sand-theme wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen unfill undo-tree underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme toc-org test-simple tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd symon swiper sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection stickyfunc-enhance srefactor spaceline spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 rebecca-theme ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme professional-theme popwin planet-theme pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools pcre2el pbcopy password-generator paradox package-lint osx-trash osx-dictionary orgit organic-green-theme org-projectile org-present org-pomodoro org-download org-caldav org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme nhexl-mode neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert move-text monokai-theme monochrome-theme monky molokai-theme moe-theme minimal-theme material-theme markdown-toc mandm-theme majapahit-theme magit-gitflow madhat2r-theme macrostep lush-theme lorem-ipsum loc-changes load-relative livid-mode linum-relative link-hint light-soap-theme levenshtein less-css-mode launchctl js2-refactor js-doc jazz-theme jabber ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme info+ indent-guide impatient-mode ietf-docs hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt heroku-theme hemisu-theme help-fns+ helm-make hc-zenburn-theme gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme goto-chg gotham-theme google-translate golden-ratio godoctor go-rename go-guru go-eldoc gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags gandalf-theme fuzzy flyspell-correct-ivy flycheck-pos-tip flycheck-bashate flx-ido flatui-theme flatland-theme fish-mode farmhouse-theme fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help erc-social-graph erc-image erc-hl-nicks emmet-mode elisp-slime-nav dumb-jump drupal-mode dracula-theme dockerfile-mode docker django-theme disaster diminish diff-hl darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode counsel-projectile company-web company-tern company-statistics company-shell company-lua company-go company-c-headers company-auctex company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode cmake-mode clues-theme clean-aindent-mode cherry-blossom-theme busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-link ac-ispell)))
- '(safe-local-variable-values
-   (quote
-    ((eval find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when (configuration-layer\\)"))))
+    (flycheck-yang zenburn-theme zen-and-art-theme yapfify yaml-mode xterm-color xclip ws-butler winum white-sand-theme which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd symon sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection stickyfunc-enhance srefactor spaceline spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 rebecca-theme realgud ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin planet-theme pippel pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools pcre2el pbcopy password-generator paradox package-lint overseer osx-trash osx-dictionary orgit organic-green-theme org-projectile org-present org-pomodoro org-download org-caldav org-bullets org-brain open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme nhexl-mode neotree naquadah-theme nameless mwim mustang-theme multi-term mu4e-alert move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc mandm-theme majapahit-theme magit-gitflow madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode live-py-mode linum-relative link-hint light-soap-theme less-css-mode launchctl js2-refactor js-doc jbeans-theme jazz-theme jabber ivy-rtags ivy-rich ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme info+ indent-guide importmagic impatient-mode ietf-docs hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt heroku-theme hemisu-theme help-fns+ helm-make hc-zenburn-theme gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate google-c-style golden-ratio godoctor go-tag go-rename go-guru go-eldoc gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags gandalf-theme fuzzy flyspell-correct-ivy flycheck-rtags flycheck-pos-tip flycheck-bashate flx-ido flatui-theme flatland-theme fish-mode fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exotica-theme exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help erc-social-graph erc-image erc-hl-nicks emmet-mode elisp-slime-nav editorconfig dumb-jump drupal-mode dracula-theme dockerfile-mode docker django-theme disaster diminish diff-hl darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode counsel-projectile counsel-gtags counsel-css company-web company-tern company-statistics company-shell company-rtags company-php company-lua company-go company-c-headers company-auctex company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode cmake-mode cmake-ide clues-theme clean-aindent-mode clang-format cherry-blossom-theme busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme base16-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link ac-ispell)))
+ '(safe-local-variable-values (quote ((evil-shift-width . 2))))
  '(send-mail-function (quote smtpmail-send-it)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -2846,10 +2870,11 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(default ((t (:background nil))))
  '(erc-input-face ((t (:foreground "cornflowerblue"))))
+ '(evil-search-highlight-persist-highlight-face ((t (:background "#338f86"))))
  '(font-lock-comment-delimiter-face ((t (:foreground "grey33"))))
  '(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic))))
- '(font-lock-doc-face ((t (:foreground "#036A07" :slant italic))))
  '(irfc-head-name-face ((t (:inherit org-level-1))))
  '(irfc-head-number-face ((t (:inherit org-level-1))))
- '(irfc-rfc-link-face ((t (:inherit org-link)))))
+ '(irfc-rfc-link-face ((t (:inherit org-link))))
+ '(lazy-highlight-face ((t (:background "#338f86")))))
 )
