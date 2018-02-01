@@ -3,9 +3,8 @@
 ;; It must be stored in your home directory.
 
 (defun dotspacemacs/layers ()
-  "Configuration Layers declaration.
-You should not put any user code in this function besides modifying the variable
-values."
+  "Layer configuration:
+This function should only modify configuration layer settings."
   (setq load-prefer-newer t)
   (setq-default
    load-prefer-newer t
@@ -108,14 +107,17 @@ values."
       markdown
       ;; Primary test runner is pytest use 'SPC u' prefix to invoke nose
       (python :variables python-fill-column 100
-                         python-test-runner '(nose pytest)
+                         python-test-runner '(pytest nose)
+                         pytest-global-name "python -m pytest"
                          ;; python-auto-set-local-pyvenv-virtualenv on-visit
                          ;; python-auto-set-local-pyenv-virtualenv nil
                          python-enable-yapf-format-on-save nil)
       ;; disable emacs-lisp due to completionion in comments parsing tons
       ;; of .el files https://github.com/syl20bnr/spacemacs/issues/7038
+      restructuredtext
       (semantic :disabled-for emacs-lisp)
       shell-scripts
+      sphinx
       systemd
       yaml
       (yang :variables
@@ -156,6 +158,7 @@ values."
      org-caldav
      package-lint
      persistent-scratch
+     polymode
      xclip
      )
    ;; A list of packages that cannot be updated.
@@ -171,27 +174,24 @@ values."
      irfc
      mu4e-maildirs-extension
      nameless
-     ;; projectile
-     ;; projectile-mode
      ;; recentf
      ;; savehist
      ;; smartparens
      ) ; evil-org
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
-   ;; `used-only' installs only explicitly used packages and uninstall any
-   ;; unused packages as well as their unused dependencies.
-   ;; `used-but-keep-unused' installs only the used packages but won't uninstall
-   ;; them if they become unused. `all' installs *all* packages supported by
-   ;; Spacemacs and never uninstall them. (default is `used-only')
+   ;; `used-only' installs only explicitly used packages and deletes any unused
+   ;; packages as well as their unused dependencies. `used-but-keep-unused'
+   ;; installs only the used packages but won't delete unused ones. `all'
+   ;; installs *all* packages supported by Spacemacs and never uninstalls them.
+   ;; (default is `used-only')
    dotspacemacs-install-packages 'used-only))
 
 (defun dotspacemacs/init ()
-  "Initialization function.
-This function is called at the very startup of Spacemacs initialization
-before layers configuration.
-You should not put any user code in there besides modifying the variable
-values."
+  "Initialization:
+This function is called at the very beginning of Spacemacs startup,
+before layer configuration.
+It should only modify the values of Spacemacs settings."
   ;; mDetermine display size to pick font size
 
   (setq ch-def-height 12.0)
@@ -217,6 +217,13 @@ values."
    dotspacemacs-elpa-https t
    ;; Maximum allowed time in seconds to contact an ELPA repository.
    dotspacemacs-elpa-timeout 5
+   ;; If non-nil then Spacelpa repository is the primary source to install
+   ;; a locked version of packages. If nil then Spacemacs will install the lastest
+   ;; version of packages from MELPA. (default nil)
+   dotspacemacs-use-spacelpa nil
+   ;; If non-nil then verify the signature for downloaded Spacelpa archives.
+   ;; (default nil)
+   dotspacemacs-verify-spacelpa-archives nil
    ;; If non-nil then spacemacs will check for updates at startup
    ;; when the current branch is not `develop'. Note that checking for
    ;; new versions works via git commands, thus it calls GitHub services
@@ -224,8 +231,8 @@ values."
    dotspacemacs-check-for-update nil
    ;; If non-nil, a form that evaluates to a package directory. For example, to
    ;; use different package directories for different Emacs versions, set this
-   ;; to `emacs-version'.
-   dotspacemacs-elpa-subdirectory nil
+   ;; to `emacs-version'. (default 'emacs-version)
+   dotspacemacs-elpa-subdirectory 'emacs-version
    ;; One of `vim', `emacs' or `hybrid'.
    ;; `hybrid' is like `vim' except that `insert state' is replaced by the
    ;; `hybrid state' with `emacs' key bindings. The value can also be a list
@@ -255,12 +262,12 @@ values."
    ;; List of items to show in startup buffer or an association list of
    ;; the form `(list-type . list-size)`. If nil then it is disabled.
    ;; Possible values for list-type are:
-   ;; `recents' `bookmarks' `projects' `agenda' `todos'."
+   ;; `recents' `bookmarks' `projects' `agenda' `todos'.
    ;; List sizes may be nil, in which case
    ;; `spacemacs-buffer-startup-lists-length' takes effect.
    dotspacemacs-startup-lists '((recents . 5)
                                 (projects . 7))
-   ;; True if the home buffer should respond to resize events.
+   ;; True if the home buffer should respond to resize events. (default t)
    dotspacemacs-startup-buffer-responsive t
    ;; Default major mode of the scratch buffer (default `text-mode')
    dotspacemacs-scratch-mode 'lisp-interaction-mode
@@ -277,7 +284,14 @@ values."
                          ;; cobalt
                          leuven
                          )
-   ;; If non nil the cursor color matches the state color in GUI Emacs.
+   ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
+   ;; `all-the-icons', `custom', `vim-powerline' and `vanilla'. The first three
+   ;; are spaceline themes. `vanilla' is default Emacs mode-line. `custom' is a
+   ;; user defined themes, refer to the DOCUMENTATION.org for more info on how
+   ;; to create your own spaceline theme.. (default 'spacemacs)
+   dotspacemacs-mode-line-theme 'spacemacs
+   ;; If non-nil the cursor color matches the state color in GUI Emacs.
+   ;; (default t)
    dotspacemacs-colorize-cursor-according-to-state t
    ;;
    ;; Bit wider than Ubuntu, pretty good as well though in being more courier/serif like
@@ -306,7 +320,7 @@ values."
 
    ;; The leader key
    dotspacemacs-leader-key "SPC"
-   ;; The key used for Emacs commands (M-x) (after pressing on the leader key).
+   ;; The key used for Emacs commands `M-x' (after pressing on the leader key).
    ;; (default "SPC")
    dotspacemacs-emacs-command-key "SPC"
    ;; The key used for Vim Ex commands (default ":")
@@ -346,6 +360,9 @@ values."
    ;; If non-nil then the last auto saved layouts are resumed automatically upon
    ;; start. (default nil)
    dotspacemacs-auto-resume-layouts nil
+   ;; If non-nil, auto-generate layout name when creating new layouts. Only has
+   ;; effect when using the "jump to layout by number" commands. (default nil)
+   dotspacemacs-auto-generate-layout-names nil
    ;; Size (in MB) above which spacemacs will prompt to open the large file
    ;; literally to avoid performance issues. Opening a file literally means that
    ;; no major mode or minor modes are active. (default is 1)
@@ -370,8 +387,9 @@ values."
    ;; source settings. Else, disable fuzzy matching in all sources.
    ;; (default 'always)
    dotspacemacs-helm-use-fuzzy 'always
-   ;; If non-nil the paste micro-state is enabled. When enabled pressing `p'
-   ;; several times cycle between the kill ring content. (default nil)
+   ;; If non-nil, the paste transient-state is enabled. While enabled, pressing
+   ;; `p' several times cycles through the elements in the `kill-ring'.
+   ;; (default nil)
    dotspacemacs-enable-paste-transient-state nil
    ;; Which-key delay in seconds. The which-key buffer is the popup listing
    ;; the commands bound to the current keystroke sequence. (default 0.4)
@@ -458,6 +476,27 @@ values."
    ;; specified with an installed package.
    ;; Not used for now. (default nil)
    dotspacemacs-default-package-repository nil
+   ;; Format specification for setting the frame title.
+   ;; %a - the `abbreviated-file-name', or `buffer-name'
+   ;; %t - `projectile-project-name'
+   ;; %I - `invocation-name'
+   ;; %S - `system-name'
+   ;; %U - contents of $USER
+   ;; %b - buffer name
+   ;; %f - visited file name
+   ;; %F - frame name
+   ;; %s - process status
+   ;; %p - percent of buffer above top of window, or Top, Bot or All
+   ;; %P - percent of buffer above bottom of window, perhaps plus Top, or Bot or All
+   ;; %m - mode name
+   ;; %n - Narrow if appropriate
+   ;; %z - mnemonics of buffer, terminal, and keyboard coding systems
+   ;; %Z - like %z, but including the end-of-line format
+   ;; (default "%I@%S")
+   dotspacemacs-frame-title-format "%I@%S"
+   ;; Format specification for setting the icon title format
+   ;; (default nil - same as frame-title-format)
+   dotspacemacs-icon-title-format nil
    ;; Delete whitespace while saving buffer. Possible values are `all'
    ;; to aggressively delete empty line and long sequences of whitespace,
    ;; `trailing' to delete only the whitespace at end of lines, `changed' to
@@ -467,6 +506,10 @@ values."
    ;; Either nil or a number of seconds. If non-nil zone out after the specified
    ;; number of seconds. (default nil)
    dotspacemacs-zone-out-when-idle nil
+   ;; Run `spacemacs/prettify-org-buffer' when
+   ;; visiting README.org files of Spacemacs.
+   ;; (default nil)
+   dotspacemacs-pretty-docs nil
    ))
 
 (defun dotspacemacs/user-init ()
@@ -497,6 +540,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (add-to-list 'load-path (concat dotspacemacs-directory "themes-test/"))
   (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "local-lisp/"))
   (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/emacs-mandm-theme"))
+  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/pycoverage"))
   (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "themes-test/"))
   (add-to-list 'load-path (concat "~/p/ietf-docs"))
   ;;(require 'iterm-custom-keys)
@@ -538,6 +582,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;;   (define-key evil-evilified-state-map-original "H" 'evil-window-top)
   ;;   (define-key evil-evilified-state-map-original "L" 'evil-window-bottom)
   ;;   (define-key evil-evilified-state-map-original "M" 'evil-window-middle))
+   projectile-globally-unignored-files '(".gitlab-ci.yml" ".pylintrc" ".travis.yml")
 
    )
 
@@ -1361,7 +1406,7 @@ long messages in some external browser (see `browse-url-generic-program')."
 
         mu4e-view-show-addresses t
         ;; ;; Visuals
-        ;; mu4e-headers-results-limit 1000
+        mu4e-headers-results-limit 2000
         mu4e-headers-visible-lines 15
         mu4e-headers-visible-columns 80
 
@@ -1905,8 +1950,23 @@ long messages in some external browser (see `browse-url-generic-program')."
                                ))))
         ))
 
+    (when (configuration-layer/layer-usedp 'restructuredtext)
+      (with-eval-after-load 'rst
+        (setq rst-preferred-adornments
+        '((?# over-and-under 0)
+         (?* over-and-under 0)
+         (?= simple 0)
+         (?- simple 0)
+         (?^ simple 0)
+         (34 simple 0)))
+        (require 'poly-rest-mode)
+        (add-hook 'rst-mode-hook 'poly-rest-mode)
+        ))
     (when (configuration-layer/layer-usedp 'python)
       (with-eval-after-load 'python
+
+
+        (autoload 'pycoverage-mode "pycoverage" "python coverage mode" t)
 
         ;; (setq python-fill-docstring-style 'symmetric
         ;;       python-fill-string-function 'my-python-fill-string-function)
@@ -1971,6 +2031,37 @@ long messages in some external browser (see `browse-url-generic-program')."
                     (delete-region impstart impend)
                     (goto-char impstart)
                     (insert bigstr)))))))
+
+        (defun rst-python-statement-is-docstring (begin)
+          "Return true if beginning of statiment is :begin"
+          (save-excursion
+            (save-match-data
+              (python-nav-beginning-of-statement)
+              (looking-at-p begin))))
+
+        (defun rst-python-front-verify ()
+          (rst-python-statement-is-docstring (match-string 0)))
+
+        (require 'mmm-mode)
+
+        (add-to-list 'mmm-save-local-variables 'adaptive-fill-regexp)
+        (add-to-list 'mmm-save-local-variables 'fill-paragraph-function)
+
+        (mmm-add-classes
+         '((rst-python-docstrings
+            :submode rst-mode
+            :face mmm-comment-submode-face
+            :front "u?\\(\"\"\"\\|\'\'\'\\)"
+            :front-verify rst-python-front-verify
+            :back "~1"
+            :end-not-begin t
+            :save-matches 1
+            ;; :front rst-python-docstrings-find-front
+            ;; :back rst-python-docstrings-find-back
+            :insert ((?d embdocstring nil @ "u\"\"\"" @ _ @ "\"\"\"" @))
+            :delimiter-mode nil)))
+
+        (mmm-add-mode-ext-class 'python-mode nil 'rst-python-docstrings)
 
         (defun my-python-mode-hook ()
           (setq comment-column 60)
@@ -2620,7 +2711,7 @@ long messages in some external browser (see `browse-url-generic-program')."
                     (define-auto-insert
                       '("\\.py\\'" . "# Home python comment skeleton")
                       '("Short description: "
-                        "# -*- coding: utf-8 -*-"
+                        "# -*- coding: utf-8 eval: (yapf-mode 1) -*-#"
                         > "#" \n
                         > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
                         > "#" \n
@@ -2860,8 +2951,11 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (flycheck-yang zenburn-theme zen-and-art-theme yapfify yaml-mode xterm-color xclip ws-butler winum white-sand-theme which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd symon sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection stickyfunc-enhance srefactor spaceline spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 rebecca-theme realgud ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin planet-theme pippel pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools pcre2el pbcopy password-generator paradox package-lint overseer osx-trash osx-dictionary orgit organic-green-theme org-projectile org-present org-pomodoro org-download org-caldav org-bullets org-brain open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme nhexl-mode neotree naquadah-theme nameless mwim mustang-theme multi-term mu4e-alert move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc mandm-theme majapahit-theme magit-gitflow madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode live-py-mode linum-relative link-hint light-soap-theme less-css-mode launchctl js2-refactor js-doc jbeans-theme jazz-theme jabber ivy-rtags ivy-rich ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme info+ indent-guide importmagic impatient-mode ietf-docs hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt heroku-theme hemisu-theme help-fns+ helm-make hc-zenburn-theme gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate google-c-style golden-ratio godoctor go-tag go-rename go-guru go-eldoc gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags gandalf-theme fuzzy flyspell-correct-ivy flycheck-rtags flycheck-pos-tip flycheck-bashate flx-ido flatui-theme flatland-theme fish-mode fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exotica-theme exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help erc-social-graph erc-image erc-hl-nicks emmet-mode elisp-slime-nav editorconfig dumb-jump drupal-mode dracula-theme dockerfile-mode docker django-theme disaster diminish diff-hl darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode counsel-projectile counsel-gtags counsel-css company-web company-tern company-statistics company-shell company-rtags company-php company-lua company-go company-c-headers company-auctex company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode cmake-mode cmake-ide clues-theme clean-aindent-mode clang-format cherry-blossom-theme busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme base16-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link ac-ispell)))
- '(safe-local-variable-values (quote ((evil-shift-width . 2))))
+    (zenburn-theme use-package scss-mode pyvenv live-py-mode linum-relative impatient-mode evil-matchit dumb-jump diff-hl ace-window ac-php-core company swiper smartparens highlight evil flycheck helm helm-core ivy markdown-mode ht projectile org-plus-contrib magit git-commit yasnippet php-mode epl all-the-icons zen-and-art-theme yapfify yang-mode yaml-mode xterm-color xcscope xclip ws-butler with-editor winum white-sand-theme which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen unfill undo-tree underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd symon sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection stickyfunc-enhance srefactor spaceline-all-the-icons spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 rebecca-theme realgud ranger rainbow-delimiters railscasts-theme pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin polymode planet-theme pippel pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools pcre2el pbcopy password-generator paradox package-lint overseer osx-trash osx-dictionary orgit organic-green-theme org-projectile org-present org-pomodoro org-download org-caldav org-bullets org-brain open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme nhexl-mode neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc mandm-theme majapahit-theme magit-gitflow madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode link-hint light-soap-theme less-css-mode launchctl js2-refactor js-doc jbeans-theme jazz-theme jabber ivy-rtags ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme info+ indent-guide importmagic ietf-docs hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt heroku-theme hemisu-theme help-fns+ helm-make hc-zenburn-theme gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme goto-chg gotham-theme google-translate google-c-style golden-ratio godoctor go-tag go-rename go-guru go-eldoc gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ ghub gh-md ggtags gandalf-theme fuzzy font-lock+ flyspell-correct-ivy flycheck-rtags flycheck-pos-tip flycheck-bashate flx-ido flatui-theme flatland-theme fish-mode fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exotica-theme exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help erc-social-graph erc-image erc-hl-nicks emmet-mode elisp-slime-nav editorconfig drupal-mode dracula-theme dockerfile-mode docker django-theme disaster diminish darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode counsel-projectile counsel-gtags counsel-css company-web company-tern company-statistics company-shell company-rtags company-php company-lua company-go company-c-headers company-auctex company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode cmake-mode cmake-ide clues-theme clean-aindent-mode clang-format cherry-blossom-theme busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme bind-key base16-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-complete-rst auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-link ac-ispell)))
+ '(safe-local-variable-values
+   (quote
+    ((evil-shift-width . 2)
+     (docker-image-name . "hyperv"))))
  '(send-mail-function (quote smtpmail-send-it)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
