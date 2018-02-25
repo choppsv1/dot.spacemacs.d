@@ -17,8 +17,8 @@
 (defun yang/post-init-company ()
   (spacemacs|add-company-backends :modes yang-mode))
 
-(defun yang/post-init-flycheck ()
-  (spacemacs/enable-flycheck 'yang-mode))
+;; (defun yang/post-init-flycheck ()
+;;   (spacemacs/enable-flycheck 'yang-mode))
 
 (defun yang/init-yang-mode ()
   "Initialize YANG mode"
@@ -27,7 +27,7 @@
            ("Procfile\\'" . yang-mode))
     :config
     (progn
-      (eval-after-load 'flycheck
+      (eval-after-load "flycheck"
         (progn
           (flycheck-define-command-checker 'yang-pyang
             "A YANG syntax checker using the pyang parser."
@@ -44,7 +44,8 @@
                              (-> errors
                                  flycheck-dedent-error-messages
                                  flycheck-sanitize-errors)))
-          (add-to-list 'flycheck-checkers 'yang-pyang)
+          ;; (add-to-list 'flycheck-checkers 'yang-pyang)
+          (spacemacs/enable-flycheck 'yang-mode)
           )
         )
       )
