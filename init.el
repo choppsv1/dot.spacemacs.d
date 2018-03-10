@@ -210,8 +210,8 @@ It should only modify the values of Spacemacs settings."
             (= (string-to-number xres) 3840))
         ;; big display
         (if (> (string-to-number dpi) 196)
-            (setq ch-def-height 9.0)
-          (setq ch-def-height 10.5))
+            (setq ch-def-height 12.0)
+          (setq ch-def-height 12.0))
       ;; small display
       (setq ch-def-height 9.0)))
   ;; (message "def height %s" ch-def-height)
@@ -881,6 +881,9 @@ layers configuration. You are free to put any user code."
                         (member dotspacemacs-editing-style '(vim)))
 
     (define-key dired-mode-map "e" 'dired-ediff-files)
+    ;; let's create a dired micro-state?
+    ;; (define-key dired-mode-map "?" 'spacemacs/dired-transient-state/body)
+    (define-key dired-mode-map "?" 'which-key-show-top-level)
 
     (xclip-mode 1)
     (when (not (display-graphic-p))
@@ -1331,8 +1334,10 @@ This will replace the last notification sent with this function."
             mu4e-headers-include-related nil
             mu4e-view-show-addresses t
             ;; HTML
-            mu4e-html2text-command 'mu4e-shr2text
+            mu4e-html2text-command 'my-mu4e-shr2text
             shr-color-visible-luminance-min 80
+            shr-use-fonts nil
+
             mu4e-use-fancy-chars nil
 
             ;; -----------
@@ -1474,6 +1479,7 @@ This will replace the last notification sent with this function."
                                      ("/chopps.org/spam-train" . ?S)
                                      ("/chopps.org/spam-probable" . ?s))
 
+
        )
 
       (with-eval-after-load 'mu4e
@@ -1530,6 +1536,10 @@ This will replace the last notification sent with this function."
                                              (smtpmail-local-domain         .      "gmail.com")
                                              (smtpmail-smtp-service . 587)))))
 
+
+          (defun my-mu4e-shr2text (msg)
+            (let ((display-graphic-p (lambda () nil)))
+              (mu4e-shr2text msg)))
 
           ;; Work around a bug with too long names in the spaceline/modeline
           (defun trim-modeline-string-chopps (str)
@@ -1751,6 +1761,7 @@ This will replace the last notification sent with this function."
       (with-eval-after-load "flycheck"
         ;; (setq flycheck-highlighting-mode 'lines)
         (setq flycheck-highlighting-mode 'sexps)
+        (setq flycheck-temp-prefix ".flycheck")
         ;; the pos-tip window doesn't seem to work with my awesome setup (anymore)
         (setq flycheck-display-errors-function #'flycheck-display-error-messages)
         (setq-default flycheck-pylint-use-symbolic-id nil)
@@ -2120,6 +2131,7 @@ This will replace the last notification sent with this function."
 
         ;; key desc (cmd1 cmd2 ...) settings-for-whole-set files
 
+        (setq org-html-doctype "html5")
 
         ;; This is for using xelatex
         (with-eval-after-load "org"
@@ -2946,12 +2958,21 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (zenburn-theme yasnippet-snippets web-mode pyvenv org-mime org-brain evil-unimpaired docker apropospriate-theme ac-php-core company counsel flycheck helm helm-core rtags magit ghub ivy which-key exec-path-from-shell evil zen-and-art-theme yapfify yang-mode yaml-mode xterm-color xcscope xclip ws-butler winum white-sand-theme wgrep web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill undo-tree underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd symon swiper sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection stickyfunc-enhance srefactor spaceline-all-the-icons spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 rebecca-theme realgud ranger rainbow-delimiters railscasts-theme pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin polymode planet-theme pippel pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools pcre2el pbcopy password-generator paradox package-lint overseer osx-trash osx-dictionary orgit organic-green-theme org-projectile org-present org-pomodoro org-download org-caldav org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme nhexl-mode neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc mandm-theme majapahit-theme magit-gitflow madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode live-py-mode linum-relative link-hint light-soap-theme less-css-mode launchctl json-mode js2-refactor js-doc jbeans-theme jazz-theme jabber ivy-xref ivy-rtags ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme indent-guide importmagic impatient-mode ietf-docs hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation heroku-theme hemisu-theme helm-make hc-zenburn-theme gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme goto-chg gotham-theme google-translate google-c-style golden-ratio godoctor go-tag go-rename go-guru go-eldoc gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags gandalf-theme fuzzy font-lock+ flyspell-correct-ivy flycheck-rtags flycheck-pos-tip flycheck-bashate flx-ido flatui-theme flatland-theme fish-mode fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exotica-theme evil-visualstar evil-visual-mark-mode evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help emmet-mode elisp-slime-nav editorconfig dumb-jump drupal-mode dracula-theme dockerfile-mode docker-tramp django-theme disaster diminish diff-hl darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode counsel-projectile counsel-gtags counsel-css company-web company-tern company-statistics company-shell company-rtags company-php company-lua company-go company-c-headers company-auctex company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode clues-theme clean-aindent-mode clang-format cherry-blossom-theme centered-cursor-mode busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme base16-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-complete-rst auto-compile anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link ac-ispell))))
+    (yang-mode zenburn-theme zen-and-art-theme yasnippet-snippets yapfify yaml-mode xterm-color xclip ws-butler winum white-sand-theme which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd symon sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection stickyfunc-enhance srefactor spaceline-all-the-icons spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 rebecca-theme realgud ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin polymode planet-theme pippel pipenv pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools pcre2el pbcopy password-generator paradox package-lint overseer osx-trash osx-dictionary orgit organic-green-theme org-projectile org-present org-pomodoro org-mime org-download org-caldav org-bullets org-brain open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme nhexl-mode neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc mandm-theme majapahit-theme magit-gitflow madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode live-py-mode linum-relative link-hint light-soap-theme less-css-mode launchctl js2-refactor js-doc jbeans-theme jazz-theme jabber ivy-xref ivy-rtags ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme indent-guide importmagic impatient-mode ietf-docs hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation heroku-theme hemisu-theme helm-make hc-zenburn-theme gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate google-c-style golden-ratio godoctor go-tag go-rename go-guru go-eldoc gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags gandalf-theme fuzzy font-lock+ flyspell-correct-ivy flycheck-rtags flycheck-pos-tip flycheck-bashate flx-ido flatui-theme flatland-theme fish-mode fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exotica-theme exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help emmet-mode elisp-slime-nav editorconfig dumb-jump drupal-mode dracula-theme dockerfile-mode docker django-theme disaster diminish diff-hl darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode counsel-projectile counsel-gtags counsel-css company-web company-tern company-statistics company-shell company-rtags company-php company-lua company-go company-c-headers company-auctex company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode clues-theme clean-aindent-mode clang-format cherry-blossom-theme centered-cursor-mode busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme base16-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-complete-rst auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link ac-ispell)))
+ '(safe-local-variable-values
+   (quote
+    ((eval progn
+           (require
+            (quote projectile))
+           (puthash
+            (projectile-project-root)
+            "make test" projectile-test-cmd-map))))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(default ((t (:background nil))))
  '(erc-input-face ((t (:foreground "cornflowerblue"))))
  '(evil-search-highlight-persist-highlight-face ((t (:background "#338f86"))))
  '(font-lock-comment-delimiter-face ((t (:foreground "grey33"))))
