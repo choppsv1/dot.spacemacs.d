@@ -1387,6 +1387,7 @@ This will replace the last notification sent with this function."
                                                   "chopps@rawdofmt.org"
                                                   ;; we want contacts added from these mailing lists
                                                   "isis-wg@ietf.org"
+                                                  "lsr@ietf.org"
                                                   "developers@netbsd.org"
                                                   "netbsd-developers@netbsd.org"
                                                   )
@@ -1413,6 +1414,7 @@ This will replace the last notification sent with this function."
                                "maildir:/chopps.org/ietf-rtg-dir"
                                "maildir:/chopps.org/ietf-rtg-yang-dt"
                                "maildir:/chopps.org/ietf-wg-isis"
+                               "maildir:/chopps.org/ietf-wg-lsr"
                                "maildir:/chopps.org/ietf-wg-netmod"
                                "maildir:/chopps.org/ietf-wg-rtg")
 
