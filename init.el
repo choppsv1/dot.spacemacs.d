@@ -210,10 +210,10 @@ It should only modify the values of Spacemacs settings."
             (= (string-to-number xres) 3840))
         ;; big display
         (if (> (string-to-number dpi) 196)
-            (setq ch-def-height 9.0)
+            (setq ch-def-height 10.0)
           (setq ch-def-height 12.0))
       ;; small display
-      (setq ch-def-height 9.0)))
+      (setq ch-def-height 10.0)))
   ;; (message "def height %s" ch-def-height)
 
 
@@ -893,6 +893,7 @@ layers configuration. You are free to put any user code."
 
     (setq
      spacemacs--hjkl-completion-navigation-functions nil
+     browse-url-chromium-program 'browse-url-chromium
      browse-url-new-window-flag nil
      tab-always-indent t
      case-fold-search nil
