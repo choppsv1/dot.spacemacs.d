@@ -79,7 +79,7 @@ This function should only modify configuration layer settings."
               )
 
       ;; nginx
-      (spell-checking :variables enable-flyspell-auto-completion t)
+      (spell-checking :variables enable-flyspell-auto-completion nil)
 
       ;; spotify
       (syntax-checking :variables syntax-checking-enable-tooltips t)
