@@ -79,7 +79,8 @@ This function should only modify configuration layer settings."
               )
 
       ;; nginx
-      spell-checking
+      (spell-checking :variables enable-flyspell-auto-completion t)
+
       ;; spotify
       (syntax-checking :variables syntax-checking-enable-tooltips t)
 
@@ -206,14 +207,16 @@ It should only modify the values of Spacemacs settings."
         )
     (setq xres (replace-regexp-in-string "\n\\'" "" xres))
     ;; (setq yres (replace-regexp-in-string "\n\\'" "" yres))
-    (if (or (> (string-to-number xres) 5000)
-            (= (string-to-number xres) 3840))
+    (if (> (string-to-number xres) 5000)
         ;; big display
-        (if (> (string-to-number dpi) 196)
+        (setq ch-def-height 12.0)
+      ;; small display
+      (if (= (string-to-number xres) 3840)
+        (if (> (string-to-number dpi) 240)
             (setq ch-def-height 10.0)
           (setq ch-def-height 12.0))
       ;; small display
-      (setq ch-def-height 10.0)))
+        (setq ch-def-height 10.0))))
   ;; (message "def height %s" ch-def-height)
 
 
@@ -861,6 +864,9 @@ layers configuration. You are free to put any user code."
 
     (setq python-indent-offset 4)
 
+    ;; (with-eval-after-load "ispell"
+    (setq ispell-program-name "hunspell")
+
     ;; overrides
     (setq-default nxml-child-indent 2)
     (setq-default yaml-indent-offset 2)
@@ -891,9 +897,16 @@ layers configuration. You are free to put any user code."
           (turn-on-xclip)
         (void-function nil)))
 
+    (with-eval-after-load "browse-url"
+      ;;(defun browse-url-can-use-xdg-open ()
+      (defadvice browse-url-can-use-xdg-open (after ad-browse-url-can-use-xdg-open activate)
+        "Always use xdg-open"
+        (setq ad-return-value t)))
+        ;;(setq ad-return-value (executable-find "xdg-open"))))
+    ;; (ad-activate 'browse-url-can-use-xdg-open)
+
     (setq
      spacemacs--hjkl-completion-navigation-functions nil
-     browse-url-chromium-program 'browse-url-chromium
      browse-url-new-window-flag nil
      tab-always-indent t
      case-fold-search nil
@@ -902,6 +915,7 @@ layers configuration. You are free to put any user code."
 
     (add-to-list 'auto-mode-alist '("\\.xml\\'" . nxml-mode))
     (add-to-list 'auto-mode-alist '("\\.act\\'" . python-mode))
+    (add-to-list 'auto-mode-alist '("\\.pyact\\'" . python-mode))
 
     ;; =======
     ;; Display
@@ -1773,6 +1787,18 @@ This will replace the last notification sent with this function."
         ;; (flycheck-add-next-checker 'python-flake8 'python-pylint)
         ;; (flycheck-add-next-checker 'python-pylint 'python-pycompile)
 
+        (flycheck-define-checker python-pyflakes
+          "A Python syntax and style checker using the pyflakes utility.
+To override the path to the pyflakes executable, set
+`flycheck-python-pyflakes-executable'.
+See URL `http://pypi.python.org/pypi/pyflakes'."
+          :command ("pyflakes" source-inplace)
+          :error-patterns
+          ((error line-start (file-name) ":" line ":" (message) line-end))
+          :modes python-mode)
+
+        (add-to-list 'flycheck-checkers 'python-pyflakes)
+
         ;; (setq flycheck-checkers (delq 'python-pycompile flycheck-checkers))
         ;; (setq flycheck-checkers (cons 'python-pylint (delq 'python-pylint flycheck-checkers)))
 
@@ -1998,6 +2024,8 @@ This will replace the last notification sent with this function."
         (spacemacs/set-leader-keys-for-major-mode 'python-mode "en" 'flycheck-next-error)
         (spacemacs/set-leader-keys-for-major-mode 'python-mode "ep" 'flycheck-prev-error)
 
+        ;;
+        (add-to-list 'python-shell-extra-pythonpaths "/opt/Acton/modules")
 
         ;; Consider _ a part of words for python
         (modify-syntax-entry ?_ "w" python-mode-syntax-table)
@@ -2094,7 +2122,15 @@ This will replace the last notification sent with this function."
           (message "Python mode hook done"))
 
         (add-hook 'python-mode-hook 'my-python-mode-hook)
+
+        ;; (require 'nadvice)
+        (defun my-save-kill-ring (fun &rest _args)
+          (let ((kill-ring nil))
+            (funcall fun)))
+        (advice-add 'yapffy-region :around 'my-save-kill-ring)
+
         )
+
       )
 
     ;; remove when added to spacemacs--indent-variable-alist
@@ -2151,7 +2187,27 @@ This will replace the last notification sent with this function."
 
           (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
 
-          (require 'ox-latex))
+          (require 'ox-latex)
+
+          ;; ;; lualatex preview
+          ;; (setq org-latex-pdf-process
+          ;;       '("lualatex -shell-escape -interaction nonstopmode %f"
+          ;;         "lualatex -shell-escape -interaction nonstopmode %f"))
+
+          ;; (setq luamagick '(luamagick :programs ("lualatex" "convert")
+          ;;                             :description "pdf > png"
+          ;;                             :message "you need to install lualatex and imagemagick."
+          ;;                             :use-xcolor t
+          ;;                             :image-input-type "pdf"
+          ;;                             :image-output-type "png"
+          ;;                             :image-size-adjust (1.0 . 1.0)
+          ;;                             :latex-compiler ("lualatex -interaction nonstopmode -output-directory %o %f")
+          ;;                             :image-converter ("convert -density %D -trim -antialias %f -quality 100 %O")))
+
+          ;; (add-to-list 'org-preview-latex-process-alist luamagick)
+
+          ;; (setq org-preview-latex-default-process 'luamagick)
+          )
 
 
         ;; (with-eval-after-load "org-agenda"
@@ -2417,6 +2473,12 @@ This will replace the last notification sent with this function."
 
       ;; Languages to interpret (execute) in begin_src blocks
 
+        ;; ;; XXX latex preview highly questionable
+        ;; (add-to-list 'org-latex-packages-alist
+        ;;              '("" "tikz" t))
+        ;; (eval-after-load "preview"
+        ;;   '(add-to-list 'preview-default-preamble "\\PreviewEnvironment{tikzpicture}" t))
+
         ;; spacemacs default
         ;; Its value is ((shell . t) (python . t) (dot . t) (emacs-lisp . t))
         ;; Original value was ((emacs-lisp . t))
@@ -2435,6 +2497,7 @@ This will replace the last notification sent with this function."
            )
          )
       ;;  (dot2tex . t))
+
 
       ;; (eval-after-load "org"
       ;;   '(mapc
@@ -2660,19 +2723,17 @@ This will replace the last notification sent with this function."
 
     (define-key evil-normal-state-map (kbd "C-]") 'ggtags-find-tag-dwim)
 
-    ;; (fold-section "yang"
-    ;;               ;; (autoload 'yang-mode "yang-mode")
-    ;;               ;; (add-to-list 'auto-mode-alist '("\\.yang\\'" . yang-mode))
-    ;;               (defun my-yang-mode-hook ()
-    ;;                 "Configuration for YANG Mode. Add this to `yang-mode-hook'."
-    ;;                 ; (c-set-style "BSD")
-    ;;                 (c-set-style "BSD")
-    ;;                 ;; (flycheck-mode 1)
-    ;;                 (setq indent-tabs-mode nil)
-    ;;                 (setq c-basic-offset 2)
-    ;;                 (setq font-lock-maximum-decoration t)
-    ;;                 (font-lock-mode t))
-    ;;               (add-hook 'yang-mode-hook 'my-yang-mode-hook))
+    (with-eval-after-load "yang-mode"
+                  ;; (autoload 'yang-mode "yang-mode")
+                  ;; (add-to-list 'auto-mode-alist '("\\.yang\\'" . yang-mode))
+                  (defun my-yang-mode-hook ()
+                    "Configuration for YANG Mode. Add this to `yang-mode-hook'."
+                    (c-set-style "Procket")
+                    (setq indent-tabs-mode nil)
+                    (setq c-basic-offset 2)
+                    (setq font-lock-maximum-decoration t)
+                    (font-lock-mode t))
+                  (add-hook 'yang-mode-hook 'my-yang-mode-hook))
 
     ;; ---------------------
     ;; Auto insert templates
@@ -2962,12 +3023,13 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (zenburn-theme zen-and-art-theme yasnippet-snippets yapfify yang-mode yaml-mode xterm-color xclip ws-butler winum white-sand-theme wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen unfill underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd symon sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection stickyfunc-enhance srefactor spaceline-all-the-icons all-the-icons memoize spaceline powerline spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 rebecca-theme realgud test-simple loc-changes load-relative ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin polymode planet-theme pippel pipenv pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools pcre2el pbcopy password-generator paradox spinner package-lint overseer osx-trash osx-dictionary orgit organic-green-theme org-projectile org-category-capture org-present org-pomodoro org-mime org-download org-caldav org-bullets org-brain open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme nhexl-mode neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert ht alert log4e gntp move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc markdown-mode mandm-theme majapahit-theme magit-gitflow madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode skewer-mode live-py-mode linum-relative link-hint light-soap-theme less-css-mode launchctl js2-refactor multiple-cursors js2-mode js-doc jbeans-theme jazz-theme jabber fsm ivy-xref ivy-rtags ivy-purpose window-purpose imenu-list ivy-hydra ir-black-theme insert-shebang inkpot-theme indent-guide importmagic epc ctable concurrent deferred impatient-mode simple-httpd ietf-docs hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation heroku-theme hemisu-theme helm-make helm helm-core hc-zenburn-theme haml-mode gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate google-c-style golden-ratio godoctor go-tag go-rename go-guru go-eldoc gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md ggtags gandalf-theme fuzzy flyspell-correct-ivy flyspell-correct flycheck-rtags flycheck-pos-tip pos-tip flycheck-bashate flycheck flx-ido flx flatui-theme flatland-theme fish-mode fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exotica-theme evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-matchit evil-magit magit git-commit ghub let-alist with-editor evil-lisp-state evil-lion evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-cleverparens smartparens paredit evil-args evil-anzu anzu eval-sexp-fu highlight espresso-theme eshell-z eshell-prompt-extras esh-help emmet-mode elisp-slime-nav editorconfig dumb-jump drupal-mode dracula-theme dockerfile-mode docker json-mode tablist magit-popup docker-tramp json-snatcher json-reformat django-theme disaster diff-hl darktooth-theme autothemer darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode counsel-projectile projectile pkg-info epl counsel-gtags counsel-css counsel swiper ivy company-web web-completion-data company-tern dash-functional tern company-statistics company-shell company-rtags rtags company-php ac-php-core xcscope php-mode company-lua lua-mode company-go go-mode company-c-headers company-auctex company-anaconda company column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode clues-theme clean-aindent-mode clang-format cherry-blossom-theme centered-cursor-mode busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme base16-theme badwolf-theme auto-yasnippet yasnippet auto-highlight-symbol auto-dictionary auto-complete-rst auto-compile packed auctex apropospriate-theme anti-zenburn-theme anaconda-mode pythonic f dash s ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link avy ac-ispell auto-complete popup which-key use-package org-plus-contrib hydra font-lock+ exec-path-from-shell evil goto-chg undo-tree diminish bind-map bind-key async))))
+    (yasnippet-snippets yaml-mode web-mode systemd solarized-theme rebecca-theme realgud pyvenv pipenv php-extras persp-mode persistent-scratch pdf-tools package-lint orgit org-mime org-download org-caldav org-brain nhexl-mode monokai-theme moe-theme live-py-mode link-hint js2-refactor multiple-cursors ivy-xref insert-shebang hy-mode hl-todo helm-make helm helm-core gruvbox-theme graphviz-dot-mode gitignore-mode gitconfig-mode gitattributes-mode git-link ggtags flyspell-correct-ivy flyspell-correct evil-org evil-nerd-commenter evil-matchit evil-magit emmet-mode editorconfig dumb-jump dracula-theme dockerfile-mode docker cyberpunk-theme counsel-projectile counsel-css company-web company-auctex company-anaconda clang-format base16-theme auto-yasnippet auto-compile packed auctex alect-themes adaptive-wrap avy lua-mode ac-php-core xcscope company counsel swiper smartparens flycheck go-mode htmlize ivy magit magit-popup git-commit ghub with-editor alert projectile yasnippet php-mode js2-mode spaceline powerline s dash which-key use-package font-lock+ exec-path-from-shell async evil org-plus-contrib hydra zenburn-theme zen-and-art-theme yapfify yang-mode xterm-color xclip ws-butler winum white-sand-theme wgrep web-completion-data web-beautify volatile-highlights vi-tilde-fringe uuidgen unfill undo-tree underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme toc-org test-simple tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit tablist symon sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection stickyfunc-enhance srefactor spaceline-all-the-icons spacegray-theme soothe-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 ranger rainbow-delimiters railscasts-theme pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin polymode planet-theme pippel pip-requirements phpunit phpcbf php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme pcre2el pbcopy password-generator paradox overseer osx-trash osx-dictionary organic-green-theme org-projectile org-present org-pomodoro org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert move-text monochrome-theme monky molokai-theme mmm-mode minimal-theme material-theme markdown-toc mandm-theme majapahit-theme magit-gitflow madhat2r-theme macrostep lush-theme lorem-ipsum log4e loc-changes load-relative livid-mode linum-relative light-soap-theme less-css-mode launchctl json-mode js-doc jbeans-theme jazz-theme jabber ivy-rtags ivy-purpose ivy-hydra ir-black-theme inkpot-theme indent-guide importmagic impatient-mode ietf-docs hungry-delete highlight-parentheses highlight-numbers highlight-indentation heroku-theme hemisu-theme hc-zenburn-theme gruber-darker-theme grandshell-theme goto-chg gotham-theme google-translate google-c-style golden-ratio godoctor go-tag go-rename go-guru go-eldoc gnuplot gntp git-timemachine git-messenger git-gutter-fringe git-gutter-fringe+ gh-md gandalf-theme fuzzy flyspell-popup flycheck-rtags flycheck-pos-tip flycheck-bashate flx-ido flatui-theme flatland-theme fish-mode fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exotica-theme evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help elisp-slime-nav drupal-mode docker-tramp django-theme disaster diminish diff-hl darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode csv-mode counsel-gtags company-tern company-statistics company-shell company-rtags company-php company-lua company-go company-c-headers column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized coffee-mode clues-theme clean-aindent-mode cherry-blossom-theme centered-cursor-mode busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme bind-key badwolf-theme auto-highlight-symbol auto-dictionary auto-complete-rst apropospriate-theme anti-zenburn-theme anaconda-mode ample-zen-theme ample-theme aggressive-indent afternoon-theme ace-window ace-link ac-ispell))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(default ((t (:background nil))))
  '(evil-search-highlight-persist-highlight-face ((t (:background "#338f86"))))
  '(irfc-head-name-face ((t (:inherit org-level-1))))
  '(irfc-head-number-face ((t (:inherit org-level-1))))

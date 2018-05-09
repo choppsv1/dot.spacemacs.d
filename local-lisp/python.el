@@ -510,7 +510,7 @@ The type returned can be `comment', `string' or `paren'."
   ;; Keywords
   `(,(rx symbol-start
          (or
-          "and" "del" "from" "not" "while" "as" "elif" "global" "or" "with"
+          "actor" "and" "del" "from" "not" "while" "as" "elif" "global" "or" "with"
           "assert" "else" "if" "pass" "yield" "break" "except" "import" "class"
           "in" "raise" "continue" "finally" "is" "return" "def" "for" "lambda"
           "try"
@@ -528,6 +528,9 @@ The type returned can be `comment', `string' or `paren'."
           ;; Extra:
           "self")
          symbol-end)
+    ;; actors
+    (,(rx symbol-start "actor" (1+ space) (group (1+ (or word ?_))))
+     (1 font-lock-function-name-face))
     ;; functions
     (,(rx symbol-start "def" (1+ space) (group (1+ (or word ?_))))
      (1 font-lock-function-name-face))
