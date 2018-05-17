@@ -187,14 +187,21 @@ You should not put any user code in there besides modifying the variable
 values."
   ;; mDetermine display size to pick font size
 
-  (setq ch-def-height 11.5)
-  (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
-        ;; (yres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* [0-9]*x\\([0-9]*\\) .*/\\1/'")))
-        )
-    (setq xres (replace-regexp-in-string "\n\\'" "" xres))
-    ;; (setq yres (replace-regexp-in-string "\n\\'" "" yres))
-    (if (<= (string-to-number xres) 5000)
-        (setq ch-def-height 11.5)))
+  (cond
+   ((string-equal system-type "darwin") ; Mac OS X
+    (setq ch-def-height 15.0))
+   ((string-equal system-type "gnu/linux")
+    (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
+          (setq ch-def-height 15.0)
+          ;; (yres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* [0-9]*x\\([0-9]*\\) .*/\\1/'")))
+          )
+      (setq xres (replace-regexp-in-string "\n\\'" "" xres))
+      ;; (setq yres (replace-regexp-in-string "\n\\'" "" yres))
+      (if (<= (string-to-number xres) 5000)
+          (setq ch-def-height 11.0)
+         (setq ch-def-height 11.0)
+         ))))
+
   ;; (message "def height %s" ch-def-height)
 
 
@@ -666,9 +673,9 @@ values."
                          ;; xp
                          ;; zen-and-art
                          ;; zenburn
-                         zonokai-blue
+                         ;; zonokai-blue
                          ;; zonokai-red
-                         zonokai
+                         ;; zonokai
                          )
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
@@ -962,6 +969,9 @@ before packages are loaded. If you are unsure, you should try in setting them in
                                 ;;                       (font-lock-comment-face :foreground "grey44" :slant italic)
                                 ;;                       (font-lock-comment-delimiter-face :foreground "grey77"))
                                 ))
+
+  ;;'(font-lock-comment-delimiter-face ((t (:foreground "grey33"))))
+  ;;'(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic))))
 
 
   ;; XXX what we want actually is to advise this function and temporarily change
