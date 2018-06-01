@@ -767,16 +767,24 @@ before packages are loaded. If you are unsure, you should try in setting them in
                 ;;type should be a symbol; it is usually one of PRIMARY, SECONDARY or CLIPBOARD.
                 ;;These are symbols with upper-case names, in accord with X Window System
                 ;;conventions. If type is nil, that stands for PRIMARY.
+                ;; (defun remote-gui-select-text (data)
+                ;;   (let ((cmd (or (and (getenv "SSH_CONNECTION")
+                ;;                       "ssh -q ${SSH_CONNECTION%% *} 'xclip -in >& /dev/null || pbcopy'")
+                ;;                  "xclip -in >& /dev/null || pbcopy")))
+                ;;     (save-excursion
+                ;;       (with-temp-buffer
+                ;;         (insert data)
+                ;;         (shell-command-on-region (point-min) (point-max) cmd)))
+                ;;     data))
                 (defun remote-gui-select-text (data)
-                  (let ((cmd (or (and (getenv "SSH_CONNECTION")
-                                      "ssh -q ${SSH_CONNECTION%% *} 'xclip -in >& /dev/null || pbcopy'")
-                                 "xclip -in >& /dev/null || pbcopy")))
+                  (let ((cmd "ssh -q ${SSH_CONNECTION%% *} 'xclip -in >& /dev/null || pbcopy'"))
                     (save-excursion
                       (with-temp-buffer
                         (insert data)
                         (shell-command-on-region (point-min) (point-max) cmd)))
                       data))
-                  (when (not (display-graphic-p))
+                (when (and (not (display-graphic-p))
+                           (getenv "SSH_CONNECTION"))
                     (setq-default interprogram-cut-function #'remote-gui-select-text))
 
                 ;; (global-set-key (kbd "M-W") 'kill-region-to-ssh)
