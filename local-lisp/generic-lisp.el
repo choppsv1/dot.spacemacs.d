@@ -175,11 +175,10 @@
   "Copy the region to our ssh clients clipboard"
   (interactive)
   (let ((cmd
-         (or
-          (and (not (string= "" (getenv "SSH_CLIENT")))
-               (concat "ssh -q " (car (split-string (getenv "SSH_CLIENT"))) " xclip -in "))
-  ;; (let ((cmd (or (and (not (string= "" (getenv "SSH_CLIENT"))) (concat "ssh -q " (car (split-string (getenv "SSH_CLIENT"))) " pbcopy"))
-          "xclip -in")))
+         (or (and (not (string= "" (getenv "SSH_CONNECTION")))
+                  (concat "ssh -q " (car (split-string (getenv "SSH_CONNECTION"))) " bash -c 'xclip -in || pbcopy' >& /dev/null"))
+             ;; (let ((cmd (or (and (not (string= "" (getenv "SSH_CONNECTION"))) (concat "ssh -q " (car (split-string (getenv "SSH_CLIENT"))) " pbcopy"))
+             "bash -c 'xclip -in || pbcopy' >& /dev/null")))
     (message "running command: %s" cmd)
     (shell-command-on-region (mark) (point) cmd))
   (deactivate-mark))
