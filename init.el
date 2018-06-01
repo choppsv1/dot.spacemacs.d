@@ -764,7 +764,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (fold-section "Keybindings"
                 (define-key isearch-mode-map [remap isearch-delete-char] 'isearch-del-char)
 
-
                 ;;type should be a symbol; it is usually one of PRIMARY, SECONDARY or CLIPBOARD.
                 ;;These are symbols with upper-case names, in accord with X Window System
                 ;;conventions. If type is nil, that stands for PRIMARY.
@@ -774,9 +773,8 @@ before packages are loaded. If you are unsure, you should try in setting them in
                       (insert data)
                       (shell-command-on-region (point-min) (point-max) "copytoclip.sh"))
                     data))
-
-                (if (not (string= "" (getenv "TMUX")))
-                    (setq-default interprogram-cut-function #'remote-gui-select-text))
+                (when (not (display-graphic-p))
+                  (setq-default interprogram-cut-function #'remote-gui-select-text))
 
                 ;; (global-set-key (kbd "M-W") 'kill-region-to-ssh)
                 (global-set-key (kbd "M-Y") 'yank-from-ssh)
