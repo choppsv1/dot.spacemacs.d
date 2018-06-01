@@ -768,13 +768,16 @@ before packages are loaded. If you are unsure, you should try in setting them in
                 ;;These are symbols with upper-case names, in accord with X Window System
                 ;;conventions. If type is nil, that stands for PRIMARY.
                 (defun remote-gui-select-text (data)
-                  (save-excursion
-                    (with-temp-buffer
-                      (insert data)
-                      (shell-command-on-region (point-min) (point-max) "copytoclip.sh"))
-                    data))
-                (when (not (display-graphic-p))
-                  (setq-default interprogram-cut-function #'remote-gui-select-text))
+                  (let ((cmd (or (and (getenv "SSH_CONNECTION")
+                                      "ssh -q ${SSH_CONNECTION%% *} 'xclip -in >& /dev/null || pbcopy'")
+                                 "xclip -in >& /dev/null || pbcopy")))
+                    (save-excursion
+                      (with-temp-buffer
+                        (insert data)
+                        (shell-command-on-region (point-min) (point-max) cmd)))
+                      data))
+                  (when (not (display-graphic-p))
+                    (setq-default interprogram-cut-function #'remote-gui-select-text))
 
                 ;; (global-set-key (kbd "M-W") 'kill-region-to-ssh)
                 (global-set-key (kbd "M-Y") 'yank-from-ssh)
