@@ -764,18 +764,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (fold-section "Keybindings"
                 (define-key isearch-mode-map [remap isearch-delete-char] 'isearch-del-char)
 
-                ;;type should be a symbol; it is usually one of PRIMARY, SECONDARY or CLIPBOARD.
-                ;;These are symbols with upper-case names, in accord with X Window System
-                ;;conventions. If type is nil, that stands for PRIMARY.
-                ;; (defun remote-gui-select-text (data)
-                ;;   (let ((cmd (or (and (getenv "SSH_CONNECTION")
-                ;;                       "ssh -q ${SSH_CONNECTION%% *} 'xclip -in >& /dev/null || pbcopy'")
-                ;;                  "xclip -in >& /dev/null || pbcopy")))
-                ;;     (save-excursion
-                ;;       (with-temp-buffer
-                ;;         (insert data)
-                ;;         (shell-command-on-region (point-min) (point-max) cmd)))
-                ;;     data))
                 (defun remote-gui-select-text (data)
                   "gui-select-test version to use ssh to copy the current kill to the local systems clipboard"
                   (let ((cmd "ssh -q ${SSH_CONNECTION%% *} bash -c 'xclip -in >& /dev/null || pbcopy'"))
@@ -792,18 +780,30 @@ before packages are loaded. If you are unsure, you should try in setting them in
                   (save-excursion
                     (shell-command-to-string "ssh -q ${SSH_CONNECTION%% *} bash -c 'xclip -out 2> /dev/null || pbpaste -Prefer txt'")))
 
-                (defun yank-from-ssh ()
-                  (interactive)
-                  (kill-new (shell-command-to-string "ssh -q ${SSH_CONNECTION%% *} bash -c 'xclip -out 2> /dev/null || pbpaste -Prefer txt'"))
-                  (yank))
-
                 (when (and (not (display-graphic-p))
                            (getenv "SSH_CONNECTION"))
                   (setq-default interprogram-cut-function #'remote-gui-select-text)
+                  ;; This is very slow, all yanks cause synchronous ssh connection..
                   ;; (setq-default interprogram-paste-function #'remote-gui-selection-value)
                   )
-                ;; (global-set-key (kbd "M-W") 'kill-region-to-ssh)
-                (global-set-key (kbd "M-Y") 'yank-from-ssh)
+
+                ;; (defun yank-from-ssh ()
+                ;;   (interactive)
+                ;;   (kill-new (remote-gui-selection-value))
+                ;;   (yank))
+
+                (defun yank-from-ssh ()
+                  (interactive)
+                  (let ((interprogram-paste-function #'remote-gui-selection-value))
+                    (if (bound-and-true-p rebox-mode)
+                        (rebox-yank)
+                      (yank))))
+
+                ;; (evil-global-set-key 'insert (kbd "C-y") 'yank-from-ssh)
+
+                ;; (global-set-key (kbd "C-Y") 'yank-from-ssh)
+                ;; (global-set-key (kbd "M-Y") 'yank-from-ssh)
+
                 ;; (global-set-key (kbd "M-Q") 'rebox-dwim)
 
                 ;; Find emacs source
@@ -2742,6 +2742,11 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                   ;; Configure some modes to start in different modes.
                   (evil-set-initial-state 'artist-mode 'emacs)
                   (evil-set-initial-state 'mu4e-compose-mode 'insert)
+                  ;; Have to use this to avoid rebox taking it over.
+                  (global-set-key (kbd "C-y") 'yank-from-ssh)
+                  ;; (evil-global-set-key 'insert (kbd "C-y") 'yank-from-ssh)
+                  ;; (evil-global-set-key 'emacs (kbd "C-y") 'yank-from-ssh)
+                  ;; (evil-global-set-key 'replace (kbd "C-y") 'yank-from-ssh)
                   )
 
     ;; XXX layouts debug why are layouts so messed up?
