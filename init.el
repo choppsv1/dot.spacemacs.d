@@ -777,16 +777,31 @@ before packages are loaded. If you are unsure, you should try in setting them in
                 ;;         (shell-command-on-region (point-min) (point-max) cmd)))
                 ;;     data))
                 (defun remote-gui-select-text (data)
-                  (let ((cmd "ssh -q ${SSH_CONNECTION%% *} 'xclip -in >& /dev/null || pbcopy'"))
+                  "gui-select-test version to use ssh to copy the current kill to the local systems clipboard"
+                  (let ((cmd "ssh -q ${SSH_CONNECTION%% *} bash -c 'xclip -in >& /dev/null || pbcopy'"))
                     (save-excursion
-                      (with-temp-buffer
-                        (insert data)
-                        (shell-command-on-region (point-min) (point-max) cmd)))
-                      data))
+                      (let* ((process-connection-type nil)  ; use a pipe
+                             (proc (start-process-shell-command "cut-to-remote" nil cmd)))
+                        (process-send-string proc data)
+                        (process-send-eof proc)))
+                    data))
+
+                (defun remote-gui-selection-value ()
+                  "Use ssh to obtain the current clibboard on the local system"
+                  (interactive)
+                  (save-excursion
+                    (shell-command-to-string "ssh -q ${SSH_CONNECTION%% *} bash -c 'xclip -out 2> /dev/null || pbpaste -Prefer txt'")))
+
+                (defun yank-from-ssh ()
+                  (interactive)
+                  (kill-new (shell-command-to-string "ssh -q ${SSH_CONNECTION%% *} bash -c 'xclip -out 2> /dev/null || pbpaste -Prefer txt'"))
+                  (yank))
+
                 (when (and (not (display-graphic-p))
                            (getenv "SSH_CONNECTION"))
-                    (setq-default interprogram-cut-function #'remote-gui-select-text))
-
+                  (setq-default interprogram-cut-function #'remote-gui-select-text)
+                  ;; (setq-default interprogram-paste-function #'remote-gui-selection-value)
+                  )
                 ;; (global-set-key (kbd "M-W") 'kill-region-to-ssh)
                 (global-set-key (kbd "M-Y") 'yank-from-ssh)
                 ;; (global-set-key (kbd "M-Q") 'rebox-dwim)
