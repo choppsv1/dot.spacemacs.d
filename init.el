@@ -780,7 +780,10 @@ before packages are loaded. If you are unsure, you should try in setting them in
                   "A version of `gui-selection-value' that uses ssh
                    to obtain the current clipboard from the local
                    system"
-                  (shell-command-to-string "ssh -q ${SSH_CONNECTION%% *} bash -c 'xclip -out 2> /dev/null || pbpaste -Prefer txt'"))
+                  (if (getenv "DISPLAY")
+                      (shell-command-to-string "xclip -out 2> /dev/null")
+                    ;; XXX hardcoding of :0 display here sucks
+                    (shell-command-to-string "ssh -x -q ${SSH_CONNECTION%% *} 'xclip -display :0 -out 2> /dev/null || pbpaste -Prefer txt'")))
 
                 (defun yank-from-ssh ()
                   (interactive)
@@ -2729,20 +2732,20 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     (defun sigusr1-handler ()
       (interactive)
       (message "Caught signel %S" last-input-event)
-      (let ((lines (split-string (shell-command-to-string "tmux show-environment") "\n" t)))
-        (while lines
-          (let ((tup (split-string (car lines) "=" t)))
-            (if (not (string/starts-with (car tup) "-"))
-                (progn
-                  (setenv (car tup) (cadr tup))
-                  (message "Updating %s with %s" (car tup) (cadr tup))))
-            (setq lines (cdr lines))))))
+      (dolist (line (split-string (shell-command-to-string "tmux show-environment") "\n" t))
+        (if (string/starts-with line "-")
+            (progn
+              (setq line (seq-subseq line 1))
+              (message "Removing %s" line)
+              (setenv line nil))
+          (let ((tup (split-string line "=" t)))
+            (setenv (car tup) (cadr tup))
+            (message "Updating %s with %s" (car tup) (cadr tup))))))
 
-    (let ((tmux (getenv "TMUX")))
-      (if tmux
-          (progn
-            (message "Enabling TMUX signal handling")
-            (define-key special-event-map [sigusr1] 'sigusr1-handler))))
+    (if (getenv "TMUX")
+        (progn
+          (message "Enabling TMUX signal handling")
+          (define-key special-event-map [sigusr1] 'sigusr1-handler)))
 
     ;; ====
     ;; Evil
