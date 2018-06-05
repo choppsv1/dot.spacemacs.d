@@ -63,7 +63,7 @@ This function should only modify configuration layer settings."
       jabber
       mu4e
       org
-      ;; (org2blog :variables org2blog-name "hoppsjots.org")
+      (org2blog :variables org2blog-name "hoppsjots.org")
       ;; pandoc
       (osx :variables
            osx-use-option-as-meta t)
@@ -765,32 +765,22 @@ before packages are loaded. If you are unsure, you should try in setting them in
                 (define-key isearch-mode-map [remap isearch-delete-char] 'isearch-del-char)
 
                 (defun remote-gui-select-text (data)
-                  "gui-select-test version to use ssh to copy the current kill to the local systems clipboard"
+                  "A version of `gui-select-test' that uses ssh to
+                   copy the current kill to the local systems
+                   clipboard"
                   (let ((cmd "ssh -q ${SSH_CONNECTION%% *} bash -c 'xclip -in >& /dev/null || pbcopy'"))
                     (save-excursion
-                      (let* ((process-connection-type nil)  ; use a pipe
+                      (let* ((process-connection-type nil)  ; use a pipe as it cleans itself up
                              (proc (start-process-shell-command "cut-to-remote" nil cmd)))
                         (process-send-string proc data)
                         (process-send-eof proc)))
                     data))
 
                 (defun remote-gui-selection-value ()
-                  "Use ssh to obtain the current clibboard on the local system"
-                  (interactive)
-                  (save-excursion
-                    (shell-command-to-string "ssh -q ${SSH_CONNECTION%% *} bash -c 'xclip -out 2> /dev/null || pbpaste -Prefer txt'")))
-
-                (when (and (not (display-graphic-p))
-                           (getenv "SSH_CONNECTION"))
-                  (setq-default interprogram-cut-function #'remote-gui-select-text)
-                  ;; This is very slow, all yanks cause synchronous ssh connection..
-                  ;; (setq-default interprogram-paste-function #'remote-gui-selection-value)
-                  )
-
-                ;; (defun yank-from-ssh ()
-                ;;   (interactive)
-                ;;   (kill-new (remote-gui-selection-value))
-                ;;   (yank))
+                  "A version of `gui-selection-value' that uses ssh
+                   to obtain the current clipboard from the local
+                   system"
+                  (shell-command-to-string "ssh -q ${SSH_CONNECTION%% *} bash -c 'xclip -out 2> /dev/null || pbpaste -Prefer txt'"))
 
                 (defun yank-from-ssh ()
                   (interactive)
@@ -799,10 +789,14 @@ before packages are loaded. If you are unsure, you should try in setting them in
                         (rebox-yank)
                       (yank))))
 
-                ;; (evil-global-set-key 'insert (kbd "C-y") 'yank-from-ssh)
-
-                ;; (global-set-key (kbd "C-Y") 'yank-from-ssh)
-                ;; (global-set-key (kbd "M-Y") 'yank-from-ssh)
+                (when (and (not (display-graphic-p))
+                           (getenv "SSH_CONNECTION"))
+                  (setq-default interprogram-cut-function #'remote-gui-select-text)
+                  ;; This is very slow, all yanks cause synchronous ssh connection..
+                  ;; Instead we use a specific function bound to only one key C-y
+                  ;; (setq-default interprogram-paste-function #'remote-gui-selection-value)
+                  (global-set-key (kbd "C-y") 'yank-from-ssh)
+                  )
 
                 ;; (global-set-key (kbd "M-Q") 'rebox-dwim)
 
@@ -1365,7 +1359,7 @@ This will replace the last notification sent with this function."
         :type '(string :tag "Folder name")
         :group 'mu4e-folders)
 
-      (setq mu4e-maildir "~/Documents/imap-accounts"
+      (setq mu4e-maildir "~/Mail"
             mu4e-attachment-dir "~/Downloads"
 
             mu4e-change-filenames-when-moving t
@@ -1378,7 +1372,7 @@ This will replace the last notification sent with this function."
             ;; -------
             ;; Viewing
             ;; -------
-            mu4e-headers-results-limit 2000
+            mu4e-headers-results-limit 500
             mu4e-headers-visible-lines 15
             mu4e-headers-visible-columns 80
             ;; For searches useful as t to find replies to threads?
@@ -1590,9 +1584,9 @@ This will replace the last notification sent with this function."
                                              (smtpmail-smtp-service . 587)))))
 
 
-          (defun my-mu4e-shr2text (msg)
+          (defun my-mu4e-shr2text ()
             (let ((display-graphic-p (lambda () nil)))
-              (mu4e-shr2text msg)))
+              (mu4e-shr2text)))
 
           ;; Work around a bug with too long names in the spaceline/modeline
           (defun trim-modeline-string-chopps (str)
@@ -2727,6 +2721,29 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         (org-notify-start)
         ))
 
+
+    ;; ====
+    ;; TMUX
+    ;; ====
+
+    (defun sigusr1-handler ()
+      (interactive)
+      (message "Caught signel %S" last-input-event)
+      (let ((lines (split-string (shell-command-to-string "tmux show-environment") "\n" t)))
+        (while lines
+          (let ((tup (split-string (car lines) "=" t)))
+            (if (not (string/starts-with (car tup) "-"))
+                (progn
+                  (setenv (car tup) (cadr tup))
+                  (message "Updating %s with %s" (car tup) (cadr tup))))
+            (setq lines (cdr lines))))))
+
+    (let ((tmux (getenv "TMUX")))
+      (if tmux
+          (progn
+            (message "Enabling TMUX signal handling")
+            (define-key special-event-map [sigusr1] 'sigusr1-handler))))
+
     ;; ====
     ;; Evil
     ;; ====
@@ -2743,7 +2760,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                   (evil-set-initial-state 'artist-mode 'emacs)
                   (evil-set-initial-state 'mu4e-compose-mode 'insert)
                   ;; Have to use this to avoid rebox taking it over.
-                  (global-set-key (kbd "C-y") 'yank-from-ssh)
                   ;; (evil-global-set-key 'insert (kbd "C-y") 'yank-from-ssh)
                   ;; (evil-global-set-key 'emacs (kbd "C-y") 'yank-from-ssh)
                   ;; (evil-global-set-key 'replace (kbd "C-y") 'yank-from-ssh)
@@ -3065,12 +3081,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (zenburn-theme web-mode org-projectile org-category-capture ivy-xref doom-themes cyberpunk-theme smartparens helm helm-core window-purpose rtags magit which-key zen-and-art-theme yasnippet-snippets yapfify yang-mode yaml-mode xterm-color xclip ws-butler winum white-sand-theme wgrep web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd symon sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection stickyfunc-enhance srefactor spaceline-all-the-icons spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 rebecca-theme ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin polymode planet-theme pippel pipenv pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools pcre2el pbcopy password-generator paradox package-lint overseer osx-trash osx-dictionary orgit organic-green-theme org-present org-pomodoro org-mime org-download org-caldav org-bullets org-brain open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme nhexl-mode neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc mandm-theme majapahit-theme magit-svn magit-gitflow madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode live-py-mode linum-relative link-hint light-soap-theme less-css-mode launchctl kaolin-themes json-navigator js2-refactor js-doc jbeans-theme jazz-theme jabber ivy-rtags ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme indent-guide importmagic impatient-mode imenu-list ietf-docs hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation heroku-theme hemisu-theme helm-make hc-zenburn-theme gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate google-c-style golden-ratio godoctor go-tag go-rename go-guru go-eldoc gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ ghub gh-md ggtags gandalf-theme fuzzy font-lock+ flyspell-correct-ivy flycheck-rtags flycheck-pos-tip flycheck-bashate flx-ido flatui-theme flatland-theme fish-mode fill-column-indicator farmhouse-theme fancy-battery eziam-theme eyebrowse expand-region exotica-theme exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help emmet-mode elisp-slime-nav editorconfig dumb-jump drupal-mode dracula-theme dockerfile-mode docker django-theme disaster diminish diff-hl darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode csv-mode counsel-projectile counsel-gtags counsel-css company-web company-tern company-statistics company-shell company-rtags company-php company-lua company-go company-c-headers company-auctex company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized clues-theme clean-aindent-mode clang-format cherry-blossom-theme centered-cursor-mode busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme base16-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-complete-rst auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme ace-window ace-link ac-ispell)))
- '(safe-local-variable-values
-   (quote
-    ((evil-shift-width . 2)
-     (javascript-backend . tern)
-     (javascript-backend . lsp)))))
+    (org2blog metaweblog xml-rpc zenburn-theme zen-and-art-theme yasnippet-snippets yapfify yang-mode yaml-mode xterm-color xclip ws-butler winum white-sand-theme which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd symon sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection stickyfunc-enhance srefactor spaceline-all-the-icons spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebox2 rebecca-theme ranger rainbow-delimiters railscasts-theme pyvenv pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin polymode planet-theme pippel pipenv pip-requirements phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode persistent-scratch pdf-tools pcre2el pbcopy password-generator paradox package-lint overseer osx-trash osx-dictionary orgit organic-green-theme org-projectile org-present org-pomodoro org-mime org-download org-caldav org-bullets org-brain open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme nhexl-mode neotree naquadah-theme mwim mustang-theme multi-term mu4e-alert move-text monokai-theme monochrome-theme monky molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc mandm-theme majapahit-theme magit-svn magit-gitflow madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode live-py-mode linum-relative link-hint light-soap-theme less-css-mode launchctl kaolin-themes json-navigator js2-refactor js-doc jbeans-theme jazz-theme jabber ivy-xref ivy-rtags ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme indent-guide importmagic impatient-mode ietf-docs hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation heroku-theme hemisu-theme helm-make hc-zenburn-theme gruvbox-theme gruber-darker-theme graphviz-dot-mode grandshell-theme gotham-theme google-translate google-c-style golden-ratio godoctor go-tag go-rename go-guru go-eldoc gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags gandalf-theme fuzzy font-lock+ flyspell-correct-ivy flycheck-rtags flycheck-pos-tip flycheck-bashate flx-ido flatui-theme flatland-theme fish-mode fill-column-indicator farmhouse-theme fancy-battery eziam-theme eyebrowse expand-region exotica-theme exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help emmet-mode elisp-slime-nav editorconfig dumb-jump drupal-mode dracula-theme doom-themes dockerfile-mode docker django-theme disaster diminish diff-hl darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme csv-mode counsel-projectile counsel-gtags counsel-css company-web company-tern company-statistics company-shell company-rtags company-php company-lua company-go company-c-headers company-auctex company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized clues-theme clean-aindent-mode clang-format cherry-blossom-theme centered-cursor-mode busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme base16-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-complete-rst auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme ace-window ace-link ac-ispell))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

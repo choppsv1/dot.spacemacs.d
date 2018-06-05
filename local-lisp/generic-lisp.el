@@ -199,6 +199,7 @@
 (add-hook 'server-done-hook 'return-to-last-screen-window)
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
 
+
 ;; (require 'flymake)
 
 ;; (defun flymake-elisp-init ()
