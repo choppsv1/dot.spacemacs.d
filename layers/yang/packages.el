@@ -33,8 +33,8 @@
       :error-filter '(lambda (errors)
                        (-> errors
                            flycheck-dedent-error-messages
-                           flycheck-sanitize-errors))
-      (add-to-list 'flycheck-checkers 'yang-pyang))
+                           flycheck-sanitize-errors)))
+    (add-to-list 'flycheck-checkers 'yang-pyang)
     (spacemacs/enable-flycheck 'yang-mode)))
 
 (defun yang/init-yang-mode ()
