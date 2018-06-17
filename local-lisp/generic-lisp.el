@@ -1,5 +1,6 @@
 (defmacro fold-section (description &rest body)
   "A macro allowing for ignoring the first thing"
+  (if (bound-and-true-p debug-init-msg) (message "DEBUG-INIT: %s" description))
   (list 'if t (cons 'progn body)))
 
 (defun find-and-close-fold (re-string)
