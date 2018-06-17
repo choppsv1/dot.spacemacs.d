@@ -1,5 +1,10 @@
 (defmacro fold-section (description &rest body)
   "A macro allowing for ignoring the first thing"
+  (if (bound-and-true-p debug-init-msg) (message "DEBUG-INIT FOLD-DEBUG: %s" description))
+  (list 'if t (cons 'progn body)))
+
+(defmacro when-layer-used (layer &rest body)
+  (if (bound-and-true-p debug-init-msg) (message "DEBUG-INIT WHEN-LAYER-USED-DEBUG: %s" layer))
   (list 'if t (cons 'progn body)))
 
 (defun find-and-close-fold (re-string)
@@ -171,17 +176,17 @@
     )
   )
 
-(defun kill-region-to-ssh ()
-  "Copy the region to our ssh clients clipboard"
-  (interactive)
-  (let ((cmd
-         (or (and (not (string= "" (getenv "SSH_CONNECTION")))
-                  (concat "ssh -q " (car (split-string (getenv "SSH_CONNECTION"))) " bash -c 'xclip -in || pbcopy' >& /dev/null"))
-             ;; (let ((cmd (or (and (not (string= "" (getenv "SSH_CONNECTION"))) (concat "ssh -q " (car (split-string (getenv "SSH_CLIENT"))) " pbcopy"))
-             "bash -c 'xclip -in || pbcopy' >& /dev/null")))
-    (message "running command: %s" cmd)
-    (shell-command-on-region (mark) (point) cmd))
-  (deactivate-mark))
+;; (defun kill-region-to-ssh ()
+;;   "Copy the region to our ssh clients clipboard"
+;;   (interactive)
+;;   (let ((cmd
+;;          (or (and (not (string= "" (getenv "SSH_CONNECTION")))
+;;                   (concat "ssh -q " (car (split-string (getenv "SSH_CONNECTION"))) " bash -c 'xsel -ibp || pbcopy' >& /dev/null"))
+;;              ;; (let ((cmd (or (and (not (string= "" (getenv "SSH_CONNECTION"))) (concat "ssh -q " (car (split-string (getenv "SSH_CLIENT"))) " pbcopy"))
+;;              "bash -c 'xsel -ibp || pbcopy' >& /dev/null")))
+;;     (message "running command: %s" cmd)
+;;     (shell-command-on-region (mark) (point) cmd))
+;;   (deactivate-mark))
 
 (setq lastw-screen-window -1)
 (defun bring-screen-window-front ()
