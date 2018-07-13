@@ -213,7 +213,7 @@ It should only modify the values of Spacemacs settings."
       ;; small display
       (if (= (string-to-number xres) 3840)
         (if (> (string-to-number dpi) 240)
-            (setq ch-def-height 10.0)
+            (setq ch-def-height 9.0)
           (setq ch-def-height 12.0))
       ;; small display
         (setq ch-def-height 10.0))))
@@ -2102,6 +2102,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         (defun my-python-mode-hook ()
           (setq comment-column 60)
           (setq flycheck-checker 'python-pylint)
+          (semantic-mode -1)
 
                 ;; flycheck-checker-error-threshold 900
                 ;; flycheck-pylintrc "~/.pylintrc")))
