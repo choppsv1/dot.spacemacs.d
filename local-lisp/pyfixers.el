@@ -259,6 +259,13 @@
              (flycheck-overlay-errors-in (line-beginning-position) (line-end-position)))
     (pyfixer:get-errlist-given-line (line-number-at-pos))))
 
+;; (defun pyfixer:get-line-errors ()
+;;   "Get a list of error messages from either flymake or flycheck"
+;;   (if (pyfixer:is-flycheck-on)
+;;       (let ((errors (-keep 'flycheck-error-format-message-and-id
+;;                            (flycheck-overlay-errors-at (point))))))
+;;     (pyfixer:get-errlist-given-line (line-number-at-pos))))
+
 (defun pyfixer:get-buffer-errors ()
   "Get a list of all error message in the buffer"
   (if (pyfixer:is-flycheck-on)
@@ -315,10 +322,9 @@
   (if errdata
       (let (errno fixer)
         (message "Errdata: %s" errdata)
-        (if (string-match "\\(^\\([EWRC][0-9]+\\) \\|\\[\\([EWRC][0-9]+\\)]\\).*" errdata)
+        (if (string-match ".*\\[\\([EWRCF][0-9]+\\)\\].*" errdata)
             (progn
-              (if (not (setq errno (match-string 2 errdata)))
-                  (setq errno (match-string 3 errdata)))
+              (setq errno (match-string 1 errdata))
               (end-of-line)
               (insert (format "  # pylint: disable=%s" errno)))))))
 
