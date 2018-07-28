@@ -157,15 +157,16 @@ This function should only modify configuration layer settings."
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages
    '(
-     dockerfile-mode
-     ;; rfcview
      base16-theme
+     dockerfile-mode
+     exec-path-from-shell
      monky
      nhexl-mode
      org-caldav
      package-lint
      persistent-scratch
      polymode
+     ;; rfcview
      xclip
      ;; colorsarenice-light
      )
@@ -203,6 +204,8 @@ before layer configuration.
 It should only modify the values of Spacemacs settings."
   ;; mDetermine display size to pick font size
 
+  (setq debug-init-msg t)
+
   (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
         (dpi (shell-command-to-string "xdpyinfo | sed -e '/dots per inch/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
         ;; (yres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* [0-9]*x\\([0-9]*\\) .*/\\1/'")))
@@ -216,18 +219,18 @@ It should only modify the values of Spacemacs settings."
       (if (= (string-to-number xres) 3840)
         (if (> (string-to-number dpi) 240)
             (setq ch-def-height 9.0)
-          (setq ch-def-height 10.0))
+          (setq ch-def-height 12.0))
       ;; small display
-        (setq ch-def-height 10.0))))
+        (setq ch-def-height 14.0))))
   ;; (message "def height %s" ch-def-height)
 
 
-  ;; This setq-default sexp is an exhaustive list of all the supported
+  ;; this setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
   (setq-default
-   ;; If non-nil then enable support for the portable dumper. You'll need
-   ;; to compile Emacs 27 from source following the instructions in file
-   ;; EXPERIMENTAL.org at to root of the git repository.
+   ;; if non-nil then enable support for the portable dumper. you'll need
+   ;; to compile emacs 27 from source following the instructions in file
+   ;; experimental.org at to root of the git repository.
    ;; (default nil)
    dotspacemacs-enable-emacs-pdumper nil
 
@@ -645,6 +648,12 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;; User-init
   ;; ---------
 
+  (cond ((string-equal system-type "darwin")
+         (progn
+           (custom-set-variables '(epg-gpg-program  "/usr/local/MacGPG2/bin/gpg2"))
+           )))
+
+
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   (add-to-list 'load-path (concat dotspacemacs-directory "themes-test/"))
   (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "local-lisp/"))
@@ -657,7 +666,8 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (require 'generic-lisp)
   (require 'generic-mode-hooks)
 
-  (fringe-mode '(16 . 16))
+  (when (display-graphic-p)
+    (fringe-mode '(16 . 16)))
 
   (let ((default-directory (concat dotspacemacs-directory "repos/")))
     (normal-top-level-add-subdirs-to-load-path))
@@ -674,7 +684,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
     (setq org-directory "~/org"))
 
   (setq
-   debug-init-msg t
    evil-search-wrap nil
    evil-want-C-i-jump nil
    ;; This is very annoying to have to set, visual highlight in evil is hijacking PRIMARY selection
@@ -908,6 +917,9 @@ This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
 
   (progn
+
+    (cond ((string-equal system-type "darwin")
+           (exec-path-from-shell-copy-env "PATH")))
 
     (if (string= (getenv "HOSTNAME") "tops")
         (load-theme 'mandm))
@@ -3141,7 +3153,8 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
+ '(epg-gpg-program "/usr/local/MacGPG2/bin/gpg2")
+ '(package-selected-packages
    (quote
     ("c8528db6cde3acec2ee75b8a9d1ddf6488767302c0a894b2ce41c22b3af26efc" default))))
 (custom-set-faces
@@ -3149,9 +3162,5 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(erc-input-face ((t (:foreground "cornflowerblue"))))
- '(evil-search-highlight-persist-highlight-face ((t (:background "#338f86"))))
- '(font-lock-comment-delimiter-face ((t (:foreground "grey50"))))
- '(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic))))
- '(lazy-highlight-face ((t (:background "#338f86")))))
+ '(default ((t (:background nil)))))
 )
