@@ -1072,6 +1072,7 @@ layers configuration. You are free to put any user code."
       ;;   :body
       ;;   (mu4e))
 
+      (setq persp-add-buffer-on-after-change-major-mode 'free)
 
       (spacemacs|define-custom-layout "notes"
         :binding "n"
@@ -3153,14 +3154,17 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(epg-gpg-program "/usr/local/MacGPG2/bin/gpg2")
- '(package-selected-packages
+ '(custom-safe-themes
    (quote
-    ("c8528db6cde3acec2ee75b8a9d1ddf6488767302c0a894b2ce41c22b3af26efc" default))))
+    ("3765938eeb031a4962e8c3d88b58c1f76d95133da7464ecc868f786bba13510c" default))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:background nil)))))
+ '(erc-input-face ((t (:foreground "cornflowerblue"))))
+ '(evil-search-highlight-persist-highlight-face ((t (:background "#338f86"))))
+ '(font-lock-comment-delimiter-face ((t (:foreground "grey50"))))
+ '(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic))))
+ '(lazy-highlight-face ((t (:background "#338f86")))))
 )
