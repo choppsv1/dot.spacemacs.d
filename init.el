@@ -66,10 +66,10 @@ This function should only modify configuration layer settings."
       mu4e
       org
       (org2blog :variables org2blog-name "hoppsjots.org")
-      pandoc
+      ;; pandoc
       (osx :variables
            osx-use-option-as-meta t)
-      pdf-tools
+      ;; pdf-tools
       ranger
 
       rebox
@@ -204,8 +204,10 @@ before layer configuration.
 It should only modify the values of Spacemacs settings."
   ;; mDetermine display size to pick font size
 
-  (setq debug-init-msg t)
-
+  (cond
+ ((string-equal system-type "darwin") ; Mac OS X
+  (setq ch-def-height 16.0))
+ ((string-equal system-type "gnu/linux")
   (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
         (dpi (shell-command-to-string "xdpyinfo | sed -e '/dots per inch/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
         ;; (yres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* [0-9]*x\\([0-9]*\\) .*/\\1/'")))
@@ -221,16 +223,16 @@ It should only modify the values of Spacemacs settings."
             (setq ch-def-height 9.0)
           (setq ch-def-height 12.0))
       ;; small display
-        (setq ch-def-height 14.0))))
+        (setq ch-def-height 10.0))))))
   ;; (message "def height %s" ch-def-height)
 
 
   ;; this setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
   (setq-default
-   ;; if non-nil then enable support for the portable dumper. you'll need
-   ;; to compile emacs 27 from source following the instructions in file
-   ;; experimental.org at to root of the git repository.
+   ;; If non-nil then enable support for the portable dumper. You'll need
+   ;; to compile Emacs 27 from source following the instructions in file
+   ;; EXPERIMENTAL.org at to root of the git repository.
    ;; (default nil)
    dotspacemacs-enable-emacs-pdumper nil
 
@@ -343,7 +345,242 @@ It should only modify the values of Spacemacs settings."
                          mandm
                          ;; classic
                          ;; cobalt
+                         ;; colonoscopy
+                         ;; colorsarenice-dark
+                         ;; colorsarenice-light
+                         ;; comidia
+                         ;; cyberpunk
+                         ;; dakrone
+                         ;; dark-blue2
+                         ;; dark-blue
+                         ;; darkburn
+                         ;; dark-erc
+                         ;; dark-font-lock
+                         ;; dark-gnus
+                         ;; dark-green
+                         ;; dark-info
+                         ;; dark-krystal
+                         ;; dark-laptop
+                         ;; dark-mint
+                         ;; darktooth
+                         ;; deep-blue
+                         ;; deep-thought
+                         ;; desert
+                         ;; Deviant
+                         ;; digital-ofs1
+                         ;; distinguished
+                         ;; django
+                         ;; dorsey
+                         ;; dracula
+                         ;; dream
+                         ;; eltbus
+                         ;; emacs-21
+                         ;; emacs-nw
+                         ;; erosiond
+                         ;; euphoria
+                         ;; evenhold
+                         ;; faff
+                         ;; farmhouse-dark
+                         ;; farmhouse-light
+                         ;; feng-shui
+                         ;; firebelly
+                         ;; firecode
+                         ;; fischmeister
+                         ;; flatland-black
+                         ;; flatland
+                         ;; flatui
+                         ;; fogus
+                         ;; gandalf
+                         ;; github
+                         ;; gnome2
+                         ;; gnome
+                         ;; goldenrod
+                         ;; gotham
+                         ;; graham
+                         ;; grandshell
+                         ;; granger
+                         ;; gray1
+                         ;; gray30
+                         ;; green-phosphor
+                         ;; greiner
+                         ;; greymatters
+                         ;; gruber-darker
+                         ;; gruvbox
+                         ;; gtk-ide
+                         ;; hemisu-dark
+                         ;; hemisu-light
+                         ;; hemisu
+                         ;; heroku
+                         ;; hickey
+                         ;; high-contrast
+                         ;; hipster
+                         ;; hober
+                         ;; hydandata-light
+                         ;; idea-darkula
+                         ;; infodoc
+                         ;; inkpot
+                         ;; iodine
+                         ;; ir-black
+                         ;; jazz
+                         ;; jbeans
+                         ;; jb-simple
+                         ;; jedit-grey
+                         ;; jonadabian-slate
+                         ;; jonadabian
+                         ;; jsc-dark
+                         ;; jsc-light2
+                         ;; jsc-light
+                         ;; julie
+                         ;; junio
+                         ;; katester
+                         ;; kingsajz
+                         ;; kooten
+                         ;; late-night
+                         ;; lavender
+                         ;; lawrence
+                         ;; ld-dark
+                         ;; lethe
                          leuven
+                         ;; light-soap
+                         ;; lush
+                         ;; mac-classic
+                         ;; majapahit-dark
+                         ;; majapahit-light
+                         ;; marine
+                         ;; marquardt
+                         ;; material-light
+                         ;; material
+                         ;; matrix
+                         ;; mbo70s
+                         ;; mccarthy
+                         ;; meacupla
+                         ;; mellow
+                         ;; midnight
+                         ;; minimal-light
+                         ;; minimal
+                         ;; mistyday
+                         ;; moe-dark
+                         ;; moe-light
+                         ;; moe
+                         ;; molokai
+                         ;; monochrome-bright
+                         ;; monochrome
+                         ;; monokai
+                         ;; montz
+                         ;; mustang
+                         ;; mustard
+                         ;; my-solarized-dark
+                         ;; my-solarized-light
+                         ;; naquadah
+                         ;; niflheim
+                         ;; noctilux
+                         ;; obsidian
+                         ;; occidental
+                         ;; odersky
+                         ;; oldlace
+                         ;; organic-green
+                         ;; oswald
+                         ;; paper
+                         ;; parus
+                         ;; pastelmac
+                         ;; pastels-on-dark
+                         ;; peacock
+                         ;; phoenix-dark-mono
+                         ;; phoenix-dark-pink
+                         ;; pierson
+                         ;; planet
+                         ;; pok-wob
+                         ;; pok-wog
+                         ;; professional
+                         ;; purple-haze
+                         ;; quasi-monochrome
+                         ;; radiance
+                         ;; railscasts
+                         ;; railscast
+                         ;; ramangalahy
+                         ;; raspopovic
+                         ;; renegade
+                         ;; resolve
+                         ;; retro-green
+                         ;; retro-orange
+                         ;; reverse
+                         ;; reykjavik
+                         ;; rippedcasts
+                         ;; ritchie
+                         ;; robin-hood
+                         ;; rotor
+                         ;; ryerson
+                         ;; salmon-diff
+                         ;; salmon-font-lock
+                         ;; sanityinc-tomorrow-blue
+                         ;; sanityinc-tomorrow-bright
+                         ;; sanityinc-tomorrow-day
+                         ;; sanityinc-tomorrow-eighties
+                         ;; sanityinc-tomorrow-night
+                         ;; scintilla
+                         ;; seoul256
+                         ;; seti
+                         ;; shaman
+                         ;; simple-1
+                         ;; sitaramv-nt
+                         ;; sitaramv-solaris
+                         ;; slime
+                         ;; smyx
+                         ;; snowish
+                         ;; snow
+                         ;; soft-charcoal
+                         ;; soft-morning
+                         ;; soft-stone
+                         ;; solarized-dark
+                         ;; solarized-light
+                         ;; solarized
+                         ;; soothe
+                         ;; spacegray
+                         ;; spolsky
+                         ;; standard-ediff
+                         ;; standard
+                         ;; stekene-dark
+                         ;; stekene-light
+                         ;; subatomic256
+                         ;; subatomic
+                         ;; subdued
+                         ;; subtle-blue
+                         ;; subtle-hacker
+                         ;; sunburst
+                         ;; sunny-day
+                         ;; suscolors
+                         ;; taming-mr-arneson
+                         ;; tango-2
+                         ;; tango-plus
+                         ;; tangotango
+                         ;; tao-yang
+                         ;; tao-yin
+                         ;; taylor
+                         ;; tommyh
+                         ;; tomorrow-night-paradise
+                         ;; tronesque
+                         ;; tron
+                         ;; tty-dark
+                         ;; twilight-bright
+                         ;; twilight
+                         ;; ubuntu
+                         ;; ujelly
+                         ;; underwater
+                         ;; vim-colors
+                         ;; waher
+                         ;; warm-night
+                         ;; whateveryouwant
+                         ;; wheat
+                         ;; white-sand
+                         ;; wilson
+                         ;; word-perfect
+                         ;; xemacs
+                         ;; xp
+                         ;; zen-and-art
+                         ;; zenburn
+                         ;; zonokai-blue
+                         ;; zonokai-red
+                         ;; zonokai
                          )
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
    ;; `all-the-icons', `custom', `vim-powerline' and `vanilla'. The first three
@@ -414,21 +651,6 @@ It should only modify the values of Spacemacs settings."
    ;; works in the GUI. (default nil)
    dotspacemacs-distinguish-gui-tab nil
 
-   ;; If non-nil `Y' is remapped to `y$' in Evil states. (default nil)
-   dotspacemacs-remap-Y-to-y$ nil
-
-   ;; If non-nil, the shift mappings `<' and `>' retain visual state if used
-   ;; there. (default t)
-   dotspacemacs-retain-visual-state-on-shift t
-
-   ;; If non-nil, `J' and `K' move lines up and down when in visual mode.
-   ;; (default nil)
-   dotspacemacs-visual-line-move-text nil
-
-   ;; If non-nil, inverse the meaning of `g' in `:substitute' Evil ex-command.
-   ;; (default nil)
-   dotspacemacs-ex-substitute-global nil
-
    ;; Name of the default layout (default "Default")
    dotspacemacs-default-layout-name "Default"
 
@@ -457,23 +679,6 @@ It should only modify the values of Spacemacs settings."
 
    ;; Maximum number of rollback slots to keep in the cache. (default 5)
    dotspacemacs-max-rollback-slots 5
-
-   ;; If non-nil, `helm' will try to minimize the space it uses. (default nil)
-   dotspacemacs-helm-resize nil
-
-   ;; if non-nil, the helm header is hidden when there is only one source.
-   ;; (default nil)
-   dotspacemacs-helm-no-header nil
-
-   ;; define the position to display `helm', options are `bottom', `top',
-   ;; `left', or `right'. (default 'bottom)
-   dotspacemacs-helm-position 'bottom
-
-   ;; Controls fuzzy matching in helm. If set to `always', force fuzzy matching
-   ;; in all non-asynchronous sources. If set to `source', preserve individual
-   ;; source settings. Else, disable fuzzy matching in all sources.
-   ;; (default 'always)
-   dotspacemacs-helm-use-fuzzy 'always
 
    ;; If non-nil, the paste transient-state is enabled. While enabled, pressing
    ;; `p' several times cycles through the elements in the `kill-ring'.
@@ -649,10 +854,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;; ---------
 
   (cond ((string-equal system-type "darwin")
-         (progn
-           (custom-set-variables '(epg-gpg-program  "/usr/local/MacGPG2/bin/gpg2"))
-           )))
-
+           (setq epg-gpg-program "/usr/local/MacGPG2/bin/gpg2")))
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   (add-to-list 'load-path (concat dotspacemacs-directory "themes-test/"))
@@ -708,8 +910,9 @@ before packages are loaded. If you are unsure, you should try in setting them in
    ;;                              (evil-shift-width . 2)
    ;;                              )
    )
+  (setq debug-init-msg t)
 
-  (message "set debug-init-msg %s" debug-init-msg)
+  (message "debug-init-msg is %s" debug-init-msg)
 
   (and debug-init-msg (message "debug-init 1"))
 
@@ -752,6 +955,9 @@ before packages are loaded. If you are unsure, you should try in setting them in
                                 ;;                       (font-lock-comment-face :foreground "grey44" :slant italic)
                                 ;;                       (font-lock-comment-delimiter-face :foreground "grey77"))
                                 ))
+
+  ;;'(font-lock-comment-delimiter-face ((t (:foreground "grey33"))))
+  ;;'(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic))))
 
 
   ;; XXX what we want actually is to advise this function and temporarily change
@@ -2248,9 +2454,11 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      (with-eval-after-load 'lua-mode
        (setq-default lua-indent-level 4)))
 
-    (with-eval-after-load 'magit-mode
-      (magit-define-popup-switch 'magit-push-popup ?t "Push associated annotated tags" "--follow-tags")
-      )
+    ;; This is breaking now.
+    ;; (with-eval-after-load 'magit-mode
+    ;;   (magit-define-popup-switch 'magit-push-popup ?t "Push associated annotated tags" "--follow-tags")
+    ;;   )
+
     ;;   (progn
     ;;     (delq (assoc "^\t+#" makefile-font-lock-keywords) makefile-font-lock-keywords)))
     (with-eval-after-load 'make-mode
@@ -3154,9 +3362,6 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   (quote
-    ("3765938eeb031a4962e8c3d88b58c1f76d95133da7464ecc868f786bba13510c" default))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
