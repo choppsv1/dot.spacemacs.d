@@ -3343,10 +3343,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     )
   )
 
- ;; '(font-lock-comment-delimiter-face ((t (:foreground "grey33"))))
- ;; '(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic)))))
- ;; '(variable-pitch ((t (:family "DejaVu Sans Mono")))))
-
 ;; ;; Local Variables: ;; eval (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when-layer-used\\|(when (configuration-layer\\)") ;; End:
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -3372,4 +3368,4 @@ This function is called at the very end of Spacemacs initialization."
  '(font-lock-comment-delimiter-face ((t (:foreground "grey50"))))
  '(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic))))
  '(lazy-highlight-face ((t (:background "#338f86")))))
-)
+))
