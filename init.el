@@ -5,9 +5,11 @@
 (defun dotspacemacs/layers ()
   "Layer configuration:
 This function should only modify configuration layer settings."
-  (setq load-prefer-newer t)
+  (setq load-prefer-newer t
+        )
   (setq-default
    load-prefer-newer t
+
    ;; Base distribution to use. This is a layer contained in the directory
    ;; `+distribution'. For now available distributions are `spacemacs-base'
    ;; or `spacemacs'. (default 'spacemacs)
@@ -204,6 +206,7 @@ This function is called at the very beginning of Spacemacs startup,
 before layer configuration.
 It should only modify the values of Spacemacs settings."
   ;; mDetermine display size to pick font size
+  (setq custom-file (concat dotspacemacs-directory ".custom.el"))
 
   (cond
  ((string-equal system-type "darwin") ; Mac OS X
@@ -3220,29 +3223,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     )
   )
 
-;; ;; Local Variables: ;; eval (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when-layer-used\\|(when (configuration-layer\\)") ;; End:
-
-;; Do not write anything past this comment. This is where Emacs will
-;; auto-generate custom variable definitions.
-
-(defun dotspacemacs/emacs-custom-settings ()
-  "Emacs custom settings.
-This is an auto-generated function, do not modify its content directly, use
-Emacs customize menu instead.
-This function is called at the very end of Spacemacs initialization."
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(erc-input-face ((t (:foreground "cornflowerblue"))))
- '(evil-search-highlight-persist-highlight-face ((t (:background "#338f86"))))
- '(font-lock-comment-delimiter-face ((t (:foreground "grey50"))))
- '(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic))))
- '(lazy-highlight-face ((t (:background "#338f86")))))
-))
+;; Local Variables:
+;; eval (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when-layer-used\\|(when (configuration-layer\\)")
+;; End:
