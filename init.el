@@ -160,6 +160,7 @@ This function should only modify configuration layer settings."
      base16-theme
      dockerfile-mode
      exec-path-from-shell
+     magit-todos
      monky
      nhexl-mode
      org-caldav
@@ -216,12 +217,12 @@ It should only modify the values of Spacemacs settings."
     ;; (setq yres (replace-regexp-in-string "\n\\'" "" yres))
     (if (> (string-to-number xres) 5000)
         ;; big display
-        (setq ch-def-height 12.0)
+        (setq ch-def-height 10.0)
       ;; small display
       (if (= (string-to-number xres) 3840)
         (if (> (string-to-number dpi) 240)
             (setq ch-def-height 9.0)
-          (setq ch-def-height 12.0))
+          (setq ch-def-height 11.0))
       ;; small display
         (setq ch-def-height 10.0))))))
   ;; (message "def height %s" ch-def-height)
@@ -339,248 +340,10 @@ It should only modify the values of Spacemacs settings."
 
    dotspacemacs-themes '(
                          misterioso
-                         ;; classic
                          gruvbox-light-hard
                          molokai
                          mandm
-                         ;; classic
-                         ;; cobalt
-                         ;; colonoscopy
-                         ;; colorsarenice-dark
-                         ;; colorsarenice-light
-                         ;; comidia
-                         ;; cyberpunk
-                         ;; dakrone
-                         ;; dark-blue2
-                         ;; dark-blue
-                         ;; darkburn
-                         ;; dark-erc
-                         ;; dark-font-lock
-                         ;; dark-gnus
-                         ;; dark-green
-                         ;; dark-info
-                         ;; dark-krystal
-                         ;; dark-laptop
-                         ;; dark-mint
-                         ;; darktooth
-                         ;; deep-blue
-                         ;; deep-thought
-                         ;; desert
-                         ;; Deviant
-                         ;; digital-ofs1
-                         ;; distinguished
-                         ;; django
-                         ;; dorsey
-                         ;; dracula
-                         ;; dream
-                         ;; eltbus
-                         ;; emacs-21
-                         ;; emacs-nw
-                         ;; erosiond
-                         ;; euphoria
-                         ;; evenhold
-                         ;; faff
-                         ;; farmhouse-dark
-                         ;; farmhouse-light
-                         ;; feng-shui
-                         ;; firebelly
-                         ;; firecode
-                         ;; fischmeister
-                         ;; flatland-black
-                         ;; flatland
-                         ;; flatui
-                         ;; fogus
-                         ;; gandalf
-                         ;; github
-                         ;; gnome2
-                         ;; gnome
-                         ;; goldenrod
-                         ;; gotham
-                         ;; graham
-                         ;; grandshell
-                         ;; granger
-                         ;; gray1
-                         ;; gray30
-                         ;; green-phosphor
-                         ;; greiner
-                         ;; greymatters
-                         ;; gruber-darker
-                         ;; gruvbox
-                         ;; gtk-ide
-                         ;; hemisu-dark
-                         ;; hemisu-light
-                         ;; hemisu
-                         ;; heroku
-                         ;; hickey
-                         ;; high-contrast
-                         ;; hipster
-                         ;; hober
-                         ;; hydandata-light
-                         ;; idea-darkula
-                         ;; infodoc
-                         ;; inkpot
-                         ;; iodine
-                         ;; ir-black
-                         ;; jazz
-                         ;; jbeans
-                         ;; jb-simple
-                         ;; jedit-grey
-                         ;; jonadabian-slate
-                         ;; jonadabian
-                         ;; jsc-dark
-                         ;; jsc-light2
-                         ;; jsc-light
-                         ;; julie
-                         ;; junio
-                         ;; katester
-                         ;; kingsajz
-                         ;; kooten
-                         ;; late-night
-                         ;; lavender
-                         ;; lawrence
-                         ;; ld-dark
-                         ;; lethe
                          leuven
-                         ;; light-soap
-                         ;; lush
-                         ;; mac-classic
-                         ;; majapahit-dark
-                         ;; majapahit-light
-                         ;; marine
-                         ;; marquardt
-                         ;; material-light
-                         ;; material
-                         ;; matrix
-                         ;; mbo70s
-                         ;; mccarthy
-                         ;; meacupla
-                         ;; mellow
-                         ;; midnight
-                         ;; minimal-light
-                         ;; minimal
-                         ;; mistyday
-                         ;; moe-dark
-                         ;; moe-light
-                         ;; moe
-                         ;; molokai
-                         ;; monochrome-bright
-                         ;; monochrome
-                         ;; monokai
-                         ;; montz
-                         ;; mustang
-                         ;; mustard
-                         ;; my-solarized-dark
-                         ;; my-solarized-light
-                         ;; naquadah
-                         ;; niflheim
-                         ;; noctilux
-                         ;; obsidian
-                         ;; occidental
-                         ;; odersky
-                         ;; oldlace
-                         ;; organic-green
-                         ;; oswald
-                         ;; paper
-                         ;; parus
-                         ;; pastelmac
-                         ;; pastels-on-dark
-                         ;; peacock
-                         ;; phoenix-dark-mono
-                         ;; phoenix-dark-pink
-                         ;; pierson
-                         ;; planet
-                         ;; pok-wob
-                         ;; pok-wog
-                         ;; professional
-                         ;; purple-haze
-                         ;; quasi-monochrome
-                         ;; radiance
-                         ;; railscasts
-                         ;; railscast
-                         ;; ramangalahy
-                         ;; raspopovic
-                         ;; renegade
-                         ;; resolve
-                         ;; retro-green
-                         ;; retro-orange
-                         ;; reverse
-                         ;; reykjavik
-                         ;; rippedcasts
-                         ;; ritchie
-                         ;; robin-hood
-                         ;; rotor
-                         ;; ryerson
-                         ;; salmon-diff
-                         ;; salmon-font-lock
-                         ;; sanityinc-tomorrow-blue
-                         ;; sanityinc-tomorrow-bright
-                         ;; sanityinc-tomorrow-day
-                         ;; sanityinc-tomorrow-eighties
-                         ;; sanityinc-tomorrow-night
-                         ;; scintilla
-                         ;; seoul256
-                         ;; seti
-                         ;; shaman
-                         ;; simple-1
-                         ;; sitaramv-nt
-                         ;; sitaramv-solaris
-                         ;; slime
-                         ;; smyx
-                         ;; snowish
-                         ;; snow
-                         ;; soft-charcoal
-                         ;; soft-morning
-                         ;; soft-stone
-                         ;; solarized-dark
-                         ;; solarized-light
-                         ;; solarized
-                         ;; soothe
-                         ;; spacegray
-                         ;; spolsky
-                         ;; standard-ediff
-                         ;; standard
-                         ;; stekene-dark
-                         ;; stekene-light
-                         ;; subatomic256
-                         ;; subatomic
-                         ;; subdued
-                         ;; subtle-blue
-                         ;; subtle-hacker
-                         ;; sunburst
-                         ;; sunny-day
-                         ;; suscolors
-                         ;; taming-mr-arneson
-                         ;; tango-2
-                         ;; tango-plus
-                         ;; tangotango
-                         ;; tao-yang
-                         ;; tao-yin
-                         ;; taylor
-                         ;; tommyh
-                         ;; tomorrow-night-paradise
-                         ;; tronesque
-                         ;; tron
-                         ;; tty-dark
-                         ;; twilight-bright
-                         ;; twilight
-                         ;; ubuntu
-                         ;; ujelly
-                         ;; underwater
-                         ;; vim-colors
-                         ;; waher
-                         ;; warm-night
-                         ;; whateveryouwant
-                         ;; wheat
-                         ;; white-sand
-                         ;; wilson
-                         ;; word-perfect
-                         ;; xemacs
-                         ;; xp
-                         ;; zen-and-art
-                         ;; zenburn
-                         ;; zonokai-blue
-                         ;; zonokai-red
-                         ;; zonokai
                          )
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
    ;; `all-the-icons', `custom', `vim-powerline' and `vanilla'. The first three
@@ -596,30 +359,11 @@ It should only modify the values of Spacemacs settings."
    ;; (default t)
    dotspacemacs-colorize-cursor-according-to-state t
 
-   ;;
-   ;; Bit wider than Ubuntu, pretty good as well though in being more courier/serif like
-   ;; dotspacemacs-default-font `("Cousine" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
-   ;; dotspacemacs-default-font `("Courier" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; dotspacemacs-default-font `("Office Code Pro D" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Perfect UTF-8, good sans serif
    dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal)
-   ;; Droid has odd spaced UTF-8
-   ;; dotspacemacs-default-font '("Droid Sans Mono" :size 6.0)
-   ;; Monoid has odd spaced UTF-8
-   ;; dotspacemacs-default-font `("Monoid" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
-   ;; Very light strokes, can look nice but dim a bit wider again than cousine and ubuntu
-   ;; dotspacemacs-default-font `("Nimbus Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
-   ;; Looks pretty nice, some UTF graphics don't quite match up
-   ;; dotspacemacs-default-font `("Liberation Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
-   ;; dotspacemacs-default-font `("Source Code Pro for Powerline" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Very condensed -- pretty good for coding -- same odd shapes offs UTF as Liberation Mono
    ;; dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.2)
-   ;; dotspacemacs-default-font ("Ubuntu Mono" :size 6.0 :weight normal :width normal :powerline-scale 1.4)
-    ;; dotspacemacs-default-font '("Source Code Pro"
-    ;;                              :size 16.0
-    ;;                              :weight normal
-    ;;                              :width normal
-    ;;                              :powerline-scale 1.4)
 
    ;; The leader key (default "SPC")
    dotspacemacs-leader-key "SPC"
@@ -869,7 +613,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (require 'generic-mode-hooks)
 
   (when (display-graphic-p)
-    (fringe-mode '(16 . 16)))
+    (fringe-mode '(20 . nil)))
 
   (let ((default-directory (concat dotspacemacs-directory "repos/")))
     (normal-top-level-add-subdirs-to-load-path))
@@ -3279,7 +3023,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     ;; (if inhibit-startup-screen
     ;;     (quit-window))
 
-    ;; (setq powerline-default-separator 'wave)
+    (setq powerline-default-separator 'wave)
 
     ;; (defun split-window-sensibly-prefer-horizontal (&optional window)
     ;;   "Same as `split-window-sensibly' except prefer to split horizontally first."
@@ -3308,38 +3052,171 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
     (require 'list-timers)
     (evil-set-initial-state 'timers-menu-mode 'insert)
-    )
 
+
+  ;; left-arrow, right-arrow
+  ;; Used to indicate truncated lines.
+
+  ;; left-curly-arrow, right-curly-arrow
+  ;; Used to indicate continued lines.
+
+  ;; right-triangle, left-triangle
+  ;; The former is used by overlay arrows. The latter is unused.
+
+  ;; up-arrow, down-arrow, top-left-angle top-right-angle
+  ;; bottom-left-angle, bottom-right-angle
+  ;; top-right-angle, top-left-angle
+  ;; left-bracket, right-bracket, top-right-angle, top-left-angle
+  ;; Used to indicate buffer boundaries.
+
+  ;; filled-rectangle, hollow-rectangle
+  ;; filled-square, hollow-square
+  ;; vertical-bar, horizontal-bar
+  ;; Used for different types of fringe cursors.
+
+  ;; UTF-8 left-arrow, right-arrow (for truncated lines), left-curly-arrow, and right-curly-arrow
+  ;; → ←  ↩ ↪ ⬅ ↺ ↻ ↷ ⟲ ⟳ ⤵⤴ ⤷ ⤶
   ;; custom graphics that works nice with half-width fringes
-  (with-eval-after-load 'git-gutter-fringe
-    (fringe-helper-define 'git-gutter-fr:added nil
-      "...XXXX...."
-      "...XXXX...."
-      "...XXXX...."
-      "XXXXXXXXXXX"
-      "XXXXXXXXXXX"
-      "XXXXXXXXXXX"
-      "...XXXX...."
-      "...XXXX...."
-      "...XXXX...."
+
+;; .....................
+;; ..............##.....
+;; ..............###....
+;; ...............###...
+;; ................###..
+;; ####################.
+;; #####################
+;; #####################
+;; ................####.
+;; ...............####..
+;; ..............####...
+;; ..............###....
+;; ...............#.....
+
+;; .....................
+;; .....##..............
+;; ....###..............
+;; ...###...............
+;; ..###................
+;; .####################
+;; #####################
+;; #####################
+;; .####................
+;; ..####...............
+;; ...####..............
+;; ....###..............
+;; .....#...............
+
+
+    (with-eval-after-load 'git-gutter-fringe
+      (fringe-helper-define 'left-curly-arrow nil
+        "........................."
+        "........................."
+        ".................#......."
+        ".................####...."
+        ".................#####..."
+        "..................####..."
+        ".......##..........####.."
+        "......###...........###.."
+        ".....###...........####.."
+        "....###............###..."
+        "...###################..."
+        "..###################...."
+        "..##################....."
+        "...####.................."
+        "....####................."
+        ".....####................"
+        "......###................"
+        ".......#................."
+        "........................."
+        "........................."
+        )
+
+      (fringe-helper-define 'right-curly-arrow nil
+        "........................."
+        ".......#................."
+        "....####................."
+        "...#####................."
+        "...####.................."
+        "..####..........##......."
+        "..###...........###......"
+        "..###............###....."
+        "...###............###...."
+        "...###################..."
+        "....###################.."
+        ".....##################.."
+        "..................####..."
+        ".................####...."
+        "................####....."
+        "................###......"
+        ".................#......."
+        "........................."
+        )
+
+
+
+
+      (fringe-helper-define 'git-gutter-fr:added nil
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+        "XXXXXXXXXXXXXXXXXXX"
+        "XXXXXXXXXXXXXXXXXXX"
+        "XXXXXXXXXXXXXXXXXXX"
+        "XXXXXXXXXXXXXXXXXXX"
+        "XXXXXXXXXXXXXXXXXXX"
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+
+
+        )
+      (fringe-helper-define 'git-gutter-fr:deleted nil
+        "......................"
+        "......................"
+        "......................"
+        "......................"
+        "......................"
+        "......................"
+        "XXXXXXXXXXXXXXXXXXXXXX"
+        "XXXXXXXXXXXXXXXXXXXXXX"
+        "XXXXXXXXXXXXXXXXXXXXXX"
+        "XXXXXXXXXXXXXXXXXXXXXX"
+        "......................"
+        "......................"
+        "......................"
+        "......................"
+        "......................"
+        "......................"
+        )
+      (fringe-helper-define 'git-gutter-fr:modified nil
+        "........................."
+        "........................."
+        "........................."
+        "..........XXXXX.........."
+        ".........XXXXXXX........."
+        "........XXXXXXXXX........"
+        ".......XXXXXXXXXXX......."
+        ".......XXXXXXXXXXX......."
+        ".......XXXXXXXXXXX......."
+        ".......XXXXXXXXXXX......."
+        ".......XXXXXXXXXXX......."
+        "........XXXXXXXXX........"
+        ".........XXXXXXX........."
+        "..........XXXXX.........."
+        "........................."
+        "........................."
+        "........................."
+        "........................."
+        )
       )
-    (fringe-helper-define 'git-gutter-fr:deleted nil
-      "..........."
-      "..........."
-      "..........."
-      "XXXXXXXXXXX"
-      "XXXXXXXXXXX"
-      "XXXXXXXXXXX"
-      "..........."
-      "..........."
-      "..........."
-      )
-    (fringe-helper-define 'git-gutter-fr:modified nil
-      "..X...."
-      ".XXX..."
-      "XX.XX.."
-      ".XXX..."
-      "..X....")
     )
   )
 
