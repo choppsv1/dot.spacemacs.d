@@ -206,7 +206,8 @@ This function is called at the very beginning of Spacemacs startup,
 before layer configuration.
 It should only modify the values of Spacemacs settings."
   ;; mDetermine display size to pick font size
-  (setq custom-file (concat dotspacemacs-directory ".custom.el"))
+  (setq custom-file (concat dotspacemacs-directory "custom.el"))
+  (load custom-file)
 
   (cond
  ((string-equal system-type "darwin") ; Mac OS X
@@ -220,14 +221,14 @@ It should only modify the values of Spacemacs settings."
     ;; (setq yres (replace-regexp-in-string "\n\\'" "" yres))
     (if (> (string-to-number xres) 5000)
         ;; big display
-        (setq ch-def-height 10.0)
+        (setq ch-def-height 12.0)
       ;; small display
       (if (= (string-to-number xres) 3840)
         (if (> (string-to-number dpi) 240)
-            (setq ch-def-height 9.0)
-          (setq ch-def-height 11.0))
+            (setq ch-def-height 11.0)
+          (setq ch-def-height 13.0))
       ;; small display
-        (setq ch-def-height 10.0))))))
+        (setq ch-def-height 12.0))))))
   ;; (message "def height %s" ch-def-height)
 
 
@@ -604,11 +605,9 @@ before packages are loaded. If you are unsure, you should try in setting them in
            (setq epg-gpg-program "/usr/local/MacGPG2/bin/gpg2")))
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
-  (add-to-list 'load-path (concat dotspacemacs-directory "themes-test/"))
-  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "local-lisp/"))
-  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/emacs-mandm-theme"))
-  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/pycoverage"))
-  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "themes-test/"))
+  (add-to-list 'custom-theme-load-path "~/p/emacs-mandm-theme/")
+  ;; (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/pycoverage"))
+  ;; (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "themes-test/"))
   (add-to-list 'load-path (concat "~/p/ietf-docs"))
   ;;(require 'iterm-custom-keys)
   (require 'iterm-xterm-extra)
@@ -666,7 +665,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (setq comment-delim-color "grey50")
 
   (setq theming-modifications `(
-                                (mandm (default :background "#011827"))
+                                ;; (mandm (default :background "#011827"))
                                 (misterioso (erc-input-face :foreground "cornflowerblue")
                                             (font-lock-comment-face :foreground "DarkGrey" :slant italic)
                                             (evil-search-highlight-persist-highlight-face :background "#338f86")
@@ -921,8 +920,10 @@ layers configuration. You are free to put any user code."
     ;; tabs are 8 characters wide!
     (setq-default tab-width 8)
 
+    (setq-default magit-todos-ignored-keywords '("NOTE" "DONE" "FAIL"))
+
     ;; take out
-    (setq magithub-debug-mode t)
+    ;; (setq magithub-debug-mode t)
 
     ;; Hate smart parens but apparently still want code??
     (remove-hook 'prog-mode-hook #'smartparens-mode)
@@ -3224,5 +3225,5 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
   )
 
 ;; Local Variables:
-;; eval (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when-layer-used\\|(when (configuration-layer\\)")
+;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when-layer-used\\|(when (configuration-layer\\)")
 ;; End:
