@@ -2059,6 +2059,12 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         ;; (add-hook 'rst-mode-hook 'my-rst-hook)
 
         ))
+
+    (when-layer-used
+     'magit
+     (with-eval-after-load 'magit
+       (magit-todos-mode 1)))
+
     (when-layer-used
      'python
       (with-eval-after-load 'python
