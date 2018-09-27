@@ -1138,6 +1138,10 @@ layers configuration. You are free to put any user code."
       ;; We want to be in normal state most of the time so we can flip in and out.
       (evil-set-initial-state 'erc-mode 'normal)
 
+
+    ;; https://github.com/syl20bnr/spacemacs/issues/11152
+    (etq projectile-keymap-prefix (kbd "C-c C-p"))
+
       ;; Simplify this function so it works
       (with-eval-after-load 'erc-log
         (defun erc-log-all-but-server-buffers (buffer)
