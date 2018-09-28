@@ -208,6 +208,7 @@ It should only modify the values of Spacemacs settings."
   ;; mDetermine display size to pick font size
   (setq custom-file (concat dotspacemacs-directory "custom.el"))
   (load custom-file)
+  (dotspacemacs/emacs-custom-settings)
 
   (cond
  ((string-equal system-type "darwin") ; Mac OS X
@@ -1140,7 +1141,7 @@ layers configuration. You are free to put any user code."
 
 
     ;; https://github.com/syl20bnr/spacemacs/issues/11152
-    (etq projectile-keymap-prefix (kbd "C-c C-p"))
+    (setq projectile-keymap-prefix (kbd "C-c C-p"))
 
       ;; Simplify this function so it works
       (with-eval-after-load 'erc-log
