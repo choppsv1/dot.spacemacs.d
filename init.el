@@ -161,6 +161,7 @@ This function should only modify configuration layer settings."
      dockerfile-mode
      exec-path-from-shell
      monky
+     magit-todos
      nhexl-mode
      org-caldav
      package-lint
