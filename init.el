@@ -5,9 +5,11 @@
 (defun dotspacemacs/layers ()
   "Layer configuration:
 This function should only modify configuration layer settings."
-  (setq load-prefer-newer t)
+  (setq load-prefer-newer t
+        )
   (setq-default
    load-prefer-newer t
+
    ;; Base distribution to use. This is a layer contained in the directory
    ;; `+distribution'. For now available distributions are `spacemacs-base'
    ;; or `spacemacs'. (default 'spacemacs)
@@ -160,6 +162,7 @@ This function should only modify configuration layer settings."
      base16-theme
      dockerfile-mode
      exec-path-from-shell
+     magit-todos
      monky
      magit-todos
      nhexl-mode
@@ -204,6 +207,8 @@ This function is called at the very beginning of Spacemacs startup,
 before layer configuration.
 It should only modify the values of Spacemacs settings."
   ;; mDetermine display size to pick font size
+  (setq custom-file (concat dotspacemacs-directory "custom.el"))
+  (load custom-file)
 
   (cond
  ((string-equal system-type "darwin") ; Mac OS X
@@ -221,10 +226,10 @@ It should only modify the values of Spacemacs settings."
       ;; small display
       (if (= (string-to-number xres) 3840)
         (if (> (string-to-number dpi) 240)
-            (setq ch-def-height 9.0)
-          (setq ch-def-height 12.0))
+            (setq ch-def-height 11.0)
+          (setq ch-def-height 13.0))
       ;; small display
-        (setq ch-def-height 10.0))))))
+        (setq ch-def-height 12.0))))))
   ;; (message "def height %s" ch-def-height)
 
 
@@ -340,248 +345,10 @@ It should only modify the values of Spacemacs settings."
 
    dotspacemacs-themes '(
                          misterioso
-                         ;; classic
                          gruvbox-light-hard
                          molokai
                          mandm
-                         ;; classic
-                         ;; cobalt
-                         ;; colonoscopy
-                         ;; colorsarenice-dark
-                         ;; colorsarenice-light
-                         ;; comidia
-                         ;; cyberpunk
-                         ;; dakrone
-                         ;; dark-blue2
-                         ;; dark-blue
-                         ;; darkburn
-                         ;; dark-erc
-                         ;; dark-font-lock
-                         ;; dark-gnus
-                         ;; dark-green
-                         ;; dark-info
-                         ;; dark-krystal
-                         ;; dark-laptop
-                         ;; dark-mint
-                         ;; darktooth
-                         ;; deep-blue
-                         ;; deep-thought
-                         ;; desert
-                         ;; Deviant
-                         ;; digital-ofs1
-                         ;; distinguished
-                         ;; django
-                         ;; dorsey
-                         ;; dracula
-                         ;; dream
-                         ;; eltbus
-                         ;; emacs-21
-                         ;; emacs-nw
-                         ;; erosiond
-                         ;; euphoria
-                         ;; evenhold
-                         ;; faff
-                         ;; farmhouse-dark
-                         ;; farmhouse-light
-                         ;; feng-shui
-                         ;; firebelly
-                         ;; firecode
-                         ;; fischmeister
-                         ;; flatland-black
-                         ;; flatland
-                         ;; flatui
-                         ;; fogus
-                         ;; gandalf
-                         ;; github
-                         ;; gnome2
-                         ;; gnome
-                         ;; goldenrod
-                         ;; gotham
-                         ;; graham
-                         ;; grandshell
-                         ;; granger
-                         ;; gray1
-                         ;; gray30
-                         ;; green-phosphor
-                         ;; greiner
-                         ;; greymatters
-                         ;; gruber-darker
-                         ;; gruvbox
-                         ;; gtk-ide
-                         ;; hemisu-dark
-                         ;; hemisu-light
-                         ;; hemisu
-                         ;; heroku
-                         ;; hickey
-                         ;; high-contrast
-                         ;; hipster
-                         ;; hober
-                         ;; hydandata-light
-                         ;; idea-darkula
-                         ;; infodoc
-                         ;; inkpot
-                         ;; iodine
-                         ;; ir-black
-                         ;; jazz
-                         ;; jbeans
-                         ;; jb-simple
-                         ;; jedit-grey
-                         ;; jonadabian-slate
-                         ;; jonadabian
-                         ;; jsc-dark
-                         ;; jsc-light2
-                         ;; jsc-light
-                         ;; julie
-                         ;; junio
-                         ;; katester
-                         ;; kingsajz
-                         ;; kooten
-                         ;; late-night
-                         ;; lavender
-                         ;; lawrence
-                         ;; ld-dark
-                         ;; lethe
                          leuven
-                         ;; light-soap
-                         ;; lush
-                         ;; mac-classic
-                         ;; majapahit-dark
-                         ;; majapahit-light
-                         ;; marine
-                         ;; marquardt
-                         ;; material-light
-                         ;; material
-                         ;; matrix
-                         ;; mbo70s
-                         ;; mccarthy
-                         ;; meacupla
-                         ;; mellow
-                         ;; midnight
-                         ;; minimal-light
-                         ;; minimal
-                         ;; mistyday
-                         ;; moe-dark
-                         ;; moe-light
-                         ;; moe
-                         ;; molokai
-                         ;; monochrome-bright
-                         ;; monochrome
-                         ;; monokai
-                         ;; montz
-                         ;; mustang
-                         ;; mustard
-                         ;; my-solarized-dark
-                         ;; my-solarized-light
-                         ;; naquadah
-                         ;; niflheim
-                         ;; noctilux
-                         ;; obsidian
-                         ;; occidental
-                         ;; odersky
-                         ;; oldlace
-                         ;; organic-green
-                         ;; oswald
-                         ;; paper
-                         ;; parus
-                         ;; pastelmac
-                         ;; pastels-on-dark
-                         ;; peacock
-                         ;; phoenix-dark-mono
-                         ;; phoenix-dark-pink
-                         ;; pierson
-                         ;; planet
-                         ;; pok-wob
-                         ;; pok-wog
-                         ;; professional
-                         ;; purple-haze
-                         ;; quasi-monochrome
-                         ;; radiance
-                         ;; railscasts
-                         ;; railscast
-                         ;; ramangalahy
-                         ;; raspopovic
-                         ;; renegade
-                         ;; resolve
-                         ;; retro-green
-                         ;; retro-orange
-                         ;; reverse
-                         ;; reykjavik
-                         ;; rippedcasts
-                         ;; ritchie
-                         ;; robin-hood
-                         ;; rotor
-                         ;; ryerson
-                         ;; salmon-diff
-                         ;; salmon-font-lock
-                         ;; sanityinc-tomorrow-blue
-                         ;; sanityinc-tomorrow-bright
-                         ;; sanityinc-tomorrow-day
-                         ;; sanityinc-tomorrow-eighties
-                         ;; sanityinc-tomorrow-night
-                         ;; scintilla
-                         ;; seoul256
-                         ;; seti
-                         ;; shaman
-                         ;; simple-1
-                         ;; sitaramv-nt
-                         ;; sitaramv-solaris
-                         ;; slime
-                         ;; smyx
-                         ;; snowish
-                         ;; snow
-                         ;; soft-charcoal
-                         ;; soft-morning
-                         ;; soft-stone
-                         ;; solarized-dark
-                         ;; solarized-light
-                         ;; solarized
-                         ;; soothe
-                         ;; spacegray
-                         ;; spolsky
-                         ;; standard-ediff
-                         ;; standard
-                         ;; stekene-dark
-                         ;; stekene-light
-                         ;; subatomic256
-                         ;; subatomic
-                         ;; subdued
-                         ;; subtle-blue
-                         ;; subtle-hacker
-                         ;; sunburst
-                         ;; sunny-day
-                         ;; suscolors
-                         ;; taming-mr-arneson
-                         ;; tango-2
-                         ;; tango-plus
-                         ;; tangotango
-                         ;; tao-yang
-                         ;; tao-yin
-                         ;; taylor
-                         ;; tommyh
-                         ;; tomorrow-night-paradise
-                         ;; tronesque
-                         ;; tron
-                         ;; tty-dark
-                         ;; twilight-bright
-                         ;; twilight
-                         ;; ubuntu
-                         ;; ujelly
-                         ;; underwater
-                         ;; vim-colors
-                         ;; waher
-                         ;; warm-night
-                         ;; whateveryouwant
-                         ;; wheat
-                         ;; white-sand
-                         ;; wilson
-                         ;; word-perfect
-                         ;; xemacs
-                         ;; xp
-                         ;; zen-and-art
-                         ;; zenburn
-                         ;; zonokai-blue
-                         ;; zonokai-red
-                         ;; zonokai
                          )
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
    ;; `all-the-icons', `custom', `vim-powerline' and `vanilla'. The first three
@@ -597,30 +364,11 @@ It should only modify the values of Spacemacs settings."
    ;; (default t)
    dotspacemacs-colorize-cursor-according-to-state t
 
-   ;;
-   ;; Bit wider than Ubuntu, pretty good as well though in being more courier/serif like
-   ;; dotspacemacs-default-font `("Cousine" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
-   ;; dotspacemacs-default-font `("Courier" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; dotspacemacs-default-font `("Office Code Pro D" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Perfect UTF-8, good sans serif
    dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal)
-   ;; Droid has odd spaced UTF-8
-   ;; dotspacemacs-default-font '("Droid Sans Mono" :size 6.0)
-   ;; Monoid has odd spaced UTF-8
-   ;; dotspacemacs-default-font `("Monoid" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
-   ;; Very light strokes, can look nice but dim a bit wider again than cousine and ubuntu
-   ;; dotspacemacs-default-font `("Nimbus Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
-   ;; Looks pretty nice, some UTF graphics don't quite match up
-   ;; dotspacemacs-default-font `("Liberation Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
-   ;; dotspacemacs-default-font `("Source Code Pro for Powerline" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Very condensed -- pretty good for coding -- same odd shapes offs UTF as Liberation Mono
    ;; dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.2)
-   ;; dotspacemacs-default-font ("Ubuntu Mono" :size 6.0 :weight normal :width normal :powerline-scale 1.4)
-    ;; dotspacemacs-default-font '("Source Code Pro"
-    ;;                              :size 16.0
-    ;;                              :weight normal
-    ;;                              :width normal
-    ;;                              :powerline-scale 1.4)
 
    ;; The leader key (default "SPC")
    dotspacemacs-leader-key "SPC"
@@ -858,11 +606,9 @@ before packages are loaded. If you are unsure, you should try in setting them in
            (setq epg-gpg-program "/usr/local/MacGPG2/bin/gpg2")))
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
-  (add-to-list 'load-path (concat dotspacemacs-directory "themes-test/"))
-  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "local-lisp/"))
-  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/emacs-mandm-theme"))
-  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/pycoverage"))
-  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "themes-test/"))
+  (add-to-list 'custom-theme-load-path "~/p/emacs-mandm-theme/")
+  ;; (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/pycoverage"))
+  ;; (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "themes-test/"))
   (add-to-list 'load-path (concat "~/p/ietf-docs"))
   ;;(require 'iterm-custom-keys)
   (require 'iterm-xterm-extra)
@@ -870,7 +616,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (require 'generic-mode-hooks)
 
   (when (display-graphic-p)
-    (fringe-mode '(16 . 16)))
+    (fringe-mode '(20 . nil)))
 
   (let ((default-directory (concat dotspacemacs-directory "repos/")))
     (normal-top-level-add-subdirs-to-load-path))
@@ -920,7 +666,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (setq comment-delim-color "grey50")
 
   (setq theming-modifications `(
-                                (mandm (default :background "#011827"))
+                                ;; (mandm (default :background "#011827"))
                                 (misterioso (erc-input-face :foreground "cornflowerblue")
                                             (font-lock-comment-face :foreground "DarkGrey" :slant italic)
                                             (evil-search-highlight-persist-highlight-face :background "#338f86")
@@ -1175,8 +921,10 @@ layers configuration. You are free to put any user code."
     ;; tabs are 8 characters wide!
     (setq-default tab-width 8)
 
+    (setq-default magit-todos-ignored-keywords '("NOTE" "DONE" "FAIL"))
+
     ;; take out
-    (setq magithub-debug-mode t)
+    ;; (setq magithub-debug-mode t)
 
     ;; Hate smart parens but apparently still want code??
     (remove-hook 'prog-mode-hook #'smartparens-mode)
@@ -1390,6 +1138,10 @@ layers configuration. You are free to put any user code."
             )
       ;; We want to be in normal state most of the time so we can flip in and out.
       (evil-set-initial-state 'erc-mode 'normal)
+
+
+    ;; https://github.com/syl20bnr/spacemacs/issues/11152
+    (etq projectile-keymap-prefix (kbd "C-c C-p"))
 
       ;; Simplify this function so it works
       (with-eval-after-load 'erc-log
@@ -2312,6 +2064,12 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         ;; (add-hook 'rst-mode-hook 'my-rst-hook)
 
         ))
+
+    (when-layer-used
+     'magit
+     (with-eval-after-load 'magit
+       (magit-todos-mode 1)))
+
     (when-layer-used
      'python
       (with-eval-after-load 'python
@@ -3280,7 +3038,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     ;; (if inhibit-startup-screen
     ;;     (quit-window))
 
-    ;; (setq powerline-default-separator 'wave)
+    (setq powerline-default-separator 'wave)
 
     ;; (defun split-window-sensibly-prefer-horizontal (&optional window)
     ;;   "Same as `split-window-sensibly' except prefer to split horizontally first."
@@ -3309,64 +3067,174 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
     (require 'list-timers)
     (evil-set-initial-state 'timers-menu-mode 'insert)
-    )
 
+
+  ;; left-arrow, right-arrow
+  ;; Used to indicate truncated lines.
+
+  ;; left-curly-arrow, right-curly-arrow
+  ;; Used to indicate continued lines.
+
+  ;; right-triangle, left-triangle
+  ;; The former is used by overlay arrows. The latter is unused.
+
+  ;; up-arrow, down-arrow, top-left-angle top-right-angle
+  ;; bottom-left-angle, bottom-right-angle
+  ;; top-right-angle, top-left-angle
+  ;; left-bracket, right-bracket, top-right-angle, top-left-angle
+  ;; Used to indicate buffer boundaries.
+
+  ;; filled-rectangle, hollow-rectangle
+  ;; filled-square, hollow-square
+  ;; vertical-bar, horizontal-bar
+  ;; Used for different types of fringe cursors.
+
+  ;; UTF-8 left-arrow, right-arrow (for truncated lines), left-curly-arrow, and right-curly-arrow
+  ;; → ←  ↩ ↪ ⬅ ↺ ↻ ↷ ⟲ ⟳ ⤵⤴ ⤷ ⤶
   ;; custom graphics that works nice with half-width fringes
-  (with-eval-after-load 'git-gutter-fringe
-    (fringe-helper-define 'git-gutter-fr:added nil
-      "...XXXX...."
-      "...XXXX...."
-      "...XXXX...."
-      "XXXXXXXXXXX"
-      "XXXXXXXXXXX"
-      "XXXXXXXXXXX"
-      "...XXXX...."
-      "...XXXX...."
-      "...XXXX...."
+
+;; .....................
+;; ..............##.....
+;; ..............###....
+;; ...............###...
+;; ................###..
+;; ####################.
+;; #####################
+;; #####################
+;; ................####.
+;; ...............####..
+;; ..............####...
+;; ..............###....
+;; ...............#.....
+
+;; .....................
+;; .....##..............
+;; ....###..............
+;; ...###...............
+;; ..###................
+;; .####################
+;; #####################
+;; #####################
+;; .####................
+;; ..####...............
+;; ...####..............
+;; ....###..............
+;; .....#...............
+
+
+    (with-eval-after-load 'git-gutter-fringe
+      (fringe-helper-define 'left-curly-arrow nil
+        "........................."
+        "........................."
+        ".................#......."
+        ".................####...."
+        ".................#####..."
+        "..................####..."
+        ".......##..........####.."
+        "......###...........###.."
+        ".....###...........####.."
+        "....###............###..."
+        "...###################..."
+        "..###################...."
+        "..##################....."
+        "...####.................."
+        "....####................."
+        ".....####................"
+        "......###................"
+        ".......#................."
+        "........................."
+        "........................."
+        )
+
+      (fringe-helper-define 'right-curly-arrow nil
+        "........................."
+        ".......#................."
+        "....####................."
+        "...#####................."
+        "...####.................."
+        "..####..........##......."
+        "..###...........###......"
+        "..###............###....."
+        "...###............###...."
+        "...###################..."
+        "....###################.."
+        ".....##################.."
+        "..................####..."
+        ".................####...."
+        "................####....."
+        "................###......"
+        ".................#......."
+        "........................."
+        )
+
+
+
+
+      (fringe-helper-define 'git-gutter-fr:added nil
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+        "XXXXXXXXXXXXXXXXXXX"
+        "XXXXXXXXXXXXXXXXXXX"
+        "XXXXXXXXXXXXXXXXXXX"
+        "XXXXXXXXXXXXXXXXXXX"
+        "XXXXXXXXXXXXXXXXXXX"
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+        ".......XXXXX......."
+
+
+        )
+      (fringe-helper-define 'git-gutter-fr:deleted nil
+        "......................"
+        "......................"
+        "......................"
+        "......................"
+        "......................"
+        "......................"
+        "XXXXXXXXXXXXXXXXXXXXXX"
+        "XXXXXXXXXXXXXXXXXXXXXX"
+        "XXXXXXXXXXXXXXXXXXXXXX"
+        "XXXXXXXXXXXXXXXXXXXXXX"
+        "......................"
+        "......................"
+        "......................"
+        "......................"
+        "......................"
+        "......................"
+        )
+      (fringe-helper-define 'git-gutter-fr:modified nil
+        "........................."
+        "........................."
+        "........................."
+        "..........XXXXX.........."
+        ".........XXXXXXX........."
+        "........XXXXXXXXX........"
+        ".......XXXXXXXXXXX......."
+        ".......XXXXXXXXXXX......."
+        ".......XXXXXXXXXXX......."
+        ".......XXXXXXXXXXX......."
+        ".......XXXXXXXXXXX......."
+        "........XXXXXXXXX........"
+        ".........XXXXXXX........."
+        "..........XXXXX.........."
+        "........................."
+        "........................."
+        "........................."
+        "........................."
+        )
       )
-    (fringe-helper-define 'git-gutter-fr:deleted nil
-      "..........."
-      "..........."
-      "..........."
-      "XXXXXXXXXXX"
-      "XXXXXXXXXXX"
-      "XXXXXXXXXXX"
-      "..........."
-      "..........."
-      "..........."
-      )
-    (fringe-helper-define 'git-gutter-fr:modified nil
-      "..X...."
-      ".XXX..."
-      "XX.XX.."
-      ".XXX..."
-      "..X....")
     )
   )
 
-;; ;; Local Variables: ;; eval (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when-layer-used\\|(when (configuration-layer\\)") ;; End:
-
-;; Do not write anything past this comment. This is where Emacs will
-;; auto-generate custom variable definitions.
-
-(defun dotspacemacs/emacs-custom-settings ()
-  "Emacs custom settings.
-This is an auto-generated function, do not modify its content directly, use
-Emacs customize menu instead.
-This function is called at the very end of Spacemacs initialization."
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(erc-input-face ((t (:foreground "cornflowerblue"))))
- '(evil-search-highlight-persist-highlight-face ((t (:background "#338f86"))))
- '(font-lock-comment-delimiter-face ((t (:foreground "grey50"))))
- '(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic))))
- '(lazy-highlight-face ((t (:background "#338f86")))))
-))
+;; Local Variables:
+;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when-layer-used\\|(when (configuration-layer\\)")
+;; End:
