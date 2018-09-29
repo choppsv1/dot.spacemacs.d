@@ -210,6 +210,8 @@ It should only modify the values of Spacemacs settings."
   (setq custom-file (concat dotspacemacs-directory "custom.el"))
   (load custom-file)
 
+  (setq ch-def-height 12.0)
+
   (cond
  ((string-equal system-type "darwin") ; Mac OS X
   (setq ch-def-height 16.0))
@@ -764,10 +766,12 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
                 (defun remote-gui-select-text (data)
                   "gui-select-test version to use ssh to copy the current kill to the local systems clipboard"
-                  (let ((cmd "ssh -q ${SSH_CONNECTION%% *} -- bash -c 'xsel -ibp >& /dev/null || pbcopy'"))
+                  ;; (let ((cmd "ssh -q ${SSH_CONNECTION%% *} bash -c 'xsel -ibp --display :0 >& /dev/null || pbcopy'"))
+                  (let ((cmd "copytoclipem.sh"))
                     (save-excursion
                       (let* ((process-connection-type nil)  ; use a pipe as it cleans itself up
                              (proc (start-process-shell-command "cut-to-remote" nil cmd)))
+                        (message "invoking remote select text cmd: %s with data: %s" cmd data)
                         (process-send-string proc data)
                         (process-send-eof proc)))
                     data))
@@ -1141,7 +1145,7 @@ layers configuration. You are free to put any user code."
 
 
     ;; https://github.com/syl20bnr/spacemacs/issues/11152
-    (etq projectile-keymap-prefix (kbd "C-c C-p"))
+    (setq projectile-keymap-prefix (kbd "C-c C-p"))
 
       ;; Simplify this function so it works
       (with-eval-after-load 'erc-log
