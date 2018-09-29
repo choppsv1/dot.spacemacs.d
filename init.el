@@ -209,6 +209,7 @@ It should only modify the values of Spacemacs settings."
   ;; mDetermine display size to pick font size
   (setq custom-file (concat dotspacemacs-directory "custom.el"))
   (load custom-file)
+  (dotspacemacs/emacs-custom-settings)
 
   (setq ch-def-height 12.0)
 
