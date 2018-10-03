@@ -1,4 +1,4 @@
-;; -*- mode: emacs-lisp -*-
+;; -*- mode: emacs-lisp; lexical-binding: t -*-
 ;; This file is loaded by Spacemacs at startup.
 ;; It must be stored in your home directory.
 
@@ -201,6 +201,28 @@ This function should only modify configuration layer settings."
    ;; (default is `used-only')
    dotspacemacs-install-packages 'used-only))
 
+(defun set-fontsize ()
+  (cond
+   ((string-equal system-type "darwin") ; Mac OS X
+    (setq ch-def-height 16.0))
+   ((string-equal system-type "gnu/linux")
+    (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
+          (dpi (shell-command-to-string "xdpyinfo | sed -e '/dots per inch/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
+          ;; (yres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* [0-9]*x\\([0-9]*\\) .*/\\1/'")))
+          )
+      (setq xres (replace-regexp-in-string "\n\\'" "" xres))
+      ;; (setq yres (replace-regexp-in-string "\n\\'" "" yres))
+      (if (> (string-to-number xres) 5000)
+          ;; big display
+          (setq ch-def-height 16.0)
+        ;; small display
+        (if (= (string-to-number xres) 3840)
+            (if (> (string-to-number dpi) 240)
+                (setq ch-def-height 14.0)
+              (setq ch-def-height 17.0))
+          ;; small display
+          (setq ch-def-height 15.0)))))))
+
 (defun dotspacemacs/init ()
   "Initialization:
 This function is called at the very beginning of Spacemacs startup,
@@ -211,29 +233,8 @@ It should only modify the values of Spacemacs settings."
   (load custom-file)
   (dotspacemacs/emacs-custom-settings)
 
-  (setq ch-def-height 12.0)
-
-  (cond
- ((string-equal system-type "darwin") ; Mac OS X
-  (setq ch-def-height 16.0))
- ((string-equal system-type "gnu/linux")
-  (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
-        (dpi (shell-command-to-string "xdpyinfo | sed -e '/dots per inch/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
-        ;; (yres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* [0-9]*x\\([0-9]*\\) .*/\\1/'")))
-        )
-    (setq xres (replace-regexp-in-string "\n\\'" "" xres))
-    ;; (setq yres (replace-regexp-in-string "\n\\'" "" yres))
-    (if (> (string-to-number xres) 5000)
-        ;; big display
-        (setq ch-def-height 12.0)
-      ;; small display
-      (if (= (string-to-number xres) 3840)
-        (if (> (string-to-number dpi) 240)
-            (setq ch-def-height 11.0)
-          (setq ch-def-height 13.0))
-      ;; small display
-        (setq ch-def-height 12.0))))))
-  ;; (message "def height %s" ch-def-height)
+  (set-fontsize)
+  (message "def height %s" ch-def-height)
 
 
   ;; this setq-default sexp is an exhaustive list of all the supported
@@ -354,11 +355,11 @@ It should only modify the values of Spacemacs settings."
                          leuven
                          )
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
-   ;; `all-the-icons', `custom', `vim-powerline' and `vanilla'. The first three
-   ;; are spaceline themes. `vanilla' is default Emacs mode-line. `custom' is a
-   ;; user defined themes, refer to the DOCUMENTATION.org for more info on how
-   ;; to create your own spaceline theme. Value can be a symbol or list with\
-   ;; additional properties.
+   ;; `all-the-icons', `custom', `doom', `vim-powerline' and `vanilla'. The
+   ;; first three are spaceline themes. `doom' is the doom-emacs mode-line.
+   ;; `vanilla' is default Emacs mode-line. `custom' is a user defined themes,
+   ;; refer to the DOCUMENTATION.org for more info on how to create your own
+   ;; spaceline theme. Value can be a symbol or list with additional properties.
    ;; (default '(spacemacs :separator wave :separator-scale 1.5))
    ;; dotspacemacs-mode-line-theme '(all-the-icons :separator-scale 1.0)
    dotspacemacs-mode-line-theme '(spacemacs :separator wave :separator-scale 1.3)
@@ -369,6 +370,7 @@ It should only modify the values of Spacemacs settings."
 
    ;; dotspacemacs-default-font `("Office Code Pro D" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Perfect UTF-8, good sans serif
+   ;; dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal)
    dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal)
    ;; Very condensed -- pretty good for coding -- same odd shapes offs UTF as Liberation Mono
    ;; dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.2)
@@ -432,9 +434,9 @@ It should only modify the values of Spacemacs settings."
    ;; Maximum number of rollback slots to keep in the cache. (default 5)
    dotspacemacs-max-rollback-slots 5
 
-   ;; If non-nil, the paste transient-state is enabled. While enabled, pressing
-   ;; `p' several times cycles through the elements in the `kill-ring'.
-   ;; (default nil)
+   ;; If non-nil, the paste transient-state is enabled. While enabled, after you
+   ;; paste something, pressing `C-j' and `C-k' several times cycles through the
+   ;; elements in the `kill-ring'. (default nil)
    dotspacemacs-enable-paste-transient-state nil
 
    ;; Which-key delay in seconds. The which-key buffer is the popup listing
@@ -488,7 +490,9 @@ It should only modify the values of Spacemacs settings."
    ;; If non-nil show the color guide hint for transient state keys. (default t)
    dotspacemacs-show-transient-state-color-guide t
 
-   ;; If non-nil unicode symbols are displayed in the mode line. (default t)
+   ;; If non-nil unicode symbols are displayed in the mode line.
+   ;; If you use Emacs as a daemon and wants unicode characters only in GUI set
+   ;; the value to quoted `display-graphic-p'. (default t)
    dotspacemacs-mode-line-unicode-symbols t
 
    ;; If non-nil smooth scrolling (native-scrolling) is enabled. Smooth
@@ -581,6 +585,15 @@ It should only modify the values of Spacemacs settings."
    ;; (default nil)
    dotspacemacs-pretty-docs nil))
 
+
+(defun dotspacemacs/user-env ()
+  "Environment variables setup.
+This function defines the environment variables for your Emacs session. By
+default it calls `spacemacs/load-spacemacs-env' which loads the environment
+variables declared in `~/.spacemacs.env' or `~/.spacemacs.d/.spacemacs.env'.
+See the header of this file for more information."
+  (spacemacs/load-spacemacs-env))
+
 (defun dotspacemacs/user-init ()
   "Initialization function for user code.
 It is called immediately after `dotspacemacs/init', before layer configuration
@@ -589,6 +602,7 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
 
+  (set-fontsize)
   ;; Copied from core/core-fonts-support.el
 
   ;; XXX debug disappearing modeline
@@ -867,6 +881,14 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;;   )
 
 
+  )
+
+
+(defun dotspacemacs/user-load ()
+  "Library to load while dumping.
+This function is called only while dumping Spacemacs configuration. You can
+`require' or `load' the libraries of your choice that will be included in the
+dump."
   )
 
 (defun dotspacemacs/user-config ()
