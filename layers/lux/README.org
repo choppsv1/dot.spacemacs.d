@@ -1,0 +1,15 @@
+#+TITLE: LUX layer
+
+* Table of Contents                                         :TOC_4_gh:noexport:
+- [[#description][Description]]
+  - [[#features][Features:]]
+- [[#install][Install]]
+
+* Description
+  This layer provides support for the lux file format.
+
+** Features:
+- Syntax highlighting
+
+* Install
+  To use this configuration layer, add it to your =~/.spacemacs=.

@@ -119,6 +119,7 @@ This function should only modify configuration layer settings."
       javascript
       (latex :variables latex-build-command "latexmk")
       (lua :variables lua-default-application "lua5.1")
+      lux
       markdown
       ;; Primary test runner is pytest use 'SPC u' prefix to invoke nose
       (python :variables python-fill-column 100
@@ -227,7 +228,7 @@ This function should only modify configuration layer settings."
         (if (= (string-to-number xres) 3840)
             (if (> (string-to-number dpi) 240)
                 (setq ch-def-height 14.0)
-              (setq ch-def-height 17.0))
+              (setq ch-def-height 12.0))
           ;; small display
           (setq ch-def-height 15.0)))))))
 
