@@ -71,10 +71,12 @@ This function should only modify configuration layer settings."
       ;; pandoc
       (osx :variables
            osx-use-option-as-meta t)
-      ;; pdf-tools
+      pdf
       ranger
 
       rebox
+      (rust :variables
+            rust-format-on-save t)
 
       (shell :variables
               ;; shell-default-shell 'shell
@@ -101,12 +103,18 @@ This function should only modify configuration layer settings."
 
       php ;; this is here I think to avoid a bug if we put it in alpha order
       csv
-      (c-c++ :variables
-             c-c++-default-mode-for-headers 'c-mode
-             c-c++-enable-clang-support t)
+      c-c++
+      ;; (c-c++ :variables
+      ;;        c-c++-default-mode-for-headers 'c-mode
+      ;;        c-c++-enable-clang-support t)
       emacs-lisp
       git
-      go
+      (go :variables
+          go-format-before-save t
+          ;; go-use-golangci-lint t
+          go-use-gometalinter t
+          go-backend 'lsp
+          )
       html
       javascript
       (latex :variables latex-build-command "latexmk")
