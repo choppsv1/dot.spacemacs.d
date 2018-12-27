@@ -111,8 +111,8 @@ This function should only modify configuration layer settings."
       git
       (go :variables
           go-format-before-save t
-          ;; go-use-golangci-lint t
-          go-use-gometalinter t
+          go-use-golangci-lint t
+          ;; go-use-gometalinter t
           go-backend 'lsp
           )
       html
@@ -121,7 +121,7 @@ This function should only modify configuration layer settings."
       (lua :variables lua-default-application "lua5.1")
       lux
       markdown
-      ;; Primary test runner is pytest use 'SPC u' prefix to invoke nose
+      ;; primary test runner is pytest use 'spc u' prefix to invoke nose
       (python :variables python-fill-column 100
                          python-fill-docstring-style 'pep-257-nn
                          python-test-runner '(pytest nose)
@@ -143,7 +143,7 @@ This function should only modify configuration layer settings."
             yang-pyang-extra-args "--max-line-length=79")
 
       ;; -----------------------------
-      ;; Let's keep this later. (why?)
+      ;; let's keep this later. (why?)
       ;; -----------------------------
       ;; (erc :variables
       ;;      erc-server-list
@@ -162,9 +162,9 @@ This function should only modify configuration layer settings."
       ;; vim-empty-lines
      )
 
-   ;; List of additional packages that will be installed without being
-   ;; wrapped in a layer. If you need some configuration for these
-   ;; packages, then consider creating a layer. You can also put the
+   ;; list of additional packages that will be installed without being
+   ;; wrapped in a layer. if you need some configuration for these
+   ;; packages, then consider creating a layer. you can also put the
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages
    '(
@@ -228,7 +228,7 @@ This function should only modify configuration layer settings."
         (if (= (string-to-number xres) 3840)
             (if (> (string-to-number dpi) 240)
                 (setq ch-def-height 14.0)
-              (setq ch-def-height 12.0))
+              (setq ch-def-height 14.0))
           ;; small display
           (setq ch-def-height 15.0)))))))
 
@@ -357,10 +357,10 @@ It should only modify the values of Spacemacs settings."
    ;; with 2 themes variants, one dark and one light)
 
    dotspacemacs-themes '(
+                         mandm
                          misterioso
                          gruvbox-light-hard
                          molokai
-                         mandm
                          leuven
                          )
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
@@ -380,9 +380,9 @@ It should only modify the values of Spacemacs settings."
    ;; dotspacemacs-default-font `("Office Code Pro D" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Perfect UTF-8, good sans serif
    ;; dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal)
-   dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal)
+   ;; dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal)
    ;; Very condensed -- pretty good for coding -- same odd shapes offs UTF as Liberation Mono
-   ;; dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.2)
+    dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.2)
 
    ;; The leader key (default "SPC")
    dotspacemacs-leader-key "SPC"
@@ -623,6 +623,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
                       :powerline-offset))
          (fontspec (apply 'font-spec :name font font-props)))
     (set-frame-font fontspec))
+
 
   ;; ---------
   ;; User-init
@@ -910,8 +911,19 @@ layers configuration. You are free to put any user code."
     (cond ((string-equal system-type "darwin")
            (exec-path-from-shell-copy-env "PATH")))
 
-    (if (string= (getenv "HOSTNAME") "tops")
-        (load-theme 'mandm))
+    ;; (cond ((not (string-equal system-type "darwin"))
+    ;;        (add-hook after-make-frame-functions (lambda () (load-theme 'mandm)))))
+
+  (if (not (daemonp)) (server-start))
+  ; (if (daemonp)
+  ;    (add-hook 'after-make-frame-functions
+  ;            (lambda (frame)
+  ;                        (with-selected-frame frame
+  ;                                          (load-theme 'mandm t))))
+  ;                                              (load-theme 'mandm t))
+
+    ;; (if (string= (getenv "HOSTNAME") "tops")
+    ;;     (load-theme 'mandm))
 
     (and debug-init-msg (message "debug-init USER-CONFIG"))
     (setq dotspacemacs-themes (mapcar (lambda (package) (intern (string-remove-suffix "-theme" (symbol-name package)))) themes-megapack-packages))
@@ -1349,8 +1361,7 @@ This will replace the last notification sent with this function."
         )
       )
 
-    (when-layer-used
-     'rcirc
+    (when-layer-used 'rcirc
      (defun get-gitter-password ()
         (let* ((auth-source-creation-defaults nil)
                (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
@@ -1396,8 +1407,7 @@ This will replace the last notification sent with this function."
        )
       )
 
-    (when-layer-used
-     'jabber
+    (when-layer-used 'jabber
      (setq ssl-program-name "gnutls-cli"
             ssl-program-arguments '("--insecure" "-p" service host)
             ssl-certificate-verification-policy 1)
@@ -1477,16 +1487,21 @@ This will replace the last notification sent with this function."
 
             ;; only complete addresses found in email to one of the below addresses
             mu4e-user-mail-address-list (list "chopps@chopps.org"
-                                              "chopps@dev.terastrm.net"
+                                              "chopps@devhopps.com"
+                                              "chopps@labn.net"
                                               "chopps@gmail.com"
                                               "chopps@netbsd.org"
+
+                                              "christian@devhopps.com"
+                                              "chris@devhopps.com"
+                                              "chopps@dev.terastrm.net"
                                               "chopps@rawdofmt.org")
 
             ;; This isn't used yet but we'd like it to be for getting
             ;; contact completions from any mail with these addresses in them.
             mu4e-contacts-user-mail-address-list (list
                                                   "chopps@chopps.org"
-                                                  "chopps@dev.terastrm.net"
+                                                  "chopps@devhopps.com"
                                                   "chopps@gmail.com"
                                                   "chopps@netbsd.org"
                                                   "chopps@rawdofmt.org"
@@ -1495,6 +1510,7 @@ This will replace the last notification sent with this function."
                                                   "lsr@ietf.org"
                                                   "developers@netbsd.org"
                                                   "netbsd-developers@netbsd.org"
+                                                  "chopps@dev.terastrm.net"
                                                   )
 
             message-completion-alistp '(("^\\(Newsgroups\\|Followup-To\\|Posted-To\\|Gcc\\):" . message-expand-group)
@@ -1508,9 +1524,9 @@ This will replace the last notification sent with this function."
             ;; -----------
 
             mu4e-inbox-mailbox '("maildir:/gmail.com/INBOX"
+                                 "maildir:/labn.net/INBOX"
                                  "maildir:/chopps.org/INBOX"
-                                 "maildir:/dev.terastrm.net/INBOX"
-                                 "maildir:/chopps.org/a-terastream")
+                                 "maildir:/devhopps.com/INBOX")
 
             mu4e-imp-mailbox '("maildir:/chopps.org/ietf-chairs"
                                "maildir:/chopps.org/ietf-chairs-rtg"
@@ -1576,7 +1592,7 @@ This will replace the last notification sent with this function."
             ;; [j]ump shortcuts
             mu4e-maildir-shortcuts '(("/chopps.org/INBOX" . ?i)
                                      ("/gmail.com/INBOX" . ?g)
-                                     ("/dev.terastrm.net/INBOX" . ?w)
+                                     ("/labn.net/INBOX" . ?w)
                                      ("/chopps.org/receipts" . ?r)
                                      ("/chopps.org/a-terastream" . ?t)
                                      ("/chopps.org/aa-netbsd" . ?n)
@@ -1611,22 +1627,23 @@ This will replace the last notification sent with this function."
                                              (smtpmail-local-domain         .      "chopps.org")
                                              (smtpmail-smtp-service         . 587)))
                                  ,(make-mu4e-context
-                                    :name "dev.terastrm.net"
+                                    :name "labn.net"
                                     :match-func (lambda (msg)
-                                                  (and msg (string-match "/dev.terastrm.net/.*" (mu4e-message-field msg :maildir))))
-                                    :vars '((user-mail-address  . "chopps@dev.terastrm.net")
+                                                  (and msg (string-match "/labn.net/.*" (mu4e-message-field msg :maildir))))
+                                    :vars '((user-mail-address  . "chopps@labn.net")
                                             (user-full-name . "Christian Hopps")
                                              ;; mu4e
-                                             (mu4e-sent-folder   . "/dev.terastrm.net/Sent Messages")
-                                             (mu4e-trash-folder  . "/dev.terastrm.net/Deleted Messages")
-                                             (mu4e-drafts-folder . "/dev.terastrm.net/Drafts")
+                                             (mu4e-sent-folder   . "/labn.net/Sent Messages")
+                                             (mu4e-trash-folder  . "/labn.net/Deleted Messages")
+                                             (mu4e-drafts-folder . "/labn.net/Drafts")
                                              (mu4e-sent-messages-behavior   . sent)
                                              ;; smtp
-                                             (smtpmail-starttls-credentials . '(("smtp.dev.terastrm.net" 587 nil nil)))
-                                             (smtpmail-default-smtp-server  . "smtp.dev.terastrm.net")
-                                             (smtpmail-smtp-server          . "smtp.dev.terastrm.net")
-                                             (smtpmail-local-domain         .      "dev.terastrm.net")
-                                             (smtpmail-smtp-service         . 587)))
+                                             (smtpmail-starttls-credentials . '(("box313.bluehost.com" 465 nil nil)))
+                                             (smtpmail-default-smtp-server  . "box313.bluehost.com")
+                                             (smtpmail-smtp-server          . "box313.bluehost.com")
+                                             (smtpmail-local-domain         . "labn.net")
+                                             ;; (smtpmail-stream-type          . ssl)
+                                             (smtpmail-smtp-service         . 465)))
                                  ,(make-mu4e-context
                                     :name "gmail.com"
                                     :match-func (lambda (msg)
@@ -1704,7 +1721,7 @@ This will replace the last notification sent with this function."
 
             ;; XXX hate that this is the case, but DT is horrible with this crap.
             ;; XXX need to do this only if not DT
-            ;; (mml-secure-message-sign-pgpmime)
+            (mml-secure-message-sign-pgpmime)
             )
           (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
 
