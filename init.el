@@ -66,7 +66,7 @@ This function should only modify configuration layer settings."
       ietf
       ;; jabber
       mu4e
-      org
+      (org :variables org-clock-idle-time 15)
       (org2blog :variables org2blog-name "hoppsjots.org")
       ;; pandoc
       (osx :variables
@@ -103,10 +103,14 @@ This function should only modify configuration layer settings."
 
       php ;; this is here I think to avoid a bug if we put it in alpha order
       csv
-      c-c++
-      ;; (c-c++ :variables
-      ;;        c-c++-default-mode-for-headers 'c-mode
-      ;;        c-c++-enable-clang-support t)
+      (c-c++ :variables
+             c-c++-default-mode-for-headers 'c-mode
+             ;; c-c++-adopt-subprojects t
+             ;; c-c++-backend 'lsp-ccls
+             ;; c-c++-lsp-sem-highlight-rainbow t
+             c-c++-enable-clang-support t
+             c-c++-enable-clang-format-on-save t
+             )
       emacs-lisp
       git
       (go :variables
@@ -132,7 +136,7 @@ This function should only modify configuration layer settings."
       ;; disable emacs-lisp due to completionion in comments parsing tons
       ;; of .el files https://github.com/syl20bnr/spacemacs/issues/7038
       restructuredtext
-      (semantic :disabled-for emacs-lisp)
+      (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
       shell-scripts
       sphinx
       systemd
@@ -708,9 +712,14 @@ before packages are loaded. If you are unsure, you should try in setting them in
                                          (lazy-highlight-face :background "#338f86")
                                          (font-lock-doc-face :foreground "#A5A17E" :slant italic)
                                          (font-lock-comment-delimiter-face :foreground "#55513E"))
+                                (light-soap (default :height 130 :foreground "#474747" :background "#fafad4"))
                                 (quasi-monochrome (default :height ,(* ch-def-height 10))
                                                   (font-lock-string-face :foreground "DarkGrey" :slant italic)
                                                   (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
+                                (mandm ;; (default :background "#F0F0E0")
+                                 (font-lock-doc-face :foreground "#036A07" :slant normal)
+                                 (font-lock-comment-face :foreground "#6D6D64" :slant normal)
+                                 (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant normal))
                                 (leuven ;; (default :background "#F0F0E0")
                                  (default :background "#ede8da")
                                  ;;(default :background "#F0F0E5")
@@ -970,6 +979,7 @@ layers configuration. You are free to put any user code."
     (setq-default tab-width 8)
 
     (setq-default magit-todos-ignored-keywords '("NOTE" "DONE" "FAIL"))
+    (setq-default evil-escape-key-sequence "kj")
 
     ;; take out
     ;; (setq magithub-debug-mode t)
@@ -980,10 +990,11 @@ layers configuration. You are free to put any user code."
     (run-hook-with-args 'spacemacs--hjkl-completion-navigation-functions
                         (member dotspacemacs-editing-style '(vim)))
 
-    (define-key dired-mode-map "e" 'dired-ediff-files)
-    ;; let's create a dired micro-state?
-    ;; (define-key dired-mode-map "?" 'spacemacs/dired-transient-state/body)
-    (define-key dired-mode-map "?" 'which-key-show-top-level)
+    ;; Failue b/c dired-mode-map not defined here
+    ;; (define-key dired-mode-map "e" 'dired-ediff-files)
+    ;; ;; let's create a dired micro-state?
+    ;; ;; (define-key dired-mode-map "?" 'spacemacs/dired-transient-state/body)
+    ;; (define-key dired-mode-map "?" 'which-key-show-top-level)
 
     ;; (xclip-mode 1)
     ;; (when (not (display-graphic-p))
@@ -1528,7 +1539,9 @@ This will replace the last notification sent with this function."
                                  "maildir:/chopps.org/INBOX"
                                  "maildir:/devhopps.com/INBOX")
 
-            mu4e-imp-mailbox '("maildir:/chopps.org/ietf-chairs"
+            mu4e-imp-mailbox '("maildir:/chopps.org/dpdk-dev"
+                               "maildir:/chopps.org/dpdk-users"
+                               "maildir:/chopps.org/ietf-chairs"
                                "maildir:/chopps.org/ietf-chairs-rtg"
                                "maildir:/chopps.org/ietf-dt-netmod-ds"
                                "maildir:/chopps.org/ietf-rtg-dir"
@@ -1554,7 +1567,8 @@ This will replace the last notification sent with this function."
             mu4e-bookmarks
             (append
              (list (list (concat "flag:unread AND NOT flag:trashed AND " mu4e-inbox-filter-base) "Unread [i]NBOX messages" ?i)
-                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-isis") "Unread IS-IS messages" ?I)
+                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-lsr") "Unread IS-IS messages" ?I)
+                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-lsr") "Unread IS-IS messages" ?L)
                    (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-*") "Unread IETF messages" ?E)
 
                    (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
@@ -1592,17 +1606,14 @@ This will replace the last notification sent with this function."
             ;; [j]ump shortcuts
             mu4e-maildir-shortcuts '(("/chopps.org/INBOX" . ?i)
                                      ("/gmail.com/INBOX" . ?g)
-                                     ("/labn.net/INBOX" . ?w)
+                                     ("/labn.net/INBOX" . ?l)
                                      ("/chopps.org/receipts" . ?r)
-                                     ("/chopps.org/a-terastream" . ?t)
                                      ("/chopps.org/aa-netbsd" . ?n)
                                      ("/chopps.org/ietf-wg-isis" . ?I)
                                      ("/chopps.org/ietf-wg-homenet" . ?H)
                                      ("/chopps.org/ietf-wg-netmod" . ?N)
                                      ("/chopps.org/spam-train" . ?S)
                                      ("/chopps.org/spam-probable" . ?s))
-
-
        )
 
       (with-eval-after-load 'mu4e
@@ -1624,8 +1635,11 @@ This will replace the last notification sent with this function."
                                              (smtpmail-starttls-credentials . '(("smtp.chopps.org" 587 nil nil)))
                                              (smtpmail-default-smtp-server  . "smtp.chopps.org")
                                              (smtpmail-smtp-server          . "smtp.chopps.org")
+                                             ;; (smtpmail-starttls-credentials . '(("coffee.chopps.org" 25 nil nil)))
+                                             ;;(smtpmail-default-smtp-server  . "coffee.chopps.org")
+                                             ;;(smtpmail-smtp-server          . "coffee.chopps.org")
                                              (smtpmail-local-domain         .      "chopps.org")
-                                             (smtpmail-smtp-service         . 587)))
+                                             (smtpmail-smtp-service         . 25)))
                                  ,(make-mu4e-context
                                     :name "labn.net"
                                     :match-func (lambda (msg)
@@ -1642,7 +1656,7 @@ This will replace the last notification sent with this function."
                                              (smtpmail-default-smtp-server  . "box313.bluehost.com")
                                              (smtpmail-smtp-server          . "box313.bluehost.com")
                                              (smtpmail-local-domain         . "labn.net")
-                                             ;; (smtpmail-stream-type          . ssl)
+                                             (smtpmail-stream-type          . ssl)
                                              (smtpmail-smtp-service         . 465)))
                                  ,(make-mu4e-context
                                     :name "gmail.com"
@@ -1950,6 +1964,10 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
     (when-layer-used
      'c-c++
+
+     ;; Turn this back off now that the hook is there, let files/projects enable it.
+     (setq-default c-c++-enable-clang-format-on-save nil)
+
      (setq c-font-lock-extra-types
             (quote
              ("FILE"
@@ -2346,6 +2364,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      (defun my-org-mode-hook ()
        (if debug-init-msg
            (message "Org-mode-hook"))
+       (require 'ox-xml2rfc)
        ;; (org-set-local 'yas/trigger-key [tab])
        ;; (yas-minor-mode)
        ;; Probably done now.
@@ -2473,8 +2492,11 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         ("L" "Mac Link Note" entry (file+headline ,(concat org-directory "/notes.org") "Notes")
          "* NOTE %?\n%u\n%(org-mac-safari-get-frontmost-url)\n")
 
-        ("s" "Status" entry (file+weektree ,(concat org-directory "/status.org"))
-         "* NOTE %?\n%u\n")
+        ("s" "Status" item (file+olp+datetree ,(concat org-directory "/work.org") "Working" "Status Items")
+         "- %^{Status Item} %u\n" :tree-type week :immediate-finish t)
+
+        ;; ("s" "Status" entry (file+weektree ,(concat org-directory "/status.org"))
+        ;;  "* NOTE %?\n%u\n")
 
         ("y" "Advil dose 200mg" entry (file+olp+datetree ,(concat org-directory "/advil.org") "Advil")
          "* NOTE 200mg\nCreated: %U\nPain Level: 1-2" :immediate-finish t)
@@ -2894,7 +2916,8 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                   ;; (add-to-list 'auto-mode-alist '("\\.yang\\'" . yang-mode))
                   (defun my-yang-mode-hook ()
                     "Configuration for YANG Mode. Add this to `yang-mode-hook'."
-                    (c-set-style "Procket")
+                    ;; (c-set-style "Procket")
+                    ;; (c-set-style "KNF")
                     (setq indent-tabs-mode nil)
                     (setq c-basic-offset 2)
                     (setq font-lock-maximum-decoration t)
