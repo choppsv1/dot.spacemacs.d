@@ -917,6 +917,10 @@ layers configuration. You are free to put any user code."
 
   (progn
 
+    ;; I *like* being able to get back to package files.
+    (with-eval-after-load "recentf"
+      (setq recentf-exclude (delete (recentf-expand-file-name package-user-dir) recentf-exclude)))
+
     (cond ((string-equal system-type "darwin")
            (exec-path-from-shell-copy-env "PATH")))
 
@@ -2332,6 +2336,8 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
        ;; XXX add back
        ;; (add-to-list 'org-file-apps '("\\.pdf\\'" . emacs))
 
+       (setq-default org-use-sub-superscripts '{})
+       ;; (setq-default org-export-with-sub-superscripts nil)
        (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
 
        (require 'ox-latex)

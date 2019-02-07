@@ -56,7 +56,9 @@ The %s will be replaced by the footnote reference itself."
 ;;; Define Back-End
 
 (org-export-define-derived-backend 'xml2rfc 'html
-  :filters-alist '((:filter-parse-tree . org-xml2rfc-separate-elements))
+  :filters-alist '((:filter-parse-tree .
+                                       (org-xml2rfc-separate-elements
+                                        org-xml2rfc--translate-description-lists)))
   :menu-entry
   '(?x "Export to XML2RFC"
        ((?M "To temporary buffer"
@@ -66,7 +68,8 @@ The %s will be replaced by the footnote reference itself."
 	    (lambda (a s v b)
 	      (if a (org-xml2rfc-export-to-xml t s v)
 		(org-open-file (org-xml2rfc-export-to-xml nil s v)))))))
-  :translate-alist '((bold . org-xml2rfc-bold)
+  :translate-alist '(
+                     (bold . org-xml2rfc-bold)
 		     (code . org-xml2rfc-verbatim)
 		     (example-block . org-xml2rfc-example-block)
 		     (export-block . org-xml2rfc-export-block)
@@ -83,13 +86,16 @@ The %s will be replaced by the footnote reference itself."
 		     (node-property . org-xml2rfc-node-property)
 		     (paragraph . org-xml2rfc-paragraph)
 		     (plain-list . org-xml2rfc-plain-list)
-		     (plain-text . org-xml2rfc-plain-text)
 		     (property-drawer . org-xml2rfc-property-drawer)
 		     (quote-block . org-xml2rfc-quote-block)
 		     (section . org-xml2rfc-section)
+                     (special-block . org-xml2rfc-special-block)
 		     (src-block . org-xml2rfc-example-block)
+                     (subscript . org-html-subscript)
+                     (superscript . org-html-superscript)
 		     (template . org-xml2rfc-template)
-		     (verbatim . org-xml2rfc-verbatim))
+		     (verbatim . org-xml2rfc-verbatim)
+                     )
   :options-alist
   '((:xml2rfc-footnote-format nil nil org-xml2rfc-footnote-format)
     (:xml2rfc-footnotes-section nil nil org-xml2rfc-footnotes-section)
@@ -163,10 +169,22 @@ channel."
   "Transcode EXAMPLE-BLOCK element into XML2RFC format.
 CONTENTS is nil.  INFO is a plist used as a communication
 channel."
-  (replace-regexp-in-string
-   "^" "    "
-   (org-remove-indentation
-    (org-export-format-code-default example-block info))))
+  (concat "<figure><artwork><![CDATA[\n"
+          ;; (org-remove-indentation
+          ;;  (org-export-format-code-default example-block info))
+           (org-export-format-code-default example-block info)
+          "]]></artwork></figure>"))
+
+(defun org-xml2rfc-special-block (special-block contents info)
+  "Transcode a SPECIAL-BLOCK element from Org to LaTeX.
+CONTENTS holds the contents of the block.  INFO is a plist
+holding contextual information."
+  (let ((block-type (org-element-property :type special-block)))
+    (cond
+     ((string= (downcase block-type) "abstract")
+      (plist-put info :abstract (format "<abstract>%s</abstract>" (org-trim contents)))
+      "")
+     (t (org-trim contents)))))
 
 (defun org-xml2rfc-export-block (export-block contents info)
   "Transcode a EXPORT-BLOCK element from Org to XML2RFC.
@@ -176,10 +194,13 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
     ;; Also include HTML export blocks.
     (org-export-with-backend 'html export-block contents info)))
 
-(defun org-xml2rfc-indent (spaces contents)
-  (let ((indent (make-string spaces ? )))
-    (replace-regexp-in-string "^" indent contents)))
+;; This is too simple and messes up diagrams
+;; (defun org-xml2rfc-indent (spaces contents)
+;;   (let ((indent (make-string spaces ? )))
+;;     (replace-regexp-in-string "^" indent contents)))
 
+(defun org-xml2rfc-indent (spaces contents)
+  contents)
 
 ;;;; Headline
 
@@ -205,13 +226,12 @@ a communication channel."
 	   ;; Headline text without tags.
 	   (heading (concat todo priority title))
 	   (style (plist-get info :xml2rfc-headline-style)))
-      (let ((outer-indent (make-string (* 2 level) ? ))
-            (inner-indent (make-string (+ 2 (* 2 level)) ? ))
-            (anchor
-	     (and (org-xml2rfc--headline-referred-p headline info)
-		  (format " anchor=\"%s\""
-			  (or (org-element-property :CUSTOM_ID headline)
-			      (org-export-get-reference headline info))))))
+      (let ((anchor (or (and (org-xml2rfc--headline-referred-p headline info)
+		             (format " anchor=\"%s\""
+			             (or (org-element-property :CUSTOM_ID headline)
+			                 (org-export-get-reference headline info))))
+                        "")))
+
         (org-xml2rfc-indent 2 (format "<section title=\"%s\"%s>\n%s\n</section>\n"
                                       title anchor
                                       (org-xml2rfc-indent 2 contents)))))))
@@ -296,6 +316,32 @@ as a communication channel."
 
 ;;;; Item
 
+;; (defun org-xml2rfc-item (item contents info)
+;;   "Transcode ITEM element into XML2RFC format.
+;; CONTENTS is the item contents.  INFO is a plist used as
+;; a communication channel."
+;;   (let* ((type (org-element-property :type (org-export-get-parent item)))
+;; 	 (struct (org-element-property :structure item))
+;; 	 (bullet (if (not (eq type 'ordered)) "-"
+;; 		   (concat (number-to-string
+;; 			    (car (last (org-list-get-item-number
+;; 					(org-element-property :begin item)
+;; 					struct
+;; 					(org-list-prevs-alist struct)
+;; 					(org-list-parents-alist struct)))))
+;; 			   "."))))
+;;     (concat bullet
+;; 	    (make-string (- 4 (length bullet)) ? )
+;; 	    (pcase (org-element-property :checkbox item)
+;; 	      (`on "[X] ")
+;; 	      (`trans "[-] ")
+;; 	      (`off "[ ] "))
+;; 	    (let ((tag (org-element-property :tag item)))
+;; 	      (and tag (format "<dt><em>%s</em></dt> " (org-export-data tag info))))
+;; 	    (and contents
+;; 		 (concat "<dd>" (org-trim (replace-regexp-in-string "^" "    " contents) "</dd>"))
+;;                  )))
+
 (defun org-xml2rfc-item (item contents info)
   "Transcode ITEM element into XML2RFC format.
 CONTENTS is the item contents.  INFO is a plist used as
@@ -310,16 +356,19 @@ a communication channel."
 					(org-list-prevs-alist struct)
 					(org-list-parents-alist struct)))))
 			   "."))))
-    (concat bullet
+    (let ((tag (org-element-property :tag item)))
+      (cond
+       (tag
+	(format "<dt>%s</dt> <dd>%s</dd>" (org-export-data tag info) contents))
+       (t (concat bullet
 	    (make-string (- 4 (length bullet)) ? )
 	    (pcase (org-element-property :checkbox item)
 	      (`on "[X] ")
 	      (`trans "[-] ")
 	      (`off "[ ] "))
-	    (let ((tag (org-element-property :tag item)))
-	      (and tag (format "**%s:** "(org-export-data tag info))))
 	    (and contents
-		 (org-trim (replace-regexp-in-string "^" "    " contents))))))
+		 (concat "<dd>" (org-trim (replace-regexp-in-string "^" "    " contents) "</dd>"))
+            )))))))
 
 
 
@@ -454,38 +503,18 @@ a communication channel."
 
 ;;;; Plain List
 
-(defun org-xml2rfc-plain-list (_plain-list contents _info)
+(defun org-xml2rfc-plain-list (plain-list contents _info)
   "Transcode PLAIN-LIST element into XML2RFC format.
 CONTENTS is the plain-list contents.  INFO is a plist used as
 a communication channel."
-  contents)
-
-
-;;;; Plain Text
-
-(defun org-xml2rfc-plain-text (text info)
-  "Transcode a TEXT string into XML2RFC format.
-TEXT is the string to transcode.  INFO is a plist holding
-contextual information."
-  (when (plist-get info :with-smart-quotes)
-    (setq text (org-export-activate-smart-quotes text :html info)))
-  ;; The below series of replacements in `text' is order sensitive.
-  ;; Protect `, *, _, and \
-  (setq text (replace-regexp-in-string "[`*_\\]" "\\\\\\&" text))
-  ;; Protect ambiguous #.  This will protect # at the beginning of
-  ;; a line, but not at the beginning of a paragraph.  See
-  ;; `org-xml2rfc-paragraph'.
-  (setq text (replace-regexp-in-string "\n#" "\n\\\\#" text))
-  ;; Protect ambiguous !
-  (setq text (replace-regexp-in-string "\\(!\\)\\[" "\\\\!" text nil nil 1))
-  ;; Handle special strings, if required.
-  (when (plist-get info :with-special-strings)
-    (setq text (org-html-convert-special-strings text)))
-  ;; Handle break preservation, if required.
-  (when (plist-get info :preserve-breaks)
-    (setq text (replace-regexp-in-string "[ \t]*\n" "  \n" text)))
-  ;; Return value.
-  text)
+  (let* ((type (pcase (org-element-property :type plain-list)
+	         (`ordered "ol")
+	         (`unordered "ul")
+	         (`descriptive "dl")
+	         (other (error "Unknown HTML list type: %s" other))))
+         (class (format "org-%s" type))
+         (attributes (org-export-read-attribute :attr_html plain-list)))
+    (format "<%s>\n%s</%s>" type contents type)))
 
 
 ;;;; Property Drawer
@@ -517,6 +546,48 @@ CONTENTS is the section contents.  INFO is a plist used as
 a communication channel."
   contents)
 
+;; (defun org-xml2rfc-section (section contents info)
+;;   "Transcode a SECTION element from Org to HTML.
+;; CONTENTS holds the contents of the section.  INFO is a plist
+;; holding contextual information."
+;;   (let ((parent (org-export-get-parent-headline section)))
+;;     ;; Before first headline: no container, just return CONTENTS.
+;;     (if (not parent) contents
+;;       (progn (plist-put info :abstract (format "<abstract>%s</abstract>" (org-trim contents))) "")
+;;       (concat "SECSTART" contents "SECEND"))))
+
+;;       ;; ;; Get div's class and id references.
+;;       ;; (let* ((class-num (+ (org-export-get-relative-level parent info)
+;;       ;;   		   (1- (plist-get info :html-toplevel-hlevel))))
+;;       ;;        (section-number
+;;       ;;         (and (org-export-numbered-headline-p parent info)
+;;       ;;   	   (mapconcat
+;;       ;;   	    #'number-to-string
+;;       ;;   	    (org-export-get-headline-number parent info) "-"))))
+;;       ;;   ;; Build return value.
+;;       ;;   (format "<div class=\"outline-text-%d\" id=\"text-%s\">\n%s</div>\n"
+;;       ;;   	class-num
+;;       ;;   	(or (org-element-property :CUSTOM_ID parent)
+;;       ;;   	    section-number
+;;       ;;   	    (org-export-get-reference parent info))
+;;       ;;   	(or contents ""))))))
+
+
+;;;; Subscript
+
+(defun org-xml2rfc-subscript (_subscript contents _info)
+  "Transcode a SUBSCRIPT object from Org to HTML.
+CONTENTS is the contents of the object.  INFO is a plist holding
+contextual information."
+  (format "<sub>%s</sub>" contents))
+
+;;;; Superscript
+
+(defun org-xml2rfc-superscript (_superscript contents _info)
+  "Transcode a SUPERSCRIPT object from Org to HTML.
+CONTENTS is the contents of the object.  INFO is a plist holding
+contextual information."
+  (format "<sup>%s</sup>" contents))
 
 ;;;; Template
 
@@ -600,16 +671,51 @@ CONTENTS is the transcoded contents string.  INFO is a plist
 holding export options."
   ;; Make sure CONTENTS is separated from table of contents and
   ;; footnotes with at least a blank line.
-  (concat
-   ;; Table of contents.
-   (let ((depth (plist-get info :with-toc)))
-     (when depth
-       (concat (org-xml2rfc--build-toc info (and (wholenump depth) depth)) "\n")))
-   ;; Document contents.
-   contents
-   "\n"
-   ;; Footnotes section.
-   (org-xml2rfc--footnote-section info)))
+  ;; Table of contents.
+  (let ((depth (plist-get info :with-toc))
+        (title (org-export-data (plist-get info :title) info)))
+    (concat
+
+     ;; Replace this with actual code.
+     "<?xml version=\"1.0\"?>
+<?xml-stylesheet type=\"text/xsl\" href=\"rfc2629.xslt\"?>
+<?rfc toc=\"yes\"?>
+<?rfc compact=\"no\"?>
+<?rfc subcompact=\"no\"?>
+<?rfc symrefs=\"yes\" ?>
+<?rfc sortrefs=\"yes\"?>
+<?rfc iprnotified=\"no\"?>
+<?rfc strict=\"yes\"?>
+<rfc ipr=\"trust200902\"   category=\"std\"
+    docName=\"draft-chopps-ipsecme-iptfs-00\" submissionType=\"IETF\" consensus=\"true\" version=\"3\" >\n"
+         "<front>
+  <title abbrev=\"\">" title "</title>
+    <author initials=\"C\" surname=\"Hopps\" fullname='Christian E. Hopps' >
+      <organization>LabN Consulting, L.L.C.</organization>
+      <address>
+        <email>chopps@chopps.org</email>
+      </address>
+    </author>
+<date/>"
+  (or (plist-get info :abstract) "")
+  "</front>"
+
+  ;; (when depth
+  ;;   (concat (org-xml2rfc--build-toc info (and (wholenump depth) depth)) "\n"))
+
+  "<middle>\n"
+  ;; Document contents.
+  contents
+  "</middle>\n"
+  "<back>"
+
+  (with-temp-buffer
+    (insert-file-contents "references.xml")
+    (buffer-string))
+
+  "</back></rfc>"
+  ;; Footnotes section.
+  (org-xml2rfc--footnote-section info))))
 
 (defun org-xml2rfc-template (contents _info)
   "Return complete document string after XML2RFC conversion.
