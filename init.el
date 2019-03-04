@@ -59,14 +59,16 @@ This function should only modify configuration layer settings."
       docker
 
       ;; this causing github login and errors for all git projects even private non-github ones).
-      ;; github
+      github
       graphviz
       gtags
       (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
       ietf
       ;; jabber
       mu4e
-      (org :variables org-clock-idle-time 15)
+      (org :variables
+           org-clock-idle-time 15
+           org-enable-rfc-support t)
       (org2blog :variables org2blog-name "hoppsjots.org")
       ;; pandoc
       (osx :variables
@@ -615,6 +617,7 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
 
+  ;; (spacemacs/toggle-smartparens-globally-off)
   (set-fontsize)
   ;; Copied from core/core-fonts-support.el
 
@@ -915,7 +918,20 @@ dump."
 This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
 
+  ;; XXX is this going to make everything fail?
+  (defun et/semantic-remove-hooks ()
+    (remove-hook 'completion-at-point-functions
+                 'semantic-analyze-completion-at-point-function)
+    (remove-hook 'completion-at-point-functions
+                 'semantic-analyze-notc-completion-at-point-function)
+    (remove-hook 'completion-at-point-functions
+                 'semantic-analyze-nolongprefix-completion-at-point-function))
+
+  (add-hook 'semantic-mode-hook #'et/semantic-remove-hooks)
+
   (progn
+
+
 
     ;; I *like* being able to get back to package files.
     (with-eval-after-load "recentf"
@@ -1571,24 +1587,24 @@ This will replace the last notification sent with this function."
             mu4e-bookmarks
             (append
              (list (list (concat "flag:unread AND NOT flag:trashed AND " mu4e-inbox-filter-base) "Unread [i]NBOX messages" ?i)
-                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-lsr") "Unread IS-IS messages" ?I)
-                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-lsr") "Unread IS-IS messages" ?L)
-                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-*") "Unread IETF messages" ?E)
+                   (list (concat mu4e-unread-filter         mu4e-imp-filter-base) "Unread Important messages" ?I)
+                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-lsr") "Unread LSR messages" ?L)
+                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-netmod") "Unread netmod messages" ?n)
+                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-*") "Unread IETF messages" ?e)
 
-                   (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
-                   (list (concat "flag:flagged AND NOT flag:trashed AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "[F]lagged Non-INBOX messages" ?F)
+                   ;; (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
+                   ;; (list (concat "flag:flagged AND NOT flag:trashed AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "[F]lagged Non-INBOX messages" ?F)
 
-                   (list (concat mu4e-unread-filter         mu4e-imp-filter-base) "Unread Important messages" ?n)
-                   (list (concat mu4e-unread-flagged-filter mu4e-imp-filter-base) "Unread-Flagged Important messages" ?N)
+                   ;; (list (concat mu4e-unread-flagged-filter mu4e-imp-filter-base) "Unread-Flagged Important messages" ?N)
 
                    (list (concat mu4e-unread-filter         " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread [u]nimportant messages" ?u)
-                   (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged [U]nimportant messages" ?U)
+                   ;; (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged [U]nimportant messages" ?U)
 
                    (list (concat mu4e-unread-filter         " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread Non-INBOX messages" ?o)
-                   (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged Non-INBOX messages" ?O)
+                   ;; (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged Non-INBOX messages" ?O)
 
                    (list (concat mu4e-unread-filter         mu4e-not-junk-folder-filter) "Unread messages" ?a)
-                   (list (concat mu4e-unread-flagged-filter mu4e-not-junk-folder-filter) "Unread-flagged messages" ?A)
+                   ;; (list (concat mu4e-unread-flagged-filter mu4e-not-junk-folder-filter) "Unread-flagged messages" ?A)
 
                    (list "(maildir:/chopps.org/spam-probable                                              )" "Probable spam messages" ?s))
              (mapcar (lambda (x) (cons (concat (car x) mu4e-not-junk-folder-filter) (cdr x)))
@@ -1643,6 +1659,7 @@ This will replace the last notification sent with this function."
                                              ;;(smtpmail-default-smtp-server  . "coffee.chopps.org")
                                              ;;(smtpmail-smtp-server          . "coffee.chopps.org")
                                              (smtpmail-local-domain         .      "chopps.org")
+                                             (smtpmail-stream-type          . starttls)
                                              (smtpmail-smtp-service         . 25)))
                                  ,(make-mu4e-context
                                     :name "labn.net"
@@ -1678,6 +1695,7 @@ This will replace the last notification sent with this function."
                                              (smtpmail-default-smtp-server  . "smtp.gmail.com")
                                              (smtpmail-smtp-server          . "smtp.gmail.com")
                                              (smtpmail-local-domain         .      "gmail.com")
+                                             (smtpmail-stream-type          . starttls)
                                              (smtpmail-smtp-service . 587)))
                                  ))
 
@@ -2370,7 +2388,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      (defun my-org-mode-hook ()
        (if debug-init-msg
            (message "Org-mode-hook"))
-       (require 'ox-xml2rfc)
+       (require 'ox-rfc)
        ;; (org-set-local 'yas/trigger-key [tab])
        ;; (yas-minor-mode)
        ;; Probably done now.
@@ -2408,6 +2426,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                 (string= lang "dot")
                 (string= lang "gnuplot")
                 (string= lang "plantuml")
+                ;; (string= lang "yang")
                 )))
      ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
 

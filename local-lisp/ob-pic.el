@@ -70,10 +70,10 @@ This function is called by `org-babel-execute-src-block'."
    ;;(cmdline (or (cdr (assoc :cmdline params))
    ;;             (format "-T%s" (file-name-extension out-file))))
    ;; (cmd (or (cdr (assoc :cmd params)) "groff -p"))
-   (cmdline (or (cdr (assoc :cmdline params))
+         (cmdline (or (cdr (assoc :cmdline params))
                 ""))
-   (cmd (or (cdr (assoc :cmd params)) "dpic"))
-   (in-file (org-babel-temp-file "pic-")))
+         (cmd (or (cdr (assoc :cmd params)) "dpic"))
+         (in-file (org-babel-temp-file "pic-")))
     (with-temp-file in-file
       (insert (org-babel-expand-body:pic body params)))
     (message "XXX cmd %s cmdline %s params %s" cmd cmdline params)

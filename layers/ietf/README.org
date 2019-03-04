@@ -1,44 +1,63 @@
-#+TITLE: %LAYER_NAME% layer
-#+HTML_HEAD_EXTRA: <link rel="stylesheet" type="text/css" href="../css/readtheorg.css" />
+#+TITLE: ietf layer
+
+[[file:img/ietf-logo.png]]
 
 * Table of Contents                                        :TOC_4_org:noexport:
- - [[Description][Description]]
-   - [[ietf-docs][ietf-docs]]
-   - [[IRFC mode][IRFC mode]]
- - [[Install][Install]]
- - [[Key bindings][Key bindings]]
+- [[Description][Description]]
+  - [[Features][Features]]
+    - [[Fetching and Opening IETF Documents][Fetching and Opening IETF Documents]]
+    - [[Viewing IETF Documents][Viewing IETF Documents]]
+    - [[Writing IETF Documents][Writing IETF Documents]]
+- [[Install][Install]]
+- [[Key bindings][Key bindings]]
 
 * Description
 The =IETF= layer collects various useful packages for participating in the
-Internet Engineering Task Force (https://www.ietf.org). Currently there are 2
-packages.
-  - ietf-docs
-  - irfc
+Internet Engineering Task Force (https://www.ietf.org).
 
-** ietf-docs
-The IETF docs package adds support for fetching and displaying IETF documents
-with a function based on the name of the document. For example if the point is
-anwhere on the text RFC781 and one invokes the ~ietf-docs-open-at-point~ the
-package will fetch the document to a local cache (if not present) and view it.
-This works for the 3 standard document names, STDXXX, RFCXXX and draft-xxxx-yyy.
+** Features
+  - Fetching and opening IETF documents.
+  - Viewing IETF documents.
+  - Writing IETF documents.
 
-** IRFC mode
-RFC mode is a minor mode supporting viewing of IETF documents, it uses the well
-known structure of all IETF documents to format the viewing of them.
-Additionally it creates hyperlinks for references within the document.
+*** Fetching and Opening IETF Documents
+Support for fetching and downloading IETF documents is added through the
+=ietf-docs= package. The IETF docs package adds support for fetching and loading
+IETF documents based on the name of a document (usually under the emacs point).
+For example if the point is anwhere on the text RFC781 and one invokes the
+=ietf-docs-open-at-point= the package will fetch the document to a local cache
+(if not present) and view it. This works for the 3 standard document names,
+STDXXX, RFCXXX and draft-xxxx-yyy.
+
+*** Viewing IETF Documents
+Support for viewing IETF documents is added through the IRFC minor mode
+(=irfc-mode=). The IRFC minor mode improves the display and formatting of IETF
+documents using the well known IETF document structure. Additionally it creates
+hyperlink overlays for references within the document.
+
+*** Writing IETF Documents
+Support for writing IETF documents using org mode is added using the RFC Org
+Mode Exporter (=ox-rfc=) package.
 
 * Install
-To use this contribution add it to your =~/.spacemacs=
-
-:variables ietf-docs-dir - where cached documents should be stored.
+To use the ietf layer add it to your =~/.spacemacs=
 
 #+begin_src emacs-lisp
   (setq-default dotspacemacs-configuration-layers '(ietf))
+#+end_src
+
+By default fetched IETF documents are stored in a subdirectory of the
+=spacemacs-cache-directory=. To override this location you can set the
+=ietf-docs-cache= variable.
+
+#+begin_src emacs-lisp
+  (setq-default dotspacemacs-configuration-layers '(
+    (ietf :variables
+          ietf-docs-cache "~/Downloads/ietf-docs-cache")))
 #+end_src
 
 * Key bindings
 
 | Key Binding | Description                                         |
 |-------------+-----------------------------------------------------|
-| ~<SPC> f I~ | Opens IETF document based on the text at the point. |
-|             |                                                     |
+| ~SPC f I~   | Opens IETF document based on the text at the point. |
