@@ -59,14 +59,16 @@ This function should only modify configuration layer settings."
       docker
 
       ;; this causing github login and errors for all git projects even private non-github ones).
-      ;; github
+      github
       graphviz
       gtags
       (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
       ietf
       ;; jabber
       mu4e
-      org
+      (org :variables
+           org-clock-idle-time 15
+           org-enable-rfc-support t)
       (org2blog :variables org2blog-name "hoppsjots.org")
       ;; pandoc
       (osx :variables
@@ -103,17 +105,21 @@ This function should only modify configuration layer settings."
 
       php ;; this is here I think to avoid a bug if we put it in alpha order
       csv
-      c-c++
-      ;; (c-c++ :variables
-      ;;        c-c++-default-mode-for-headers 'c-mode
-      ;;        c-c++-enable-clang-support t)
+      (c-c++ :variables
+             c-c++-default-mode-for-headers 'c-mode
+             ;; c-c++-adopt-subprojects t
+             ;; c-c++-backend 'lsp-ccls
+             ;; c-c++-lsp-sem-highlight-rainbow t
+             c-c++-enable-clang-support t
+             c-c++-enable-clang-format-on-save t
+             )
       emacs-lisp
       git
       (go :variables
           go-format-before-save t
-          ;; go-use-golangci-lint t
-          go-use-gometalinter t
-          godoc-at-point-function 'godoc-gogetdoc
+          go-use-golangci-lint t
+          ;; go-use-gometalinter t
+          ;; godoc-at-point-function 'godoc-gogetdoc
           go-backend 'lsp
           )
       html
@@ -122,7 +128,7 @@ This function should only modify configuration layer settings."
       (lua :variables lua-default-application "lua5.1")
       lux
       markdown
-      ;; Primary test runner is pytest use 'SPC u' prefix to invoke nose
+      ;; primary test runner is pytest use 'spc u' prefix to invoke nose
       (python :variables python-fill-column 100
                          python-fill-docstring-style 'pep-257-nn
                          python-test-runner '(pytest nose)
@@ -133,7 +139,7 @@ This function should only modify configuration layer settings."
       ;; disable emacs-lisp due to completionion in comments parsing tons
       ;; of .el files https://github.com/syl20bnr/spacemacs/issues/7038
       restructuredtext
-      (semantic :disabled-for emacs-lisp)
+      (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
       shell-scripts
       sphinx
       systemd
@@ -144,7 +150,7 @@ This function should only modify configuration layer settings."
             yang-pyang-extra-args "--max-line-length=79")
 
       ;; -----------------------------
-      ;; Let's keep this later. (why?)
+      ;; let's keep this later. (why?)
       ;; -----------------------------
       ;; (erc :variables
       ;;      erc-server-list
@@ -163,9 +169,9 @@ This function should only modify configuration layer settings."
       ;; vim-empty-lines
      )
 
-   ;; List of additional packages that will be installed without being
-   ;; wrapped in a layer. If you need some configuration for these
-   ;; packages, then consider creating a layer. You can also put the
+   ;; list of additional packages that will be installed without being
+   ;; wrapped in a layer. if you need some configuration for these
+   ;; packages, then consider creating a layer. you can also put the
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages
    '(
@@ -229,7 +235,7 @@ This function should only modify configuration layer settings."
         (if (= (string-to-number xres) 3840)
             (if (> (string-to-number dpi) 240)
                 (setq ch-def-height 14.0)
-              (setq ch-def-height 12.0))
+              (setq ch-def-height 14.0))
           ;; small display
           (setq ch-def-height 15.0)))))))
 
@@ -358,10 +364,10 @@ It should only modify the values of Spacemacs settings."
    ;; with 2 themes variants, one dark and one light)
 
    dotspacemacs-themes '(
+                         mandm
                          misterioso
                          gruvbox-light-hard
                          molokai
-                         mandm
                          leuven
                          )
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
@@ -381,9 +387,9 @@ It should only modify the values of Spacemacs settings."
    ;; dotspacemacs-default-font `("Office Code Pro D" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Perfect UTF-8, good sans serif
    ;; dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal)
-   dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal)
+   ;; dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal)
    ;; Very condensed -- pretty good for coding -- same odd shapes offs UTF as Liberation Mono
-   ;; dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.2)
+    dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.2)
 
    ;; The leader key (default "SPC")
    dotspacemacs-leader-key "SPC"
@@ -612,6 +618,7 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
 
+  ;; (spacemacs/toggle-smartparens-globally-off)
   (set-fontsize)
   ;; Copied from core/core-fonts-support.el
 
@@ -624,6 +631,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
                       :powerline-offset))
          (fontspec (apply 'font-spec :name font font-props)))
     (set-frame-font fontspec))
+
 
   ;; ---------
   ;; User-init
@@ -708,9 +716,14 @@ before packages are loaded. If you are unsure, you should try in setting them in
                                          (lazy-highlight-face :background "#338f86")
                                          (font-lock-doc-face :foreground "#A5A17E" :slant italic)
                                          (font-lock-comment-delimiter-face :foreground "#55513E"))
+                                (light-soap (default :height 130 :foreground "#474747" :background "#fafad4"))
                                 (quasi-monochrome (default :height ,(* ch-def-height 10))
                                                   (font-lock-string-face :foreground "DarkGrey" :slant italic)
                                                   (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
+                                (mandm ;; (default :background "#F0F0E0")
+                                 (font-lock-doc-face :foreground "#036A07" :slant normal)
+                                 (font-lock-comment-face :foreground "#6D6D64" :slant normal)
+                                 (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant normal))
                                 (leuven ;; (default :background "#F0F0E0")
                                  (default :background "#ede8da")
                                  ;;(default :background "#F0F0E5")
@@ -906,13 +919,41 @@ dump."
 This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
 
+  ;; XXX is this going to make everything fail?
+  (defun et/semantic-remove-hooks ()
+    (remove-hook 'completion-at-point-functions
+                 'semantic-analyze-completion-at-point-function)
+    (remove-hook 'completion-at-point-functions
+                 'semantic-analyze-notc-completion-at-point-function)
+    (remove-hook 'completion-at-point-functions
+                 'semantic-analyze-nolongprefix-completion-at-point-function))
+
+  (add-hook 'semantic-mode-hook #'et/semantic-remove-hooks)
+
   (progn
+
+
+
+    ;; I *like* being able to get back to package files.
+    (with-eval-after-load "recentf"
+      (setq recentf-exclude (delete (recentf-expand-file-name package-user-dir) recentf-exclude)))
 
     (cond ((string-equal system-type "darwin")
            (exec-path-from-shell-copy-env "PATH")))
 
-    (if (string= (getenv "HOSTNAME") "tops")
-        (load-theme 'mandm))
+    ;; (cond ((not (string-equal system-type "darwin"))
+    ;;        (add-hook after-make-frame-functions (lambda () (load-theme 'mandm)))))
+
+  (if (not (daemonp)) (server-start))
+  ; (if (daemonp)
+  ;    (add-hook 'after-make-frame-functions
+  ;            (lambda (frame)
+  ;                        (with-selected-frame frame
+  ;                                          (load-theme 'mandm t))))
+  ;                                              (load-theme 'mandm t))
+
+    ;; (if (string= (getenv "HOSTNAME") "tops")
+    ;;     (load-theme 'mandm))
 
     (and debug-init-msg (message "debug-init USER-CONFIG"))
     (setq dotspacemacs-themes (mapcar (lambda (package) (intern (string-remove-suffix "-theme" (symbol-name package)))) themes-megapack-packages))
@@ -959,6 +1000,7 @@ layers configuration. You are free to put any user code."
     (setq-default tab-width 8)
 
     (setq-default magit-todos-ignored-keywords '("NOTE" "DONE" "FAIL"))
+    (setq-default evil-escape-key-sequence "kj")
 
     ;; take out
     ;; (setq magithub-debug-mode t)
@@ -969,10 +1011,11 @@ layers configuration. You are free to put any user code."
     (run-hook-with-args 'spacemacs--hjkl-completion-navigation-functions
                         (member dotspacemacs-editing-style '(vim)))
 
-    (define-key dired-mode-map "e" 'dired-ediff-files)
-    ;; let's create a dired micro-state?
-    ;; (define-key dired-mode-map "?" 'spacemacs/dired-transient-state/body)
-    (define-key dired-mode-map "?" 'which-key-show-top-level)
+    ;; Failue b/c dired-mode-map not defined here
+    ;; (define-key dired-mode-map "e" 'dired-ediff-files)
+    ;; ;; let's create a dired micro-state?
+    ;; ;; (define-key dired-mode-map "?" 'spacemacs/dired-transient-state/body)
+    ;; (define-key dired-mode-map "?" 'which-key-show-top-level)
 
     ;; (xclip-mode 1)
     ;; (when (not (display-graphic-p))
@@ -1350,8 +1393,7 @@ This will replace the last notification sent with this function."
         )
       )
 
-    (when-layer-used
-     'rcirc
+    (when-layer-used 'rcirc
      (defun get-gitter-password ()
         (let* ((auth-source-creation-defaults nil)
                (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
@@ -1397,8 +1439,7 @@ This will replace the last notification sent with this function."
        )
       )
 
-    (when-layer-used
-     'jabber
+    (when-layer-used 'jabber
      (setq ssl-program-name "gnutls-cli"
             ssl-program-arguments '("--insecure" "-p" service host)
             ssl-certificate-verification-policy 1)
@@ -1478,16 +1519,21 @@ This will replace the last notification sent with this function."
 
             ;; only complete addresses found in email to one of the below addresses
             mu4e-user-mail-address-list (list "chopps@chopps.org"
-                                              "chopps@dev.terastrm.net"
+                                              "chopps@devhopps.com"
+                                              "chopps@labn.net"
                                               "chopps@gmail.com"
                                               "chopps@netbsd.org"
+
+                                              "christian@devhopps.com"
+                                              "chris@devhopps.com"
+                                              "chopps@dev.terastrm.net"
                                               "chopps@rawdofmt.org")
 
             ;; This isn't used yet but we'd like it to be for getting
             ;; contact completions from any mail with these addresses in them.
             mu4e-contacts-user-mail-address-list (list
                                                   "chopps@chopps.org"
-                                                  "chopps@dev.terastrm.net"
+                                                  "chopps@devhopps.com"
                                                   "chopps@gmail.com"
                                                   "chopps@netbsd.org"
                                                   "chopps@rawdofmt.org"
@@ -1496,6 +1542,7 @@ This will replace the last notification sent with this function."
                                                   "lsr@ietf.org"
                                                   "developers@netbsd.org"
                                                   "netbsd-developers@netbsd.org"
+                                                  "chopps@dev.terastrm.net"
                                                   )
 
             message-completion-alistp '(("^\\(Newsgroups\\|Followup-To\\|Posted-To\\|Gcc\\):" . message-expand-group)
@@ -1509,11 +1556,13 @@ This will replace the last notification sent with this function."
             ;; -----------
 
             mu4e-inbox-mailbox '("maildir:/gmail.com/INBOX"
+                                 "maildir:/labn.net/INBOX"
                                  "maildir:/chopps.org/INBOX"
-                                 "maildir:/dev.terastrm.net/INBOX"
-                                 "maildir:/chopps.org/a-terastream")
+                                 "maildir:/devhopps.com/INBOX")
 
-            mu4e-imp-mailbox '("maildir:/chopps.org/ietf-chairs"
+            mu4e-imp-mailbox '("maildir:/chopps.org/dpdk-dev"
+                               "maildir:/chopps.org/dpdk-users"
+                               "maildir:/chopps.org/ietf-chairs"
                                "maildir:/chopps.org/ietf-chairs-rtg"
                                "maildir:/chopps.org/ietf-dt-netmod-ds"
                                "maildir:/chopps.org/ietf-rtg-dir"
@@ -1539,23 +1588,24 @@ This will replace the last notification sent with this function."
             mu4e-bookmarks
             (append
              (list (list (concat "flag:unread AND NOT flag:trashed AND " mu4e-inbox-filter-base) "Unread [i]NBOX messages" ?i)
-                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-isis") "Unread IS-IS messages" ?I)
-                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-*") "Unread IETF messages" ?E)
+                   (list (concat mu4e-unread-filter         mu4e-imp-filter-base) "Unread Important messages" ?I)
+                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-lsr") "Unread LSR messages" ?L)
+                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-netmod") "Unread netmod messages" ?n)
+                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-*") "Unread IETF messages" ?e)
 
-                   (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
-                   (list (concat "flag:flagged AND NOT flag:trashed AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "[F]lagged Non-INBOX messages" ?F)
+                   ;; (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
+                   ;; (list (concat "flag:flagged AND NOT flag:trashed AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "[F]lagged Non-INBOX messages" ?F)
 
-                   (list (concat mu4e-unread-filter         mu4e-imp-filter-base) "Unread Important messages" ?n)
-                   (list (concat mu4e-unread-flagged-filter mu4e-imp-filter-base) "Unread-Flagged Important messages" ?N)
+                   ;; (list (concat mu4e-unread-flagged-filter mu4e-imp-filter-base) "Unread-Flagged Important messages" ?N)
 
                    (list (concat mu4e-unread-filter         " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread [u]nimportant messages" ?u)
-                   (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged [U]nimportant messages" ?U)
+                   ;; (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged [U]nimportant messages" ?U)
 
                    (list (concat mu4e-unread-filter         " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread Non-INBOX messages" ?o)
-                   (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged Non-INBOX messages" ?O)
+                   ;; (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged Non-INBOX messages" ?O)
 
                    (list (concat mu4e-unread-filter         mu4e-not-junk-folder-filter) "Unread messages" ?a)
-                   (list (concat mu4e-unread-flagged-filter mu4e-not-junk-folder-filter) "Unread-flagged messages" ?A)
+                   ;; (list (concat mu4e-unread-flagged-filter mu4e-not-junk-folder-filter) "Unread-flagged messages" ?A)
 
                    (list "(maildir:/chopps.org/spam-probable                                              )" "Probable spam messages" ?s))
              (mapcar (lambda (x) (cons (concat (car x) mu4e-not-junk-folder-filter) (cdr x)))
@@ -1577,17 +1627,14 @@ This will replace the last notification sent with this function."
             ;; [j]ump shortcuts
             mu4e-maildir-shortcuts '(("/chopps.org/INBOX" . ?i)
                                      ("/gmail.com/INBOX" . ?g)
-                                     ("/dev.terastrm.net/INBOX" . ?w)
+                                     ("/labn.net/INBOX" . ?l)
                                      ("/chopps.org/receipts" . ?r)
-                                     ("/chopps.org/a-terastream" . ?t)
                                      ("/chopps.org/aa-netbsd" . ?n)
                                      ("/chopps.org/ietf-wg-isis" . ?I)
                                      ("/chopps.org/ietf-wg-homenet" . ?H)
                                      ("/chopps.org/ietf-wg-netmod" . ?N)
                                      ("/chopps.org/spam-train" . ?S)
                                      ("/chopps.org/spam-probable" . ?s))
-
-
        )
 
       (with-eval-after-load 'mu4e
@@ -1609,25 +1656,30 @@ This will replace the last notification sent with this function."
                                              (smtpmail-starttls-credentials . '(("smtp.chopps.org" 587 nil nil)))
                                              (smtpmail-default-smtp-server  . "smtp.chopps.org")
                                              (smtpmail-smtp-server          . "smtp.chopps.org")
+                                             ;; (smtpmail-starttls-credentials . '(("coffee.chopps.org" 25 nil nil)))
+                                             ;;(smtpmail-default-smtp-server  . "coffee.chopps.org")
+                                             ;;(smtpmail-smtp-server          . "coffee.chopps.org")
                                              (smtpmail-local-domain         .      "chopps.org")
-                                             (smtpmail-smtp-service         . 587)))
+                                             (smtpmail-stream-type          . starttls)
+                                             (smtpmail-smtp-service         . 25)))
                                  ,(make-mu4e-context
-                                    :name "dev.terastrm.net"
+                                    :name "labn.net"
                                     :match-func (lambda (msg)
-                                                  (and msg (string-match "/dev.terastrm.net/.*" (mu4e-message-field msg :maildir))))
-                                    :vars '((user-mail-address  . "chopps@dev.terastrm.net")
+                                                  (and msg (string-match "/labn.net/.*" (mu4e-message-field msg :maildir))))
+                                    :vars '((user-mail-address  . "chopps@labn.net")
                                             (user-full-name . "Christian Hopps")
                                              ;; mu4e
-                                             (mu4e-sent-folder   . "/dev.terastrm.net/Sent Messages")
-                                             (mu4e-trash-folder  . "/dev.terastrm.net/Deleted Messages")
-                                             (mu4e-drafts-folder . "/dev.terastrm.net/Drafts")
+                                             (mu4e-sent-folder   . "/labn.net/Sent Messages")
+                                             (mu4e-trash-folder  . "/labn.net/Deleted Messages")
+                                             (mu4e-drafts-folder . "/labn.net/Drafts")
                                              (mu4e-sent-messages-behavior   . sent)
                                              ;; smtp
-                                             (smtpmail-starttls-credentials . '(("smtp.dev.terastrm.net" 587 nil nil)))
-                                             (smtpmail-default-smtp-server  . "smtp.dev.terastrm.net")
-                                             (smtpmail-smtp-server          . "smtp.dev.terastrm.net")
-                                             (smtpmail-local-domain         .      "dev.terastrm.net")
-                                             (smtpmail-smtp-service         . 587)))
+                                             (smtpmail-starttls-credentials . '(("box313.bluehost.com" 465 nil nil)))
+                                             (smtpmail-default-smtp-server  . "box313.bluehost.com")
+                                             (smtpmail-smtp-server          . "box313.bluehost.com")
+                                             (smtpmail-local-domain         . "labn.net")
+                                             (smtpmail-stream-type          . ssl)
+                                             (smtpmail-smtp-service         . 465)))
                                  ,(make-mu4e-context
                                     :name "gmail.com"
                                     :match-func (lambda (msg)
@@ -1644,6 +1696,7 @@ This will replace the last notification sent with this function."
                                              (smtpmail-default-smtp-server  . "smtp.gmail.com")
                                              (smtpmail-smtp-server          . "smtp.gmail.com")
                                              (smtpmail-local-domain         .      "gmail.com")
+                                             (smtpmail-stream-type          . starttls)
                                              (smtpmail-smtp-service . 587)))
                                  ))
 
@@ -1705,7 +1758,7 @@ This will replace the last notification sent with this function."
 
             ;; XXX hate that this is the case, but DT is horrible with this crap.
             ;; XXX need to do this only if not DT
-            ;; (mml-secure-message-sign-pgpmime)
+            (mml-secure-message-sign-pgpmime)
             )
           (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
 
@@ -1934,6 +1987,10 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
     (when-layer-used
      'c-c++
+
+     ;; Turn this back off now that the hook is there, let files/projects enable it.
+     (setq-default c-c++-enable-clang-format-on-save nil)
+
      (setq c-font-lock-extra-types
             (quote
              ("FILE"
@@ -2298,6 +2355,8 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
        ;; XXX add back
        ;; (add-to-list 'org-file-apps '("\\.pdf\\'" . emacs))
 
+       (setq-default org-use-sub-superscripts '{})
+       ;; (setq-default org-export-with-sub-superscripts nil)
        (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
 
        (require 'ox-latex)
@@ -2330,6 +2389,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      (defun my-org-mode-hook ()
        (if debug-init-msg
            (message "Org-mode-hook"))
+       (require 'ox-rfc)
        ;; (org-set-local 'yas/trigger-key [tab])
        ;; (yas-minor-mode)
        ;; Probably done now.
@@ -2367,6 +2427,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                 (string= lang "dot")
                 (string= lang "gnuplot")
                 (string= lang "plantuml")
+                ;; (string= lang "yang")
                 )))
      ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
 
@@ -2457,8 +2518,11 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         ("L" "Mac Link Note" entry (file+headline ,(concat org-directory "/notes.org") "Notes")
          "* NOTE %?\n%u\n%(org-mac-safari-get-frontmost-url)\n")
 
-        ("s" "Status" entry (file+weektree ,(concat org-directory "/status.org"))
-         "* NOTE %?\n%u\n")
+        ("s" "Status" item (file+olp+datetree ,(concat org-directory "/work.org") "Working" "Status Items")
+         "- %^{Status Item} %u\n" :tree-type week :immediate-finish t)
+
+        ;; ("s" "Status" entry (file+weektree ,(concat org-directory "/status.org"))
+        ;;  "* NOTE %?\n%u\n")
 
         ("y" "Advil dose 200mg" entry (file+olp+datetree ,(concat org-directory "/advil.org") "Advil")
          "* NOTE 200mg\nCreated: %U\nPain Level: 1-2" :immediate-finish t)
@@ -2878,7 +2942,8 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                   ;; (add-to-list 'auto-mode-alist '("\\.yang\\'" . yang-mode))
                   (defun my-yang-mode-hook ()
                     "Configuration for YANG Mode. Add this to `yang-mode-hook'."
-                    (c-set-style "Procket")
+                    ;; (c-set-style "Procket")
+                    ;; (c-set-style "KNF")
                     (setq indent-tabs-mode nil)
                     (setq c-basic-offset 2)
                     (setq font-lock-maximum-decoration t)
