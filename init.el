@@ -113,6 +113,7 @@ This function should only modify configuration layer settings."
           go-format-before-save t
           ;; go-use-golangci-lint t
           go-use-gometalinter t
+          godoc-at-point-function 'godoc-gogetdoc
           go-backend 'lsp
           )
       html
