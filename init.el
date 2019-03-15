@@ -67,7 +67,7 @@ This function should only modify configuration layer settings."
       ;; jabber
       mu4e
       org
-      (org2blog :variables org2blog-name "hoppsjots.org")
+      ;; (org2blog :variables org2blog-name "hoppsjots.org")
       ;; pandoc
       (osx :variables
            osx-use-option-as-meta t)
@@ -101,7 +101,7 @@ This function should only modify configuration layer settings."
       ;; Languages
       ;; ---------
 
-      php ;; this is here I think to avoid a bug if we put it in alpha order
+      ;; php ;; this is here I think to avoid a bug if we put it in alpha order
       csv
       c-c++
       ;; (c-c++ :variables
@@ -109,11 +109,12 @@ This function should only modify configuration layer settings."
       ;;        c-c++-enable-clang-support t)
       emacs-lisp
       git
+      lsp
       (go :variables
           go-format-before-save t
           ;; go-use-golangci-lint t
           go-use-gometalinter t
-          go-backend 'lsp
+          ;; go-backend 'lsp
           )
       html
       javascript
@@ -213,7 +214,7 @@ This function should only modify configuration layer settings."
 (defun set-fontsize ()
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
-    (setq ch-def-height 16.0))
+    (setq ch-def-height 15.0))
    ((string-equal system-type "gnu/linux")
     (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
           (dpi (shell-command-to-string "xdpyinfo | sed -e '/dots per inch/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
