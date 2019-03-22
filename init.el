@@ -114,6 +114,7 @@ This function should only modify configuration layer settings."
              c-c++-enable-clang-format-on-save t
              )
       emacs-lisp
+      ess
       git
       (go :variables
           go-format-before-save t
@@ -1540,6 +1541,7 @@ This will replace the last notification sent with this function."
                                                   ;; we want contacts added from these mailing lists
                                                   "isis-wg@ietf.org"
                                                   "lsr@ietf.org"
+                                                  "ipsec@ietf.org"
                                                   "developers@netbsd.org"
                                                   "netbsd-developers@netbsd.org"
                                                   "chopps@dev.terastrm.net"
@@ -1560,14 +1562,11 @@ This will replace the last notification sent with this function."
                                  "maildir:/chopps.org/INBOX"
                                  "maildir:/devhopps.com/INBOX")
 
-            mu4e-imp-mailbox '("maildir:/chopps.org/dpdk-dev"
-                               "maildir:/chopps.org/dpdk-users"
-                               "maildir:/chopps.org/ietf-chairs"
+            mu4e-imp-mailbox '("maildir:/chopps.org/ietf-chairs"
                                "maildir:/chopps.org/ietf-chairs-rtg"
-                               "maildir:/chopps.org/ietf-dt-netmod-ds"
                                "maildir:/chopps.org/ietf-rtg-dir"
                                "maildir:/chopps.org/ietf-rtg-dir"
-                               "maildir:/chopps.org/ietf-rtg-yang-dt"
+                               "maildir:/chopps.org/ietf-wg-ipsec"
                                "maildir:/chopps.org/ietf-wg-isis"
                                "maildir:/chopps.org/ietf-wg-lsr"
                                "maildir:/chopps.org/ietf-wg-netmod"
@@ -1588,9 +1587,9 @@ This will replace the last notification sent with this function."
             mu4e-bookmarks
             (append
              (list (list (concat "flag:unread AND NOT flag:trashed AND " mu4e-inbox-filter-base) "Unread [i]NBOX messages" ?i)
-                   (list (concat mu4e-unread-filter         mu4e-imp-filter-base) "Unread Important messages" ?I)
-                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-lsr") "Unread LSR messages" ?L)
-                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-netmod") "Unread netmod messages" ?n)
+                   (list (concat mu4e-unread-filter  mu4e-imp-filter-base) "Unread Important messages" ?n)
+                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-lsr") "Unread LSR messages" ?l)
+                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-netmod") "Unread netmod messages" ?N)
                    (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-*") "Unread IETF messages" ?e)
 
                    ;; (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
