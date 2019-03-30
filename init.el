@@ -171,9 +171,9 @@ This function should only modify configuration layer settings."
       ;; vim-empty-lines
      )
 
-   ;; list of additional packages that will be installed without being
-   ;; wrapped in a layer. if you need some configuration for these
-   ;; packages, then consider creating a layer. you can also put the
+   ;; List of additional packages that will be installed without being
+   ;; wrapped in a layer. If you need some configuration for these
+   ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages
    '(
@@ -236,10 +236,10 @@ This function should only modify configuration layer settings."
         ;; small display
         (if (= (string-to-number xres) 3840)
             (if (> (string-to-number dpi) 240)
-                (setq ch-def-height 14.0)
-              (setq ch-def-height 14.0))
+                (setq ch-def-height 10.0)
+              (setq ch-def-height 11.0))
           ;; small display
-          (setq ch-def-height 15.0)))))))
+          (setq ch-def-height 12.0)))))))
 
 (defun dotspacemacs/init ()
   "Initialization:
@@ -366,8 +366,8 @@ It should only modify the values of Spacemacs settings."
    ;; with 2 themes variants, one dark and one light)
 
    dotspacemacs-themes '(
-                         mandm
                          misterioso
+                         mandm
                          gruvbox-light-hard
                          molokai
                          leuven
@@ -379,19 +379,23 @@ It should only modify the values of Spacemacs settings."
    ;; refer to the DOCUMENTATION.org for more info on how to create your own
    ;; spaceline theme. Value can be a symbol or list with additional properties.
    ;; (default '(spacemacs :separator wave :separator-scale 1.5))
-   ;; dotspacemacs-mode-line-theme '(all-the-icons :separator-scale 1.0)
-   dotspacemacs-mode-line-theme '(spacemacs :separator wave :separator-scale 1.3)
+   dotspacemacs-mode-line-theme '(spacemacs :separator wave :separator-scale 1.5)
 
    ;; If non-nil the cursor color matches the state color in GUI Emacs.
    ;; (default t)
    dotspacemacs-colorize-cursor-according-to-state t
 
+   ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
+   ;; quickly tweak the mode-line size to make separators look not too crappy.
    ;; dotspacemacs-default-font `("Office Code Pro D" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Perfect UTF-8, good sans serif
    ;; dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal)
    ;; dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal)
    ;; Very condensed -- pretty good for coding -- same odd shapes offs UTF as Liberation Mono
-    dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.2)
+   ;; dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.2)
+   ;; dotspacemacs-default-font `(("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.2)
+   ;;                             ("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.2))
+   dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.5)
 
    ;; The leader key (default "SPC")
    dotspacemacs-leader-key "SPC"
@@ -555,6 +559,13 @@ It should only modify the values of Spacemacs settings."
    ;; (default nil)
    dotspacemacs-enable-server nil
 
+   ;; Set the emacs server socket location.
+   ;; If nil, uses whatever the Emacs default is, otherwise a directory path
+   ;; like \"~/.emacs.d/server\". It has no effect if
+   ;; `dotspacemacs-enable-server' is nil.
+   ;; (default nil)
+   dotspacemacs-server-socket-dir nil
+
    ;; If non-nil, advise quit functions to keep server open when quitting.
    ;; (default nil)
    dotspacemacs-persistent-server nil
@@ -603,7 +614,6 @@ It should only modify the values of Spacemacs settings."
    ;; (default nil)
    dotspacemacs-pretty-docs nil))
 
-
 (defun dotspacemacs/user-env ()
   "Environment variables setup.
 This function defines the environment variables for your Emacs session. By
@@ -621,19 +631,26 @@ before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
 
   ;; (spacemacs/toggle-smartparens-globally-off)
-  (set-fontsize)
+  ;; (set-fontsize)
   ;; Copied from core/core-fonts-support.el
 
-  ;; XXX debug disappearing modeline
-  (let* ((font (car dotspacemacs-default-font))
-         (props (cdr dotspacemacs-default-font))
-         (scale (plist-get props :powerline-scale))
-         (font-props (spacemacs/mplist-remove
-                      (spacemacs/mplist-remove props :powerline-scale)
-                      :powerline-offset))
-         (fontspec (apply 'font-spec :name font font-props)))
-    (set-frame-font fontspec))
+  (defun debug-frame-font ()
+    (message "GOT FONT UPDATE"))
+  (add-hook 'debuug-frame-font 'after-setting-font-hooks)
 
+  ;; XXX debug disappearing modeline
+  (defun replay-font-set ()
+    ""
+    (interactive)
+    (let* ((font (car dotspacemacs-default-font))
+           (props (cdr dotspacemacs-default-font))
+           (scale (plist-get props :powerline-scale))
+           (font-props (spacemacs/mplist-remove
+                        (spacemacs/mplist-remove props :powerline-scale)
+                        :powerline-offset))
+           (fontspec (apply 'font-spec :name font font-props)))
+      (message "replay-font-set fontspec: %s" fontspec)
+      (set-frame-font fontspec)))
 
   ;; ---------
   ;; User-init
@@ -718,7 +735,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
                                          (lazy-highlight-face :background "#338f86")
                                          (font-lock-doc-face :foreground "#A5A17E" :slant italic)
                                          (font-lock-comment-delimiter-face :foreground "#55513E"))
-                                (light-soap (default :height 130 :foreground "#474747" :background "#fafad4"))
+                                (light-soap (default :foreground "#474747" :background "#fafad4"))
                                 (quasi-monochrome (default :height ,(* ch-def-height 10))
                                                   (font-lock-string-face :foreground "DarkGrey" :slant italic)
                                                   (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
@@ -907,7 +924,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
 
   )
-
 
 (defun dotspacemacs/user-load ()
   "Library to load while dumping.
@@ -1656,12 +1672,12 @@ This will replace the last notification sent with this function."
                                              (smtpmail-starttls-credentials . '(("smtp.chopps.org" 587 nil nil)))
                                              (smtpmail-default-smtp-server  . "smtp.chopps.org")
                                              (smtpmail-smtp-server          . "smtp.chopps.org")
-                                             ;; (smtpmail-starttls-credentials . '(("coffee.chopps.org" 25 nil nil)))
+                                             ;;(smtpmail-starttls-credentials . '(("coffee.chopps.org" 25 nil nil)))
                                              ;;(smtpmail-default-smtp-server  . "coffee.chopps.org")
                                              ;;(smtpmail-smtp-server          . "coffee.chopps.org")
                                              (smtpmail-local-domain         .      "chopps.org")
                                              (smtpmail-stream-type          . starttls)
-                                             (smtpmail-smtp-service         . 25)))
+                                             (smtpmail-smtp-service         . 587)))
                                  ,(make-mu4e-context
                                     :name "labn.net"
                                     :match-func (lambda (msg)
@@ -3140,7 +3156,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     ;; (if inhibit-startup-screen
     ;;     (quit-window))
 
-    (setq powerline-default-separator 'wave)
+    ;; (setq powerline-default-separator 'wave)
 
     ;; (defun split-window-sensibly-prefer-horizontal (&optional window)
     ;;   "Same as `split-window-sensibly' except prefer to split horizontally first."
@@ -3170,7 +3186,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     (require 'list-timers)
     (evil-set-initial-state 'timers-menu-mode 'insert)
 
-
   ;; left-arrow, right-arrow
   ;; Used to indicate truncated lines.
 
@@ -3195,36 +3210,39 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
   ;; → ←  ↩ ↪ ⬅ ↺ ↻ ↷ ⟲ ⟳ ⤵⤴ ⤷ ⤶
   ;; custom graphics that works nice with half-width fringes
 
-;; .....................
-;; ..............##.....
-;; ..............###....
-;; ...............###...
-;; ................###..
-;; ####################.
-;; #####################
-;; #####################
-;; ................####.
-;; ...............####..
-;; ..............####...
-;; ..............###....
-;; ...............#.....
-
-;; .....................
-;; .....##..............
-;; ....###..............
-;; ...###...............
-;; ..###................
-;; .####################
-;; #####################
-;; #####################
-;; .####................
-;; ..####...............
-;; ...####..............
-;; ....###..............
-;; .....#...............
-
-
     (with-eval-after-load 'git-gutter-fringe
+
+      ;; .....................
+      ;; ..............##.....
+      ;; ..............###....
+      ;; ...............###...
+      ;; ................###..
+      ;; ####################.
+      ;; #####################
+      ;; #####################
+      ;; ................####.
+      ;; ...............####..
+      ;; ..............####...
+      ;; ..............###....
+      ;; ...............#.....
+
+      ;; .....................
+      ;; .....##..............
+      ;; ....###..............
+      ;; ...###...............
+      ;; ..###................
+      ;; .####################
+      ;; #####################
+      ;; #####################
+      ;; .####................
+      ;; ..####...............
+      ;; ...####..............
+      ;; ....###..............
+      ;; .....#...............
+
+
+
+
       (fringe-helper-define 'left-curly-arrow nil
         "........................."
         "........................."
@@ -3334,9 +3352,13 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         "........................."
         )
       )
+
     )
   )
 
 ;; Local Variables:
 ;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when-layer-used\\|(when (configuration-layer\\)")
 ;; End:
+
+;; Do not write anything past this comment. This is where Emacs will
+;; auto-generate custom variable definitions.
