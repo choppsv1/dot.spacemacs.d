@@ -60,14 +60,16 @@ This function should only modify configuration layer settings."
       docker
 
       ;; this causing github login and errors for all git projects even private non-github ones).
-      ;; github
+      github
       graphviz
       gtags
       (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
       ietf
       ;; jabber
       mu4e
-      (org :variables org-clock-idle-time 15)
+      (org :variables
+           org-clock-idle-time 15
+           org-enable-rfc-support t)
       (org2blog :variables org2blog-name "hoppsjots.org")
       ;; pandoc
       (osx :variables
@@ -102,7 +104,7 @@ This function should only modify configuration layer settings."
       ;; Languages
       ;; ---------
 
-      php ;; this is here I think to avoid a bug if we put it in alpha order
+      ;; php ;; this is here I think to avoid a bug if we put it in alpha order
       csv
       (c-c++ :variables
              c-c++-default-mode-for-headers 'c-mode
@@ -113,11 +115,14 @@ This function should only modify configuration layer settings."
              c-c++-enable-clang-format-on-save t
              )
       emacs-lisp
+      ess
       git
+      lsp
       (go :variables
           go-format-before-save t
           go-use-golangci-lint t
           ;; go-use-gometalinter t
+          ;; godoc-at-point-function 'godoc-gogetdoc
           go-backend 'lsp
           )
       html
@@ -167,9 +172,9 @@ This function should only modify configuration layer settings."
       ;; vim-empty-lines
      )
 
-   ;; list of additional packages that will be installed without being
-   ;; wrapped in a layer. if you need some configuration for these
-   ;; packages, then consider creating a layer. you can also put the
+   ;; List of additional packages that will be installed without being
+   ;; wrapped in a layer. If you need some configuration for these
+   ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages
    '(
@@ -219,9 +224,8 @@ This function should only modify configuration layer settings."
   (setq ch-def-font "DejaVu Sans Mono")
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
-    (setq ch-def-height 16.0)
     (setq ch-def-font "DejaVu Sans Mono")
-    )
+    (setq ch-def-height 15.0))
    ((string-equal system-type "gnu/linux")
     (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
           (dpi (shell-command-to-string "xdpyinfo | sed -e '/dots per inch/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
@@ -236,10 +240,10 @@ This function should only modify configuration layer settings."
         ;; small display
         (if (= (string-to-number xres) 3840)
             (if (> (string-to-number dpi) 240)
-                (setq ch-def-height 14.0)
-              (setq ch-def-height 14.0))
+                (setq ch-def-height 10.0)
+              (setq ch-def-height 11.0))
           ;; small display
-          (setq ch-def-height 15.0)))))))
+          (setq ch-def-height 12.0)))))))
 
 (defun dotspacemacs/init ()
   "Initialization:
@@ -366,8 +370,8 @@ It should only modify the values of Spacemacs settings."
    ;; with 2 themes variants, one dark and one light)
 
    dotspacemacs-themes '(
-                         mandm
                          misterioso
+                         mandm
                          gruvbox-light-hard
                          molokai
                          leuven
@@ -379,18 +383,19 @@ It should only modify the values of Spacemacs settings."
    ;; refer to the DOCUMENTATION.org for more info on how to create your own
    ;; spaceline theme. Value can be a symbol or list with additional properties.
    ;; (default '(spacemacs :separator wave :separator-scale 1.5))
-   ;; dotspacemacs-mode-line-theme '(all-the-icons :separator-scale 1.0)
-   dotspacemacs-mode-line-theme '(spacemacs :separator wave :separator-scale 1.3)
+   dotspacemacs-mode-line-theme '(spacemacs :separator wave :separator-scale 1.5)
 
    ;; If non-nil the cursor color matches the state color in GUI Emacs.
    ;; (default t)
    dotspacemacs-colorize-cursor-according-to-state t
 
+   ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
+   ;; quickly tweak the mode-line size to make separators look not too crappy.
    ;; dotspacemacs-default-font `("Office Code Pro D" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Perfect UTF-8, good sans serif
    ;; dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal)
    ;; dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal)
-   dotspacemacs-default-font `(,ch-def-font :size ,ch-def-height :weight normal :width normal)
+   dotspacemacs-default-font `(,ch-def-font :size ,ch-def-height :weight normal :width normal :powerline-scale 1.5)
    ;; Very condensed -- pretty good for coding -- same odd shapes offs UTF as Liberation Mono
    ;; dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.2)
 
@@ -556,6 +561,13 @@ It should only modify the values of Spacemacs settings."
    ;; (default nil)
    dotspacemacs-enable-server nil
 
+   ;; Set the emacs server socket location.
+   ;; If nil, uses whatever the Emacs default is, otherwise a directory path
+   ;; like \"~/.emacs.d/server\". It has no effect if
+   ;; `dotspacemacs-enable-server' is nil.
+   ;; (default nil)
+   dotspacemacs-server-socket-dir nil
+
    ;; If non-nil, advise quit functions to keep server open when quitting.
    ;; (default nil)
    dotspacemacs-persistent-server nil
@@ -604,7 +616,6 @@ It should only modify the values of Spacemacs settings."
    ;; (default nil)
    dotspacemacs-pretty-docs nil))
 
-
 (defun dotspacemacs/user-env ()
   "Environment variables setup.
 This function defines the environment variables for your Emacs session. By
@@ -621,19 +632,27 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
 
-  (set-fontsize)
+  ;; (spacemacs/toggle-smartparens-globally-off)
+  ;; (set-fontsize)
   ;; Copied from core/core-fonts-support.el
 
-  ;; XXX debug disappearing modeline
-  (let* ((font (car dotspacemacs-default-font))
-         (props (cdr dotspacemacs-default-font))
-         (scale (plist-get props :powerline-scale))
-         (font-props (spacemacs/mplist-remove
-                      (spacemacs/mplist-remove props :powerline-scale)
-                      :powerline-offset))
-         (fontspec (apply 'font-spec :name font font-props)))
-    (set-frame-font fontspec))
+  (defun debug-frame-font ()
+    (message "GOT FONT UPDATE"))
+  (add-hook 'debuug-frame-font 'after-setting-font-hooks)
 
+  ;; XXX debug disappearing modeline
+  (defun replay-font-set ()
+    ""
+    (interactive)
+    (let* ((font (car dotspacemacs-default-font))
+           (props (cdr dotspacemacs-default-font))
+           (scale (plist-get props :powerline-scale))
+           (font-props (spacemacs/mplist-remove
+                        (spacemacs/mplist-remove props :powerline-scale)
+                        :powerline-offset))
+           (fontspec (apply 'font-spec :name font font-props)))
+      (message "replay-font-set fontspec: %s" fontspec)
+      (set-frame-font fontspec)))
 
   ;; ---------
   ;; User-init
@@ -718,7 +737,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
                                          (lazy-highlight-face :background "#338f86")
                                          (font-lock-doc-face :foreground "#A5A17E" :slant italic)
                                          (font-lock-comment-delimiter-face :foreground "#55513E"))
-                                (light-soap (default :height 130 :foreground "#474747" :background "#fafad4"))
+                                (light-soap (default :foreground "#474747" :background "#fafad4"))
                                 (quasi-monochrome (default :height ,(* ch-def-height 10))
                                                   (font-lock-string-face :foreground "DarkGrey" :slant italic)
                                                   (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
@@ -908,7 +927,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   )
 
-
 (defun dotspacemacs/user-load ()
   "Library to load while dumping.
 This function is called only while dumping Spacemacs configuration. You can
@@ -921,7 +939,20 @@ dump."
 This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
 
+  ;; XXX is this going to make everything fail?
+  (defun et/semantic-remove-hooks ()
+    (remove-hook 'completion-at-point-functions
+                 'semantic-analyze-completion-at-point-function)
+    (remove-hook 'completion-at-point-functions
+                 'semantic-analyze-notc-completion-at-point-function)
+    (remove-hook 'completion-at-point-functions
+                 'semantic-analyze-nolongprefix-completion-at-point-function))
+
+  (add-hook 'semantic-mode-hook #'et/semantic-remove-hooks)
+
   (progn
+
+
 
     ;; I *like* being able to get back to package files.
     (with-eval-after-load "recentf"
@@ -1531,6 +1562,7 @@ This will replace the last notification sent with this function."
                                                   ;; we want contacts added from these mailing lists
                                                   "isis-wg@ietf.org"
                                                   "lsr@ietf.org"
+                                                  "ipsec@ietf.org"
                                                   "developers@netbsd.org"
                                                   "netbsd-developers@netbsd.org"
                                                   "chopps@dev.terastrm.net"
@@ -1551,14 +1583,11 @@ This will replace the last notification sent with this function."
                                  "maildir:/chopps.org/INBOX"
                                  "maildir:/devhopps.com/INBOX")
 
-            mu4e-imp-mailbox '("maildir:/chopps.org/dpdk-dev"
-                               "maildir:/chopps.org/dpdk-users"
-                               "maildir:/chopps.org/ietf-chairs"
+            mu4e-imp-mailbox '("maildir:/chopps.org/ietf-chairs"
                                "maildir:/chopps.org/ietf-chairs-rtg"
-                               "maildir:/chopps.org/ietf-dt-netmod-ds"
                                "maildir:/chopps.org/ietf-rtg-dir"
                                "maildir:/chopps.org/ietf-rtg-dir"
-                               "maildir:/chopps.org/ietf-rtg-yang-dt"
+                               "maildir:/chopps.org/ietf-wg-ipsec"
                                "maildir:/chopps.org/ietf-wg-isis"
                                "maildir:/chopps.org/ietf-wg-lsr"
                                "maildir:/chopps.org/ietf-wg-netmod"
@@ -1579,24 +1608,24 @@ This will replace the last notification sent with this function."
             mu4e-bookmarks
             (append
              (list (list (concat "flag:unread AND NOT flag:trashed AND " mu4e-inbox-filter-base) "Unread [i]NBOX messages" ?i)
-                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-lsr") "Unread IS-IS messages" ?I)
-                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-lsr") "Unread IS-IS messages" ?L)
-                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-*") "Unread IETF messages" ?E)
+                   (list (concat mu4e-unread-filter  mu4e-imp-filter-base) "Unread Important messages" ?n)
+                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-lsr") "Unread LSR messages" ?l)
+                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-netmod") "Unread netmod messages" ?N)
+                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-*") "Unread IETF messages" ?e)
 
-                   (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
-                   (list (concat "flag:flagged AND NOT flag:trashed AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "[F]lagged Non-INBOX messages" ?F)
+                   ;; (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
+                   ;; (list (concat "flag:flagged AND NOT flag:trashed AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "[F]lagged Non-INBOX messages" ?F)
 
-                   (list (concat mu4e-unread-filter         mu4e-imp-filter-base) "Unread Important messages" ?n)
-                   (list (concat mu4e-unread-flagged-filter mu4e-imp-filter-base) "Unread-Flagged Important messages" ?N)
+                   ;; (list (concat mu4e-unread-flagged-filter mu4e-imp-filter-base) "Unread-Flagged Important messages" ?N)
 
                    (list (concat mu4e-unread-filter         " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread [u]nimportant messages" ?u)
-                   (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged [U]nimportant messages" ?U)
+                   ;; (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged [U]nimportant messages" ?U)
 
                    (list (concat mu4e-unread-filter         " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread Non-INBOX messages" ?o)
-                   (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged Non-INBOX messages" ?O)
+                   ;; (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged Non-INBOX messages" ?O)
 
                    (list (concat mu4e-unread-filter         mu4e-not-junk-folder-filter) "Unread messages" ?a)
-                   (list (concat mu4e-unread-flagged-filter mu4e-not-junk-folder-filter) "Unread-flagged messages" ?A)
+                   ;; (list (concat mu4e-unread-flagged-filter mu4e-not-junk-folder-filter) "Unread-flagged messages" ?A)
 
                    (list "(maildir:/chopps.org/spam-probable                                              )" "Probable spam messages" ?s))
              (mapcar (lambda (x) (cons (concat (car x) mu4e-not-junk-folder-filter) (cdr x)))
@@ -1647,11 +1676,12 @@ This will replace the last notification sent with this function."
                                              (smtpmail-starttls-credentials . '(("smtp.chopps.org" 587 nil nil)))
                                              (smtpmail-default-smtp-server  . "smtp.chopps.org")
                                              (smtpmail-smtp-server          . "smtp.chopps.org")
-                                             ;; (smtpmail-starttls-credentials . '(("coffee.chopps.org" 25 nil nil)))
+                                             ;;(smtpmail-starttls-credentials . '(("coffee.chopps.org" 25 nil nil)))
                                              ;;(smtpmail-default-smtp-server  . "coffee.chopps.org")
                                              ;;(smtpmail-smtp-server          . "coffee.chopps.org")
                                              (smtpmail-local-domain         .      "chopps.org")
-                                             (smtpmail-smtp-service         . 25)))
+                                             (smtpmail-stream-type          . starttls)
+                                             (smtpmail-smtp-service         . 587)))
                                  ,(make-mu4e-context
                                     :name "labn.net"
                                     :match-func (lambda (msg)
@@ -1686,6 +1716,7 @@ This will replace the last notification sent with this function."
                                              (smtpmail-default-smtp-server  . "smtp.gmail.com")
                                              (smtpmail-smtp-server          . "smtp.gmail.com")
                                              (smtpmail-local-domain         .      "gmail.com")
+                                             (smtpmail-stream-type          . starttls)
                                              (smtpmail-smtp-service . 587)))
                                  ))
 
@@ -2378,7 +2409,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      (defun my-org-mode-hook ()
        (if debug-init-msg
            (message "Org-mode-hook"))
-       (require 'ox-xml2rfc)
+       (require 'ox-rfc)
        ;; (org-set-local 'yas/trigger-key [tab])
        ;; (yas-minor-mode)
        ;; Probably done now.
@@ -2416,6 +2447,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                 (string= lang "dot")
                 (string= lang "gnuplot")
                 (string= lang "plantuml")
+                ;; (string= lang "yang")
                 )))
      ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
 
@@ -3128,7 +3160,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     ;; (if inhibit-startup-screen
     ;;     (quit-window))
 
-    (setq powerline-default-separator 'wave)
+    ;; (setq powerline-default-separator 'wave)
 
     ;; (defun split-window-sensibly-prefer-horizontal (&optional window)
     ;;   "Same as `split-window-sensibly' except prefer to split horizontally first."
@@ -3158,7 +3190,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     (require 'list-timers)
     (evil-set-initial-state 'timers-menu-mode 'insert)
 
-
   ;; left-arrow, right-arrow
   ;; Used to indicate truncated lines.
 
@@ -3183,36 +3214,39 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
   ;; → ←  ↩ ↪ ⬅ ↺ ↻ ↷ ⟲ ⟳ ⤵⤴ ⤷ ⤶
   ;; custom graphics that works nice with half-width fringes
 
-;; .....................
-;; ..............##.....
-;; ..............###....
-;; ...............###...
-;; ................###..
-;; ####################.
-;; #####################
-;; #####################
-;; ................####.
-;; ...............####..
-;; ..............####...
-;; ..............###....
-;; ...............#.....
-
-;; .....................
-;; .....##..............
-;; ....###..............
-;; ...###...............
-;; ..###................
-;; .####################
-;; #####################
-;; #####################
-;; .####................
-;; ..####...............
-;; ...####..............
-;; ....###..............
-;; .....#...............
-
-
     (with-eval-after-load 'git-gutter-fringe
+
+      ;; .....................
+      ;; ..............##.....
+      ;; ..............###....
+      ;; ...............###...
+      ;; ................###..
+      ;; ####################.
+      ;; #####################
+      ;; #####################
+      ;; ................####.
+      ;; ...............####..
+      ;; ..............####...
+      ;; ..............###....
+      ;; ...............#.....
+
+      ;; .....................
+      ;; .....##..............
+      ;; ....###..............
+      ;; ...###...............
+      ;; ..###................
+      ;; .####################
+      ;; #####################
+      ;; #####################
+      ;; .####................
+      ;; ..####...............
+      ;; ...####..............
+      ;; ....###..............
+      ;; .....#...............
+
+
+
+
       (fringe-helper-define 'left-curly-arrow nil
         "........................."
         "........................."
@@ -3322,9 +3356,13 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         "........................."
         )
       )
+
     )
   )
 
 ;; Local Variables:
 ;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when-layer-used\\|(when (configuration-layer\\)")
 ;; End:
+
+;; Do not write anything past this comment. This is where Emacs will
+;; auto-generate custom variable definitions.
