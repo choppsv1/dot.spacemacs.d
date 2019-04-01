@@ -1,0 +1,4 @@
+.DS_Store
+custom.el
+.spacemacs.env
+repos/

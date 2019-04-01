@@ -57,8 +57,7 @@ The %s will be replaced by the footnote reference itself."
 
 (org-export-define-derived-backend 'xml2rfc 'html
   :filters-alist '((:filter-parse-tree .
-                                       (org-xml2rfc-separate-elements
-                                        org-xml2rfc--translate-description-lists)))
+                                       (org-xml2rfc-separate-elements)))
   :menu-entry
   '(?x "Export to XML2RFC"
        ((?M "To temporary buffer"
