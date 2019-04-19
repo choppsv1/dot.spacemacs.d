@@ -2690,6 +2690,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         (pic . t)
         (plantuml . t)
         (python . t)
+        (shell . t)
         ;; (sh . t)
         )
       )
