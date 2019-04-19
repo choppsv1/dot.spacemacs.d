@@ -56,6 +56,7 @@ This function should only modify configuration layer settings."
       ;; company-complete vs complete-at-point
 
       better-defaults
+      ;; ditaa
       docker
 
       ;; this causing github login and errors for all git projects even private non-github ones).
@@ -220,19 +221,22 @@ This function should only modify configuration layer settings."
    dotspacemacs-install-packages 'used-only))
 
 (defun set-fontsize ()
+  (setq ch-def-font "DejaVu Sans Mono")
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
+    (setq ch-def-font "DejaVu Sans Mono")
     (setq ch-def-height 15.0))
    ((string-equal system-type "gnu/linux")
     (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
           (dpi (shell-command-to-string "xdpyinfo | sed -e '/dots per inch/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
           ;; (yres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* [0-9]*x\\([0-9]*\\) .*/\\1/'")))
           )
+      (setq ch-def-font "DejaVu Sans Mono")
       (setq xres (replace-regexp-in-string "\n\\'" "" xres))
       ;; (setq yres (replace-regexp-in-string "\n\\'" "" yres))
       (if (> (string-to-number xres) 5000)
           ;; big display
-          (setq ch-def-height 16.0)
+          (setq ch-def-height 20.0)
         ;; small display
         (if (= (string-to-number xres) 3840)
             (if (> (string-to-number dpi) 240)
@@ -391,11 +395,9 @@ It should only modify the values of Spacemacs settings."
    ;; Perfect UTF-8, good sans serif
    ;; dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal)
    ;; dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal)
+   dotspacemacs-default-font `(,ch-def-font :size ,ch-def-height :weight normal :width normal :powerline-scale 1.5)
    ;; Very condensed -- pretty good for coding -- same odd shapes offs UTF as Liberation Mono
    ;; dotspacemacs-default-font `("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.2)
-   ;; dotspacemacs-default-font `(("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.2)
-   ;;                             ("Ubuntu Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.2))
-   dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.5)
 
    ;; The leader key (default "SPC")
    dotspacemacs-leader-key "SPC"
@@ -957,7 +959,9 @@ layers configuration. You are free to put any user code."
       (setq recentf-exclude (delete (recentf-expand-file-name package-user-dir) recentf-exclude)))
 
     (cond ((string-equal system-type "darwin")
-           (exec-path-from-shell-copy-env "PATH")))
+           (exec-path-from-shell-copy-env "PATH")
+           (or (and (fboundp 'server-running-p) (server-running-p)) (server-start))
+           ))
 
     ;; (cond ((not (string-equal system-type "darwin"))
     ;;        (add-hook after-make-frame-functions (lambda () (load-theme 'mandm)))))
@@ -2862,7 +2866,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
      ;; XXX need to change this
      (and debug-init-msg (message "debug-init pre-server-running-notificiation-setup"))
-     (when (or (daemonp) (bound-and-true-p server-running-p))
+     (when (or (daemonp) (and (fboundp 'server-running-p) (server-running-p)))
        (require 'org-notify)
        (defun org-notify-action-notify-urgency (plist)
          "Pop up a notification window."
