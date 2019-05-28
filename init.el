@@ -73,9 +73,9 @@ This function should only modify configuration layer settings."
       graphviz
       gtags
       (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
-      ietf
       ;; jabber
       mu4e
+      multiple-cursors
       (org :variables
            org-clock-idle-time 15
            org-enable-rfc-support t)
@@ -108,6 +108,7 @@ This function should only modify configuration layer settings."
                        version-control-diff-tool 'git-gutter
                        version-control-diff-side 'left
                        version-control-global-margin t)
+      treemacs
 
       ;; ---------
       ;; Languages
@@ -251,7 +252,7 @@ This function should only modify configuration layer settings."
         (if (= (string-to-number xres) 3840)
             (if (> (string-to-number dpi) 240)
                 (setq ch-def-height 10.0)
-              (setq ch-def-height 11.0))
+              (setq ch-def-height 13.0))
           ;; small display
           (setq ch-def-height 12.0)))))))
 
@@ -378,7 +379,6 @@ It should only modify the values of Spacemacs settings."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-
    dotspacemacs-themes '(
                          misterioso
                          mandm
@@ -818,6 +818,8 @@ before packages are loaded. If you are unsure, you should try in setting them in
         (setq x-last-selected-text-primary ))))
 
   (debug-init-message "debug-init DISPLAY")
+
+  (setq abbrev-file-name (concat spacemacs-cache-directory "abbrev_defs"))
 
   ;; =======
   ;; Display
@@ -2043,13 +2045,77 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         ;; (modify-syntax-entry ?_ "w" java-mode-syntax-table)
         ;; (modify-syntax-entry ?_ "w" objc-mode-syntax-table)
 
+        (defun vpp-indent-format-buffer ()
+          "Reformat the buffer using 'indent'"
+          (interactive)
+          (let ((oldbuf (current-buffer))
+                fmtbuf
+                errbuf)
+            (with-temp-buffer
+              (insert-buffer-substring oldbuf)
+              (shell-command-on-region (point-min) (point-max) "indent -gnu" (current-buffer) t nil t)
+              (unless (= 0 (compare-buffer-substrings oldbuf nil nil (current-buffer) nil nil))
+                (setq fmtbuf (current-buffer))
+                (with-temp-buffer
+                  (insert-buffer-substring fmtbuf)
+                  (shell-command-on-region (point-min) (point-max) "indent -gnu" (current-buffer) t nil t)
+                  (if (not (= 0 (compare-buffer-substrings fmtbuf nil nil (current-buffer) nil nil)))
+                      (progn
+                        (message "INDENT FAILED second invocation different from first")
+                        (let ((cbuf (current-buffer))
+                              (tmp1 (make-temp-file "vppfmt1"))
+                              (tmp2 (make-temp-file "vppfmt2")))
+                          (unwind-protect
+                              (progn
+                                (with-temp-file tmp2 (insert-buffer-substring cbuf))
+                                (with-temp-file tmp1 (insert-buffer-substring fmtbuf))
+                                (let ((newbuf (get-buffer-create "*vpp-indent-non-deterministic*")))
+                                  (shell-command (format "diff -u %s %s" tmp1 tmp2) newbuf)
+                                  (if (= 0 (buffer-size newbuf))
+                                      (kill-buffer newbuf)
+                                    (setq errbuf newbuf))))
+                            (delete-file tmp1)
+                            (delete-file tmp2))))
+                    (with-current-buffer oldbuf
+                      (if (boundp 'replace-buffer-contents)
+                          ;; emacs 26 retains properties in buffer
+                          (replace-buffer-contents fmtbuf)
+                        (let ((oldpoint (point)))
+                          (erase-buffer)
+                          (insert-buffer-substring fmtbuf)
+                          (goto-char (min (point-max) oldpoint)))))))))
+            (if errbuf (display-buffer errbuf))))
+
+        (defun vpp-format-buffer (&optional force-clang)
+          (if (and (eq major-mode 'c++-mode)
+                   (boundp 'clang-format-buffer))
+              (clang-format-buffer)
+            (if force-clang
+                (clang-format-buffer)
+              (vpp-indent-format-buffer))))
+            ;;(clang-format-buffer)))
+
+        (defun vpp-maybe-format-buffer ()
+          "Reformat buffer if contains VPP magic"
+          (when (save-excursion
+                  (goto-char (point-min))
+                  (re-search-forward "fd.io coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t))
+            (cond
+             ((string= "CLANG" (match-string 1)) (vpp-format-buffer 1) t)
+             (t (vpp-format-buffer)))))
+
+        (defun vpp-maybe-format-buffer-on-save ()
+          (add-hook 'before-save-hook 'vpp-maybe-format-buffer nil t))
+
+        (add-hook 'c-mode-hook 'vpp-maybe-format-buffer-on-save)
+        (add-hook 'c++-mode-hook 'vpp-maybe-format-buffer-on-save)
+
         (setq-default c-electric-flag nil)
         (add-hook 'c-mode-common-hook
                   (function (lambda ()
                               (if (string= (shell-command-to-string "uname -s") "NetBSD\n")
                                   (c-set-style "KNF")
-                                (c-set-style "Procket")
-                                (setq indent-tabs-mode nil))
+                                (c-set-style "Procket"))
                               (c-toggle-auto-hungry-state 1)
                               (setq c-electric-flag nil)
                               (setq fill-column 80)
