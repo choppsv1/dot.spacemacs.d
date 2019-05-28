@@ -1,10 +1,12 @@
+
+
 (defmacro fold-section (description &rest body)
   "A macro allowing for ignoring the first thing"
-  (if (bound-and-true-p debug-init-msg) (message "DEBUG-INIT FOLD-DEBUG: %s" description))
+  (if (bound-and-true-p debug-init-msg) (debug-init-message "FOLD-DEBUG: %s" description))
   (list 'if t (cons 'progn body)))
 
 (defmacro when-layer-used (layer &rest body)
-  (if (bound-and-true-p debug-init-msg) (message "DEBUG-INIT WHEN-LAYER-USED-DEBUG: %s" layer))
+  (if (bound-and-true-p debug-init-msg) (debug-init-message "WHEN-LAYER-USED-DEBUG: %s" layer))
   (list 'if t (cons 'progn body)))
 
 (defun find-and-close-fold (re-string)

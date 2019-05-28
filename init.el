@@ -2,6 +2,15 @@
 ;; This file is loaded by Spacemacs at startup.
 ;; It must be stored in your home directory.
 
+
+(setq debug-init-msg t)
+(defun debug-init-message (fmt &rest a)
+  (and debug-init-msg
+       (let ((ts (format-time-string "%S.%N")))
+         (apply 'message
+                (append (list (concat ts ": DEBUG-INIT: " fmt))
+                        a)))))
+
 (defun dotspacemacs/layers ()
   "Layer configuration:
 This function should only modify configuration layer settings."
@@ -225,7 +234,8 @@ This function should only modify configuration layer settings."
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
     (setq ch-def-font "DejaVu Sans Mono")
-    (setq ch-def-height 15.0))
+    (setq ch-def-height 15.0)
+    (debug-init-message "Setting font to %s:%f" ch-def-font ch-def-height))
    ((string-equal system-type "gnu/linux")
     (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
           (dpi (shell-command-to-string "xdpyinfo | sed -e '/dots per inch/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
@@ -256,7 +266,7 @@ It should only modify the values of Spacemacs settings."
   (dotspacemacs/emacs-custom-settings)
 
   (set-fontsize)
-  (message "def height %s" ch-def-height)
+  (debug-init-message "def height %s" ch-def-height)
 
 
   ;; this setq-default sexp is an exhaustive list of all the supported
@@ -632,12 +642,16 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
 
+  (setq exec-path-from-shell-check-startup-files nil)
+
+  (debug-init-message "USER-INIT: Start")
+
   ;; (spacemacs/toggle-smartparens-globally-off)
   ;; (set-fontsize)
   ;; Copied from core/core-fonts-support.el
 
   (defun debug-frame-font ()
-    (message "GOT FONT UPDATE"))
+    (debug-init-message "GOT FONT UPDATE"))
   (add-hook 'debuug-frame-font 'after-setting-font-hooks)
 
   ;; XXX debug disappearing modeline
@@ -651,7 +665,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
                         (spacemacs/mplist-remove props :powerline-scale)
                         :powerline-offset))
            (fontspec (apply 'font-spec :name font font-props)))
-      (message "replay-font-set fontspec: %s" fontspec)
+      (debug-init-message "replay-font-set fontspec: %s" fontspec)
       (set-frame-font fontspec)))
 
   ;; ---------
@@ -713,11 +727,10 @@ before packages are loaded. If you are unsure, you should try in setting them in
    ;;                              (evil-shift-width . 2)
    ;;                              )
    )
-  (setq debug-init-msg t)
 
-  (message "debug-init-msg is %s" debug-init-msg)
+  (debug-init-message "debug-init-msg is %s" debug-init-msg)
 
-  (and debug-init-msg (message "debug-init 1"))
+  (debug-init-message "debug-init 1")
 
   (setq comment-delim-color "grey50")
 
@@ -774,7 +787,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (defun _evil-visual-update-x-selection (&optional buffer)
     "Update the X selection with the current visual region."
     (let ((buf (or buffer (current-buffer))))
-      ;; (message "XXXVISUALSELECT1")
+      ;; (debug-init-message "XXXVISUALSELECT1")
       (when (buffer-live-p buf)
         (with-current-buffer buf
           (when (and (evil-visual-state-p)
@@ -786,7 +799,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
                                   evil-visual-beginning
                                   evil-visual-end))
             ;; is this last thing right?
-            ;; (message "XXXVISUALSELECT2")
+            ;; (debug-init-message "XXXVISUALSELECT2")
             (setq x-last-selected-text-primary )
             )))))
 
@@ -804,7 +817,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
                                    evil-visual-end))
         (setq x-last-selected-text-primary ))))
 
-  (and debug-init-msg (message "debug-init DISPLAY"))
+  (debug-init-message "debug-init DISPLAY")
 
   ;; =======
   ;; Display
@@ -819,7 +832,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;; Global Key Bindings and Registers
   ;; =================================
 
-  (and debug-init-msg (message "debug-init Keybindings"))
   (fold-section "Keybindings"
                 (define-key isearch-mode-map [remap isearch-delete-char] 'isearch-del-char)
 
@@ -924,6 +936,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;;     )
   ;;   )
 
+  (debug-init-message "USER-INIT: End")
 
   )
 
@@ -932,12 +945,16 @@ before packages are loaded. If you are unsure, you should try in setting them in
 This function is called only while dumping Spacemacs configuration. You can
 `require' or `load' the libraries of your choice that will be included in the
 dump."
+  (debug-init-message "USER-LOAD: Start")
+  (debug-init-message "USER-LOAD: End")
   )
 
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
 This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
+
+  (debug-init-message "USER-CONFIG: Start")
 
   ;; XXX is this going to make everything fail?
   (defun et/semantic-remove-hooks ()
@@ -977,7 +994,7 @@ layers configuration. You are free to put any user code."
     ;; (if (string= (getenv "HOSTNAME") "tops")
     ;;     (load-theme 'mandm))
 
-    (and debug-init-msg (message "debug-init USER-CONFIG"))
+    (debug-init-message "debug-init USER-CONFIG")
     (setq dotspacemacs-themes (mapcar (lambda (package) (intern (string-remove-suffix "-theme" (symbol-name package)))) themes-megapack-packages))
 
     (persistent-scratch-setup-default)
@@ -1022,7 +1039,7 @@ layers configuration. You are free to put any user code."
     (setq-default tab-width 8)
 
     (setq-default magit-todos-ignored-keywords '("NOTE" "DONE" "FAIL"))
-    (setq-default evil-escape-key-sequence "kj")
+    (setq-default evil-escape-key-sequence nil)
 
     ;; take out
     ;; (setq magithub-debug-mode t)
@@ -1659,7 +1676,7 @@ This will replace the last notification sent with this function."
 
       (with-eval-after-load 'mu4e
         (progn
-          (and debug-init-msg (message "debug-init MU4E setq"))
+          (debug-init-message "debug-init MU4E setq")
           (setq mu4e-contexts `(
                                 ,(make-mu4e-context
                                     :name "chopps.org"
@@ -1721,7 +1738,7 @@ This will replace the last notification sent with this function."
                                  ))
 
 
-          (and debug-init-msg (message "debug-init MU4E defuns"))
+          (debug-init-message "debug-init MU4E defuns")
           (defun my-mu4e-shr2text (msg)
             (let ((display-graphic-p (lambda () nil)))
               (mu4e-shr2text msg)))
@@ -1747,7 +1764,7 @@ This will replace the last notification sent with this function."
                         (or (and name (format "%s <%s>" name email))
                           email))) clist))
 
-          (and debug-init-msg (message "debug-init MU4E helm"))
+          (debug-init-message "debug-init MU4E helm")
           (when (configuration-layer/package-usedp 'helm)
             (defun my-message-expand-name (&optional start)
               ((interactive "P"))
@@ -1793,7 +1810,7 @@ This will replace the last notification sent with this function."
             (interactive)
             (mu4e~view-in-headers-context
               (mu4e-headers-mark-move-to-spam)))
-          ;; (message "post-init end mu4e eval after load")
+          (debug-init-message "post-init end mu4e eval after load")
 
           ;; XXX these aren't defined
           ;; (define-key mu4e-headers-mode-map (kbd "C-c c") 'org-mu4e-store-and-capture)
@@ -1809,7 +1826,7 @@ This will replace the last notification sent with this function."
           ;; (mu4e-alert-enable-notifications)
 
           ;; ;; XXX disabled trying to find hang XXX THIS CAUSED IT
-          (and debug-init-msg (message "debug-init MU4E mode hook"))
+          (debug-init-message "debug-init MU4E mode hook")
           (add-hook 'mu4e-headers-mode-hook
             (lambda () (progn
                          (make-local-variable 'scroll-conservatively)
@@ -1834,7 +1851,7 @@ This will replace the last notification sent with this function."
           (add-to-list 'mu4e-view-actions
                        '("ViewInBrowser" . mu4e-action-view-in-browser))
 
-          (and debug-init-msg (message "debug-init MU4E mode add to gcal"))
+          (debug-init-message "debug-init MU4E mode add to gcal")
           (defun mu4e-action-add-to-gcal (msg)
             "Add to a calendar"
             (interactive)
@@ -1887,7 +1904,7 @@ This will replace the last notification sent with this function."
 
           (define-key mu4e-main-mode-map "u" 'mu4e-update-index)
 
-          (and debug-init-msg (message "debug-init MU4E leader keys"))
+          (debug-init-message "debug-init MU4E leader keys")
           (spacemacs/set-leader-keys-for-major-mode 'mu4e-view-mode
             "g" 'mu4e-view-go-to-url
             "h" 'mu4e-view-toggle-html
@@ -1927,7 +1944,7 @@ This will replace the last notification sent with this function."
                                          )))
           ;; XXXSLOW
 
-          (and debug-init-msg (message "debug-init MU4E defun compose"))
+          (debug-init-message "debug-init MU4E defun compose")
           (defun compose-attach-marked-files ()
             "Compose mail and attach all the marked files from a dired buffer."
             (interactive)
@@ -2307,7 +2324,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
           ;;   ;; (message "select set exec")
           ;;   ;; (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
 
-          (message "Python mode hook done"))
+          (debug-init-message "Python mode hook done"))
 
         (add-hook 'python-mode-hook 'my-python-mode-hook)
 
@@ -2349,7 +2366,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     (when-layer-used
      'org
 
-     (and debug-init-msg (message "debug-init org setup"))
+     (debug-init-message "debug-init org setup")
      ;; Do we want this?
      (add-hook 'org-mode-hook #'yas-minor-mode)
 
@@ -2405,10 +2422,10 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      ;; (with-eval-after-load "org-agenda"
      ;;   (define-key org-agenda-mode-map (kbd "RET") 'org-agenda-switch-to))
 
-     (and debug-init-msg (message "debug-init org my-org-mode-hook"))
+     (debug-init-message "debug-init org my-org-mode-hook")
      (defun my-org-mode-hook ()
        (if debug-init-msg
-           (message "Org-mode-hook"))
+           (debug-init-message "Org-mode-hook"))
        (require 'ox-rfc)
        ;; (org-set-local 'yas/trigger-key [tab])
        ;; (yas-minor-mode)
@@ -2451,7 +2468,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                 )))
      ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
 
-     (and debug-init-msg (message "debug-init org setq"))
+     (debug-init-message "debug-init org setq")
      (setq
       ;; Crypt
       org-tags-exclude-from-inheritance '("crypt")
@@ -2605,7 +2622,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      ;; In mail map todo to mail-todo
      ;; org-capture-templates-contexts '(("t" "m" ((in-mode . "mu4e-headers-mode")))
      ;;                                  ("t" "m" ((in-mode . "mu4e-view-mode"))))
-     (and debug-init-msg (message "debug-init ox setup"))
+     (debug-init-message "debug-init ox setup")
      (with-eval-after-load "ox"
        ;;
        (defconst chopps/org-latex-packages-alist-pre-hyperref
@@ -2683,7 +2700,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      ;; Its value is ((shell . t) (python . t) (dot . t) (emacs-lisp . t))
      ;; Original value was ((emacs-lisp . t))
 
-     (and debug-init-msg (message "debug-init org-babel-do-load-languges setup"))
+     (debug-init-message "debug-init org-babel-do-load-languges setup")
      ;; (org-babel-do-load-languages
      (setq org-babel-load-languages
       '((emacs-lisp . t)
@@ -2746,7 +2763,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
      ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-cmd)
 
-     (and debug-init-msg (message "debug-init org-refile-to-datatree setup"))
+     (debug-init-message "debug-init org-refile-to-datatree setup")
      (defun org-refile-to-datetree ()
        "Refile a subtree to a datetree corresponding to it's timestamp."
        (interactive)
@@ -2809,7 +2826,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      ;;                     ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
      ;;                   org-latex-classes))))
 
-     (and debug-init-msg (message "debug-init pre-org-caldev"))
+     (debug-init-message "debug-init pre-org-caldev")
      ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
      (with-eval-after-load "org-caldav"
        ;;https://calendar.google.com/calendar/ical/j2nmb305oqb7n6428m4pf1rctk%40group.calendar.google.com/private-c46e82d6b4bae1f85fe4415a769d225b/basic.ics
@@ -2851,7 +2868,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
        )
 
-     (and debug-init-msg (message "debug-init pre-org2blog"))
+     (debug-init-message "debug-init pre-org2blog")
      (when-layer-used
       'org2blog
       (with-eval-after-load "org2blog"
@@ -2864,43 +2881,52 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         )
       )
 
-     ;; XXX need to change this
-     (and debug-init-msg (message "debug-init pre-server-running-notificiation-setup"))
-     (when (or (daemonp) (and (fboundp 'server-running-p) (server-running-p)))
-       (require 'org-notify)
-       (defun org-notify-action-notify-urgency (plist)
-         "Pop up a notification window."
-         (message "XXX org-notify-action-notify-urgency enter")
-         (require 'notifications)
-         (let* ((duration (plist-get plist :duration))
-                (urgency (plist-get plist :urgency))
-                (id (notifications-notify
-                     :title     (plist-get plist :heading)
-                     :body      (org-notify-body-text plist)
-                     :urgency   (or urgency 'normal)
-                     :timeout   (if duration (* duration 1000))
-                     :actions   org-notify-actions
-                     :on-action 'org-notify-on-action-notify)))
-           (setq org-notify-on-action-map
-                 (plist-put org-notify-on-action-map id plist))
-           (message "XXX org-notify-action-notify-urgency exit")
-           ))
+     (debug-init-message "pre-server-running-notificiation-setup")
 
-       (org-notify-add 'default
-                       '(:time "15m"
-                               :period "15m"
-                               :duration 0
-                               :urgency 'critical
-                               :app-icon (concat (configuration-layer/get-layer-path 'org)
-                                                 "img/org.png")
-                               :actions org-notify-action-notify-urgency))
-       (org-notify-start)
-       ))
+     ;; XXX need to change this
+     (when (or (daemonp) (and (fboundp 'server-running-p) (server-running-p)))
+       (debug-init-message "before require org notify")
+
+       ;; (require 'org-notify)
+       ;; (debug-init-message "in-server-running-notificiation-setup")
+       ;; (defun org-notify-action-notify-urgency (plist)
+       ;;   "Pop up a notification window."
+       ;;   (message "XXX org-notify-action-notify-urgency enter")
+       ;;   (require 'notifications)
+       ;;   (let* ((duration (plist-get plist :duration))
+       ;;          (urgency (plist-get plist :urgency))
+       ;;          (id (notifications-notify
+       ;;               :title     (plist-get plist :heading)
+       ;;               :body      (org-notify-body-text plist)
+       ;;               :urgency   (or urgency 'normal)
+       ;;               :timeout   (if duration (* duration 1000))
+       ;;               :actions   org-notify-actions
+       ;;               :on-action 'org-notify-on-action-notify)))
+       ;;     (setq org-notify-on-action-map
+       ;;           (plist-put org-notify-on-action-map id plist))
+       ;;     (message "XXX org-notify-action-notify-urgency exit")
+       ;;     ))
+       ;; (debug-init-message "org notify add")
+       ;; (org-notify-add 'default
+       ;;                 '(:time "15m"
+       ;;                         :period "15m"
+       ;;                         :duration 0
+       ;;                         :urgency 'critical
+       ;;                         :app-icon (concat (configuration-layer/get-layer-path 'org)
+       ;;                                           "img/org.png")
+       ;;                         :actions org-notify-action-notify-urgency))
+       ;; (debug-init-message "org notify start")
+       ;; (org-notify-start)
+       ;; (debug-init-message "org notify started")
+       )
+     (debug-init-message "debug-init POST-server-running-notification-setup")
+     )
 
 
     ;; ====
     ;; TMUX
     ;; ====
+    (debug-init-message "debug-init tmux")
 
     (defun sigusr1-handler ()
       (interactive)
@@ -2924,6 +2950,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     ;; Evil
     ;; ====
 
+    (debug-init-message "debug-init evil")
     (fold-section "evil"
                   (setq-default evil-shift-width 4)
                   (setq evil-shift-round nil
@@ -3188,6 +3215,8 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     ;; (setq window-min-width 40)
     ;; (setq split-window-preferred-function 'split-window-sensibly-prefer-horizontal)
 
+    (debug-init-message "list-timers")
+
     (require 'list-timers)
     (evil-set-initial-state 'timers-menu-mode 'insert)
 
@@ -3214,6 +3243,8 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
   ;; UTF-8 left-arrow, right-arrow (for truncated lines), left-curly-arrow, and right-curly-arrow
   ;; → ←  ↩ ↪ ⬅ ↺ ↻ ↷ ⟲ ⟳ ⤵⤴ ⤷ ⤶
   ;; custom graphics that works nice with half-width fringes
+
+    (debug-init-message "gutter")
 
     (with-eval-after-load 'git-gutter-fringe
 
@@ -3358,6 +3389,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         )
       )
 
+    (debug-init-message "USER-CONFIG done")
     )
   )
 
