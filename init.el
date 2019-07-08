@@ -220,6 +220,12 @@ This function should only modify configuration layer settings."
      ;; recentf
      ;; savehist
      ;; smartparens
+     ;; HATE PURPOSE MODE
+     eyebrowse
+     helm-purpose
+     ivy-purpose
+     spacemacs-purpose-popwin
+     window-purpose
      ) ; evil-org
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
@@ -235,7 +241,7 @@ This function should only modify configuration layer settings."
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
     (setq ch-def-font "DejaVu Sans Mono")
-    (setq ch-def-height 15.0)
+    (setq ch-def-height 16.0)
     (debug-init-message "Setting font to %s:%f" ch-def-font ch-def-height))
    ((string-equal system-type "gnu/linux")
     (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
@@ -2770,6 +2776,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      ;; (org-babel-do-load-languages
      (setq org-babel-load-languages
       '((emacs-lisp . t)
+        (C . t)
         (dot . t)
         (gnuplot . t)
         (ditaa . t)
