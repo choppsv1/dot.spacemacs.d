@@ -344,7 +344,9 @@ It should only modify the values of Spacemacs settings."
    ;; (default 'vim)
    dotspacemacs-editing-style '(hybrid :variables
                                        ;; if t then some modes will use motion inplace of normal
-                                       ;; hjkl commands
+                                       ;; hjkl commands -- this really means C-k and other emacs
+                                       ;; keys will be hijacked to mean the non-C version of vim
+                                       ;; command -- ewwww.
                                        hybrid-mode-enable-hjkl-bindings nil
                                        ;; if nil this forces evil-emacs-state when trying to enter
                                        ;; evilified state
@@ -2257,8 +2259,8 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
          (?^ simple 0)
          (34 simple 0)))
 
-        (require 'poly-rest-mode)
-        (add-hook 'rst-mode-hook 'poly-rest-mode)
+        ;; (require 'poly-rest-mode)
+        ;; (add-hook 'rst-mode-hook 'poly-rest-mode)
 
         ;; (defun my-rst-hook ()
         ;;   (message "my-rst-hook called")
