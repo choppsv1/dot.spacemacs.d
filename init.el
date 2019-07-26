@@ -189,6 +189,8 @@ This function should only modify configuration layer settings."
    dotspacemacs-additional-packages
    '(
      base16-theme
+     borland-blue-theme
+     cobalt
      dockerfile-mode
      exec-path-from-shell
      magit-todos
@@ -388,6 +390,9 @@ It should only modify the values of Spacemacs settings."
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(
+                         sanityinc-tomorrow-blue
+                         borland-blue
+                         sanityinc-solarized-dark
                          misterioso
                          mandm
                          gruvbox-light-hard
@@ -654,7 +659,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   (debug-init-message "USER-INIT: Start")
 
-  ;; (spacemacs/toggle-smartparens-globally-off)
   ;; (set-fontsize)
   ;; Copied from core/core-fonts-support.el
 
@@ -1056,6 +1060,7 @@ layers configuration. You are free to put any user code."
 
     ;; Hate smart parens but apparently still want code??
     (remove-hook 'prog-mode-hook #'smartparens-mode)
+    (spacemacs/toggle-smartparens-globally-off)
 
     (run-hook-with-args 'spacemacs--hjkl-completion-navigation-functions
                         (member dotspacemacs-editing-style '(vim)))
@@ -2118,6 +2123,19 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         (add-hook 'c-mode-hook 'vpp-maybe-format-buffer-on-save)
         (add-hook 'c++-mode-hook 'vpp-maybe-format-buffer-on-save)
 
+        (defun check-flycheck-clang-project-add-path (path)
+          (when (and path (file-exists-p path))
+            (add-to-list
+             (make-variable-buffer-local 'flycheck-clang-include-path)
+             path)))
+
+        (defun setup-flycheck-clang-project-path ()
+          (let ((root (ignore-errors (projectile-project-root))))
+            (when (and root (file-exists-p (concat root "src/vppinfra")))
+              (dolist (path '("src/" "src/plugins/" "build-root/install-vpp_debug-native/vpp/include/"))
+                (let ((path1 (concat root path)))
+                  (check-flycheck-clang-project-add-path path1))))))
+
         (setq-default c-electric-flag nil)
         (add-hook 'c-mode-common-hook
                   (function (lambda ()
@@ -2127,6 +2145,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                               (c-toggle-auto-hungry-state 1)
                               (setq c-electric-flag nil)
                               (setq fill-column 80)
+                              (setup-flycheck-clang-project-path)
                               (flyspell-prog-mode)
                               )))
 
