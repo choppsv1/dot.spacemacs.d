@@ -48,8 +48,8 @@ This function should only modify configuration layer settings."
    dotspacemacs-configuration-layers
    '(
       ;; Choose either ivy or helm as completion framework
-      ivy
-      ;; helm
+      ;; ivy
+      helm
 
       (auto-completion :variables
                        auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets"
@@ -1505,6 +1505,28 @@ This will replace the last notification sent with this function."
       )
 
     ;; ======
+    ;; helm
+    ;; ======
+
+    (when (configuration-layer/package-usedp 'helm)
+
+      (require 'helm-net)
+
+      (push '("Stack Snippet" . (lambda (candidate)
+                                  (helm-search-suggest-perform-additional-action
+                                   "http://www.stacksnippet.com/#gsc.tab=0&gsc.q=%s"
+                                   candidate)))
+            helm-google-suggest-actions)
+
+      (defun my-helm-google-suggest ()
+        (interactive)
+        ;; set debug-on-error to swallow potential network errors
+        ;; idea taken from: https://blog.johnregner.com/post/78877988910/fixing-helm-spotify#_=_
+        (let ((debug-on-error t))
+          (helm-google-suggest))))
+
+
+    ;; ======
     ;; Email
     ;; ======
 
@@ -1781,6 +1803,7 @@ This will replace the last notification sent with this function."
 
           (debug-init-message "debug-init MU4E helm")
           (when (configuration-layer/package-usedp 'helm)
+
             (defun my-message-expand-name (&optional start)
               ((interactive "P"))
               ;; (message "my-message-expand-name called")
