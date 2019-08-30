@@ -659,9 +659,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   (debug-init-message "USER-INIT: Start")
 
-  ;; (set-fontsize)
-  ;; Copied from core/core-fonts-support.el
-
   (defun debug-frame-font ()
     (debug-init-message "GOT FONT UPDATE"))
   (add-hook 'debuug-frame-font 'after-setting-font-hooks)
@@ -969,6 +966,21 @@ This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
 
   (debug-init-message "USER-CONFIG: Start")
+
+  ;; sanityinc-tomorrow-blue
+  ;; borland-blue
+  ;; sanityinc-solarized-dark
+  ;; misterioso
+  ;; mandm
+  ;; gruvbox-light-hard
+  ;; molokai
+  ;; leuven
+  (cond
+   ((string-equal system-type "darwin") ; Mac OS X
+    (spacemacs/load-theme 'mandm))
+   ((string-equal system-type "gnu/linux")
+    (spacemacs/load-theme 'sanityinc-tomorrow-blue))
+   (t (spacemacs/load-theme 'sanityinc-tomorrow-blue)))
 
   ;; XXX is this going to make everything fail?
   (defun et/semantic-remove-hooks ()
