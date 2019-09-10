@@ -52,9 +52,7 @@ This function should only modify configuration layer settings."
       helm
 
       (auto-completion :variables
-                       auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets"
-                       ;; auto-completion-tab-key-behavior 'complete
-                       auto-completion-tab-key-behavior 'cycle
+                       auto-completion-complete-with-key-sequence "jk"
                        )
       ;; (auto-completion :variables
       ;;   auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets"
@@ -152,6 +150,7 @@ This function should only modify configuration layer settings."
       ;; disable emacs-lisp due to completionion in comments parsing tons
       ;; of .el files https://github.com/syl20bnr/spacemacs/issues/7038
       restructuredtext
+      ;; (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
       (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
       shell-scripts
       sphinx
@@ -2074,7 +2073,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
     (when-layer-used
      'c-c++
-
      ;; Turn this back off now that the hook is there, let files/projects enable it.
      (setq-default c-c++-enable-clang-format-on-save nil)
 
@@ -2082,10 +2080,14 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
             (quote
              ("FILE"
               "\\sw+_st" "\\sw+_t" "\\sw+type" ; procket types
+              "u\\(8\\|16\\|32\\|64\\)"
+              "i\\(8\\|16\\|32\\|64\\)"
+              "ushort" "uchar"
               "\\(u_?\\)?int\\(8\\|16\\|32\\|64\\)_t" "ushort" "uchar"
-              "bool" "boolean")))
+              "uword","bool" "boolean")))
 
       (with-eval-after-load "cc-mode"
+        (message "adding c mode hooks")
         ;; (modify-syntax-entry ?_ "w" awk-mode-syntax-table)
         (modify-syntax-entry ?_ "w" c-mode-syntax-table)
         (modify-syntax-entry ?_ "w" objc-mode-syntax-table)
@@ -2167,7 +2169,10 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         (defun setup-flycheck-clang-project-path ()
           (let ((root (ignore-errors (projectile-project-root))))
             (when (and root (file-exists-p (concat root "src/vppinfra")))
-              (dolist (path '("src/" "src/plugins/" "build-root/install-vpp_debug-native/vpp/include/"))
+              (dolist (path '("src/" "src/plugins/" "build-root/install-vpp_debug-native/vpp/include/"
+                              "../openwrt-dd/staging_dir/target-aarch64_cortex-a53+neon-vfpv4_glibc-2.22/root-mvebu64/usr/include/"
+                              "../openwrt/staging_dir/target-aarch64_cortex-a72_glibc/root-mvebu/usr/include/"))
+
                 (let ((path1 (concat root path)))
                   (check-flycheck-clang-project-add-path path1))))))
 
