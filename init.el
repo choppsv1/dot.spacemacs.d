@@ -52,9 +52,7 @@ This function should only modify configuration layer settings."
       helm
 
       (auto-completion :variables
-                       auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets"
-                       ;; auto-completion-tab-key-behavior 'complete
-                       auto-completion-tab-key-behavior 'cycle
+                       auto-completion-complete-with-key-sequence "jk"
                        )
       ;; (auto-completion :variables
       ;;   auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets"
@@ -65,10 +63,12 @@ This function should only modify configuration layer settings."
       ;; company-complete vs complete-at-point
 
       better-defaults
+      (cmake :variables cmake-enable-cmake-ide-support nil)
       ;; ditaa
       docker
 
       ;; this causing github login and errors for all git projects even private non-github ones).
+      git
       github
       graphviz
       gtags
@@ -126,7 +126,6 @@ This function should only modify configuration layer settings."
              )
       emacs-lisp
       ess
-      git
       lsp
       (go :variables
           go-format-before-save t
@@ -152,6 +151,7 @@ This function should only modify configuration layer settings."
       ;; disable emacs-lisp due to completionion in comments parsing tons
       ;; of .el files https://github.com/syl20bnr/spacemacs/issues/7038
       restructuredtext
+      ;; (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
       (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
       shell-scripts
       sphinx
@@ -195,7 +195,6 @@ This function should only modify configuration layer settings."
      exec-path-from-shell
      magit-todos
      monky
-     magit-todos
      nhexl-mode
      org-caldav
      package-lint
@@ -686,6 +685,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   (add-to-list 'custom-theme-load-path "~/p/emacs-mandm-theme/")
+  (add-to-list 'load-path (concat dotspacemacs-directory "repos/magit-gerrit"))
   ;; (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/pycoverage"))
   ;; (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "themes-test/"))
   (add-to-list 'load-path (concat "~/p/ietf-docs"))
@@ -2086,7 +2086,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
     (when-layer-used
      'c-c++
-
      ;; Turn this back off now that the hook is there, let files/projects enable it.
      (setq-default c-c++-enable-clang-format-on-save nil)
 
@@ -2094,10 +2093,14 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
             (quote
              ("FILE"
               "\\sw+_st" "\\sw+_t" "\\sw+type" ; procket types
+              "u\\(8\\|16\\|32\\|64\\)"
+              "i\\(8\\|16\\|32\\|64\\)"
+              "ushort" "uchar"
               "\\(u_?\\)?int\\(8\\|16\\|32\\|64\\)_t" "ushort" "uchar"
-              "bool" "boolean")))
+              "uword" "bool" "boolean")))
 
       (with-eval-after-load "cc-mode"
+        (message "adding c mode hooks")
         ;; (modify-syntax-entry ?_ "w" awk-mode-syntax-table)
         (modify-syntax-entry ?_ "w" c-mode-syntax-table)
         (modify-syntax-entry ?_ "w" objc-mode-syntax-table)
@@ -2162,7 +2165,9 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                   (re-search-forward "fd.io coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t))
             (cond
              ((string= "CLANG" (match-string 1)) (vpp-format-buffer 1) t)
-             (t (vpp-format-buffer)))))
+             ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
+             ((string= "INDENT" (match-string 1)) (vpp-format-buffer) t)
+             (t t))))
 
         (defun vpp-maybe-format-buffer-on-save ()
           (add-hook 'before-save-hook 'vpp-maybe-format-buffer nil t))
@@ -2179,7 +2184,10 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         (defun setup-flycheck-clang-project-path ()
           (let ((root (ignore-errors (projectile-project-root))))
             (when (and root (file-exists-p (concat root "src/vppinfra")))
-              (dolist (path '("src/" "src/plugins/" "build-root/install-vpp_debug-native/vpp/include/"))
+              (dolist (path '("src/" "src/plugins/" "build-root/install-vpp_debug-native/vpp/include/"
+                              "../openwrt-dd/staging_dir/target-aarch64_cortex-a53+neon-vfpv4_glibc-2.22/root-mvebu64/usr/include/"
+                              "../openwrt/staging_dir/target-aarch64_cortex-a72_glibc/root-mvebu/usr/include/"))
+
                 (let ((path1 (concat root path)))
                   (check-flycheck-clang-project-add-path path1))))))
 
@@ -2339,7 +2347,9 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     (when-layer-used
      'magit
      (with-eval-after-load 'magit
-       (magit-todos-mode 1)))
+       (magit-todos-mode 1))
+     (with-eval-after-load 'magit
+       (require 'magit-gerrit)))
 
     (when-layer-used
      'python
