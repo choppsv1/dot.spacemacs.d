@@ -685,7 +685,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   (add-to-list 'custom-theme-load-path "~/p/emacs-mandm-theme/")
-  (add-to-list 'load-path (concat dotspacemacs-directory "repos/magit-gerrit"))
+  ;; (add-to-list 'load-path (concat dotspacemacs-directory "repos/magit-gerrit"))
   ;; (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/pycoverage"))
   ;; (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "themes-test/"))
   (add-to-list 'load-path (concat "~/p/ietf-docs"))
@@ -2336,8 +2336,9 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      'magit
      (with-eval-after-load 'magit
        (magit-todos-mode 1))
-     (with-eval-after-load 'magit
-       (require 'magit-gerrit)))
+     ;; (with-eval-after-load 'magit
+     ;;   (require 'magit-gerrit))
+       )
 
     (when-layer-used
      'python
