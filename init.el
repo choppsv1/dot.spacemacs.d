@@ -1124,10 +1124,20 @@ layers configuration. You are free to put any user code."
                   (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u2503))
 
                   (spaceline-toggle-minor-modes-off)
+                  (spaceline-toggle-point-position-off)
+                  (spaceline-toggle-buffer-encoding-off)
+                  (spaceline-toggle-buffer-encoding-abbrev-off)
+
+                  (if (display-graphic-p)
+                      (progn
+                        (spaceline-toggle-battery-on)
+                        (spaceline-toggle-org-clock-on))
+                    (spaceline-toggle-battery-off)
+                    (spaceline-toggle-org-clock-off)
+                    )
 
                   (setq spaceline-window-numbers-unicode nil
                         spaceline-workspace-numbers-unicode nil)
-
 
                   ;; ;; We can dump this in a while when spaceline is fixed to not blank the modeline
                   ;; ;; with very long buffer names
@@ -1552,6 +1562,7 @@ This will replace the last notification sent with this function."
       (setq mu4e-maildir "~/Mail"
             mu4e-attachment-dir "~/Downloads"
 
+
             mu4e-change-filenames-when-moving t
             mu4e-mu-binary (executable-find "mu")
             mu4e-update-interval nil
@@ -1568,6 +1579,7 @@ This will replace the last notification sent with this function."
             ;; For searches useful as t to find replies to threads?
             mu4e-headers-include-related nil
             mu4e-view-show-addresses t
+            mu4e-view-use-gnus t
             ;; HTML
             mu4e-html2text-command 'my-mu4e-shr2text
             shr-color-visible-luminance-min 80
@@ -2517,6 +2529,9 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      ;; key desc (cmd1 cmd2 ...) settings-for-whole-set files
 
      (setq org-html-doctype "html5")
+
+     ;; Save running clock and clock history.
+     (setq org-clock-persist t)
 
      ;; This is for using xelatex
      (with-eval-after-load "org"
@@ -3531,6 +3546,14 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
     (debug-init-message "USER-CONFIG done")
     )
+
+  ;;; To save the clock history across Emacs sessions, use
+  (if (display-graphic-p)
+      (progn
+        (if (not (file-exists-p org-clock-persist-file))
+            (shell-command (concat "touch " org-clock-persist-file)))
+        (org-clock-persistence-insinuate)
+        ))
   )
 
 ;; Local Variables:
