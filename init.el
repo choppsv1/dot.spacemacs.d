@@ -3039,42 +3039,44 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      (debug-init-message "pre-server-running-notificiation-setup")
 
      ;; XXX need to change this
-     (when (or (daemonp) (and (fboundp 'server-running-p) (server-running-p)))
+     (when (and (or (daemonp) (and (fboundp 'server-running-p) (server-running-p)))
+                (string-equal system-type "darwin"))
        (debug-init-message "before require org notify")
 
-       ;; (require 'org-notify)
-       ;; (debug-init-message "in-server-running-notificiation-setup")
-       ;; (defun org-notify-action-notify-urgency (plist)
-       ;;   "Pop up a notification window."
-       ;;   (message "XXX org-notify-action-notify-urgency enter")
-       ;;   (require 'notifications)
-       ;;   (let* ((duration (plist-get plist :duration))
-       ;;          (urgency (plist-get plist :urgency))
-       ;;          (id (notifications-notify
-       ;;               :title     (plist-get plist :heading)
-       ;;               :body      (org-notify-body-text plist)
-       ;;               :urgency   (or urgency 'normal)
-       ;;               :timeout   (if duration (* duration 1000))
-       ;;               :actions   org-notify-actions
-       ;;               :on-action 'org-notify-on-action-notify)))
-       ;;     (setq org-notify-on-action-map
-       ;;           (plist-put org-notify-on-action-map id plist))
-       ;;     (message "XXX org-notify-action-notify-urgency exit")
-       ;;     ))
-       ;; (debug-init-message "org notify add")
-       ;; (org-notify-add 'default
-       ;;                 '(:time "15m"
-       ;;                         :period "15m"
-       ;;                         :duration 0
-       ;;                         :urgency 'critical
-       ;;                         :app-icon (concat (configuration-layer/get-layer-path 'org)
-       ;;                                           "img/org.png")
-       ;;                         :actions org-notify-action-notify-urgency))
-       ;; (debug-init-message "org notify start")
-       ;; (org-notify-start)
-       ;; (debug-init-message "org notify started")
+       (require 'org-notify)
+       (debug-init-message "in-server-running-notificiation-setup")
+       (defun org-notify-action-notify-urgency (plist)
+         "Pop up a notification window."
+         (message "XXX org-notify-action-notify-urgency enter")
+         (require 'notifications)
+         (let* ((duration (plist-get plist :duration))
+                (urgency (plist-get plist :urgency))
+                (id (notifications-notify
+                     :title     (plist-get plist :heading)
+                     :body      (org-notify-body-text plist)
+                     :urgency   (or urgency 'normal)
+                     :timeout   (if duration (* duration 1000))
+                     :actions   org-notify-actions
+                     :on-action 'org-notify-on-action-notify)))
+           (setq org-notify-on-action-map
+                 (plist-put org-notify-on-action-map id plist))
+           (message "XXX org-notify-action-notify-urgency exit")
+           ))
+       (debug-init-message "org notify add")
+       (org-notify-add 'default
+                       '(:time "15m"
+                               :period "15m"
+                               :duration 0
+                               :urgency 'critical
+                               :app-icon (concat (configuration-layer/get-layer-path 'org)
+                                                 "img/org.png")
+                               :actions org-notify-action-notify-urgency))
+       (debug-init-message "org notify start")
+       (org-notify-start)
+       (debug-init-message "org notify started")
        )
      (debug-init-message "debug-init POST-server-running-notification-setup")
+
      )
 
 
