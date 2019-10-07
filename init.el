@@ -942,7 +942,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;;     (setq rebox-style-loop '(81 82 83))
   ;;     ;; (setq rebox-style-loop '(71 72 73 74 75 76 77 81 82 83 84 85 86 87))
   ;;     ;; C-mode comments
-  ;;     ;; (setq-default '(241 235 243))
+  ;;     ;; (setq-default '(241 235 245))
   ;;     (add-hook 'all-prog-mode-hook 'rebox-mode)
   ;;     )
   ;;   )
@@ -2190,6 +2190,10 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
                 (let ((path1 (concat root path)))
                   (check-flycheck-clang-project-add-path path1))))))
+
+        (defun rebox-c-hook ()
+          (set (make-local-variable 'rebox-style-loop) '(241 235 245)))
+        (add-hook 'c-mode-hook 'rebox-c-hook)
 
         (setq-default c-electric-flag nil)
         (add-hook 'c-mode-common-hook
