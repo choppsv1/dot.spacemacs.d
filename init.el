@@ -132,7 +132,8 @@ This function should only modify configuration layer settings."
           go-use-golangci-lint t
           ;; go-use-gometalinter t
           ;; godoc-at-point-function 'godoc-gogetdoc
-          go-backend 'lsp
+          go-backend 'go-mode
+          ;; go-backend 'lsp
           )
       html
       javascript
@@ -141,7 +142,7 @@ This function should only modify configuration layer settings."
       lux
       markdown
       ;; primary test runner is pytest use 'spc u' prefix to invoke nose
-      (python :variables python-fill-column 100
+      (python :variables python-fill-column 120
                          python-fill-docstring-style 'pep-257-nn
                          python-test-runner '(pytest nose)
                          pytest-global-name "python -m pytest"
@@ -1063,6 +1064,9 @@ layers configuration. You are free to put any user code."
 
     ;; tabs are 8 characters wide!
     (setq-default tab-width 8)
+
+    ;; 80 columns is the normal fill column
+    (setq-default fill-column 80)
 
     (setq-default magit-todos-ignored-keywords '("NOTE" "DONE" "FAIL"))
     (setq-default evil-escape-key-sequence nil)
@@ -2184,7 +2188,9 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         (defun setup-flycheck-clang-project-path ()
           (let ((root (ignore-errors (projectile-project-root))))
             (when (and root (file-exists-p (concat root "src/vppinfra")))
-              (dolist (path '("src/" "src/plugins/" "build-root/install-vpp_debug-native/vpp/include/"
+              (dolist (path '("src/" "src/plugins/"
+                              "build-root/install-vpp_debug-native/external/include/dpdk/"
+                              "build-root/install-vpp_debug-native/vpp/include/"
                               "../openwrt-dd/staging_dir/target-aarch64_cortex-a53+neon-vfpv4_glibc-2.22/root-mvebu64/usr/include/"
                               "../openwrt/staging_dir/target-aarch64_cortex-a72_glibc/root-mvebu/usr/include/"))
 
@@ -2192,8 +2198,30 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                   (check-flycheck-clang-project-add-path path1))))))
 
         (defun rebox-c-hook ()
-          (set (make-local-variable 'rebox-style-loop) '(241 235 245)))
+          (set (make-local-variable 'rebox-style-loop) '(241 213 215 281 282 283))
+          ;; (global-set-key (kbd "M-Q") 'rebox-dwim)
+          )
         (add-hook 'c-mode-hook 'rebox-c-hook)
+
+        (when-layer-used
+         'rebox
+         (with-eval-after-load "rebox"
+           (rebox-register-template 281 176 ["//"
+                                             "// box123456"
+                                             "//"])
+           (rebox-register-template 282 286 ["// ---------"
+                                             "// box123456"
+                                             "// ---------"])
+           (rebox-register-template 283 486 ["// ========="
+                                             "// box123456"
+                                             "// ========="])))
+
+        (spacemacs/set-leader-keys-for-major-mode 'c-mode
+          "q" 'rebox-dwim)
+        (spacemacs/set-leader-keys-for-major-mode 'cc-mode
+          "q" 'rebox-dwim)
+        (spacemacs/set-leader-keys-for-major-mode 'c++-mode
+          "q" 'rebox-dwim)
 
         (setq-default c-electric-flag nil)
         (add-hook 'c-mode-common-hook
