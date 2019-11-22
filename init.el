@@ -105,8 +105,10 @@ This function should only modify configuration layer settings."
       theming
       themes-megapack
       (version-control :variables
-                       version-control-diff-tool 'git-gutter
-                       version-control-diff-side 'left
+                       version-control-diff-tool 'git-gutter+
+                       ;; version-control-diff-tool 'git-gutter
+                       ;; version-control-diff-tool 'diff-hl
+                       version-control-diff-side 'right
                        version-control-global-margin t)
       treemacs
 
@@ -192,6 +194,7 @@ This function should only modify configuration layer settings."
      base16-theme
      borland-blue-theme
      cobalt
+     color-theme-modern
      dockerfile-mode
      exec-path-from-shell
      magit-todos
@@ -695,8 +698,8 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (require 'generic-lisp)
   (require 'generic-mode-hooks)
 
-  (when (display-graphic-p)
-    (fringe-mode '(20 . nil)))
+  ;; (when (display-graphic-p)
+  ;;   (fringe-mode '(20 . nil)))
 
   (let ((default-directory (concat dotspacemacs-directory "repos/")))
     (normal-top-level-add-subdirs-to-load-path))
@@ -744,48 +747,58 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   (setq comment-delim-color "grey50")
 
-  (setq theming-modifications `(
-                                ;; (mandm (default :background "#011827"))
-                                (misterioso (erc-input-face :foreground "cornflowerblue")
-                                            (font-lock-comment-face :foreground "DarkGrey" :slant italic)
-                                            (evil-search-highlight-persist-highlight-face :background "#338f86")
-                                            (lazy-highlight-face :background "#338f86")
-                                            (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
-                                (molokai (font-lock-comment-face :foreground "DarkGrey")
-                                         (evil-search-highlight-persist-highlight-face :background "#338f86")
-                                         (lazy-highlight-face :background "#338f86")
-                                         (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
-                                (monokai (font-lock-comment-face :foreground "#A5A17E" :slant italic)
-                                         (evil-search-highlight-persist-highlight-face :background "#338f86")
-                                         (lazy-highlight-face :background "#338f86")
-                                         (font-lock-doc-face :foreground "#A5A17E" :slant italic)
-                                         (font-lock-comment-delimiter-face :foreground "#55513E"))
-                                (light-soap (default :foreground "#474747" :background "#fafad4"))
-                                (quasi-monochrome (default :height ,(* ch-def-height 10))
-                                                  (font-lock-string-face :foreground "DarkGrey" :slant italic)
-                                                  (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
-                                (mandm ;; (default :background "#F0F0E0")
-                                 (font-lock-doc-face :foreground "#036A07" :slant normal)
-                                 (font-lock-comment-face :foreground "#6D6D64" :slant normal)
-                                 (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant normal))
-                                (leuven ;; (default :background "#F0F0E0")
-                                 (default :background "#ede8da")
-                                 ;;(default :background "#F0F0E5")
-                                 (font-lock-doc-face :foreground "#036A07" :slant italic)
-                                 (font-lock-comment-face :foreground "#6D6D64" :slant italic)
-                                 (font-lock-comment-delimiter-face :foreground "#BDBDA4"))
-                                (solarized-light
-                                 (font-lock-doc-face :foreground "#036A07" :slant italic)
-                                 (font-lock-comment-face :foreground "#6D6D64" :slant italic)
-                                 (font-lock-comment-delimiter-face :foreground "#BDBDA4"))
-                                ;; (colorsarenice-light (erc-input-face :foreground "cornflowerblue")
-                                ;;                      (spacemacs-micro-state-header-face :foreground "Black")
-                                ;;                      (powerline-active1 :background "DarkSlateGrey" :foreground "LightBlue")
-                                ;;                      (powerline-inactive2 :background "DarkSlateGrey" :foreground "LightRed")
-                                ;;                      (powerline-inactive1 :background "DarkSlateGrey" :foreground "LightGrey")
-                                ;;                       (font-lock-comment-face :foreground "grey44" :slant italic)
-                                ;;                       (font-lock-comment-delimiter-face :foreground "grey77"))
-                                ))
+  (setq theming-modifications
+        `(
+          ;; (mandm (default :background "#011827"))
+          (cobalt
+            (modeline :background "#111111" :foreground "white")
+            (modeline-inactive :background "#222222" :foreground "white")
+            (spaceline-evil-emacs :foreground "black" :background "SkyBlue2")
+            (spaceline-evil-insert :foreground "black" :background "chartreuse3")
+            (spaceline-evil-motion :foreground "black" :background "plum3")
+            (spaceline-evil-normal :foreground "black" :background "DarkGoldenrod2")
+            (spaceline-evil-replace :foreground "black" :background "chocolate")
+            (spaceline-evil-visual :foreground "black" :background "grey"))
+          (misterioso (erc-input-face :foreground "cornflowerblue")
+                      (font-lock-comment-face :foreground "DarkGrey" :slant italic)
+                      (evil-search-highlight-persist-highlight-face :background "#338f86")
+                      (lazy-highlight-face :background "#338f86")
+                      (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
+          (molokai (font-lock-comment-face :foreground "DarkGrey")
+                   (evil-search-highlight-persist-highlight-face :background "#338f86")
+                   (lazy-highlight-face :background "#338f86")
+                   (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
+          (monokai (font-lock-comment-face :foreground "#A5A17E" :slant italic)
+                   (evil-search-highlight-persist-highlight-face :background "#338f86")
+                   (lazy-highlight-face :background "#338f86")
+                   (font-lock-doc-face :foreground "#A5A17E" :slant italic)
+                   (font-lock-comment-delimiter-face :foreground "#55513E"))
+          (light-soap (default :foreground "#474747" :background "#fafad4"))
+          (quasi-monochrome (default :height ,(* ch-def-height 10))
+                            (font-lock-string-face :foreground "DarkGrey" :slant italic)
+                            (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
+          (mandm ;; (default :background "#F0F0E0")
+           (font-lock-doc-face :foreground "#036A07" :slant normal)
+           (font-lock-comment-face :foreground "#6D6D64" :slant normal)
+           (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant normal))
+          (leuven ;; (default :background "#F0F0E0")
+           (default :background "#ede8da")
+           ;;(default :background "#F0F0E5")
+           (font-lock-doc-face :foreground "#036A07" :slant italic)
+           (font-lock-comment-face :foreground "#6D6D64" :slant italic)
+           (font-lock-comment-delimiter-face :foreground "#BDBDA4"))
+          (solarized-light
+           (font-lock-doc-face :foreground "#036A07" :slant italic)
+           (font-lock-comment-face :foreground "#6D6D64" :slant italic)
+           (font-lock-comment-delimiter-face :foreground "#BDBDA4"))
+          ;; (colorsarenice-light (erc-input-face :foreground "cornflowerblue")
+          ;;                      (spacemacs-micro-state-header-face :foreground "Black")
+          ;;                      (powerline-active1 :background "DarkSlateGrey" :foreground "LightBlue")
+          ;;                      (powerline-inactive2 :background "DarkSlateGrey" :foreground "LightRed")
+          ;;                      (powerline-inactive1 :background "DarkSlateGrey" :foreground "LightGrey")
+          ;;                       (font-lock-comment-face :foreground "grey44" :slant italic)
+          ;;                       (font-lock-comment-delimiter-face :foreground "grey77"))
+          ))
 
   ;;'(font-lock-comment-delimiter-face ((t (:foreground "grey33"))))
   ;;'(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic))))
@@ -978,7 +991,7 @@ layers configuration. You are free to put any user code."
   ;; leuven
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
-    (spacemacs/load-theme 'mandm))
+    (spacemacs/load-theme 'sanityinc-tomorrow-blue))
    ((string-equal system-type "gnu/linux")
     (spacemacs/load-theme 'sanityinc-tomorrow-blue))
    (t (spacemacs/load-theme 'sanityinc-tomorrow-blue)))
@@ -3433,9 +3446,10 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
   ;; → ←  ↩ ↪ ⬅ ↺ ↻ ↷ ⟲ ⟳ ⤵⤴ ⤷ ⤶
   ;; custom graphics that works nice with half-width fringes
 
-    (debug-init-message "gutter")
 
-    (with-eval-after-load 'git-gutter-fringe
+    (with-eval-after-load 'git-gutter+-disabled-foo
+
+      (debug-init-message "gutter")
 
       ;; .....................
       ;; ..............##.....
