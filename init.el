@@ -2196,6 +2196,12 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
           (when (and path (file-exists-p path))
             (add-to-list
              (make-variable-buffer-local 'flycheck-clang-include-path)
+             path)
+            (add-to-list
+             (make-variable-buffer-local 'flycheck-cppcheck-include-path)
+             path)
+            (add-to-list
+             (make-variable-buffer-local 'flycheck-gcc-include-path)
              path)))
 
         (defun setup-flycheck-clang-project-path ()
@@ -2237,6 +2243,14 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
           "q" 'rebox-dwim)
 
         (setq-default c-electric-flag nil)
+
+        ;; (setq c-mode-local-vars-hook (delete 'spacemacs//c-c++-setup-flycheck c-mode-local-vars-hook))
+
+        (add-hook 'c-mode-local-vars-hook
+                  (function (lambda ()
+                              (flycheck-select-checker 'c/c++-clang)))
+                  t)
+
         (add-hook 'c-mode-common-hook
                   (function (lambda ()
                               (if (string= (shell-command-to-string "uname -s") "NetBSD\n")
