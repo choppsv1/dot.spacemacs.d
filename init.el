@@ -105,8 +105,10 @@ This function should only modify configuration layer settings."
       theming
       themes-megapack
       (version-control :variables
-                       version-control-diff-tool 'git-gutter
-                       version-control-diff-side 'left
+                       version-control-diff-tool 'git-gutter+
+                       ;; version-control-diff-tool 'git-gutter
+                       ;; version-control-diff-tool 'diff-hl
+                       version-control-diff-side 'right
                        version-control-global-margin t)
       treemacs
 
@@ -132,7 +134,8 @@ This function should only modify configuration layer settings."
           go-use-golangci-lint t
           ;; go-use-gometalinter t
           ;; godoc-at-point-function 'godoc-gogetdoc
-          go-backend 'lsp
+          go-backend 'go-mode
+          ;; go-backend 'lsp
           )
       html
       javascript
@@ -141,7 +144,7 @@ This function should only modify configuration layer settings."
       lux
       markdown
       ;; primary test runner is pytest use 'spc u' prefix to invoke nose
-      (python :variables python-fill-column 100
+      (python :variables python-fill-column 120
                          python-fill-docstring-style 'pep-257-nn
                          python-test-runner '(pytest nose)
                          pytest-global-name "python -m pytest"
@@ -191,6 +194,7 @@ This function should only modify configuration layer settings."
      base16-theme
      borland-blue-theme
      cobalt
+     color-theme-modern
      dockerfile-mode
      exec-path-from-shell
      magit-todos
@@ -694,8 +698,8 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (require 'generic-lisp)
   (require 'generic-mode-hooks)
 
-  (when (display-graphic-p)
-    (fringe-mode '(20 . nil)))
+  ;; (when (display-graphic-p)
+  ;;   (fringe-mode '(20 . nil)))
 
   (let ((default-directory (concat dotspacemacs-directory "repos/")))
     (normal-top-level-add-subdirs-to-load-path))
@@ -743,48 +747,58 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   (setq comment-delim-color "grey50")
 
-  (setq theming-modifications `(
-                                ;; (mandm (default :background "#011827"))
-                                (misterioso (erc-input-face :foreground "cornflowerblue")
-                                            (font-lock-comment-face :foreground "DarkGrey" :slant italic)
-                                            (evil-search-highlight-persist-highlight-face :background "#338f86")
-                                            (lazy-highlight-face :background "#338f86")
-                                            (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
-                                (molokai (font-lock-comment-face :foreground "DarkGrey")
-                                         (evil-search-highlight-persist-highlight-face :background "#338f86")
-                                         (lazy-highlight-face :background "#338f86")
-                                         (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
-                                (monokai (font-lock-comment-face :foreground "#A5A17E" :slant italic)
-                                         (evil-search-highlight-persist-highlight-face :background "#338f86")
-                                         (lazy-highlight-face :background "#338f86")
-                                         (font-lock-doc-face :foreground "#A5A17E" :slant italic)
-                                         (font-lock-comment-delimiter-face :foreground "#55513E"))
-                                (light-soap (default :foreground "#474747" :background "#fafad4"))
-                                (quasi-monochrome (default :height ,(* ch-def-height 10))
-                                                  (font-lock-string-face :foreground "DarkGrey" :slant italic)
-                                                  (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
-                                (mandm ;; (default :background "#F0F0E0")
-                                 (font-lock-doc-face :foreground "#036A07" :slant normal)
-                                 (font-lock-comment-face :foreground "#6D6D64" :slant normal)
-                                 (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant normal))
-                                (leuven ;; (default :background "#F0F0E0")
-                                 (default :background "#ede8da")
-                                 ;;(default :background "#F0F0E5")
-                                 (font-lock-doc-face :foreground "#036A07" :slant italic)
-                                 (font-lock-comment-face :foreground "#6D6D64" :slant italic)
-                                 (font-lock-comment-delimiter-face :foreground "#BDBDA4"))
-                                (solarized-light
-                                 (font-lock-doc-face :foreground "#036A07" :slant italic)
-                                 (font-lock-comment-face :foreground "#6D6D64" :slant italic)
-                                 (font-lock-comment-delimiter-face :foreground "#BDBDA4"))
-                                ;; (colorsarenice-light (erc-input-face :foreground "cornflowerblue")
-                                ;;                      (spacemacs-micro-state-header-face :foreground "Black")
-                                ;;                      (powerline-active1 :background "DarkSlateGrey" :foreground "LightBlue")
-                                ;;                      (powerline-inactive2 :background "DarkSlateGrey" :foreground "LightRed")
-                                ;;                      (powerline-inactive1 :background "DarkSlateGrey" :foreground "LightGrey")
-                                ;;                       (font-lock-comment-face :foreground "grey44" :slant italic)
-                                ;;                       (font-lock-comment-delimiter-face :foreground "grey77"))
-                                ))
+  (setq theming-modifications
+        `(
+          ;; (mandm (default :background "#011827"))
+          (cobalt
+            (modeline :background "#111111" :foreground "white")
+            (modeline-inactive :background "#222222" :foreground "white")
+            (spaceline-evil-emacs :foreground "black" :background "SkyBlue2")
+            (spaceline-evil-insert :foreground "black" :background "chartreuse3")
+            (spaceline-evil-motion :foreground "black" :background "plum3")
+            (spaceline-evil-normal :foreground "black" :background "DarkGoldenrod2")
+            (spaceline-evil-replace :foreground "black" :background "chocolate")
+            (spaceline-evil-visual :foreground "black" :background "grey"))
+          (misterioso (erc-input-face :foreground "cornflowerblue")
+                      (font-lock-comment-face :foreground "DarkGrey" :slant italic)
+                      (evil-search-highlight-persist-highlight-face :background "#338f86")
+                      (lazy-highlight-face :background "#338f86")
+                      (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
+          (molokai (font-lock-comment-face :foreground "DarkGrey")
+                   (evil-search-highlight-persist-highlight-face :background "#338f86")
+                   (lazy-highlight-face :background "#338f86")
+                   (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
+          (monokai (font-lock-comment-face :foreground "#A5A17E" :slant italic)
+                   (evil-search-highlight-persist-highlight-face :background "#338f86")
+                   (lazy-highlight-face :background "#338f86")
+                   (font-lock-doc-face :foreground "#A5A17E" :slant italic)
+                   (font-lock-comment-delimiter-face :foreground "#55513E"))
+          (light-soap (default :foreground "#474747" :background "#fafad4"))
+          (quasi-monochrome (default :height ,(* ch-def-height 10))
+                            (font-lock-string-face :foreground "DarkGrey" :slant italic)
+                            (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
+          (mandm ;; (default :background "#F0F0E0")
+           (font-lock-doc-face :foreground "#036A07" :slant normal)
+           (font-lock-comment-face :foreground "#6D6D64" :slant normal)
+           (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant normal))
+          (leuven ;; (default :background "#F0F0E0")
+           (default :background "#ede8da")
+           ;;(default :background "#F0F0E5")
+           (font-lock-doc-face :foreground "#036A07" :slant italic)
+           (font-lock-comment-face :foreground "#6D6D64" :slant italic)
+           (font-lock-comment-delimiter-face :foreground "#BDBDA4"))
+          (solarized-light
+           (font-lock-doc-face :foreground "#036A07" :slant italic)
+           (font-lock-comment-face :foreground "#6D6D64" :slant italic)
+           (font-lock-comment-delimiter-face :foreground "#BDBDA4"))
+          ;; (colorsarenice-light (erc-input-face :foreground "cornflowerblue")
+          ;;                      (spacemacs-micro-state-header-face :foreground "Black")
+          ;;                      (powerline-active1 :background "DarkSlateGrey" :foreground "LightBlue")
+          ;;                      (powerline-inactive2 :background "DarkSlateGrey" :foreground "LightRed")
+          ;;                      (powerline-inactive1 :background "DarkSlateGrey" :foreground "LightGrey")
+          ;;                       (font-lock-comment-face :foreground "grey44" :slant italic)
+          ;;                       (font-lock-comment-delimiter-face :foreground "grey77"))
+          ))
 
   ;;'(font-lock-comment-delimiter-face ((t (:foreground "grey33"))))
   ;;'(font-lock-comment-face ((t (:foreground "DarkGrey" :slant italic))))
@@ -942,7 +956,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;;     (setq rebox-style-loop '(81 82 83))
   ;;     ;; (setq rebox-style-loop '(71 72 73 74 75 76 77 81 82 83 84 85 86 87))
   ;;     ;; C-mode comments
-  ;;     ;; (setq-default '(241 235 243))
+  ;;     ;; (setq-default '(241 235 245))
   ;;     (add-hook 'all-prog-mode-hook 'rebox-mode)
   ;;     )
   ;;   )
@@ -977,7 +991,7 @@ layers configuration. You are free to put any user code."
   ;; leuven
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
-    (spacemacs/load-theme 'mandm))
+    (spacemacs/load-theme 'sanityinc-tomorrow-blue))
    ((string-equal system-type "gnu/linux")
     (spacemacs/load-theme 'sanityinc-tomorrow-blue))
    (t (spacemacs/load-theme 'sanityinc-tomorrow-blue)))
@@ -1065,6 +1079,9 @@ layers configuration. You are free to put any user code."
 
     ;; tabs are 8 characters wide!
     (setq-default tab-width 8)
+
+    ;; 80 columns is the normal fill column
+    (setq-default fill-column 80)
 
     (setq-default magit-todos-ignored-keywords '("NOTE" "DONE" "FAIL"))
     (setq-default evil-escape-key-sequence nil)
@@ -2181,19 +2198,61 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
           (when (and path (file-exists-p path))
             (add-to-list
              (make-variable-buffer-local 'flycheck-clang-include-path)
+             path)
+            (add-to-list
+             (make-variable-buffer-local 'flycheck-cppcheck-include-path)
+             path)
+            (add-to-list
+             (make-variable-buffer-local 'flycheck-gcc-include-path)
              path)))
 
         (defun setup-flycheck-clang-project-path ()
           (let ((root (ignore-errors (projectile-project-root))))
             (when (and root (file-exists-p (concat root "src/vppinfra")))
-              (dolist (path '("src/" "src/plugins/" "build-root/install-vpp_debug-native/vpp/include/"
+              (dolist (path '("src/" "src/plugins/"
+                              "build-root/install-vpp_debug-native/external/include/dpdk/"
+                              "build-root/install-vpp_debug-native/vpp/include/"
                               "../openwrt-dd/staging_dir/target-aarch64_cortex-a53+neon-vfpv4_glibc-2.22/root-mvebu64/usr/include/"
                               "../openwrt/staging_dir/target-aarch64_cortex-a72_glibc/root-mvebu/usr/include/"))
 
                 (let ((path1 (concat root path)))
                   (check-flycheck-clang-project-add-path path1))))))
 
+        (defun rebox-c-hook ()
+          (set (make-local-variable 'rebox-style-loop) '(241 213 215 281 282 283))
+          ;; (global-set-key (kbd "M-Q") 'rebox-dwim)
+          )
+        (add-hook 'c-mode-hook 'rebox-c-hook)
+
+        (when-layer-used
+         'rebox
+         (with-eval-after-load "rebox"
+           (rebox-register-template 281 176 ["//"
+                                             "// box123456"
+                                             "//"])
+           (rebox-register-template 282 286 ["// ---------"
+                                             "// box123456"
+                                             "// ---------"])
+           (rebox-register-template 283 486 ["// ========="
+                                             "// box123456"
+                                             "// ========="])))
+
+        (spacemacs/set-leader-keys-for-major-mode 'c-mode
+          "q" 'rebox-dwim)
+        (spacemacs/set-leader-keys-for-major-mode 'cc-mode
+          "q" 'rebox-dwim)
+        (spacemacs/set-leader-keys-for-major-mode 'c++-mode
+          "q" 'rebox-dwim)
+
         (setq-default c-electric-flag nil)
+
+        ;; (setq c-mode-local-vars-hook (delete 'spacemacs//c-c++-setup-flycheck c-mode-local-vars-hook))
+
+        (add-hook 'c-mode-local-vars-hook
+                  (function (lambda ()
+                              (flycheck-select-checker 'c/c++-clang)))
+                  t)
+
         (add-hook 'c-mode-common-hook
                   (function (lambda ()
                               (if (string= (shell-command-to-string "uname -s") "NetBSD\n")
@@ -3415,9 +3474,10 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
   ;; → ←  ↩ ↪ ⬅ ↺ ↻ ↷ ⟲ ⟳ ⤵⤴ ⤷ ⤶
   ;; custom graphics that works nice with half-width fringes
 
-    (debug-init-message "gutter")
 
-    (with-eval-after-load 'git-gutter-fringe
+    (with-eval-after-load 'git-gutter+-disabled-foo
+
+      (debug-init-message "gutter")
 
       ;; .....................
       ;; ..............##.....

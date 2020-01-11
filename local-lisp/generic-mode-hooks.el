@@ -61,8 +61,8 @@
 (defun run-all-prog-mode-hook ()
   nil
   (progn
+    ;; (setq fill-column 100)            ; can be overriden in mode specific hooks added later
     (run-hooks 'all-prog-mode-hook)
-    (setq fill-column 100)            ; can be overriden in mode specific hooks added later
     (auto-fill-mode)
     ;; (turn-on-fci-mode)
     ))
