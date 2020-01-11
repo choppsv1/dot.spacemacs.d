@@ -995,14 +995,16 @@ layers configuration. You are free to put any user code."
 
   (progn
 
-
-
     ;; I *like* being able to get back to package files.
     (with-eval-after-load "recentf"
       (setq recentf-exclude (delete (recentf-expand-file-name package-user-dir) recentf-exclude)))
 
-    (cond ((string-equal system-type "darwin")
-           (exec-path-from-shell-copy-env "PATH")
+    (cond ((string-equal system-type "darwin") (progn (exec-path-from-shell-copy-env "PATH")
+                                                      (setq insert-directory-program "/usr/local/bin/gls")
+                                                      ;; (setq insert-directory-program "/bin/ls")
+                                                      (setq dired-listing-switchecs "-al --dired")
+                                                      ;; (setq dired-listing-switches "-aBhl")
+                                                      )
            (or (and (fboundp 'server-running-p) (server-running-p)) (server-start))
            ))
 
@@ -2549,6 +2551,18 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
        (setq-default org-use-sub-superscripts '{})
        ;; (setq-default org-export-with-sub-superscripts nil)
        (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+
+       (setq org-taskjuggler-default-global-properties
+             "shift normal \"Full time shift\" { workinghours mon - fri 09:00 - 17:00 } ")
+       ;; Make duration values make a lot more sense
+       (setq org-duration-units
+             `(("min" . 1)
+               ("h" . 60)
+               ("d" . ,(* 60 8))
+               ("w" . ,(* 60 8 5))
+               ("m" . ,(* 60 8 5 4.2))
+               ("m" . ,(* 60 8 5 4.2 12))))
+       (org-duration-set-regexps)
 
        (require 'ox-latex)
 
