@@ -128,7 +128,7 @@ This function should only modify configuration layer settings."
              )
       emacs-lisp
       ess
-      lsp
+      ;; lsp
       (go :variables
           go-format-before-save t
           go-use-golangci-lint t
@@ -147,7 +147,7 @@ This function should only modify configuration layer settings."
       (python :variables python-fill-column 120
                          python-fill-docstring-style 'pep-257-nn
                          python-test-runner '(pytest nose)
-                         pytest-global-name "python -m pytest"
+                         pytest-global-name "python -m pytest --doctest-modules"
                          ;; python-auto-set-local-pyvenv-virtualenv on-visit
                          ;; python-auto-set-local-pyenv-virtualenv nil
                          python-enable-yapf-format-on-save nil)
@@ -1007,10 +1007,16 @@ layers configuration. You are free to put any user code."
 
   (add-hook 'semantic-mode-hook #'et/semantic-remove-hooks)
 
+
+  (user-full-name)
+
+  (defun fix-user-full-name (orig-fun &rest args)
+    (message "Message got adivce")
+    (let ((res (apply orig-fun args)))
+      (replace-regexp-in-string " E " " E. " (replace-regexp-in-string " - CONTRACTOR" "" res))))
+  (advice-add 'user-full-name :around #'fix-user-full-name)
+
   (progn
-
-
-
     ;; I *like* being able to get back to package files.
     (with-eval-after-load "recentf"
       (setq recentf-exclude (delete (recentf-expand-file-name package-user-dir) recentf-exclude)))
@@ -1090,6 +1096,11 @@ layers configuration. You are free to put any user code."
     ;; Hate smart parens but apparently still want code??
     (remove-hook 'prog-mode-hook #'smartparens-mode)
     (spacemacs/toggle-smartparens-globally-off)
+    (sp-pair "'" nil :actions :rem)
+    (sp-pair "\"" nil :actions :rem)
+    (sp-pair "(" nil :actions :rem)
+    (sp-pair "\{" nil :actions :rem)
+    (sp-pair "\[" nil :actions :rem)
 
     (run-hook-with-args 'spacemacs--hjkl-completion-navigation-functions
                         (member dotspacemacs-editing-style '(vim)))
@@ -2208,6 +2219,8 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
           (let ((root (ignore-errors (projectile-project-root))))
             (when (and root (file-exists-p (concat root "src/vppinfra")))
               (dolist (path '("src/" "src/plugins/"
+                              "build-root/install-vpp-native/external/include/dpdk/"
+                              "build-root/install-vpp-native/vpp/include/"
                               "build-root/install-vpp_debug-native/external/include/dpdk/"
                               "build-root/install-vpp_debug-native/vpp/include/"
                               "../openwrt-dd/staging_dir/target-aarch64_cortex-a53+neon-vfpv4_glibc-2.22/root-mvebu64/usr/include/"
@@ -3225,7 +3238,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                             (trim-string (format-time-string " %e" (current-time)))
                             (format-time-string " %Y" (current-time))))
 
-                  (setq work-ai-prefix "/.*/\\(?:\\(?:Documents|Dropbox\\)/[Ww]ork\\|chopps/w\\)/.*/")
+                  (setq work-ai-prefix "/.*/chopps/w/.*")
 
                   (with-eval-after-load 'autoinsert
                     ;; (define-auto-insert
@@ -3269,17 +3282,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                         > "# Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
                         > "# All rights reserved." \n
                         > "#" \n
-                        > "# REDISTRIBUTION IN ANY FORM PROHIBITED WITHOUT PRIOR WRITTEN" \n
-                        > "# CONSENT OF THE AUTHOR." \n
-                        > "#" \n
-                        > "from __future__ import absolute_import, division, unicode_literals, print_function, nested_scopes" \n
                         > "" \n
-                        > _ \n
-                        > "" \n
-                        > "__author__ = '" (user-full-name) "'" \n
-                        > "__date__ = '" (new-file-header-date) "'" \n
-                        > "__version__ = '1.0'" \n
-                        > "__docformat__ = \"restructuredtext en\"" \n
                         > _ ))
                     (define-auto-insert
                       '("\\.sh\'" . "# Home shell comment skeleton")
@@ -3337,6 +3340,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                     ;;-----------+
                     ;;      Work
                     ;;-----------+
+                    (setq labn-copyright-name "LabN Consulting, L.L.C")
 
                     ;; (define-auto-insert
                     ;;   (cons (concat work-ai-prefix "\\.org\\'") "Work org mode skeleton")
@@ -3353,21 +3357,21 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                         ";;" \n
                         > ";; " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
                         > ";;" \n
+                        > ";; Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                        > ";; All rights reserved." \n
+                        > ";;" \n
                         > _
                         ))
                     (define-auto-insert
                       (cons (concat work-ai-prefix "\\.py\\'") "# Work python comment skeleton")
                       '("Short description: "
-                        "# -*- coding: utf-8 -*-"
+                        "# -*- coding: utf-8 eval: (yapf-mode 1) -*-" \n
                         > "#" \n
                         > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
                         > "#" \n
-                        > "from __future__ import absolute_import, division, unicode_literals, print_function, nested_scopes" \n
+                        > "# Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                        > "#" \n
                         > _ \n
-                        > "__author__ = '" (user-full-name) "'" \n
-                        > "__date__ = '" (new-file-header-date) "'" \n
-                        > "__version__ = '1.0'" \n
-                        > "__docformat__ = \"restructuredtext en\"" \n
                         ))
                     (define-auto-insert
                       (cons (concat work-ai-prefix "\\.sh\\'") "# Work comment skeleton")
@@ -3376,12 +3380,18 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                         > "#" \n
                         > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
                         > "#" \n
+                        > "# Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                        > "#" \n
+                        > "#" \n
                         > _ ))
                     (define-auto-insert
                       (cons (concat work-ai-prefix "\\.\\(pl\\|tcl\\)\\'") "# Work comment skeleton")
                       '("Short description: "
                         "#" \n
                         > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > "#" \n
+                        > "# Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                        > "#" \n
                         > "#" \n
                         > _ ))
                     (define-auto-insert
@@ -3390,12 +3400,18 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                         ".." \n
                         > ".. " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
                         > ".." \n
+                        > ".. Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                        > ".." \n
+                        > ".." \n
                         > _ ))
                     (define-auto-insert
                       (cons (concat work-ai-prefix "\\.\\(h\\|c\\|CC?\\|cc\\|cxx\\|cpp\\|c++\\|m\\)\\'") "Work C-style skeleton")
                       '("Short description: "
                         "/*" \n
                         > "* " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > "*" \n
+                        > "* Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                        > "*" \n
                         > "*/" \n
                         > _ ))
                     ))
