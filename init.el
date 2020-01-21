@@ -117,9 +117,11 @@ This function should only modify configuration layer settings."
       ;; ---------
 
       ;; php ;; this is here I think to avoid a bug if we put it in alpha order
+      lsp
       csv
       (c-c++ :variables
              c-c++-default-mode-for-headers 'c-mode
+             c-c++-backend 'lsp-clangd
              ;; c-c++-adopt-subprojects t
              ;; c-c++-backend 'lsp-ccls
              ;; c-c++-lsp-sem-highlight-rainbow t
@@ -128,7 +130,6 @@ This function should only modify configuration layer settings."
              )
       emacs-lisp
       ess
-      ;; lsp
       (go :variables
           go-format-before-save t
           go-use-golangci-lint t
@@ -721,7 +722,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
    ;; This is very annoying to have to set, visual highlight in evil is hijacking PRIMARY selection
    ;; behavior..
    x-select-enable-primary t
-   ;; evil-esc-delay 0.001
+   evil-esc-delay 0
    ;; js2-basic-offset 2
    ;; js-indent-level 1
    org-protocol-default-template-key "t"
@@ -1290,8 +1291,7 @@ layers configuration. You are free to put any user code."
     ;;   (persp-switch "freenode.net")
     ;;   (erc :server "irc.freenode.net" :port "6667" :nick "chopps"))
 
-    (when-layer-used
-     'erc
+    (when-layer-used 'erc
      (setq erc-prompt-for-nickserv-password nil
             erc-autojoin-channels-alist '(("irc.gitter.im" "#syl20bnr/spacemacs")
                                           ("192.168.1.6" "#syl20bnr/spacemacs")
@@ -1582,8 +1582,7 @@ This will replace the last notification sent with this function."
     ;; Email
     ;; ======
 
-    (when-layer-used
-     'mu4e
+    (when-layer-used 'mu4e
      (defcustom mu4e-spam-folder "/chopps.org/spam-train"
         "Folder for spam email"
         :type '(string :tag "Folder name")
@@ -2055,13 +2054,21 @@ This will replace the last notification sent with this function."
     ;; =================
     ;; Programming Modes
     ;; =================
+    (when-layer-used 'lsp
+     (with-eval-after-load 'lsp-mode
+       ))
 
-    (when-layer-used
-     'syntax-checking
+    (when-layer-used 'syntax-checking
      (with-eval-after-load "flycheck"
-        ;; (setq flycheck-highlighting-mode 'lines)
-        (setq flycheck-highlighting-mode 'sexps)
-        (setq flycheck-temp-prefix ".flycheck")
+       ;; (setq flycheck-highlighting-mode 'lines)
+       (setq flycheck-highlighting-mode 'sexps)
+       (setq flycheck-temp-prefix ".flycheck")
+
+       (when-layer-used
+        'lsp
+        (progn
+          (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-gcc))))
+
         ;; the pos-tip window doesn't seem to work with my awesome setup (anymore)
         (setq flycheck-display-errors-function #'flycheck-display-error-messages)
         (setq-default flycheck-pylint-use-symbolic-id nil)
@@ -2088,8 +2095,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         (define-key flycheck-mode-map (kbd "M-n") 'flycheck-next-error)
         (define-key flycheck-mode-map (kbd "M-p") 'flycheck-previous-error)))
 
-    (when-layer-used
-     'emacs-lisp
+    (when-layer-used 'emacs-lisp
      (with-eval-after-load "lisp-mode"
         ;; hyphens are words in emacs lisp
         (modify-syntax-entry ?- "w" lisp-mode-syntax-table)
@@ -2100,22 +2106,19 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         (add-hook 'emacs-lisp-mode-hook 'rebox-lisp-hook)
         ))
 
-    (when-layer-used
-     'go
+    (when-layer-used 'go
      (with-eval-after-load "go-mode"
         (defun rebox-go-hook ()
           (set (make-local-variable 'rebox-style-loop) '(81 82 83)))
         (add-hook 'go-mode-hook 'rebox-go-hook)
         ))
 
-    (when-layer-used
-     'yaml
+    (when-layer-used 'yaml
      (add-hook 'yaml-mode-hook (function (lambda ()
                                             (rebox-mode)
                                             (flyspell-prog-mode)))))
 
-    (when-layer-used
-     'c-c++
+    (when-layer-used 'c-c++
      ;; Turn this back off now that the hook is there, let files/projects enable it.
      (setq-default c-c++-enable-clang-format-on-save nil)
 
@@ -2192,7 +2195,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
           "Reformat buffer if contains VPP magic"
           (when (save-excursion
                   (goto-char (point-min))
-                  (re-search-forward "fd.io coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t))
+                  (re-search-forward "coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t))
             (cond
              ((string= "CLANG" (match-string 1)) (vpp-format-buffer 1) t)
              ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
@@ -2202,6 +2205,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         (defun vpp-maybe-format-buffer-on-save ()
           (add-hook 'before-save-hook 'vpp-maybe-format-buffer nil t))
 
+        ;; (add-hook 'c-mode-common-hook 'vpp-maybe-format-buffer-on-save)
         (add-hook 'c-mode-hook 'vpp-maybe-format-buffer-on-save)
         (add-hook 'c++-mode-hook 'vpp-maybe-format-buffer-on-save)
 
@@ -2232,23 +2236,33 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                   (check-flycheck-clang-project-add-path path1))))))
 
         (defun rebox-c-hook ()
-          (set (make-local-variable 'rebox-style-loop) '(241 213 215 281 282 283))
+          (set (make-local-variable 'rebox-style-loop) '(241 213 215))
+          (bind-key "M-q" 'rebox-dwim c-mode-map)
           ;; (global-set-key (kbd "M-Q") 'rebox-dwim)
           )
         (add-hook 'c-mode-hook 'rebox-c-hook)
 
-        (when-layer-used
-         'rebox
-         (with-eval-after-load "rebox"
-           (rebox-register-template 281 176 ["//"
-                                             "// box123456"
-                                             "//"])
-           (rebox-register-template 282 286 ["// ---------"
-                                             "// box123456"
-                                             "// ---------"])
-           (rebox-register-template 283 486 ["// ========="
-                                             "// box123456"
-                                             "// ========="])))
+        (when-layer-used 'rebox
+         (with-eval-after-load "rebox2"
+           (rebox-register-template 252 286 '("/* ---------"
+                                              " * box123456"
+                                              " * ---------*/"))
+           (rebox-register-template 253 386 '("/* ========="
+                                              " * box123456"
+                                              " * =========*/"))
+           (rebox-register-template 254 486 '("/* *********"
+                                              " * box123456"
+                                              " * **********/"))
+            (rebox-register-template 281 186 '("//"
+                                               "// box123456"
+                                               "//"))
+           (rebox-register-template 282 286 '("// ---------"
+                                              "// box123456"
+                                              "// ---------"))
+           (rebox-register-template 283 486 '("// ========="
+                                              "// box123456"
+                                              "// ========="))
+           ))
 
         (spacemacs/set-leader-keys-for-major-mode 'c-mode
           "q" 'rebox-dwim)
@@ -2261,10 +2275,11 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
         ;; (setq c-mode-local-vars-hook (delete 'spacemacs//c-c++-setup-flycheck c-mode-local-vars-hook))
 
-        (add-hook 'c-mode-local-vars-hook
-                  (function (lambda ()
-                              (flycheck-select-checker 'c/c++-clang)))
-                  t)
+        ;; XXX with LSP working now this is not correct
+        ;; (add-hook 'c-mode-local-vars-hook
+        ;;           (function (lambda ()
+        ;;                       (flycheck-select-checker 'c/c++-clang)))
+        ;;           t)
 
         (add-hook 'c-mode-common-hook
                   (function (lambda ()
@@ -2396,8 +2411,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                                ))))
         ))
 
-    (when-layer-used
-     'restructuredtext
+    (when-layer-used 'restructuredtext
       (with-eval-after-load 'rst
         (setq rst-preferred-adornments
         '((?# over-and-under 0)
@@ -2418,16 +2432,14 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
         ))
 
-    (when-layer-used
-     'magit
+    (when-layer-used 'magit
      (with-eval-after-load 'magit
        (magit-todos-mode 1))
      ;; (with-eval-after-load 'magit
      ;;   (require 'magit-gerrit))
        )
 
-    (when-layer-used
-     'python
+    (when-layer-used 'python
       (with-eval-after-load 'python
 
 
@@ -2564,8 +2576,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
       )
 
     ;; remove when added to spacemacs--indent-variable-alist
-    (when-layer-used
-     'lua
+    (when-layer-used 'lua
      (with-eval-after-load 'lua-mode
        (setq-default lua-indent-level 4)))
 
@@ -2588,8 +2599,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     ;; Org
     ;; ===
 
-    (when-layer-used
-     'org
+    (when-layer-used 'org
 
      (debug-init-message "debug-init org setup")
      ;; Do we want this?
@@ -3110,8 +3120,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
        )
 
      (debug-init-message "debug-init pre-org2blog")
-     (when-layer-used
-      'org2blog
+     (when-layer-used 'org2blog
       (with-eval-after-load "org2blog"
         ;; (defadvice org-wp-src-block (after ad-org-wp-src-block activate)
         ;;   "Always use space as title if none given"
