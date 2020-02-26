@@ -126,7 +126,7 @@ This function should only modify configuration layer settings."
              ;; c-c++-backend 'lsp-ccls
              ;; c-c++-lsp-sem-highlight-rainbow t
              c-c++-enable-clang-support t
-             c-c++-enable-clang-format-on-save t
+             c-c++-enable-clang-format-on-save nil
              )
       emacs-lisp
       ess
@@ -145,7 +145,7 @@ This function should only modify configuration layer settings."
       lux
       markdown
       ;; primary test runner is pytest use 'spc u' prefix to invoke nose
-      (python :variables python-fill-column 120
+      (python :variables python-fill-column 100
                          python-fill-docstring-style 'pep-257-nn
                          python-test-runner '(pytest nose)
                          pytest-global-name "python -m pytest --doctest-modules"
