@@ -2122,6 +2122,13 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      ;; Turn this back off now that the hook is there, let files/projects enable it.
      (setq-default c-c++-enable-clang-format-on-save nil)
 
+     (let ((binpath))
+       (dolist (suffix '("-11" "-10" "-9" "-8" "-7" ""))
+         (unless binpath
+           (setq binpath (executable-find (concat "clang-format" suffix)))))
+       (when binpath
+         (setq-default clang-format-executable binpath)))
+
      (setq c-font-lock-extra-types
             (quote
              ("FILE"
