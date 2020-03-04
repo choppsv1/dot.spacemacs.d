@@ -117,18 +117,19 @@ This function should only modify configuration layer settings."
       ;; ---------
 
       ;; php ;; this is here I think to avoid a bug if we put it in alpha order
+      lsp
       csv
       (c-c++ :variables
              c-c++-default-mode-for-headers 'c-mode
+             c-c++-backend 'lsp-clangd
              ;; c-c++-adopt-subprojects t
              ;; c-c++-backend 'lsp-ccls
              ;; c-c++-lsp-sem-highlight-rainbow t
              c-c++-enable-clang-support t
-             c-c++-enable-clang-format-on-save t
+             c-c++-enable-clang-format-on-save nil
              )
       emacs-lisp
       ess
-      lsp
       (go :variables
           go-format-before-save t
           go-use-golangci-lint t
@@ -144,10 +145,10 @@ This function should only modify configuration layer settings."
       lux
       markdown
       ;; primary test runner is pytest use 'spc u' prefix to invoke nose
-      (python :variables python-fill-column 120
+      (python :variables python-fill-column 100
                          python-fill-docstring-style 'pep-257-nn
                          python-test-runner '(pytest nose)
-                         pytest-global-name "python -m pytest"
+                         pytest-global-name "python -m pytest --doctest-modules"
                          ;; python-auto-set-local-pyvenv-virtualenv on-visit
                          ;; python-auto-set-local-pyenv-virtualenv nil
                          python-enable-yapf-format-on-save nil)
@@ -724,7 +725,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
    ;; This is very annoying to have to set, visual highlight in evil is hijacking PRIMARY selection
    ;; behavior..
    x-select-enable-primary t
-   ;; evil-esc-delay 0.001
+   evil-esc-delay 0
    ;; js2-basic-offset 2
    ;; js-indent-level 1
    org-protocol-default-template-key "t"
@@ -1010,8 +1011,14 @@ layers configuration. You are free to put any user code."
 
   (add-hook 'semantic-mode-hook #'et/semantic-remove-hooks)
 
-  (progn
 
+  (defun fix-user-full-name (orig-fun &rest args)
+    (message "Message got adivce")
+    (let ((res (apply orig-fun args)))
+      (replace-regexp-in-string " E " " E. " (replace-regexp-in-string " - CONTRACTOR" "" res))))
+  (advice-add 'user-full-name :around #'fix-user-full-name)
+
+  (progn
     ;; I *like* being able to get back to package files.
     (with-eval-after-load "recentf"
       (setq recentf-exclude (delete (recentf-expand-file-name package-user-dir) recentf-exclude)))
@@ -1095,6 +1102,11 @@ layers configuration. You are free to put any user code."
     ;; Hate smart parens but apparently still want code??
     (remove-hook 'prog-mode-hook #'smartparens-mode)
     (spacemacs/toggle-smartparens-globally-off)
+    (sp-pair "'" nil :actions :rem)
+    (sp-pair "\"" nil :actions :rem)
+    (sp-pair "(" nil :actions :rem)
+    (sp-pair "\{" nil :actions :rem)
+    (sp-pair "\[" nil :actions :rem)
 
     (run-hook-with-args 'spacemacs--hjkl-completion-navigation-functions
                         (member dotspacemacs-editing-style '(vim)))
@@ -1282,8 +1294,7 @@ layers configuration. You are free to put any user code."
     ;;   (persp-switch "freenode.net")
     ;;   (erc :server "irc.freenode.net" :port "6667" :nick "chopps"))
 
-    (when-layer-used
-     'erc
+    (when-layer-used 'erc
      (setq erc-prompt-for-nickserv-password nil
             erc-autojoin-channels-alist '(("irc.gitter.im" "#syl20bnr/spacemacs")
                                           ("192.168.1.6" "#syl20bnr/spacemacs")
@@ -1574,8 +1585,7 @@ This will replace the last notification sent with this function."
     ;; Email
     ;; ======
 
-    (when-layer-used
-     'mu4e
+    (when-layer-used 'mu4e
      (defcustom mu4e-spam-folder "/chopps.org/spam-train"
         "Folder for spam email"
         :type '(string :tag "Folder name")
@@ -2047,13 +2057,21 @@ This will replace the last notification sent with this function."
     ;; =================
     ;; Programming Modes
     ;; =================
+    (when-layer-used 'lsp
+     (with-eval-after-load 'lsp-mode
+       ))
 
-    (when-layer-used
-     'syntax-checking
+    (when-layer-used 'syntax-checking
      (with-eval-after-load "flycheck"
-        ;; (setq flycheck-highlighting-mode 'lines)
-        (setq flycheck-highlighting-mode 'sexps)
-        (setq flycheck-temp-prefix ".flycheck")
+       ;; (setq flycheck-highlighting-mode 'lines)
+       (setq flycheck-highlighting-mode 'sexps)
+       (setq flycheck-temp-prefix ".flycheck")
+
+       (when-layer-used
+        'lsp
+        (progn
+          (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-gcc))))
+
         ;; the pos-tip window doesn't seem to work with my awesome setup (anymore)
         (setq flycheck-display-errors-function #'flycheck-display-error-messages)
         (setq-default flycheck-pylint-use-symbolic-id nil)
@@ -2080,8 +2098,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         (define-key flycheck-mode-map (kbd "M-n") 'flycheck-next-error)
         (define-key flycheck-mode-map (kbd "M-p") 'flycheck-previous-error)))
 
-    (when-layer-used
-     'emacs-lisp
+    (when-layer-used 'emacs-lisp
      (with-eval-after-load "lisp-mode"
         ;; hyphens are words in emacs lisp
         (modify-syntax-entry ?- "w" lisp-mode-syntax-table)
@@ -2092,24 +2109,28 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         (add-hook 'emacs-lisp-mode-hook 'rebox-lisp-hook)
         ))
 
-    (when-layer-used
-     'go
+    (when-layer-used 'go
      (with-eval-after-load "go-mode"
         (defun rebox-go-hook ()
           (set (make-local-variable 'rebox-style-loop) '(81 82 83)))
         (add-hook 'go-mode-hook 'rebox-go-hook)
         ))
 
-    (when-layer-used
-     'yaml
+    (when-layer-used 'yaml
      (add-hook 'yaml-mode-hook (function (lambda ()
                                             (rebox-mode)
                                             (flyspell-prog-mode)))))
 
-    (when-layer-used
-     'c-c++
+    (when-layer-used 'c-c++
      ;; Turn this back off now that the hook is there, let files/projects enable it.
      (setq-default c-c++-enable-clang-format-on-save nil)
+
+     (let ((binpath))
+       (dolist (suffix '("-11" "-10" "-9" "-8" "-7" ""))
+         (unless binpath
+           (setq binpath (executable-find (concat "clang-format" suffix)))))
+       (when binpath
+         (setq-default clang-format-executable binpath)))
 
      (setq c-font-lock-extra-types
             (quote
@@ -2184,7 +2205,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
           "Reformat buffer if contains VPP magic"
           (when (save-excursion
                   (goto-char (point-min))
-                  (re-search-forward "fd.io coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t))
+                  (re-search-forward "coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t))
             (cond
              ((string= "CLANG" (match-string 1)) (vpp-format-buffer 1) t)
              ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
@@ -2194,6 +2215,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         (defun vpp-maybe-format-buffer-on-save ()
           (add-hook 'before-save-hook 'vpp-maybe-format-buffer nil t))
 
+        ;; (add-hook 'c-mode-common-hook 'vpp-maybe-format-buffer-on-save)
         (add-hook 'c-mode-hook 'vpp-maybe-format-buffer-on-save)
         (add-hook 'c++-mode-hook 'vpp-maybe-format-buffer-on-save)
 
@@ -2213,6 +2235,8 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
           (let ((root (ignore-errors (projectile-project-root))))
             (when (and root (file-exists-p (concat root "src/vppinfra")))
               (dolist (path '("src/" "src/plugins/"
+                              "build-root/install-vpp-native/external/include/dpdk/"
+                              "build-root/install-vpp-native/vpp/include/"
                               "build-root/install-vpp_debug-native/external/include/dpdk/"
                               "build-root/install-vpp_debug-native/vpp/include/"
                               "../openwrt-dd/staging_dir/target-aarch64_cortex-a53+neon-vfpv4_glibc-2.22/root-mvebu64/usr/include/"
@@ -2222,23 +2246,33 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                   (check-flycheck-clang-project-add-path path1))))))
 
         (defun rebox-c-hook ()
-          (set (make-local-variable 'rebox-style-loop) '(241 213 215 281 282 283))
+          (set (make-local-variable 'rebox-style-loop) '(241 213 215))
+          (bind-key "M-q" 'rebox-dwim c-mode-map)
           ;; (global-set-key (kbd "M-Q") 'rebox-dwim)
           )
         (add-hook 'c-mode-hook 'rebox-c-hook)
 
-        (when-layer-used
-         'rebox
-         (with-eval-after-load "rebox"
-           (rebox-register-template 281 176 ["//"
-                                             "// box123456"
-                                             "//"])
-           (rebox-register-template 282 286 ["// ---------"
-                                             "// box123456"
-                                             "// ---------"])
-           (rebox-register-template 283 486 ["// ========="
-                                             "// box123456"
-                                             "// ========="])))
+        (when-layer-used 'rebox
+         (with-eval-after-load "rebox2"
+           (rebox-register-template 252 286 '("/* ---------"
+                                              " * box123456"
+                                              " * ---------*/"))
+           (rebox-register-template 253 386 '("/* ========="
+                                              " * box123456"
+                                              " * =========*/"))
+           (rebox-register-template 254 486 '("/* *********"
+                                              " * box123456"
+                                              " * **********/"))
+            (rebox-register-template 281 186 '("//"
+                                               "// box123456"
+                                               "//"))
+           (rebox-register-template 282 286 '("// ---------"
+                                              "// box123456"
+                                              "// ---------"))
+           (rebox-register-template 283 486 '("// ========="
+                                              "// box123456"
+                                              "// ========="))
+           ))
 
         (spacemacs/set-leader-keys-for-major-mode 'c-mode
           "q" 'rebox-dwim)
@@ -2251,10 +2285,11 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
         ;; (setq c-mode-local-vars-hook (delete 'spacemacs//c-c++-setup-flycheck c-mode-local-vars-hook))
 
-        (add-hook 'c-mode-local-vars-hook
-                  (function (lambda ()
-                              (flycheck-select-checker 'c/c++-clang)))
-                  t)
+        ;; XXX with LSP working now this is not correct
+        ;; (add-hook 'c-mode-local-vars-hook
+        ;;           (function (lambda ()
+        ;;                       (flycheck-select-checker 'c/c++-clang)))
+        ;;           t)
 
         (add-hook 'c-mode-common-hook
                   (function (lambda ()
@@ -2386,8 +2421,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                                ))))
         ))
 
-    (when-layer-used
-     'restructuredtext
+    (when-layer-used 'restructuredtext
       (with-eval-after-load 'rst
         (setq rst-preferred-adornments
         '((?# over-and-under 0)
@@ -2408,16 +2442,14 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
         ))
 
-    (when-layer-used
-     'magit
+    (when-layer-used 'magit
      (with-eval-after-load 'magit
        (magit-todos-mode 1))
      ;; (with-eval-after-load 'magit
      ;;   (require 'magit-gerrit))
        )
 
-    (when-layer-used
-     'python
+    (when-layer-used 'python
       (with-eval-after-load 'python
 
 
@@ -2554,8 +2586,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
       )
 
     ;; remove when added to spacemacs--indent-variable-alist
-    (when-layer-used
-     'lua
+    (when-layer-used 'lua
      (with-eval-after-load 'lua-mode
        (setq-default lua-indent-level 4)))
 
@@ -2578,8 +2609,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     ;; Org
     ;; ===
 
-    (when-layer-used
-     'org
+    (when-layer-used 'org
 
      (debug-init-message "debug-init org setup")
      ;; Do we want this?
@@ -3100,8 +3130,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
        )
 
      (debug-init-message "debug-init pre-org2blog")
-     (when-layer-used
-      'org2blog
+     (when-layer-used 'org2blog
       (with-eval-after-load "org2blog"
         ;; (defadvice org-wp-src-block (after ad-org-wp-src-block activate)
         ;;   "Always use space as title if none given"
@@ -3242,7 +3271,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                             (trim-string (format-time-string " %e" (current-time)))
                             (format-time-string " %Y" (current-time))))
 
-                  (setq work-ai-prefix "/.*/\\(?:\\(?:Documents|Dropbox\\)/[Ww]ork\\|chopps/w\\)/.*/")
+                  (setq work-ai-prefix "/.*/chopps/w/.*")
 
                   (with-eval-after-load 'autoinsert
                     ;; (define-auto-insert
@@ -3286,17 +3315,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                         > "# Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
                         > "# All rights reserved." \n
                         > "#" \n
-                        > "# REDISTRIBUTION IN ANY FORM PROHIBITED WITHOUT PRIOR WRITTEN" \n
-                        > "# CONSENT OF THE AUTHOR." \n
-                        > "#" \n
-                        > "from __future__ import absolute_import, division, unicode_literals, print_function, nested_scopes" \n
                         > "" \n
-                        > _ \n
-                        > "" \n
-                        > "__author__ = '" (user-full-name) "'" \n
-                        > "__date__ = '" (new-file-header-date) "'" \n
-                        > "__version__ = '1.0'" \n
-                        > "__docformat__ = \"restructuredtext en\"" \n
                         > _ ))
                     (define-auto-insert
                       '("\\.sh\'" . "# Home shell comment skeleton")
@@ -3354,6 +3373,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                     ;;-----------+
                     ;;      Work
                     ;;-----------+
+                    (setq labn-copyright-name "LabN Consulting, L.L.C")
 
                     ;; (define-auto-insert
                     ;;   (cons (concat work-ai-prefix "\\.org\\'") "Work org mode skeleton")
@@ -3370,21 +3390,21 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                         ";;" \n
                         > ";; " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
                         > ";;" \n
+                        > ";; Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                        > ";; All rights reserved." \n
+                        > ";;" \n
                         > _
                         ))
                     (define-auto-insert
                       (cons (concat work-ai-prefix "\\.py\\'") "# Work python comment skeleton")
                       '("Short description: "
-                        "# -*- coding: utf-8 -*-"
+                        "# -*- coding: utf-8 eval: (yapf-mode 1) -*-" \n
                         > "#" \n
                         > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
                         > "#" \n
-                        > "from __future__ import absolute_import, division, unicode_literals, print_function, nested_scopes" \n
+                        > "# Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                        > "#" \n
                         > _ \n
-                        > "__author__ = '" (user-full-name) "'" \n
-                        > "__date__ = '" (new-file-header-date) "'" \n
-                        > "__version__ = '1.0'" \n
-                        > "__docformat__ = \"restructuredtext en\"" \n
                         ))
                     (define-auto-insert
                       (cons (concat work-ai-prefix "\\.sh\\'") "# Work comment skeleton")
@@ -3393,12 +3413,18 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                         > "#" \n
                         > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
                         > "#" \n
+                        > "# Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                        > "#" \n
+                        > "#" \n
                         > _ ))
                     (define-auto-insert
                       (cons (concat work-ai-prefix "\\.\\(pl\\|tcl\\)\\'") "# Work comment skeleton")
                       '("Short description: "
                         "#" \n
                         > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > "#" \n
+                        > "# Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                        > "#" \n
                         > "#" \n
                         > _ ))
                     (define-auto-insert
@@ -3407,12 +3433,18 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                         ".." \n
                         > ".. " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
                         > ".." \n
+                        > ".. Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                        > ".." \n
+                        > ".." \n
                         > _ ))
                     (define-auto-insert
                       (cons (concat work-ai-prefix "\\.\\(h\\|c\\|CC?\\|cc\\|cxx\\|cpp\\|c++\\|m\\)\\'") "Work C-style skeleton")
                       '("Short description: "
                         "/*" \n
                         > "* " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > "*" \n
+                        > "* Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                        > "*" \n
                         > "*/" \n
                         > _ ))
                     ))
