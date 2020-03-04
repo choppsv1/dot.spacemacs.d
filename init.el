@@ -689,6 +689,9 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   (add-to-list 'custom-theme-load-path "~/p/emacs-mandm-theme/")
+  (add-to-list 'custom-theme-load-path "~/p/emacs-mandm-theme/")
+  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/vscode-theme"))
+  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/vscode+-theme"))
   ;; (add-to-list 'load-path (concat dotspacemacs-directory "repos/magit-gerrit"))
   ;; (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/pycoverage"))
   ;; (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "themes-test/"))
