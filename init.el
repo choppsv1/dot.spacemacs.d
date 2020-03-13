@@ -11,6 +11,8 @@
                 (append (list (concat ts ": DEBUG-INIT: " fmt))
                         a)))))
 
+
+
 (defun dotspacemacs/layers ()
   "Layer configuration:
 This function should only modify configuration layer settings."
@@ -42,18 +44,21 @@ This function should only modify configuration layer settings."
    ;; If non-nil layers with lazy install support are lazy installed.
    ;; List of additional paths where to look for configuration layers.
    ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
-   dotspacemacs-configuration-layer-path '()
+   dotspacemacs-configuration-layer-path '())
 
    ;; List of configuration layers to load.
-   dotspacemacs-configuration-layers
-   '(
+  (if (not (string-equal system-type "darwin") )
+      (setq-default
+       dotspacemacs-configuration-layers
+   `(
       ;; Choose either ivy or helm as completion framework
       ;; ivy
       helm
 
-      (auto-completion :variables
-                       auto-completion-complete-with-key-sequence "jk"
-                       )
+      (auto-completion :disabled-for org
+                       :variables
+                       auto-completion-complete-with-key-sequence nil
+                       auto-completion-tab-key-behavior 'complete)
       ;; (auto-completion :variables
       ;;   auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets"
       ;;   auto-completion-enable-sort-by-usage t
@@ -74,13 +79,16 @@ This function should only modify configuration layer settings."
       gtags
       (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
       ;; jabber
-      mu4e
+      (mu4e :variables
+            ;; mu4e-enable-async-operations t
+            mu4e-enable-notifications nil
+            mu4e-use-maildirs-extension nil)
       multiple-cursors
       (org :variables
            org-clock-idle-time 15
            org-enable-rfc-support t)
       (org2blog :variables org2blog-name "hoppsjots.org")
-      ;; pandoc
+      pandoc
       (osx :variables
            osx-use-option-as-meta t)
       pdf
@@ -109,6 +117,7 @@ This function should only modify configuration layer settings."
                        ;; version-control-diff-tool 'git-gutter
                        ;; version-control-diff-tool 'diff-hl
                        version-control-diff-side 'right
+
                        version-control-global-margin t)
       treemacs
 
@@ -117,7 +126,7 @@ This function should only modify configuration layer settings."
       ;; ---------
 
       ;; php ;; this is here I think to avoid a bug if we put it in alpha order
-      lsp
+      ,(if (string-equal system-type "darwin") nil lsp)
       csv
       (c-c++ :variables
              c-c++-default-mode-for-headers 'c-mode
@@ -184,8 +193,105 @@ This function should only modify configuration layer settings."
       ;;        rcirc-enable-authinfo-support t)
       ;; eyebrowse blows layouts away!
       ;; vim-empty-lines
-     )
+     ))
+     ;;
+     ;; Mac OS-X super slow, disable all but essentials
+     ;;
+    (setq-default
+     dotspacemacs-configuration-layers
+     `(
+      ;; Choose either ivy or helm as completion framework
+      ;; ivy
+      helm
 
+      (auto-completion :disabled-for org
+                       :variables
+                       auto-completion-complete-with-key-sequence nil
+                       auto-completion-tab-key-behavior 'complete)
+      docker
+      git
+      ;; github
+      ;; graphviz
+      ;; gtags
+      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
+      (mu4e :variables
+            ;; mu4e-enable-async-operations t
+            mu4e-enable-notifications nil
+            mu4e-use-maildirs-extension nil)
+      (org :variables
+           org-clock-idle-time 15
+           org-enable-rfc-support t)
+      ;; (org2blog :variables org2blog-name "hoppsjots.org")
+      pandoc
+      (osx :variables
+           osx-use-option-as-meta t)
+      pdf
+      ;; rebox
+      ;; (shell :variables
+      ;;         ;; shell-default-shell 'shell
+      ;;         ;; shell-default-position 'bottom
+      ;;         ;; shell-default-height 30
+      ;;         )
+      (spell-checking :variables enable-flyspell-auto-completion nil)
+      ;; (syntax-checking :variables syntax-checking-enable-tooltips t)
+
+      theming
+      themes-megapack
+      ;; (version-control :variables
+      ;;                  version-control-diff-tool 'git-gutter+
+      ;;                  ;; version-control-diff-tool 'git-gutter
+      ;;                  ;; version-control-diff-tool 'diff-hl
+      ;;                  version-control-diff-side 'right
+      ;;                  version-control-global-margin t)
+
+      ;; ---------
+      ;; Languages
+      ;; ---------
+
+      emacs-lisp
+      html
+      markdown
+      ;; primary test runner is pytest use 'spc u' prefix to invoke nose
+      (python :variables python-fill-column 100
+                        python-fill-docstring-style 'pep-257-nn
+                         python-test-runner '(pytest nose)
+                         pytest-global-name "python -m pytest --doctest-modules"
+                         ;; python-auto-set-local-pyvenv-virtualenv on-visit
+                         ;; python-auto-set-local-pyenv-virtualenv nil
+                         python-enable-yapf-format-on-save nil)
+
+      ;; ;; disable emacs-lisp due to completionion in comments parsing tons
+      ;; ;; of .el files https://github.com/syl20bnr/spacemacs/issues/7038
+      ;; restructuredtext
+      ;; (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
+      ;; (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
+      shell-scripts
+      yaml
+      (yang :variables
+            yang-pyang-rules "lint"
+             yang-pyang-extra-args "--max-line-length=79")
+
+      ;; -----------------------------
+      ;; let's keep this later. (why?)
+      ;; -----------------------------
+      ;; (erc :variables
+      ;;      erc-server-list
+      ;;      '(("irc.freenode.net"
+      ;;         :port "6697"
+      ;;         :ssl t
+      ;;         :nick "chopps"
+      ;;        ))
+      ;;  )
+      ;; bb-erc
+
+      ;; rcirc
+      ;; (rcirc :variables
+      ;;        rcirc-enable-authinfo-support t)
+      ;; eyebrowse blows layouts away!
+      ;; vim-empty-lines
+     )))
+
+(setq-default
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
@@ -222,6 +328,7 @@ This function should only modify configuration layer settings."
      evil-mc
      irfc
      mu4e-maildirs-extension
+     mu4e-alert
      nameless
      ;; recentf
      ;; savehist
@@ -525,6 +632,11 @@ It should only modify the values of Spacemacs settings."
    ;; (default nil) (Emacs 24.4+ only)
    dotspacemacs-maximized-at-startup nil
 
+   ;; If non-nil the frame is undecorated when Emacs starts up. Combine this
+   ;; variable with `dotspacemacs-maximized-at-startup' in OSX to obtain
+   ;; borderless fullscreen. (default nil)
+   dotspacemacs-undecorated-at-startup nil
+
    ;; A value from the range (0..100), in increasing opacity, which describes
    ;; the transparency level of a frame when it's active or selected.
    ;; Transparency can be toggled through `toggle-transparency'. (default 90)
@@ -575,7 +687,7 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-smartparens-strict-mode nil
 
    ;; If non-nil pressing the closing parenthesis `)' key in insert mode passes
-   ;; over any automatically added closing parenthesis, bracket, quote, etc…
+   ;; over any automatically added closing parenthesis, bracket, quote, etc...
    ;; This can be temporary disabled by pressing `C-q' before `)'. (default nil)
    dotspacemacs-smart-closing-parenthesis nil
 
@@ -689,6 +801,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
            (setq epg-gpg-program "/usr/local/MacGPG2/bin/gpg2")))
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
+  (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu-mac/mu4e/")
   (add-to-list 'custom-theme-load-path "~/p/emacs-mandm-theme/")
   (add-to-list 'custom-theme-load-path "~/p/emacs-mandm-theme/")
   (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/vscode-theme"))
@@ -1593,10 +1706,10 @@ This will replace the last notification sent with this function."
 
       (setq mu4e-maildir "~/Mail"
             mu4e-attachment-dir "~/Downloads"
-
+            mu4e-index-cleanup nil
 
             mu4e-change-filenames-when-moving t
-            mu4e-mu-binary (executable-find "mu")
+            ;; mu4e-mu-binary (executable-find "mu")
             mu4e-update-interval nil
 
             ;; Stop mu4e from blowing away message buffer all the time
@@ -1607,7 +1720,7 @@ This will replace the last notification sent with this function."
             ;; -------
             mu4e-headers-results-limit 500
             mu4e-headers-visible-lines 15
-            mu4e-headers-visible-columns 80
+            mu4e-headers-visible-columns 240
             ;; For searches useful as t to find replies to threads?
             mu4e-headers-include-related nil
             mu4e-view-show-addresses t
@@ -2015,7 +2128,7 @@ This will replace the last notification sent with this function."
             ;; "b" 'mu4e-view-bookmark-make-record
             )
 
-          ;; XXXSLOW
+          ;; ;; XXXSLOW
           ;; (add-to-list 'mu4e-header-info-custom
           ;;   '(:list-or-dir .
           ;;      (:name "ML or maildir" ;; long name, as seen in message view
@@ -2031,10 +2144,10 @@ This will replace the last notification sent with this function."
             mu4e-headers-fields (quote (
                                          (:flags          .  4)
                                          (:human-date     . 12)
-                                         (:from           . 18)
-                                         ;; (:list-or-dir    . 20)
-                                         (:maildir    . 20)
-                                         (:thread-subject . nil)
+                                         (:from           . 24)
+                                         (:maildir        . 30)
+                                         ;;(:thread-subject . nil)
+                                         (:subject . nil)
                                          )))
           ;; XXXSLOW
 
@@ -2442,10 +2555,9 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
         ))
 
-    (when-layer-used 'magit
+    (when-layer-used 'git
      (with-eval-after-load 'magit
        (magit-todos-mode 1))
-     ;; (with-eval-after-load 'magit
      ;;   (require 'magit-gerrit))
        )
 
@@ -2653,7 +2765,9 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                ("d" . ,(* 60 8))
                ("w" . ,(* 60 8 5))
                ("m" . ,(* 60 8 5 4.2))
-               ("m" . ,(* 60 8 5 4.2 12))))
+               ("m" . ,(* 60 8 5 4.2 12)))
+             org-duration-format '(("h") (special . 2))
+             )
        (org-duration-set-regexps)
 
        (require 'ox-latex)
@@ -2862,6 +2976,94 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
          "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
         ))
 
+      ;; This is a copy of the function so that we can add "bimonth" steps
+      (defun org-clocktable-steps (params)
+        "Create one or more clock tables, according to PARAMS.
+Step through the range specifications in plist PARAMS to make
+a number of clock tables."
+        (let* ((ignore-empty-tables (plist-get params :stepskip0))
+               (step (plist-get params :step))
+               (step-header
+                (pcase step
+                  (`day "Daily report: ")
+                  (`week "Weekly report starting on: ")
+                  (`bimonth "Bi-Monthly report starting on: ")
+                  (`month "Monthly report starting on: ")
+                  (`year "Annual report starting on: ")
+                  (_ (user-error "Unknown `:step' specification: %S" step))))
+               (week-start (or (plist-get params :wstart) 1))
+               (month-start (or (plist-get params :mstart) 1))
+               (range
+                (pcase (plist-get params :block)
+                  (`nil nil)
+                  (range
+                   (org-clock-special-range range nil t week-start month-start))))
+               ;; For both START and END, any number is an absolute day
+               ;; number from Agenda.  Otherwise, consider value to be an Org
+               ;; timestamp string.  The `:block' property has precedence
+               ;; over `:tstart' and `:tend'.
+               (start
+                (pcase (if range (car range) (plist-get params :tstart))
+                  ((and (pred numberp) n)
+                   (pcase-let ((`(,m ,d ,y) (calendar-gregorian-from-absolute n)))
+                     (apply #'encode-time (list 0 0 org-extend-today-until d m y))))
+                  (timestamp
+                   (seconds-to-time
+                    (org-matcher-time (or timestamp
+                                          ;; The year Org was born.
+                                          "<2003-01-01 Thu 00:00>"))))))
+               (end
+                (pcase (if range (nth 1 range) (plist-get params :tend))
+                  ((and (pred numberp) n)
+                   (pcase-let ((`(,m ,d ,y) (calendar-gregorian-from-absolute n)))
+                     (apply #'encode-time (list 0 0 org-extend-today-until d m y))))
+                  (timestamp (seconds-to-time (org-matcher-time timestamp))))))
+          (while (time-less-p start end)
+            (unless (bolp) (insert "\n"))
+            ;; Insert header before each clock table.
+            (insert "\n"
+                    step-header
+                    (format-time-string (org-time-stamp-format nil t) start)
+                    "\n")
+            ;; Compute NEXT, which is the end of the current clock table,
+            ;; according to step.
+            (let* ((next
+                    (apply #'encode-time
+                           (pcase-let
+                               ((`(,_ ,_ ,_ ,d ,m ,y ,dow . ,_) (decode-time start)))
+                             (pcase step
+                               (`day (list 0 0 org-extend-today-until (1+ d) m y))
+                               (`week
+                                (let ((offset (if (= dow week-start) 7
+                                                (mod (- week-start dow) 7))))
+                                  (list 0 0 org-extend-today-until (+ d offset) m y)))
+                               (`bimonth (list 0 0 0 (if (< d 16) 16 1) (if (< d 16) m (1+ m)) y))
+                               (`month (list 0 0 0 month-start (1+ m) y))
+                               (`year (list 0 0 org-extend-today-until 1 1 (1+ y)))))))
+                   (table-begin (line-beginning-position 0))
+                   (step-time
+                    ;; Write clock table between START and NEXT.
+                    (org-dblock-write:clocktable
+                     (org-combine-plists
+                      params (list :header ""
+                                   :step nil
+                                   :block nil
+                                   :tstart (format-time-string
+                                            (org-time-stamp-format t t)
+                                            start)
+                                   :tend (format-time-string
+                                          (org-time-stamp-format t t)
+                                          ;; Never include clocks past END.
+                                          (if (time-less-p end next) end next)))))))
+              (let ((case-fold-search t)) (re-search-forward "^[ \t]*#\\+END:"))
+              ;; Remove the table if it is empty and `:stepskip0' is
+              ;; non-nil.
+              (when (and ignore-empty-tables (equal step-time 0))
+                (delete-region (line-beginning-position) table-begin))
+              (setq start next))
+            (end-of-line 0))))
+
+
      (defun org-update-inline-images ()
        (when org-inline-image-overlays
          (org-redisplay-inline-images)))
@@ -2875,6 +3077,34 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
          (add-to-list 'org-src-lang-modes  '("dot" . graphviz-dot))))
          ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+     (defun org-dblock-write:rangereport (params)
+       "Display day-by-day time reports."
+       (let* ((ts (plist-get params :tstart))
+              (te (plist-get params :tend))
+              (start (time-to-seconds
+                      (apply 'encode-time (org-parse-time-string ts))))
+              (end (time-to-seconds
+                    (apply 'encode-time (org-parse-time-string te))))
+              day-numbers)
+         (setq params (plist-put params :tstart nil))
+         (setq params (plist-put params :end nil))
+         (while (<= start end)
+           (save-excursion
+             (insert "\n\n"
+                     (format-time-string (car org-time-stamp-formats)
+                                         (seconds-to-time start))
+                     "----------------\n")
+             (org-dblock-write:clocktable
+              (plist-put
+               (plist-put
+                params
+                :tstart
+                (format-time-string (car org-time-stamp-formats)
+                                    (seconds-to-time start)))
+               :tend
+               (format-time-string (car org-time-stamp-formats)
+                                   (seconds-to-time end))))
+             (setq start (+ 86400 start))))))
 
      ;; not defined
      ;; (org-crypt-use-before-save-magic)
@@ -3147,6 +3377,29 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      (when (and (or (daemonp) (and (fboundp 'server-running-p) (server-running-p)))
                 (string-equal system-type "darwin"))
        (debug-init-message "before require org notify")
+
+
+
+       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+       ;; Terminal notifier
+       ;; requires 'brew install terminal-notifier'
+       ;; stolen from erc-notifier
+
+       (defvar terminal-notifier-command (executable-find "terminal-notifier") "The path to terminal-notifier.")
+                                        ; (terminal-notifier-notify "Emacs notification" "Something amusing happened")
+
+       (defun terminal-notifier-notify (title message)
+         "Show a message with terminal-notifier-command ."
+         (start-process "terminal-notifier"
+                        "terminal-notifier"
+                        terminal-notifier-command
+                        "-title" title
+                        "-message" message
+                        "-activate" "org.gnu.Emacs"))
+
+       (defun timed-notification (time msg)
+         (interactive "sNotification when (e.g: 2 minutes, 60 seconds, 3 days): \nsMessage: ")
+         (run-at-time time nil (lambda (msg) (terminal-notifier-notify "Emacs" msg)) msg))
 
        (require 'org-notify)
        (debug-init-message "in-server-running-notificiation-setup")
