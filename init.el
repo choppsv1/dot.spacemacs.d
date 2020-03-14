@@ -88,7 +88,7 @@ This function should only modify configuration layer settings."
            org-clock-idle-time 15
            org-enable-rfc-support t)
       (org2blog :variables org2blog-name "hoppsjots.org")
-      pandoc
+      ;; pandoc
       (osx :variables
            osx-use-option-as-meta t)
       pdf
@@ -126,7 +126,7 @@ This function should only modify configuration layer settings."
       ;; ---------
 
       ;; php ;; this is here I think to avoid a bug if we put it in alpha order
-      ,(if (string-equal system-type "darwin") nil lsp)
+      lsp
       csv
       (c-c++ :variables
              c-c++-default-mode-for-headers 'c-mode
@@ -1109,6 +1109,8 @@ layers configuration. You are free to put any user code."
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
     (spacemacs/load-theme 'sanityinc-tomorrow-blue))
+   ((or (string-prefix-p "cmf-" (system-name)) (string-prefix-p "builder" (system-name)))
+    (spacemacs/load-theme 'afternoon))
    ((string-equal system-type "gnu/linux")
     (spacemacs/load-theme 'sanityinc-tomorrow-blue))
    (t (spacemacs/load-theme 'sanityinc-tomorrow-blue)))
