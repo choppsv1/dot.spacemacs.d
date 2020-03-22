@@ -83,20 +83,18 @@ This function should only modify configuration layer settings."
             ;; mu4e-enable-async-operations t
             mu4e-enable-notifications nil
             mu4e-use-maildirs-extension nil)
-      multiple-cursors
+      ;; multiple-cursors
       (org :variables
            org-clock-idle-time 15
            org-enable-rfc-support t)
-      (org2blog :variables org2blog-name "hoppsjots.org")
+      ;; (org2blog :variables org2blog-name "hoppsjots.org")
       ;; pandoc
-      (osx :variables
-           osx-use-option-as-meta t)
-      pdf
-      ranger
+      ;; pdf
+      ;; ranger
 
       rebox
-      (rust :variables
-            rust-format-on-save t)
+      ;; (rust :variables
+      ;;      rust-format-on-save t)
 
       (shell :variables
               ;; shell-default-shell 'shell
@@ -106,10 +104,7 @@ This function should only modify configuration layer settings."
 
       ;; nginx
       (spell-checking :variables enable-flyspell-auto-completion nil)
-
-      spotify
       (syntax-checking :variables syntax-checking-enable-tooltips t)
-
       theming
       themes-megapack
       (version-control :variables
@@ -119,14 +114,14 @@ This function should only modify configuration layer settings."
                        version-control-diff-side 'right
 
                        version-control-global-margin t)
-      treemacs
+      ;; treemacs
 
       ;; ---------
       ;; Languages
       ;; ---------
 
       ;; php ;; this is here I think to avoid a bug if we put it in alpha order
-      lsp
+      lsp-mode
       csv
       (c-c++ :variables
              c-c++-default-mode-for-headers 'c-mode
@@ -138,7 +133,7 @@ This function should only modify configuration layer settings."
              c-c++-enable-clang-format-on-save nil
              )
       emacs-lisp
-      ess
+      ;; ess
       (go :variables
           go-format-before-save t
           go-use-golangci-lint t
@@ -151,7 +146,7 @@ This function should only modify configuration layer settings."
       javascript
       (latex :variables latex-build-command "latexmk")
       (lua :variables lua-default-application "lua5.1")
-      lux
+      ;; lux
       markdown
       ;; primary test runner is pytest use 'spc u' prefix to invoke nose
       (python :variables python-fill-column 100
@@ -846,6 +841,8 @@ before packages are loaded. If you are unsure, you should try in setting them in
    ;; This really should be a file local variable.
    rebox-style-loop '(71 72 73)
 
+   (with-eval-after-load 'tramp
+     (push "/home/chopps/local/bin" tramp-remote-path))
   ;; (with-eval-after-load "evil-evilified-state"
   ;;   (define-key evil-evilified-state-map-original "H" 'evil-window-top)
   ;;   (define-key evil-evilified-state-map-original "L" 'evil-window-bottom)
