@@ -841,8 +841,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
    ;; This really should be a file local variable.
    rebox-style-loop '(71 72 73)
 
-   (with-eval-after-load 'tramp
-     (push "/home/chopps/local/bin" tramp-remote-path))
   ;; (with-eval-after-load "evil-evilified-state"
   ;;   (define-key evil-evilified-state-map-original "H" 'evil-window-top)
   ;;   (define-key evil-evilified-state-map-original "L" 'evil-window-bottom)
@@ -857,6 +855,8 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   (setq-default flycheck-standard-error-navigation nil)
   (setq flycheck-standard-error-navigation nil)
+  (with-eval-after-load 'tramp
+    (push "/home/chopps/local/bin" tramp-remote-path))
 
   (debug-init-message "debug-init-msg is %s" debug-init-msg)
 
