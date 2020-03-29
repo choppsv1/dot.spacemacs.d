@@ -860,6 +860,8 @@ before packages are loaded. If you are unsure, you should try in setting them in
    ;;                              )
    )
 
+  (setq-default flycheck-standard-error-navigation nil)
+  (setq flycheck-standard-error-navigation nil)
   (with-eval-after-load 'tramp
     (push "/home/chopps/local/bin" tramp-remote-path))
 
@@ -2180,11 +2182,13 @@ This will replace the last notification sent with this function."
     ;; =================
     (when-layer-used 'lsp
      (with-eval-after-load 'lsp-mode
+     (setq-default lsp-enable-indentation nil)
        ))
 
     (when-layer-used 'syntax-checking
      (with-eval-after-load "flycheck"
        ;; (setq flycheck-highlighting-mode 'lines)
+       (add-hook 'flycheck-mode-hook (lambda () (setq next-error-function nil)))
        (setq flycheck-highlighting-mode 'sexps)
        (setq flycheck-temp-prefix ".flycheck")
 
@@ -2243,9 +2247,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                                             (flyspell-prog-mode)))))
 
     (when-layer-used 'c-c++
-     ;; Turn this back off now that the hook is there, let files/projects enable it.
-     (setq-default c-c++-enable-clang-format-on-save nil)
-
      (let ((binpath))
        (dolist (suffix '("-11" "-10" "-9" "-8" "-7" ""))
          (unless binpath
