@@ -810,8 +810,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (require 'iterm-xterm-extra)
   (setq-default xterm-extra-capabilities '(modifyOtherKeys reportBackground getSelection setSelection))
   ;; Give up and just use this.
-  (require 'clipetty)
-  (global-clipetty-mode)
   ;; (setq-default xterm-extra-capabilities '(getSelection setSelection))
 
   (require 'generic-lisp)
@@ -1105,6 +1103,9 @@ This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
 
   (debug-init-message "USER-CONFIG: Start")
+
+  (require 'clipetty)
+  (global-clipetty-mode)
 
   ;; sanityinc-tomorrow-blue
   ;; borland-blue
