@@ -295,6 +295,7 @@ This function should only modify configuration layer settings."
    '(
      base16-theme
      borland-blue-theme
+     clipetty
      cobalt
      color-theme-modern
      dockerfile-mode
@@ -807,6 +808,12 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (add-to-list 'load-path (concat "~/p/ietf-docs"))
   ;;(require 'iterm-custom-keys)
   (require 'iterm-xterm-extra)
+  (setq-default xterm-extra-capabilities '(modifyOtherKeys reportBackground getSelection setSelection))
+  ;; Give up and just use this.
+  (require 'clipetty)
+  (global-clipetty-mode)
+  ;; (setq-default xterm-extra-capabilities '(getSelection setSelection))
+
   (require 'generic-lisp)
   (require 'generic-mode-hooks)
 
@@ -975,48 +982,49 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (fold-section "Keybindings"
                 (define-key isearch-mode-map [remap isearch-delete-char] 'isearch-del-char)
 
-                (defun remote-gui-select-text (data)
-                  "gui-select-test version to use ssh to copy the current kill to the local systems clipboard"
-                  ;; (let ((cmd "ssh -q ${SSH_CONNECTION%% *} bash -c 'xsel -ibp --display :0 >& /dev/null || pbcopy'"))
-                  (let ((cmd "copytoclipem.sh"))
-                    (save-excursion
-                      (let* ((process-connection-type nil)  ; use a pipe as it cleans itself up
-                             (proc (start-process-shell-command "cut-to-remote" nil cmd)))
-                        (message "invoking remote select text cmd: %s with data: %s" cmd data)
-                        (process-send-string proc data)
-                        (process-send-eof proc)))
-                    data))
+                ;; (defun remote-gui-select-text (data)
+                ;;   "gui-select-test version to use ssh to copy the current kill to the local systems clipboard"
+                ;;   ;; (let ((cmd "ssh -q ${SSH_CONNECTION%% *} bash -c 'xsel -ibp --display :0 >& /dev/null || pbcopy'"))
+                ;;   (let ((cmd "copytoclipem.sh"))
+                ;;     (save-excursion
+                ;;       (let* ((process-connection-type nil)  ; use a pipe as it cleans itself up
+                ;;              (proc (start-process-shell-command "cut-to-remote" nil cmd)))
+                ;;         (message "invoking remote select text cmd: %s with data: %s" cmd data)
+                ;;         (process-send-string proc data)
+                ;;         (process-send-eof proc)))
+                ;;     data))
 
-                (defun remote-gui-selection-value ()
-                  "Use ssh to obtain the current clibboard on the local system"
-                  (interactive)
-                  (save-excursion
-                    (shell-command-to-string "ssh -q ${SSH_CONNECTION%% *} -- bash -c 'xsel -ob 2> /dev/null || pbpaste -Prefer txt'")))
+                ;; (defun remote-gui-selection-value ()
+                ;;   "Use ssh to obtain the current clibboard on the local system"
+                ;;   (interactive)
+                ;;   (save-excursion
+                ;;     (shell-command-to-string "ssh -q ${SSH_CONNECTION%% *} -- bash -c 'xsel -ob 2> /dev/null || pbpaste -Prefer txt'")))
 
-                (when (and (not (display-graphic-p))
-                           (getenv "SSH_CONNECTION"))
-                  (setq-default interprogram-cut-function #'remote-gui-select-text)
-                  ;; This is very slow, all yanks cause synchronous ssh connection..
-                  ;; (setq-default interprogram-paste-function #'remote-gui-selection-value)
-                  )
+                ;; See if OSC-52 works now.
+                ;; (when (and (not (display-graphic-p))
+                ;;            (getenv "SSH_CONNECTION"))
+                ;;   (setq-default interprogram-cut-function #'remote-gui-select-text)
+                ;;   ;; This is very slow, all yanks cause synchronous ssh connection..
+                ;;   ;; (setq-default interprogram-paste-function #'remote-gui-selection-value)
+                ;;   )
 
                 ;; (defun yank-from-ssh ()
                 ;;   (interactive)
-                ;;   (kill-new (remote-gui-selection-value))
-                ;;   (yank))
+                ;;   (let ((interprogram-paste-function #'remote-gui-selection-value))
+                ;;     (if (bound-and-true-p rebox-mode)
+                ;;         (rebox-yank)
+                ;;       (yank))))
+                ;; ;; Note used anymore
+                ;; ;; (defun yank-from-ssh ()
+                ;; ;;   (interactive)
+                ;; ;;   (kill-new (remote-gui-selection-value))
+                ;; ;;   (yank))
+                ;; ;; (evil-global-set-key 'insert (kbd "C-y") 'yank-from-ssh)
+                ;; (global-set-key (kbd "C-S-y") 'yank-from-ssh)
 
-                (defun yank-from-ssh ()
-                  (interactive)
-                  (let ((interprogram-paste-function #'remote-gui-selection-value))
-                    (if (bound-and-true-p rebox-mode)
-                        (rebox-yank)
-                      (yank))))
 
-                ;; (evil-global-set-key 'insert (kbd "C-y") 'yank-from-ssh)
-
-                (global-set-key (kbd "C-S-y") 'yank-from-ssh)
+                ;; Commented out a while ago
                 ;; (global-set-key (kbd "M-Y") 'yank-from-ssh)
-
                 ;; (global-set-key (kbd "M-Q") 'rebox-dwim)
 
                 ;; Find emacs source
