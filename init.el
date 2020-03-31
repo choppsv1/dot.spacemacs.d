@@ -1226,11 +1226,11 @@ layers configuration. You are free to put any user code."
     ;; Hate smart parens but apparently still want code??
     (remove-hook 'prog-mode-hook #'smartparens-mode)
     (spacemacs/toggle-smartparens-globally-off)
-    (sp-pair "'" nil :actions :rem)
-    (sp-pair "\"" nil :actions :rem)
-    (sp-pair "(" nil :actions :rem)
-    (sp-pair "\{" nil :actions :rem)
-    (sp-pair "\[" nil :actions :rem)
+    ;; (sp-pair "'" nil :actions :rem)
+    ;; (sp-pair "\"" nil :actions :rem)
+    ;; (sp-pair "(" nil :actions :rem)
+    ;; (sp-pair "\{" nil :actions :rem)
+    ;; (sp-pair "\[" nil :actions :rem)
 
     (run-hook-with-args 'spacemacs--hjkl-completion-navigation-functions
                         (member dotspacemacs-editing-style '(vim)))
