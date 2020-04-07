@@ -18,6 +18,10 @@ This function should only modify configuration layer settings."
   (setq load-prefer-newer t)
 
   (setq
+
+   ;;
+   ;; All systems get these layers -- keep it small!
+   ;;
    chopps-layers
    '(
      ;; Choose either ivy or helm as completion framework
@@ -28,48 +32,73 @@ This function should only modify configuration layer settings."
                       auto-completion-complete-with-key-sequence nil
                       auto-completion-private-snippets-directory "~/.spacemacs.d/snippets/"
                       auto-completion-tab-key-behavior 'complete)
-     ;; (auto-completion :variables
-     ;;   auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets"
-     ;;   auto-completion-enable-sort-by-usage t
-     ;;   auto-completion-enable-snippets-in-popup t
-     ;;   auto-completion-tab-key-behavior 'complete
-     ;;   )
-     ;; company-complete vs complete-at-point
      better-defaults
-     ;; ditaa
-     ;; docker
      git
+     ;; shell -- do I really use terminals in emacs?? no.
+     theming
+     themes-megapack
+
+     ;; Languages
+     emacs-lisp
+
+     ;; File Formats
+     csv
+     markdown
      (org :variables
           org-clock-idle-time 15
           org-enable-rfc-support t)
-     (shell :variables
-            ;; shell-default-shell 'shell
-            ;; shell-default-position 'bottom
-            ;; shell-default-height 30
-            )
-     theming
-     themes-megapack
-     ;; (erc :variables
-     ;;      erc-server-list
-     ;;      '(("irc.freenode.net"
-     ;;         :port "6697"
-     ;;         :ssl t
-     ;;         :nick "chopps"
-     ;;        ))
-     ;;  )
-     ;; bb-erc
-     ;; rcirc
-     ;; (rcirc :variables
-     ;;        rcirc-enable-authinfo-support t)
-     ;; eyebrowse blows layouts away!
-     ;; vim-empty-lines
+     shell-scripts
+     yaml
     )
+
+   linux-layers
+   '(
+     systemd
+     )
+
+   osx-layers
+   '(
+     (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
+     (mu4e :variables
+           ;; mu4e-enable-async-operations t
+           mu4e-enable-notifications nil
+           mu4e-use-maildirs-extension nil)
+     ;; (org2blog :variables org2blog-name "hoppsjots.org")
+     (osx :variables
+          osx-use-option-as-meta t)
+     (spell-checking :variables enable-flyspell-auto-completion nil)
+
+     ;; File formats
+     docker
+     html
+
+     ;; Languages
+     ;; (c-c++ :variables
+     ;;        c-c++-default-mode-for-headers 'c-mode
+     ;;        c-c++-backend 'lsp-clangd
+     ;;        ;; c-c++-adopt-subprojects t
+     ;;        ;; c-c++-backend 'lsp-ccls
+     ;;        ;; c-c++-lsp-sem-highlight-rainbow t
+     ;;        c-c++-enable-clang-support t
+     ;;        c-c++-enable-clang-format-on-save nil
+     ;;        )
+     (python :variables python-fill-column 100
+             python-fill-docstring-style 'pep-257-nn
+             python-test-runner '(pytest nose)
+             pytest-global-name "python -m pytest --doctest-modules"
+             ;; python-auto-set-local-pyvenv-virtualenv on-visit
+             ;; python-auto-set-local-pyenv-virtualenv nil
+             python-enable-yapf-format-on-save nil)
+     shell-scripts
+     (yang :variables
+           yang-pyang-rules "lint"
+           yang-pyang-extra-args "--max-line-length=79")
+     )
 
    dev-layers
    '(
-     (cmake :variables cmake-enable-cmake-ide-support nil)
+     ;; ditaa
      github
-     graphviz
      gtags
      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
      ;; pandoc
@@ -89,10 +118,12 @@ This function should only modify configuration layer settings."
                       version-control-global-margin t)
      ;; treemacs
 
-     ;; ---------
+     ;; File formats
+     docker
+     graphviz
+     html
+
      ;; Languages
-     ;; ---------
-     csv
      (c-c++ :variables
             c-c++-default-mode-for-headers 'c-mode
             c-c++-backend 'lsp-clangd
@@ -102,7 +133,7 @@ This function should only modify configuration layer settings."
             c-c++-enable-clang-support t
             c-c++-enable-clang-format-on-save nil
             )
-     emacs-lisp
+     (cmake :variables cmake-enable-cmake-ide-support nil)
      ;; ess
      (go :variables
          go-format-before-save t
@@ -112,14 +143,12 @@ This function should only modify configuration layer settings."
          go-backend 'go-mode
          ;; go-backend 'lsp
          )
-     html
      javascript
      (latex :variables latex-build-command "latexmk")
      (lsp :variables
           lps-ui-sideline-enable nil)
      (lua :variables lua-default-application "lua5.1")
      ;; lux
-     markdown
      ;; primary test runner is pytest use 'spc u' prefix to invoke nose
      (python :variables python-fill-column 100
              python-fill-docstring-style 'pep-257-nn
@@ -133,53 +162,14 @@ This function should only modify configuration layer settings."
      restructuredtext
      ;; (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
      (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
-     shell-scripts
      sphinx
-     yaml
 
      (yang :variables
            yang-pyang-rules "lint"
            yang-pyang-extra-args "--max-line-length=79")
      )
-   linux-layers
-   '(
-     systemd
-     )
-   osx-layers
-   '(
-     (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
-     (mu4e :variables
-           ;; mu4e-enable-async-operations t
-           mu4e-enable-notifications nil
-           mu4e-use-maildirs-extension nil)
-     ;; (org2blog :variables org2blog-name "hoppsjots.org")
-     (osx :variables
-          osx-use-option-as-meta t)
-     pandoc
-     pdf
-     (spell-checking :variables enable-flyspell-auto-completion nil)
-
-     ;; ---------
-     ;; Languages
-     ;; ---------
-
-     emacs-lisp
-     html
-     markdown
-     (python :variables python-fill-column 100
-             python-fill-docstring-style 'pep-257-nn
-             python-test-runner '(pytest nose)
-             pytest-global-name "python -m pytest --doctest-modules"
-             ;; python-auto-set-local-pyvenv-virtualenv on-visit
-             ;; python-auto-set-local-pyenv-virtualenv nil
-             python-enable-yapf-format-on-save nil)
-     shell-scripts
-     yaml
-     (yang :variables
-           yang-pyang-rules "lint"
-           yang-pyang-extra-args "--max-line-length=79")
-     )
-   chopps-dev-systems '("cmf-xe-1" "cmf-xe-6" "tops" "dak"))
+   ;; These systems get full development packages -- the slowest load
+   chopps-dev-systems '("cmf-xe-1" "tops" "dak"))
 
   (cond ((eq system-type 'darwin)
          (setq chopps-layers (append chopps-layers osx-layers)))
@@ -1103,22 +1093,18 @@ layers configuration. You are free to put any user code."
     ;;     (load-theme 'mandm))
 
     (debug-init-message "debug-init USER-CONFIG")
-    (setq dotspacemacs-themes (mapcar (lambda (package) (intern (string-remove-suffix "-theme" (symbol-name package)))) themes-megapack-packages))
+
+    ;; Add themes from megapack to dotspacemacs-themes
+    (setq dotspacemacs-themes
+          (mapcar (lambda (package)
+                    (intern (string-remove-suffix "-theme" (symbol-name package))))
+                  themes-megapack-packages))
 
     (persistent-scratch-setup-default)
 
-  ;;   (when (and (configuration-layer/layer-usedp 'python)
-  ;;              (configuration-layer/layer-usedp 'gtags))
-  ;;     (add-hook 'python-mode-hook '(lambda () (ggtags-mode 1))))
-
-  ;;   (when (and (configuration-layer/layer-usedp 'emacs-lisp)
-  ;;              (configuration-layer/layer-usedp 'gtags))
-  ;;     (add-hook 'emacs-lisp-mode-hook '(lambda () (ggtags-mode 1))))
-
-
-    ;; have to allow-emacs-pinentry in qpg-agent.conf?
-    ;; (setenv "INSIDE_EMACS" (format "%s,comint" emacs-version))
-    ;; (pinentry-start)
+    ;;
+    ;; Indention
+    ;;
 
     ;; Most everything use 4 space indent. This variable is a collection of
     ;; the values used by various modes join-line
@@ -1130,24 +1116,21 @@ layers configuration. You are free to put any user code."
 
     ;; (setq-default lisp-indent-offset nil)
       ;; (setq emacs-lisp-mode lisp-mode) . lisp-indent-offset)
-
     (setq python-indent-offset 4)
-
-    ;; (with-eval-after-load "ispell"
-    (setq ispell-program-name "hunspell")
-
     ;; overrides
     (setq-default nxml-child-indent 2)
     (setq-default yaml-indent-offset 2)
-
     ;; This is annoying it's used for json and js need to split up
     (setq-default js-indent-level 2)
 
     ;; tabs are 8 characters wide!
     (setq-default tab-width 8)
-
     ;; 80 columns is the normal fill column
     (setq-default fill-column 80)
+
+
+    ;; (with-eval-after-load "ispell"
+    (setq ispell-program-name "hunspell")
 
     (setq-default magit-todos-ignored-keywords '("NOTE" "DONE" "FAIL"))
     (setq-default evil-escape-key-sequence nil)
