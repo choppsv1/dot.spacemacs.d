@@ -3375,11 +3375,11 @@ a number of clock tables."
      (debug-init-message "pre-server-running-notificiation-setup")
 
      ;; XXX need to change this
+     (when nil
      (when (and (or (daemonp) (and (fboundp 'server-running-p) (server-running-p)))
                 (string-equal system-type "darwin"))
+
        (debug-init-message "before require org notify")
-
-
 
        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
        ;; Terminal notifier
@@ -3434,9 +3434,10 @@ a number of clock tables."
        (org-notify-start)
        (debug-init-message "org notify started")
        )
+
      (debug-init-message "debug-init POST-server-running-notification-setup")
 
-     )
+     ))
 
 
     ;; ====
