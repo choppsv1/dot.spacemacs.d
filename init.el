@@ -11,13 +11,183 @@
                 (append (list (concat ts ": DEBUG-INIT: " fmt))
                         a)))))
 
-
-
 (defun dotspacemacs/layers ()
   "Layer configuration:
 This function should only modify configuration layer settings."
-  (setq load-prefer-newer t
-        )
+
+  (setq load-prefer-newer t)
+
+  (setq
+   chopps-layers
+   '(
+     ;; Choose either ivy or helm as completion framework
+     ;; ivy
+     helm
+     (auto-completion :disabled-for org
+                      :variables
+                      auto-completion-complete-with-key-sequence nil
+                      auto-completion-private-snippets-directory "~/.spacemacs.d/snippets/"
+                      auto-completion-tab-key-behavior 'complete)
+     ;; (auto-completion :variables
+     ;;   auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets"
+     ;;   auto-completion-enable-sort-by-usage t
+     ;;   auto-completion-enable-snippets-in-popup t
+     ;;   auto-completion-tab-key-behavior 'complete
+     ;;   )
+     ;; company-complete vs complete-at-point
+     better-defaults
+     ;; ditaa
+     ;; docker
+     git
+     (org :variables
+          org-clock-idle-time 15
+          org-enable-rfc-support t)
+     (shell :variables
+            ;; shell-default-shell 'shell
+            ;; shell-default-position 'bottom
+            ;; shell-default-height 30
+            )
+     theming
+     themes-megapack
+     ;; (erc :variables
+     ;;      erc-server-list
+     ;;      '(("irc.freenode.net"
+     ;;         :port "6697"
+     ;;         :ssl t
+     ;;         :nick "chopps"
+     ;;        ))
+     ;;  )
+     ;; bb-erc
+     ;; rcirc
+     ;; (rcirc :variables
+     ;;        rcirc-enable-authinfo-support t)
+     ;; eyebrowse blows layouts away!
+     ;; vim-empty-lines
+    )
+
+   dev-layers
+   '(
+     (cmake :variables cmake-enable-cmake-ide-support nil)
+     github
+     graphviz
+     gtags
+     (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
+     ;; pandoc
+     ;; pdf
+     ;; ranger
+     ;; (rust :variables
+     ;;      rust-format-on-save t)
+     rebox
+     ;; nginx
+     (spell-checking :variables enable-flyspell-auto-completion nil)
+     (syntax-checking :variables syntax-checking-enable-tooltips t)
+     (version-control :variables
+                      version-control-diff-tool 'git-gutter+
+                      ;; version-control-diff-tool 'git-gutter
+                      ;; version-control-diff-tool 'diff-hl
+                      version-control-diff-side 'right
+                      version-control-global-margin t)
+     ;; treemacs
+
+     ;; ---------
+     ;; Languages
+     ;; ---------
+     csv
+     (c-c++ :variables
+            c-c++-default-mode-for-headers 'c-mode
+            c-c++-backend 'lsp-clangd
+            ;; c-c++-adopt-subprojects t
+            ;; c-c++-backend 'lsp-ccls
+            ;; c-c++-lsp-sem-highlight-rainbow t
+            c-c++-enable-clang-support t
+            c-c++-enable-clang-format-on-save nil
+            )
+     emacs-lisp
+     ;; ess
+     (go :variables
+         go-format-before-save t
+         go-use-golangci-lint t
+         ;; go-use-gometalinter t
+         ;; godoc-at-point-function 'godoc-gogetdoc
+         go-backend 'go-mode
+         ;; go-backend 'lsp
+         )
+     html
+     javascript
+     (latex :variables latex-build-command "latexmk")
+     (lsp :variables
+          lps-ui-sideline-enable nil)
+     (lua :variables lua-default-application "lua5.1")
+     ;; lux
+     markdown
+     ;; primary test runner is pytest use 'spc u' prefix to invoke nose
+     (python :variables python-fill-column 100
+             python-fill-docstring-style 'pep-257-nn
+             python-test-runner '(pytest nose)
+             pytest-global-name "python -m pytest --doctest-modules"
+             ;; python-auto-set-local-pyvenv-virtualenv on-visit
+             ;; python-auto-set-local-pyenv-virtualenv nil
+             python-enable-yapf-format-on-save nil)
+     ;; disable emacs-lisp due to completionion in comments parsing tons
+     ;; of .el files https://github.com/syl20bnr/spacemacs/issues/7038
+     restructuredtext
+     ;; (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
+     (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
+     shell-scripts
+     sphinx
+     yaml
+
+     (yang :variables
+           yang-pyang-rules "lint"
+           yang-pyang-extra-args "--max-line-length=79")
+     )
+   linux-layers
+   '(
+     systemd
+     )
+   osx-layers
+   '(
+     (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
+     (mu4e :variables
+           ;; mu4e-enable-async-operations t
+           mu4e-enable-notifications nil
+           mu4e-use-maildirs-extension nil)
+     ;; (org2blog :variables org2blog-name "hoppsjots.org")
+     (osx :variables
+          osx-use-option-as-meta t)
+     pandoc
+     pdf
+     (spell-checking :variables enable-flyspell-auto-completion nil)
+
+     ;; ---------
+     ;; Languages
+     ;; ---------
+
+     emacs-lisp
+     html
+     markdown
+     (python :variables python-fill-column 100
+             python-fill-docstring-style 'pep-257-nn
+             python-test-runner '(pytest nose)
+             pytest-global-name "python -m pytest --doctest-modules"
+             ;; python-auto-set-local-pyvenv-virtualenv on-visit
+             ;; python-auto-set-local-pyenv-virtualenv nil
+             python-enable-yapf-format-on-save nil)
+     shell-scripts
+     yaml
+     (yang :variables
+           yang-pyang-rules "lint"
+           yang-pyang-extra-args "--max-line-length=79")
+     )
+   chopps-dev-systems '("cmf-xe-1" "cmf-xe-6" "tops" "dak"))
+
+  (cond ((eq system-type 'darwin)
+         (setq chopps-layers (append chopps-layers osx-layers)))
+        ((eq system-type 'gnu/linux)
+         (setq chopps-layers (append chopps-layers linux-layers))))
+  (when (member system-name chopps-dev-systems)
+    (setq chopps-layers (append chopps-layers dev-layers)))
+
   (setq-default
    load-prefer-newer t
 
@@ -44,249 +214,11 @@ This function should only modify configuration layer settings."
    ;; If non-nil layers with lazy install support are lazy installed.
    ;; List of additional paths where to look for configuration layers.
    ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
-   dotspacemacs-configuration-layer-path '())
+   dotspacemacs-configuration-layer-path '()
 
    ;; List of configuration layers to load.
-  (if (not (string-equal system-type "darwin") )
-      (setq-default
-       dotspacemacs-configuration-layers
-   `(
-      ;; Choose either ivy or helm as completion framework
-      ;; ivy
-      helm
+   dotspacemacs-configuration-layers chopps-layers
 
-      (auto-completion :disabled-for org
-                       :variables
-                       auto-completion-complete-with-key-sequence nil
-                       auto-completion-tab-key-behavior 'complete)
-      ;; (auto-completion :variables
-      ;;   auto-completion-private-snippets-directory "~/.spacemacs.d/private/snippets"
-      ;;   auto-completion-enable-sort-by-usage t
-      ;;   auto-completion-enable-snippets-in-popup t
-      ;;   auto-completion-tab-key-behavior 'complete
-      ;;   )
-      ;; company-complete vs complete-at-point
-
-      better-defaults
-      (cmake :variables cmake-enable-cmake-ide-support nil)
-      ;; ditaa
-      docker
-
-      ;; this causing github login and errors for all git projects even private non-github ones).
-      git
-      github
-      graphviz
-      gtags
-      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
-      ;; jabber
-      (mu4e :variables
-            ;; mu4e-enable-async-operations t
-            mu4e-enable-notifications nil
-            mu4e-use-maildirs-extension nil)
-      ;; multiple-cursors
-      (org :variables
-           org-clock-idle-time 15
-           org-enable-rfc-support t)
-      ;; (org2blog :variables org2blog-name "hoppsjots.org")
-      ;; pandoc
-      ;; pdf
-      ;; ranger
-
-      rebox
-      ;; (rust :variables
-      ;;      rust-format-on-save t)
-
-      (shell :variables
-              ;; shell-default-shell 'shell
-              ;; shell-default-position 'bottom
-              ;; shell-default-height 30
-              )
-
-      ;; nginx
-      (spell-checking :variables enable-flyspell-auto-completion nil)
-      (syntax-checking :variables syntax-checking-enable-tooltips t)
-      theming
-      themes-megapack
-      (version-control :variables
-                       version-control-diff-tool 'git-gutter+
-                       ;; version-control-diff-tool 'git-gutter
-                       ;; version-control-diff-tool 'diff-hl
-                       version-control-diff-side 'right
-
-                       version-control-global-margin t)
-      ;; treemacs
-
-      ;; ---------
-      ;; Languages
-      ;; ---------
-
-      ;; php ;; this is here I think to avoid a bug if we put it in alpha order
-      lsp-mode
-      csv
-      (c-c++ :variables
-             c-c++-default-mode-for-headers 'c-mode
-             c-c++-backend 'lsp-clangd
-             ;; c-c++-adopt-subprojects t
-             ;; c-c++-backend 'lsp-ccls
-             ;; c-c++-lsp-sem-highlight-rainbow t
-             c-c++-enable-clang-support t
-             c-c++-enable-clang-format-on-save nil
-             )
-      emacs-lisp
-      ;; ess
-      (go :variables
-          go-format-before-save t
-          go-use-golangci-lint t
-          ;; go-use-gometalinter t
-          ;; godoc-at-point-function 'godoc-gogetdoc
-          go-backend 'go-mode
-          ;; go-backend 'lsp
-          )
-      html
-      javascript
-      (latex :variables latex-build-command "latexmk")
-      (lua :variables lua-default-application "lua5.1")
-      ;; lux
-      markdown
-      ;; primary test runner is pytest use 'spc u' prefix to invoke nose
-      (python :variables python-fill-column 100
-                         python-fill-docstring-style 'pep-257-nn
-                         python-test-runner '(pytest nose)
-                         pytest-global-name "python -m pytest --doctest-modules"
-                         ;; python-auto-set-local-pyvenv-virtualenv on-visit
-                         ;; python-auto-set-local-pyenv-virtualenv nil
-                         python-enable-yapf-format-on-save nil)
-      ;; disable emacs-lisp due to completionion in comments parsing tons
-      ;; of .el files https://github.com/syl20bnr/spacemacs/issues/7038
-      restructuredtext
-      ;; (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
-      (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
-      shell-scripts
-      sphinx
-      systemd
-      yaml
-
-      (yang :variables
-            yang-pyang-rules "lint"
-            yang-pyang-extra-args "--max-line-length=79")
-
-      ;; -----------------------------
-      ;; let's keep this later. (why?)
-      ;; -----------------------------
-      ;; (erc :variables
-      ;;      erc-server-list
-      ;;      '(("irc.freenode.net"
-      ;;         :port "6697"
-      ;;         :ssl t
-      ;;         :nick "chopps"
-      ;;        ))
-      ;;  )
-      ;; bb-erc
-
-      ;; rcirc
-      ;; (rcirc :variables
-      ;;        rcirc-enable-authinfo-support t)
-      ;; eyebrowse blows layouts away!
-      ;; vim-empty-lines
-     ))
-     ;;
-     ;; Mac OS-X super slow, disable all but essentials
-     ;;
-    (setq-default
-     dotspacemacs-configuration-layers
-     `(
-      ;; Choose either ivy or helm as completion framework
-      ;; ivy
-      helm
-
-      (auto-completion :disabled-for org
-                       :variables
-                       auto-completion-complete-with-key-sequence nil
-                       auto-completion-tab-key-behavior 'complete)
-      docker
-      git
-      ;; github
-      ;; graphviz
-      ;; gtags
-      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
-      (mu4e :variables
-            ;; mu4e-enable-async-operations t
-            mu4e-enable-notifications nil
-            mu4e-use-maildirs-extension nil)
-      (org :variables
-           org-clock-idle-time 15
-           org-enable-rfc-support t)
-      ;; (org2blog :variables org2blog-name "hoppsjots.org")
-      pandoc
-      (osx :variables
-           osx-use-option-as-meta t)
-      pdf
-      ;; rebox
-      ;; (shell :variables
-      ;;         ;; shell-default-shell 'shell
-      ;;         ;; shell-default-position 'bottom
-      ;;         ;; shell-default-height 30
-      ;;         )
-      (spell-checking :variables enable-flyspell-auto-completion nil)
-      ;; (syntax-checking :variables syntax-checking-enable-tooltips t)
-
-      theming
-      themes-megapack
-      ;; (version-control :variables
-      ;;                  version-control-diff-tool 'git-gutter+
-      ;;                  ;; version-control-diff-tool 'git-gutter
-      ;;                  ;; version-control-diff-tool 'diff-hl
-      ;;                  version-control-diff-side 'right
-      ;;                  version-control-global-margin t)
-
-      ;; ---------
-      ;; Languages
-      ;; ---------
-
-      emacs-lisp
-      html
-      markdown
-      ;; primary test runner is pytest use 'spc u' prefix to invoke nose
-      (python :variables python-fill-column 100
-                        python-fill-docstring-style 'pep-257-nn
-                         python-test-runner '(pytest nose)
-                         pytest-global-name "python -m pytest --doctest-modules"
-                         ;; python-auto-set-local-pyvenv-virtualenv on-visit
-                         ;; python-auto-set-local-pyenv-virtualenv nil
-                         python-enable-yapf-format-on-save nil)
-
-      ;; ;; disable emacs-lisp due to completionion in comments parsing tons
-      ;; ;; of .el files https://github.com/syl20bnr/spacemacs/issues/7038
-      ;; restructuredtext
-      ;; (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
-      ;; (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
-      shell-scripts
-      yaml
-      (yang :variables
-            yang-pyang-rules "lint"
-             yang-pyang-extra-args "--max-line-length=79")
-
-      ;; -----------------------------
-      ;; let's keep this later. (why?)
-      ;; -----------------------------
-      ;; (erc :variables
-      ;;      erc-server-list
-      ;;      '(("irc.freenode.net"
-      ;;         :port "6697"
-      ;;         :ssl t
-      ;;         :nick "chopps"
-      ;;        ))
-      ;;  )
-      ;; bb-erc
-
-      ;; rcirc
-      ;; (rcirc :variables
-      ;;        rcirc-enable-authinfo-support t)
-      ;; eyebrowse blows layouts away!
-      ;; vim-empty-lines
-     )))
-
-(setq-default
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
