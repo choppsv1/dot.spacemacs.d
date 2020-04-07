@@ -27,7 +27,7 @@ args = parser.parse_args()
 
 # Map elms are for C, M, C-S, M-S, C-M-S
 
-shiftmap = { chr(x): chr(x).upper() for x in xrange(ord('a'), ord('z') + 1) }
+shiftmap = { chr(x): chr(x).upper() for x in range(ord('a'), ord('z') + 1) }
 shiftmap['`'] = '~'
 shiftmap['1'] = '!'
 shiftmap['2'] = '@'
@@ -67,6 +67,7 @@ shiftmap["/"] = '?'
 # "Keyboard Map" : {
 mapfmt = r'''
                 "0x{ucode:x}-0x{ameta:x}" : {{
+                    "Comment" : "{emesc}{emkey}",
                     "Text" : "[27;{meta:d};{ascii:d}~",
                     "Action" : 10
                 }}{comma} '''
@@ -75,6 +76,7 @@ elfmt2 = '    (define-key function-key-map "\e[27;{meta:d};{ascii:d}~" [{emesc}{
 
 mapfuncfmt = r'''
                 "0x{ucode:x}-0x{ameta:x}" : {{
+                    "Comment" : "{emesc}{emkey}",
                     "Text" : "[1;{meta:d}{echar}",
                     "Action" : 10
                 }}{comma} '''
@@ -83,6 +85,7 @@ elfuncfmt = '    (define-key function-key-map "\e[1;{meta:d}{echar}" [{emesc}{em
 
 mapfunc2fmt = r'''
                 "0x{ucode:x}-0x{ameta:x}" : {{
+                    "Comment" : "{emesc}{emkey}",
                     "Text" : "[{echar};{meta:d}~",
                     "Action" : 10
                 }}{comma} '''
@@ -91,6 +94,7 @@ elfunc2fmt = '    (define-key function-key-map "\e[{echar};{meta:d}~" [{emesc}{e
 
 mapfunckeyfmt = r'''
                 "0x{ucode:x}-0x{ameta:x}" : {{
+                    "Comment" : "{emesc}{emkey}",
                     "Text" : "O{meta:d}{echar}",
                     "Action" : 10
                 }}{comma} '''
@@ -103,11 +107,11 @@ CONTROL = 2
 META =    4
 
 # No alpha in unshifted meta key
-nometa = set([chr(x) for x in xrange(ord('a'), ord('z') + 1)])
-nometa |= set([chr(x) for x in xrange(ord('A'), ord('Z') + 1)])
+nometa = set([chr(x) for x in range(ord('a'), ord('z') + 1)])
+nometa |= set([chr(x) for x in range(ord('A'), ord('Z') + 1)])
 
 # No alpha in unshifted control
-nocontrol = set([chr(x) for x in xrange(ord('a'), ord('z') + 1)])
+nocontrol = set([chr(x) for x in range(ord('a'), ord('z') + 1)])
 # Add control characters that are normally handled
 nocontrol.add('@')
 nocontrol.add('[')
@@ -117,7 +121,7 @@ nocontrol.add('\\')
 def lookahead(iterable):
     """Return an element and an indication if it's the last element"""
     i = iter(iterable)
-    last = i.next()
+    last = next(i)
     for elm in i:
         yield last, False
         last = elm
@@ -142,14 +146,14 @@ def xtermmeta (flags):
     return metamap[flags]
 
 
-def doit (iterm=False):
+def doit (iterm=False, darkstr="-dark"):
     if iterm:
         print("""{
     "Profiles": [
         {
         "Name": "xterm-keymap-profile",
         "Guid": "35E25353-C3DB-4DB0-A660-3D8BDF629AA3",
-        "Dynamic Profile Parent Name": "default",
+        "Dynamic Profile Parent Name": "default-dark",
         "Keyboard Map" : {""")
 
     # For alpha characters
@@ -188,6 +192,8 @@ def doit (iterm=False):
                                         ameta=makeapple(meta),
                                         meta=xmeta,
                                         ascii=ucode,
+                                        emesc=emesc,
+                                        emkey=emkey,
                                         comma=","), end="")
                 else:
                     if emkey == '"':
@@ -216,6 +222,8 @@ def doit (iterm=False):
                                         ameta=makeapple(meta | SHIFT),
                                         meta=xmeta,
                                         ascii=ucode,
+                                        emesc=emesc,
+                                        emkey=emkey,
                                         comma=","), end="")
                 else:
                     if emkey == '"':
@@ -274,6 +282,15 @@ def doit (iterm=False):
             echar = val[0]
             ucode = val[1]
             xmeta = xtermmeta(meta)
+
+            emesc = ""
+            if meta & CONTROL:
+                emesc += "C-"
+            if meta & META:
+                emesc += "M-"
+            if meta & SHIFT:
+                emesc += "S-"
+
             if iterm:
                 # Tab character unicode 19 for backtab (shifted tab)
                 if ucode == 9 and (meta & SHIFT):
@@ -283,16 +300,10 @@ def doit (iterm=False):
                                     meta=xmeta,
                                     echar=echar,
                                     ascii=echar,
-                                    comma=comma), end="")
+                                    comma=comma,
+                                    emkey=emkey,
+                                    emesc=emesc), end="")
             else:
-                emesc = ""
-                if meta & CONTROL:
-                    emesc += "C-"
-                if meta & META:
-                    emesc += "M-"
-                if meta & SHIFT:
-                    emesc += "S-"
-
                 ucode = ord(emkey)
                 print(val[2].format(meta=xmeta, ascii=echar, echar=echar, emkey=key, emesc=emesc))
 
