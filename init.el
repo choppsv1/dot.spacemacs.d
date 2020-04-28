@@ -34,7 +34,7 @@ This function should only modify configuration layer settings."
                       auto-completion-tab-key-behavior 'complete)
      better-defaults
      git
-     ;; shell -- do I really use terminals in emacs?? no.
+     rebox
      theming
      themes-megapack
 
@@ -2144,22 +2144,23 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         ;; hyphens are words in emacs lisp
         (modify-syntax-entry ?- "w" lisp-mode-syntax-table)
         (modify-syntax-entry ?- "w" emacs-lisp-mode-syntax-table)
-        (defun rebox-lisp-hook ()
-          (set (make-local-variable 'rebox-style-loop) '(81 82 83)))
-        (add-hook 'lisp-mode-hook 'rebox-lisp-hook)
-        (add-hook 'emacs-lisp-mode-hook 'rebox-lisp-hook)
-        ))
+        (when-layer-used 'rebox
+                         (defun rebox-lisp-hook ()
+                           (set (make-local-variable 'rebox-style-loop) '(81 82 83)))
+                         (add-hook 'lisp-mode-hook 'rebox-lisp-hook)
+                         (add-hook 'emacs-lisp-mode-hook 'rebox-lisp-hook))))
 
     (when-layer-used 'go
      (with-eval-after-load "go-mode"
-        (defun rebox-go-hook ()
-          (set (make-local-variable 'rebox-style-loop) '(81 82 83)))
-        (add-hook 'go-mode-hook 'rebox-go-hook)
-        ))
+       (when-layer-used 'rebox
+                        (defun rebox-go-hook ()
+                          (set (make-local-variable 'rebox-style-loop) '(81 82 83)))
+                        (add-hook 'go-mode-hook 'rebox-go-hook))))
 
     (when-layer-used 'yaml
      (add-hook 'yaml-mode-hook (function (lambda ()
-                                            (rebox-mode)
+                                           (when-layer-used 'rebox
+                                            (rebox-mode))
                                             (flyspell-prog-mode)))))
 
     (when-layer-used 'c-c++
@@ -2283,14 +2284,13 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                 (let ((path1 (concat root path)))
                   (check-flycheck-clang-project-add-path path1))))))
 
-        (defun rebox-c-hook ()
-          (set (make-local-variable 'rebox-style-loop) '(241 213 215))
-          (bind-key "M-q" 'rebox-dwim c-mode-map)
-          ;; (global-set-key (kbd "M-Q") 'rebox-dwim)
-          )
-        (add-hook 'c-mode-hook 'rebox-c-hook)
 
         (when-layer-used 'rebox
+          (defun rebox-c-hook ()
+            (set (make-local-variable 'rebox-style-loop) '(241 213 215))
+            (bind-key "M-q" 'rebox-dwim c-mode-map))
+          (add-hook 'c-mode-hook 'rebox-c-hook)
+
          (with-eval-after-load "rebox2"
            (rebox-register-template 252 286 '("/* ---------"
                                               " * box123456"
@@ -2309,15 +2309,14 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                                               "// ---------"))
            (rebox-register-template 283 486 '("// ========="
                                               "// box123456"
-                                              "// ========="))
-           ))
+                                              "// =========")))
 
         (spacemacs/set-leader-keys-for-major-mode 'c-mode
           "q" 'rebox-dwim)
         (spacemacs/set-leader-keys-for-major-mode 'cc-mode
           "q" 'rebox-dwim)
         (spacemacs/set-leader-keys-for-major-mode 'c++-mode
-          "q" 'rebox-dwim)
+          "q" 'rebox-dwim))
 
         (setq-default c-electric-flag nil)
 
