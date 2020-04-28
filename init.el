@@ -301,7 +301,7 @@ It should only modify the values of Spacemacs settings."
   ;; mDetermine display size to pick font size
   (setq custom-file (concat dotspacemacs-directory "custom.el"))
   (load custom-file)
-  (dotspacemacs/emacs-custom-settings)
+  ;; (dotspacemacs/emacs-custom-settings)
 
   (set-fontsize)
   (debug-init-message "def height %s" ch-def-height)
@@ -470,8 +470,10 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-major-mode-leader-key ","
 
    ;; Major mode leader key accessible in `emacs state' and `insert state'.
-   ;; (default "C-M-m")
-   dotspacemacs-major-mode-emacs-leader-key "C-M-m"
+   ;; (default "C-M-m" for terminal mode, "<M-return>" for GUI mode).
+   ;; Thus M-RET should work as leader key in both GUI and terminal modes.
+   ;; C-M-m also should work in terminal mode, but not in GUI mode.
+   dotspacemacs-major-mode-emacs-leader-key (if window-system "<M-return>" "C-M-m")
 
    ;; These variables control whether separate commands are bound in the GUI to
    ;; the key pairs `C-i', `TAB' and `C-m', `RET'.
@@ -663,6 +665,12 @@ It should only modify the values of Spacemacs settings."
    ;; delete only whitespace for changed lines or `nil' to disable cleanup.
    ;; (default nil)
    dotspacemacs-whitespace-cleanup 'changed
+
+   ;; If non nil activate `clean-aindent-mode' which tries to correct
+   ;; virtual indentation of simple modes. This can interfer with mode specific
+   ;; indent handling like has been reported for `go-mode'.
+   ;; If it does deactivate it here.
+   ;; (default t)
 
    ;; Either nil or a number of seconds. If non-nil zone out after the specified
    ;; number of seconds. (default nil)
@@ -1630,15 +1638,10 @@ This will replace the last notification sent with this function."
         :type '(string :tag "Folder name")
         :group 'mu4e-folders)
 
-      (setq mu4e-maildir "~/Mail"
-            mu4e-attachment-dir "~/Downloads"
+      (setq mu4e-attachment-dir "~/Downloads"
             mu4e-index-cleanup nil
-
             mu4e-change-filenames-when-moving t
-            ;; mu4e-mu-binary (executable-find "mu")
             mu4e-update-interval nil
-
-            ;; Stop mu4e from blowing away message buffer all the time
             mu4e-hide-index-messages t
 
             ;; -------
@@ -1647,12 +1650,13 @@ This will replace the last notification sent with this function."
             mu4e-headers-results-limit 500
             mu4e-headers-visible-lines 15
             mu4e-headers-visible-columns 240
+
             ;; For searches useful as t to find replies to threads?
             mu4e-headers-include-related nil
             mu4e-view-show-addresses t
             mu4e-view-use-gnus t
             ;; HTML
-            mu4e-html2text-command 'my-mu4e-shr2text
+            ;; mu4e-html2text-command 'my-mu4e-shr2text
             shr-color-visible-luminance-min 80
             shr-use-fonts nil
 
@@ -1663,6 +1667,7 @@ This will replace the last notification sent with this function."
             ;; -----------
             send-mail-function 'smtpmail-send-it
             message-send-mail-function 'smtpmail-send-it
+
             ;; don't keep message buffers around
             message-kill-buffer-on-exit t
             mu4e-compose-complete-addresses t
@@ -1729,15 +1734,12 @@ This will replace the last notification sent with this function."
 
             mu4e-inbox-mailbox '("maildir:/gmail.com/INBOX"
                                  "maildir:/labn.net/INBOX"
-                                 "maildir:/chopps.org/INBOX"
-                                 "maildir:/devhopps.com/INBOX")
+                                 "maildir:/chopps.org/INBOX")
 
             mu4e-imp-mailbox '("maildir:/chopps.org/ietf-chairs"
                                "maildir:/chopps.org/ietf-chairs-rtg"
                                "maildir:/chopps.org/ietf-rtg-dir"
-                               "maildir:/chopps.org/ietf-rtg-dir"
                                "maildir:/chopps.org/ietf-wg-ipsec"
-                               "maildir:/chopps.org/ietf-wg-isis"
                                "maildir:/chopps.org/ietf-wg-lsr"
                                "maildir:/chopps.org/ietf-wg-netmod"
                                "maildir:/chopps.org/ietf-wg-rtg")
@@ -1797,11 +1799,8 @@ This will replace the last notification sent with this function."
             mu4e-maildir-shortcuts '(("/chopps.org/INBOX" . ?i)
                                      ("/gmail.com/INBOX" . ?g)
                                      ("/labn.net/INBOX" . ?l)
-                                     ("/chopps.org/receipts" . ?r)
                                      ("/chopps.org/aa-netbsd" . ?n)
-                                     ("/chopps.org/ietf-wg-isis" . ?I)
-                                     ("/chopps.org/ietf-wg-homenet" . ?H)
-                                     ("/chopps.org/ietf-wg-netmod" . ?N)
+                                     ("/chopps.org/ietf-wg-lsr" . ?L)
                                      ("/chopps.org/spam-train" . ?S)
                                      ("/chopps.org/spam-probable" . ?s))
        )
@@ -1902,7 +1901,7 @@ This will replace the last notification sent with this function."
             (defun my-message-expand-name (&optional start)
               ((interactive "P"))
               ;; (message "my-message-expand-name called")
-              (helm :prompt "; commentntact:" :sources
+              (helm :prompt "; contact:" :sources
                     (helm-build-sync-source "mu4e contacts"
                                             :candidates mu4e~contact-list :candidate-transformer 'ch:ct))))
 
@@ -1926,8 +1925,6 @@ This will replace the last notification sent with this function."
             (if (not mu4e~contacts)
                 (mu4e~request-contacts))
 
-            ;; XXX hate that this is the case, but DT is horrible with this crap.
-            ;; XXX need to do this only if not DT
             (mml-secure-message-sign-pgpmime)
             )
           (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
@@ -1949,7 +1946,8 @@ This will replace the last notification sent with this function."
           ;; (define-key mu4e-headers-mode-map (kbd "C-c c") 'org-mu4e-store-and-capture)
           ;; (define-key mu4e-view-mode-map    (kbd "C-c c") 'org-mu4e-store-and-capture)
 
-          (require 'mu4e-contrib)
+          ;; removed 20200426
+          ;; (require 'mu4e-contrib)
 
           ;; XXX also add this back
           ;;
@@ -1958,28 +1956,28 @@ This will replace the last notification sent with this function."
           ;; (mu4e-alert-enable-mode-line-display)
           ;; (mu4e-alert-enable-notifications)
 
-          ;; ;; XXX disabled trying to find hang XXX THIS CAUSED IT
-          (debug-init-message "debug-init MU4E mode hook")
-          (add-hook 'mu4e-headers-mode-hook
-            (lambda () (progn
-                         (make-local-variable 'scroll-conservatively)
-                         (setq
-                           show-trailing-whitespace nil
-                           scroll-conservatively 0
-                           ;; XXX These two cause hangs
-                           ;; scroll-up-aggressively .8
-                           ;; scroll-down-aggressively .8)
-                           )
-                         )))
+          ;; removed 20200426
+          ;; ;; ;; XXX disabled trying to find hang XXX THIS CAUSED IT
+          ;; (debug-init-message "debug-init MU4E mode hook")
+          ;; (add-hook 'mu4e-headers-mode-hook
+          ;;   (lambda () (progn
+          ;;                (make-local-variable 'scroll-conservatively)
+          ;;                (setq
+          ;;                  show-trailing-whitespace nil
+          ;;                  scroll-conservatively 0
+          ;;                  ;; XXX These two cause hangs
+          ;;                  ;; scroll-up-aggressively .8
+          ;;                  ;; scroll-down-aggressively .8)
+          ;;                  )
+          ;;                )))
+          ;; (add-hook 'mu4e-view-mode-hook
+          ;;           (lambda () (setq show-trailing-whitespace nil)))
+          ;; ;; Need exit hook from headers mode to do an immediate index update.
+          ;; (add-hook 'mu4e-main-mode-hook (lambda () (mu4e-update-index)))
 
           ;; ;; XXX causes hangs
           ;; (add-hook 'mu4e-headers-mode-hook (lambda () (progn (setq scroll-up-aggressively .8))))
 
-          (add-hook 'mu4e-view-mode-hook
-                    (lambda () (setq show-trailing-whitespace nil)))
-
-          ;; Need exit hook from headers mode to do an immediate index update.
-          (add-hook 'mu4e-main-mode-hook (lambda () (mu4e-update-index)))
 
           (add-to-list 'mu4e-view-actions
                        '("ViewInBrowser" . mu4e-action-view-in-browser))
@@ -2900,7 +2898,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
          "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
         ))
 
-      ;; This is a copy of the function so that we can add "bimonth" steps
+      ;; This is a copy of the function so that we can add "semimonth" steps
       (defun org-clocktable-steps (params)
         "Create one or more clock tables, according to PARAMS.
 Step through the range specifications in plist PARAMS to make
@@ -2911,7 +2909,7 @@ a number of clock tables."
                 (pcase step
                   (`day "Daily report: ")
                   (`week "Weekly report starting on: ")
-                  (`bimonth "Bi-Monthly report starting on: ")
+                  (`semimonth "Bi-Monthly report starting on: ")
                   (`month "Monthly report starting on: ")
                   (`year "Annual report starting on: ")
                   (_ (user-error "Unknown `:step' specification: %S" step))))
@@ -2961,7 +2959,7 @@ a number of clock tables."
                                 (let ((offset (if (= dow week-start) 7
                                                 (mod (- week-start dow) 7))))
                                   (list 0 0 org-extend-today-until (+ d offset) m y)))
-                               (`bimonth (list 0 0 0 (if (< d 16) 16 1) (if (< d 16) m (1+ m)) y))
+                               (`semimonth (list 0 0 0 (if (< d 16) 16 1) (if (< d 16) m (1+ m)) y))
                                (`month (list 0 0 0 month-start (1+ m) y))
                                (`year (list 0 0 org-extend-today-until 1 1 (1+ y)))))))
                    (table-begin (line-beginning-position 0))
