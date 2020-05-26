@@ -729,15 +729,31 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu-mac/mu4e/")
   (add-to-list 'custom-theme-load-path "~/p/emacs-mandm-theme/")
-  (add-to-list 'custom-theme-load-path "~/p/emacs-mandm-theme/")
-  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/vscode-theme"))
-  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/vscode+-theme"))
-  ;; (add-to-list 'load-path (concat dotspacemacs-directory "repos/magit-gerrit"))
-  ;; (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/pycoverage"))
-  ;; (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "themes-test/"))
+
+
+  ;; add all non-theme named subdirs of repos to load path
+  (setq load-path
+        (append load-path
+                (seq-filter (lambda (x) (not (member x custom-theme-load-path)))
+                            (directory-files (concat dotspacemacs-directory "repos/") t "[^.].*"))))
+
+  ;; add all theme named subdirs of repos to theme path, b/c this is below the
+  ;; load path above they are also added to load path
+  (setq custom-theme-load-path
+        (append custom-theme-load-path
+                (directory-files (concat dotspacemacs-directory "repos/") t ".*theme.*")))
+
+  ;; Load all the themes
+  (dolist (themedir (directory-files (concat dotspacemacs-directory "repos/") t ".*theme.*"))
+    (let ((theme
+           (string-remove-suffix "-emacs" (string-remove-suffix "-theme" (file-name-base themedir)))))
+      (load-theme (intern theme) t nil)))
+
   (add-to-list 'load-path (concat "~/p/ietf-docs"))
   ;;(require 'iterm-custom-keys)
+
   (require 'iterm-xterm-extra)
+
   (setq-default xterm-extra-capabilities '(modifyOtherKeys reportBackground getSelection setSelection))
   ;; Give up and just use this.
   ;; (setq-default xterm-extra-capabilities '(getSelection setSelection))
@@ -747,9 +763,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   ;; (when (display-graphic-p)
   ;;   (fringe-mode '(20 . nil)))
-
-  (let ((default-directory (concat dotspacemacs-directory "repos/")))
-    (normal-top-level-add-subdirs-to-load-path))
 
   (auto-insert-mode)
 
