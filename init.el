@@ -121,6 +121,7 @@ This function should only modify configuration layer settings."
      ;; File formats
      docker
      graphviz
+     groovy
      html
 
      ;; Languages
