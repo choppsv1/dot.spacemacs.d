@@ -222,7 +222,8 @@ This function should only modify configuration layer settings."
      color-theme-modern
      dockerfile-mode
      exec-path-from-shell
-     magit-todos
+     ;; This is very cool but too expensive for large projects
+     ;; magit-todos
      monky
      nhexl-mode
      org-caldav
