@@ -170,7 +170,7 @@ This function should only modify configuration layer settings."
            yang-pyang-extra-args "--max-line-length=79")
      )
    ;; These systems get full development packages -- the slowest load
-   chopps-dev-systems '("cmf-xe-1" "tops" "dak"))
+   chopps-dev-systems '("cmf-xe-1" "tops" "hp13" "dak"))
 
   (cond ((eq system-type 'darwin)
          (setq chopps-layers (append chopps-layers osx-layers)))
@@ -218,7 +218,6 @@ This function should only modify configuration layer settings."
    '(
      base16-theme
      borland-blue-theme
-     clipetty
      cobalt
      color-theme-modern
      dockerfile-mode
@@ -232,7 +231,6 @@ This function should only modify configuration layer settings."
      persistent-scratch
      polymode
      ;; rfcview
-     xclip
      ;; colorsarenice-light
      )
    ;; A list of packages that cannot be updated.
@@ -267,7 +265,14 @@ This function should only modify configuration layer settings."
    ;; installs only the used packages but won't delete unused ones. `all'
    ;; installs *all* packages supported by Spacemacs and never uninstalls them.
    ;; (default is `used-only')
-   dotspacemacs-install-packages 'used-only))
+   dotspacemacs-install-packages 'used-only)
+
+  (unless (string-prefix-p "hp13" (system-name))
+    (setq dotspacemacs-additional-packages
+          (append dotspacemacs-additional-packages
+                  '(clipetty
+                    xclip))))
+  )
 
 (defun set-fontsize ()
   (setq ch-def-font "DejaVu Sans Mono")
@@ -1049,8 +1054,9 @@ layers configuration. You are free to put any user code."
 
   (debug-init-message "USER-CONFIG: Start")
 
-  (require 'clipetty)
-  (global-clipetty-mode)
+  (unless (string-prefix-p "hp13" (system-name))
+    (require 'clipetty)
+    (global-clipetty-mode))
 
   ;; sanityinc-tomorrow-blue
   ;; borland-blue
@@ -1063,7 +1069,10 @@ layers configuration. You are free to put any user code."
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
     (spacemacs/load-theme 'sanityinc-tomorrow-blue))
-   ((or (string-prefix-p "cmf-" (system-name)) (string-prefix-p "builder" (system-name)))
+   ((or (string-prefix-p "cmf-" (system-name))
+        (string-prefix-p "builder" (system-name))
+        (string-prefix-p "hp13" (system-name))
+        )
     (spacemacs/load-theme 'afternoon))
    ((string-equal system-type "gnu/linux")
     (spacemacs/load-theme 'sanityinc-tomorrow-blue))
