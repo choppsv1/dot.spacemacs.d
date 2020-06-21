@@ -127,7 +127,7 @@ This function should only modify configuration layer settings."
      ;; Languages
      (c-c++ :variables
             c-c++-default-mode-for-headers 'c-mode
-            c-c++-backend 'lsp-clangd
+            c-c++-backend 'lsp-ccls
             ;; c-c++-adopt-subprojects t
             ;; c-c++-backend 'lsp-ccls
             ;; c-c++-lsp-sem-highlight-rainbow t
@@ -1153,7 +1153,7 @@ layers configuration. You are free to put any user code."
 
 
     ;; (with-eval-after-load "ispell"
-    (setq ispell-program-name "hunspell")
+    ;; (setq ispell-program-name "hunspell")
 
     (setq-default magit-todos-ignored-keywords '("NOTE" "DONE" "FAIL"))
     (setq-default evil-escape-key-sequence nil)
@@ -2123,8 +2123,9 @@ This will replace the last notification sent with this function."
 
        (when-layer-used
         'lsp
-        (progn
-          (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-gcc))))
+        ;; (progn
+        ;;   (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-gcc)))
+        )
 
         ;; the pos-tip window doesn't seem to work with my awesome setup (anymore)
         (setq flycheck-display-errors-function #'flycheck-display-error-messages)
@@ -2273,6 +2274,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
         (defun check-flycheck-clang-project-add-path (path)
           (when (and path (file-exists-p path))
+            (message "Adding path %s to flycheck-clang-include-path" path)
             (add-to-list
              (make-variable-buffer-local 'flycheck-clang-include-path)
              path)
@@ -2492,11 +2494,11 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
         ))
 
-    (when-layer-used 'git
-     (with-eval-after-load 'magit
-       (magit-todos-mode 1))
-     ;;   (require 'magit-gerrit))
-       )
+    ;; (when-layer-used 'git
+    ;;  (with-eval-after-load 'magit
+    ;;    (magit-todos-mode 1))
+    ;;  ;;   (require 'magit-gerrit))
+    ;;    )
 
     (when-layer-used 'python
       (with-eval-after-load 'python
@@ -3132,6 +3134,7 @@ a number of clock tables."
      (setq org-babel-load-languages
       '((emacs-lisp . t)
         (C . t)
+        (calc . t)
         (dot . t)
         (gnuplot . t)
         (ditaa . t)
