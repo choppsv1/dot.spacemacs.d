@@ -50,7 +50,13 @@ This function should only modify configuration layer settings."
      shell-scripts
      yaml
     )
-
+   tops-layers
+   '(
+     (mu4e :variables
+           ;; mu4e-enable-async-operations t
+           mu4e-enable-notifications nil
+           mu4e-use-maildirs-extension nil)
+     )
    linux-layers
    '(
      systemd
@@ -143,7 +149,7 @@ This function should only modify configuration layer settings."
          go-backend 'go-mode
          ;; go-backend 'lsp
          )
-     javascript
+     ;; javascript
      (latex :variables latex-build-command "latexmk")
      (lsp :variables
           lps-ui-sideline-enable nil)
@@ -177,6 +183,8 @@ This function should only modify configuration layer settings."
          (setq chopps-layers (append chopps-layers linux-layers))))
   (when (member system-name chopps-dev-systems)
     (setq chopps-layers (append chopps-layers dev-layers)))
+  (when (member system-name '("tops"))
+    (setq chopps-layers (append chopps-layers tops-layers)))
 
   (setq-default
    load-prefer-newer t
