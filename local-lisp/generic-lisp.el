@@ -202,9 +202,11 @@
   "Return to previous screen window"
   (if (getenv "STY")
       (shell-command-to-string "screen -X other")))
-(add-hook 'server-visit-hook 'bring-screen-window-front)
-(add-hook 'server-done-hook 'return-to-last-screen-window)
-(remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
+
+;; Remved 20200516 XXX 
+;; (add-hook 'server-visit-hook 'bring-screen-window-front)
+;; (add-hook 'server-done-hook 'return-to-last-screen-window)
+;; (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
 
 
 ;; (require 'flymake)

@@ -127,12 +127,13 @@ This function should only modify configuration layer settings."
      ;; File formats
      docker
      graphviz
+     groovy
      html
 
      ;; Languages
      (c-c++ :variables
             c-c++-default-mode-for-headers 'c-mode
-            c-c++-backend 'lsp-clangd
+            c-c++-backend 'lsp-ccls
             ;; c-c++-adopt-subprojects t
             ;; c-c++-backend 'lsp-ccls
             ;; c-c++-lsp-sem-highlight-rainbow t
@@ -175,7 +176,7 @@ This function should only modify configuration layer settings."
            yang-pyang-extra-args "--max-line-length=79")
      )
    ;; These systems get full development packages -- the slowest load
-   chopps-dev-systems '("cmf-xe-1" "tops" "dak"))
+   chopps-dev-systems '("cmf-xe-1" "tops" "hp13" "dak"))
 
   (cond ((eq system-type 'darwin)
          (setq chopps-layers (append chopps-layers osx-layers)))
@@ -225,12 +226,12 @@ This function should only modify configuration layer settings."
    '(
      base16-theme
      borland-blue-theme
-     clipetty
      cobalt
      color-theme-modern
      dockerfile-mode
      exec-path-from-shell
-     magit-todos
+     ;; This is very cool but too expensive for large projects
+     ;; magit-todos
      monky
      nhexl-mode
      org-caldav
@@ -238,7 +239,6 @@ This function should only modify configuration layer settings."
      persistent-scratch
      polymode
      ;; rfcview
-     xclip
      ;; colorsarenice-light
      )
    ;; A list of packages that cannot be updated.
@@ -273,7 +273,14 @@ This function should only modify configuration layer settings."
    ;; installs only the used packages but won't delete unused ones. `all'
    ;; installs *all* packages supported by Spacemacs and never uninstalls them.
    ;; (default is `used-only')
-   dotspacemacs-install-packages 'used-only))
+   dotspacemacs-install-packages 'used-only)
+
+  (unless (string-prefix-p "hp13" (system-name))
+    (setq dotspacemacs-additional-packages
+          (append dotspacemacs-additional-packages
+                  '(clipetty
+                    xclip))))
+  )
 
 (defun set-fontsize ()
   (setq ch-def-font "DejaVu Sans Mono")
@@ -737,15 +744,31 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu-mac/mu4e/")
   (add-to-list 'custom-theme-load-path "~/p/emacs-mandm-theme/")
-  (add-to-list 'custom-theme-load-path "~/p/emacs-mandm-theme/")
-  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/vscode-theme"))
-  (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/vscode+-theme"))
-  ;; (add-to-list 'load-path (concat dotspacemacs-directory "repos/magit-gerrit"))
-  ;; (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "repos/pycoverage"))
-  ;; (add-to-list 'custom-theme-load-path (concat dotspacemacs-directory "themes-test/"))
+
+
+  ;; add all non-theme named subdirs of repos to load path
+  (setq load-path
+        (append load-path
+                (seq-filter (lambda (x) (not (member x custom-theme-load-path)))
+                            (directory-files (concat dotspacemacs-directory "repos/") t "[^.].*"))))
+
+  ;; add all theme named subdirs of repos to theme path, b/c this is below the
+  ;; load path above they are also added to load path
+  (setq custom-theme-load-path
+        (append custom-theme-load-path
+                (directory-files (concat dotspacemacs-directory "repos/") t ".*theme.*")))
+
+  ;; Load all the themes
+  (dolist (themedir (directory-files (concat dotspacemacs-directory "repos/") t ".*theme.*"))
+    (let ((theme
+           (string-remove-suffix "-emacs" (string-remove-suffix "-theme" (file-name-base themedir)))))
+      (load-theme (intern theme) t nil)))
+
   (add-to-list 'load-path (concat "~/p/ietf-docs"))
   ;;(require 'iterm-custom-keys)
+
   (require 'iterm-xterm-extra)
+
   (setq-default xterm-extra-capabilities '(modifyOtherKeys reportBackground getSelection setSelection))
   ;; Give up and just use this.
   ;; (setq-default xterm-extra-capabilities '(getSelection setSelection))
@@ -755,9 +778,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   ;; (when (display-graphic-p)
   ;;   (fringe-mode '(20 . nil)))
-
-  (let ((default-directory (concat dotspacemacs-directory "repos/")))
-    (normal-top-level-add-subdirs-to-load-path))
 
   (auto-insert-mode)
 
@@ -1042,8 +1062,9 @@ layers configuration. You are free to put any user code."
 
   (debug-init-message "USER-CONFIG: Start")
 
-  (require 'clipetty)
-  (global-clipetty-mode)
+  (unless (string-prefix-p "hp13" (system-name))
+    (require 'clipetty)
+    (global-clipetty-mode))
 
   ;; sanityinc-tomorrow-blue
   ;; borland-blue
@@ -1056,7 +1077,10 @@ layers configuration. You are free to put any user code."
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
     (spacemacs/load-theme 'sanityinc-tomorrow-blue))
-   ((or (string-prefix-p "cmf-" (system-name)) (string-prefix-p "builder" (system-name)))
+   ((or (string-prefix-p "cmf-" (system-name))
+        (string-prefix-p "builder" (system-name))
+        (string-prefix-p "hp13" (system-name))
+        )
     (spacemacs/load-theme 'afternoon))
    ((string-equal system-type "gnu/linux")
     (spacemacs/load-theme 'sanityinc-tomorrow-blue))
@@ -1146,7 +1170,7 @@ layers configuration. You are free to put any user code."
 
 
     ;; (with-eval-after-load "ispell"
-    (setq ispell-program-name "hunspell")
+    ;; (setq ispell-program-name "hunspell")
 
     (setq-default magit-todos-ignored-keywords '("NOTE" "DONE" "FAIL"))
     (setq-default evil-escape-key-sequence nil)
@@ -2116,8 +2140,9 @@ This will replace the last notification sent with this function."
 
        (when-layer-used
         'lsp
-        (progn
-          (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-gcc))))
+        ;; (progn
+        ;;   (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-gcc)))
+        )
 
         ;; the pos-tip window doesn't seem to work with my awesome setup (anymore)
         (setq flycheck-display-errors-function #'flycheck-display-error-messages)
@@ -2266,6 +2291,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
         (defun check-flycheck-clang-project-add-path (path)
           (when (and path (file-exists-p path))
+            (message "Adding path %s to flycheck-clang-include-path" path)
             (add-to-list
              (make-variable-buffer-local 'flycheck-clang-include-path)
              path)
@@ -2485,11 +2511,11 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
         ))
 
-    (when-layer-used 'git
-     (with-eval-after-load 'magit
-       (magit-todos-mode 1))
-     ;;   (require 'magit-gerrit))
-       )
+    ;; (when-layer-used 'git
+    ;;  (with-eval-after-load 'magit
+    ;;    (magit-todos-mode 1))
+    ;;  ;;   (require 'magit-gerrit))
+    ;;    )
 
     (when-layer-used 'python
       (with-eval-after-load 'python
@@ -3125,6 +3151,7 @@ a number of clock tables."
      (setq org-babel-load-languages
       '((emacs-lisp . t)
         (C . t)
+        (calc . t)
         (dot . t)
         (gnuplot . t)
         (ditaa . t)
