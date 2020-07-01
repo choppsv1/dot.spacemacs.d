@@ -82,7 +82,9 @@ This function should only modify configuration layer settings."
      ;;        c-c++-enable-clang-support t
      ;;        c-c++-enable-clang-format-on-save nil
      ;;        )
-     (python :variables python-fill-column 100
+     (python :variables python-backend 'anaconda
+             python-fill-column 100
+             python-pipenv-activate t
              python-fill-docstring-style 'pep-257-nn
              python-test-runner '(pytest nose)
              pytest-global-name "python -m pytest --doctest-modules"
@@ -151,7 +153,9 @@ This function should only modify configuration layer settings."
      (lua :variables lua-default-application "lua5.1")
      ;; lux
      ;; primary test runner is pytest use 'spc u' prefix to invoke nose
-     (python :variables python-fill-column 100
+     (python :variables python-backend 'anaconda
+             python-fill-column 100
+             python-pipenv-activate t
              python-fill-docstring-style 'pep-257-nn
              python-test-runner '(pytest nose)
              pytest-global-name "python -m pytest --doctest-modules"
@@ -2492,11 +2496,11 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
         ))
 
-    (when-layer-used 'git
-     (with-eval-after-load 'magit
-       (magit-todos-mode 1))
-     ;;   (require 'magit-gerrit))
-       )
+    ;; (when-layer-used 'git
+    ;;   (with-eval-after-load 'magit
+    ;;     (magit-todos-mode 1))
+    ;;  ;;   (require 'magit-gerrit))
+    ;;    )
 
     (when-layer-used 'python
       (with-eval-after-load 'python
