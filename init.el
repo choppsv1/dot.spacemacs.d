@@ -50,7 +50,13 @@ This function should only modify configuration layer settings."
      shell-scripts
      yaml
     )
-
+   tops-layers
+   '(
+     (mu4e :variables
+           ;; mu4e-enable-async-operations t
+           mu4e-enable-notifications nil
+           mu4e-use-maildirs-extension nil)
+     )
    linux-layers
    '(
      systemd
@@ -129,7 +135,7 @@ This function should only modify configuration layer settings."
      ;; Languages
      (c-c++ :variables
             c-c++-default-mode-for-headers 'c-mode
-            c-c++-backend 'lsp-clangd
+            c-c++-backend 'lsp-ccls
             ;; c-c++-adopt-subprojects t
             ;; c-c++-backend 'lsp-ccls
             ;; c-c++-lsp-sem-highlight-rainbow t
@@ -146,7 +152,7 @@ This function should only modify configuration layer settings."
          go-backend 'go-mode
          ;; go-backend 'lsp
          )
-     javascript
+     ;; javascript
      (latex :variables latex-build-command "latexmk")
      (lsp :variables
           lps-ui-sideline-enable nil)
@@ -174,7 +180,7 @@ This function should only modify configuration layer settings."
            yang-pyang-extra-args "--max-line-length=79")
      )
    ;; These systems get full development packages -- the slowest load
-   chopps-dev-systems '("cmf-xe-1" "tops" "dak"))
+   chopps-dev-systems '("cmf-xe-1" "tops" "hp13" "dak"))
 
   (cond ((eq system-type 'darwin)
          (setq chopps-layers (append chopps-layers osx-layers)))
@@ -182,6 +188,8 @@ This function should only modify configuration layer settings."
          (setq chopps-layers (append chopps-layers linux-layers))))
   (when (member system-name chopps-dev-systems)
     (setq chopps-layers (append chopps-layers dev-layers)))
+  (when (member system-name '("tops"))
+    (setq chopps-layers (append chopps-layers tops-layers)))
 
   (setq-default
    load-prefer-newer t
@@ -222,7 +230,6 @@ This function should only modify configuration layer settings."
    '(
      base16-theme
      borland-blue-theme
-     clipetty
      cobalt
      color-theme-modern
      dockerfile-mode
@@ -236,7 +243,6 @@ This function should only modify configuration layer settings."
      persistent-scratch
      polymode
      ;; rfcview
-     xclip
      ;; colorsarenice-light
      )
    ;; A list of packages that cannot be updated.
@@ -271,7 +277,14 @@ This function should only modify configuration layer settings."
    ;; installs only the used packages but won't delete unused ones. `all'
    ;; installs *all* packages supported by Spacemacs and never uninstalls them.
    ;; (default is `used-only')
-   dotspacemacs-install-packages 'used-only))
+   dotspacemacs-install-packages 'used-only)
+
+  (unless (string-prefix-p "hp13" (system-name))
+    (setq dotspacemacs-additional-packages
+          (append dotspacemacs-additional-packages
+                  '(clipetty
+                    xclip))))
+  )
 
 (defun set-fontsize ()
   (setq ch-def-font "DejaVu Sans Mono")
@@ -1053,8 +1066,9 @@ layers configuration. You are free to put any user code."
 
   (debug-init-message "USER-CONFIG: Start")
 
-  (require 'clipetty)
-  (global-clipetty-mode)
+  (unless (string-prefix-p "hp13" (system-name))
+    (require 'clipetty)
+    (global-clipetty-mode))
 
   ;; sanityinc-tomorrow-blue
   ;; borland-blue
@@ -1067,7 +1081,10 @@ layers configuration. You are free to put any user code."
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
     (spacemacs/load-theme 'sanityinc-tomorrow-blue))
-   ((or (string-prefix-p "cmf-" (system-name)) (string-prefix-p "builder" (system-name)))
+   ((or (string-prefix-p "cmf-" (system-name))
+        (string-prefix-p "builder" (system-name))
+        (string-prefix-p "hp13" (system-name))
+        )
     (spacemacs/load-theme 'afternoon))
    ((string-equal system-type "gnu/linux")
     (spacemacs/load-theme 'sanityinc-tomorrow-blue))
@@ -1157,7 +1174,7 @@ layers configuration. You are free to put any user code."
 
 
     ;; (with-eval-after-load "ispell"
-    (setq ispell-program-name "hunspell")
+    ;; (setq ispell-program-name "hunspell")
 
     (setq-default magit-todos-ignored-keywords '("NOTE" "DONE" "FAIL"))
     (setq-default evil-escape-key-sequence nil)
@@ -2127,8 +2144,9 @@ This will replace the last notification sent with this function."
 
        (when-layer-used
         'lsp
-        (progn
-          (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-gcc))))
+        ;; (progn
+        ;;   (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-gcc)))
+        )
 
         ;; the pos-tip window doesn't seem to work with my awesome setup (anymore)
         (setq flycheck-display-errors-function #'flycheck-display-error-messages)
@@ -2277,6 +2295,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
         (defun check-flycheck-clang-project-add-path (path)
           (when (and path (file-exists-p path))
+            (message "Adding path %s to flycheck-clang-include-path" path)
             (add-to-list
              (make-variable-buffer-local 'flycheck-clang-include-path)
              path)
@@ -2497,8 +2516,8 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         ))
 
     ;; (when-layer-used 'git
-    ;;   (with-eval-after-load 'magit
-    ;;     (magit-todos-mode 1))
+    ;;  (with-eval-after-load 'magit
+    ;;    (magit-todos-mode 1))
     ;;  ;;   (require 'magit-gerrit))
     ;;    )
 
@@ -3136,6 +3155,7 @@ a number of clock tables."
      (setq org-babel-load-languages
       '((emacs-lisp . t)
         (C . t)
+        (calc . t)
         (dot . t)
         (gnuplot . t)
         (ditaa . t)
