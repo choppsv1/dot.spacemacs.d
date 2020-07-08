@@ -50,7 +50,13 @@ This function should only modify configuration layer settings."
      shell-scripts
      yaml
     )
-
+   tops-layers
+   '(
+     (mu4e :variables
+           ;; mu4e-enable-async-operations t
+           mu4e-enable-notifications nil
+           mu4e-use-maildirs-extension nil)
+     )
    linux-layers
    '(
      systemd
@@ -82,7 +88,9 @@ This function should only modify configuration layer settings."
      ;;        c-c++-enable-clang-support t
      ;;        c-c++-enable-clang-format-on-save nil
      ;;        )
-     (python :variables python-fill-column 100
+     (python :variables python-backend 'anaconda
+             python-fill-column 100
+             python-pipenv-activate t
              python-fill-docstring-style 'pep-257-nn
              python-test-runner '(pytest nose)
              pytest-global-name "python -m pytest --doctest-modules"
@@ -144,14 +152,16 @@ This function should only modify configuration layer settings."
          go-backend 'go-mode
          ;; go-backend 'lsp
          )
-     javascript
+     ;; javascript
      (latex :variables latex-build-command "latexmk")
      (lsp :variables
           lps-ui-sideline-enable nil)
      (lua :variables lua-default-application "lua5.1")
      ;; lux
      ;; primary test runner is pytest use 'spc u' prefix to invoke nose
-     (python :variables python-fill-column 100
+     (python :variables python-backend 'anaconda
+             python-fill-column 100
+             python-pipenv-activate t
              python-fill-docstring-style 'pep-257-nn
              python-test-runner '(pytest nose)
              pytest-global-name "python -m pytest --doctest-modules"
@@ -178,6 +188,8 @@ This function should only modify configuration layer settings."
          (setq chopps-layers (append chopps-layers linux-layers))))
   (when (member system-name chopps-dev-systems)
     (setq chopps-layers (append chopps-layers dev-layers)))
+  (when (member system-name '("tops"))
+    (setq chopps-layers (append chopps-layers tops-layers)))
 
   (setq-default
    load-prefer-newer t
