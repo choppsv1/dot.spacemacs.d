@@ -759,6 +759,8 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (add-to-list 'load-path (concat "~/p/ietf-docs"))
   ;;(require 'iterm-custom-keys)
 
+  ;; (require 'explain-pause-mode)
+
   (require 'iterm-xterm-extra)
 
   (setq-default xterm-extra-capabilities '(modifyOtherKeys reportBackground getSelection setSelection))
@@ -1093,7 +1095,10 @@ layers configuration. You are free to put any user code."
   (defun fix-user-full-name (orig-fun &rest args)
     (message "Message got adivce")
     (let ((res (apply orig-fun args)))
-      (replace-regexp-in-string " E " " E. " (replace-regexp-in-string " - CONTRACTOR" "" res))))
+      (if (= (length res) 0)
+          (setq res "Christian Hopps")
+        (replace-regexp-in-string " E " " E. " (replace-regexp-in-string " - CONTRACTOR" "" res)))
+      ))
   (advice-add 'user-full-name :around #'fix-user-full-name)
 
   (progn
@@ -2121,6 +2126,8 @@ This will replace the last notification sent with this function."
     (when-layer-used 'lsp
      (with-eval-after-load 'lsp-mode
      (setq-default lsp-enable-indentation nil)
+     (setq-default lsp-file-watch-ignored (append '("/usr/include") lsp-file-watch-ignored))
+
        ))
 
     (when-layer-used 'syntax-checking
@@ -3591,7 +3598,7 @@ a number of clock tables."
                       (cons (concat work-ai-prefix "\\.el\\'") "Work Lisp comment skeleton")
                       '("Short description: "
                         ";;" \n
-                        > ";; " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > ";; " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
                         > ";;" \n
                         > ";; Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
                         > ";; All rights reserved." \n
@@ -3603,7 +3610,7 @@ a number of clock tables."
                       '("Short description: "
                         "# -*- coding: utf-8 eval: (yapf-mode 1) -*-" \n
                         > "#" \n
-                        > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
                         > "#" \n
                         > "# Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
                         > "#" \n
@@ -3614,7 +3621,7 @@ a number of clock tables."
                       '("Short description: "
                         "#!/bin/bash" \n
                         > "#" \n
-                        > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
                         > "#" \n
                         > "# Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
                         > "#" \n
@@ -3624,7 +3631,7 @@ a number of clock tables."
                       (cons (concat work-ai-prefix "\\.\\(pl\\|tcl\\)\\'") "# Work comment skeleton")
                       '("Short description: "
                         "#" \n
-                        > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
                         > "#" \n
                         > "# Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
                         > "#" \n
@@ -3634,7 +3641,7 @@ a number of clock tables."
                       (cons (concat work-ai-prefix "\\.rst\\'") "Work ReST skeleton")
                       '("Short description: "
                         ".." \n
-                        > ".. " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > ".. " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
                         > ".." \n
                         > ".. Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
                         > ".." \n
@@ -3644,7 +3651,7 @@ a number of clock tables."
                       (cons (concat work-ai-prefix "\\.\\(h\\|c\\|CC?\\|cc\\|cxx\\|cpp\\|c++\\|m\\)\\'") "Work C-style skeleton")
                       '("Short description: "
                         "/*" \n
-                        > "* " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        > "* " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
                         > "*" \n
                         > "* Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
                         > "*" \n
