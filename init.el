@@ -2289,7 +2289,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                   (re-search-forward "coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t))
             (cond
              ((string= "CLANG" (match-string 1)) (vpp-format-buffer 1) t)
-             ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
+             ;; ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
              ((string= "INDENT" (match-string 1)) (vpp-format-buffer) t)
              (t t))))
 
