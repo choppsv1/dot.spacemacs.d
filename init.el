@@ -320,6 +320,8 @@ This function is called at the very beginning of Spacemacs startup,
 before layer configuration.
 It should only modify the values of Spacemacs settings."
   ;; mDetermine display size to pick font size
+  (defadvice smartparens-mode (around disable-smartparens activate)
+    "Disable smartparens-mode completely.")
   (setq custom-file (concat dotspacemacs-directory "custom.el"))
   (load custom-file)
   ;; (dotspacemacs/emacs-custom-settings)
@@ -2166,8 +2168,11 @@ This will replace the last notification sent with this function."
     ;; =================
     (when-layer-used 'lsp
      (with-eval-after-load 'lsp-mode
-     (setq-default lsp-enable-indentation nil)
-     (setq-default lsp-file-watch-ignored (append '("/usr/include") lsp-file-watch-ignored))
+     (setq-default lsp-enable-indentation nil
+                   lsp-file-watch-ignored (append '("/usr/include" "build-root/.*") lsp-file-watch-ignored)
+                   lsp-enable-file-watchers t
+                   lsp-file-watch-threshold 5000
+                   )
 
        ))
 
