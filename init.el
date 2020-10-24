@@ -2307,12 +2307,90 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                           (goto-char (min (point-max) oldpoint)))))))))
             (if errbuf (display-buffer errbuf))))
 
+        (defun vpp-clang-diff-git-root-directory (file)
+          (with-temp-buffer
+            (when (git-gutter+-insert-git-output '("rev-parse" "--show-toplevel") file)
+              (goto-char (point-min))
+              (let ((root (buffer-substring-no-properties (point) (line-end-position))))
+                (unless (string= root "")
+                  (file-name-as-directory root))))))
+
+        (defun file-name-git-root-relative-fn (filepath)
+          (let ((base-path
+                 (let ((vc-backend (ignore-errors (vc-responsible-backend filepath))))
+                   (when vc-backend
+                     (vc-call-backend vc-backend 'root filepath)))))
+            (if base-path (file-relative-name filepath base-path))))
+
+        (defun vpp-clang-diff-format-buffer ()
+          "Reformat the buffer using 'clang-format-diff.py'"
+          ;; Get HEAD revision of file
+          ;; Save buffer to tmp file
+          ;; Get diff of those 2 files
+          ;; run clang-format-diff.py
+          ;; copy reformatted file to new file
+          ;; run clang-format-diff.py
+          ;; check diff of new file and saved file
+          (interactive)
+          (let* ((oldbuf (current-buffer))
+                 (fname (file-name-nondirectory buffer-file-name))
+                 (tmp1name (concat ".fmt1." fname))
+                 (tmp2name (concat ".fmt2." fname))
+                 binpath hfname fmtbuf errbuf)
+            (unwind-protect
+                (progn
+                  (dolist (suffix '("-11" "-10" "-9" "-8" "-7" ""))
+                    (unless binpath
+                      (setq binpath (executable-find (concat "clang-format" suffix)))))
+                  (ignore-errors
+                    (let ((headbuf (vc-find-revision buffer-file-name (vc-working-revision buffer-file-name))))
+                      (setq hfname (buffer-file-name headbuf))
+                      (kill-buffer headbuf)))
+                  (if (not hfname)
+                      (clang-format-buffer)
+                    (with-temp-file tmp1name (insert-buffer-substring oldbuf))
+                    (with-temp-buffer
+                      ;; Format the buffer content into tmp1name
+                      (shell-command (format "diff -u0 %s %s" hfname tmp1name) (current-buffer))
+                      (shell-command-on-region (point-min) (point-max)
+                                               (concat "clang-format-diff.py -i -binary " binpath))
+                      ;; Format the formatted content into tmp1name
+                      (shell-command (format "cp %s %s" tmp1name tmp2name))
+                      (shell-command (format "diff -u0 %s %s" hfname tmp1name) (current-buffer))
+                      (shell-command-on-region (point-min) (point-max)
+                                               (concat "clang-format-diff.py -i -binary " binpath))
+                      (erase-buffer)
+                      (insert-file-contents tmp1name)
+                      ;; If something changed
+                      (unless (= 0 (compare-buffer-substrings oldbuf nil nil (current-buffer) nil nil))
+                        (setq fmtbuf (current-buffer))
+                        ;; Check for non-deterministic results
+                        (let ((newbuf (get-buffer-create "*vpp-clang-non-deterministic*")))
+                          (shell-command (format "diff -u0 %s %s" tmp1name tmp2name) newbuf)
+                          (if (= 0 (buffer-size newbuf))
+                              (kill-buffer newbuf)
+                            (setq errbuf newbuf)
+                            (error "non-deterministic clang-format results")))
+                        ;; Replace buffer content with formatted results
+                        (with-current-buffer oldbuf
+                          (if (boundp 'replace-buffer-contents)
+                              ;; emacs 26 retains properties in buffer
+                              (replace-buffer-contents fmtbuf)
+                            (let ((oldpoint (point)))
+                              (erase-buffer)
+                              (insert-buffer-substring fmtbuf)
+                              (goto-char (min (point-max) oldpoint))))))))
+                  (ignore-errors (delete-file hfname))
+                  (ignore-errors (delete-file tmp1name))
+                  (ignore-errors (delete-file tmp2name)))
+              (if errbuf (display-buffer errbuf)))))
+
         (defun vpp-format-buffer (&optional force-clang)
           (if (and (eq major-mode 'c++-mode)
                    (boundp 'clang-format-buffer))
-              (clang-format-buffer)
+              (vpp-clang-diff-format-buffer)
             (if force-clang
-                (clang-format-buffer)
+                (vpp-clang-diff-format-buffer)
               (vpp-indent-format-buffer))))
             ;;(clang-format-buffer)))
 
