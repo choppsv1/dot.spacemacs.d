@@ -2322,7 +2322,124 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                      (vc-call-backend vc-backend 'root filepath)))))
             (if base-path (file-relative-name filepath base-path))))
 
-        (defun vpp-clang-diff-format-buffer ()
+        ;; start_line = int(match.group(1))
+        ;; line_count = 1
+        ;; if match.group(3):
+        ;; line_count = int(match.group(3))
+        ;; if line_count == 0:
+        ;; continue
+        ;; end_line = start_line + line_count - 1
+        ;; lines_by_file.setdefault(filename, []).extend(['-lines', str(start_line) + ':' + str(end_line)])
+
+        (defvar diffu-new-lines-re "^@@.*\\+\\([0-9]+\\)\\(,\\([0-9]+\\)\\)?")
+
+        (defun clang-format-args-from-diff-buffer (&optional buffer)
+          (let ((use-buf (or buffer (current-buffer)))
+                lines)
+            (with-current-buffer use-buf
+              (save-excursion
+                (goto-char (point-max))
+                (while (re-search-backward diffu-new-lines-re nil 'noerror)
+                  (let ((start (string-to-number (match-string 1)))
+                        (count (string-to-number (or (match-string 3) "1"))))
+                    (message "start %d count %d" start count)
+                    (unless (= count 0)
+                      (setq lines (cons (format "--lines=%d:%d" start (+ start count -1)) lines)))))))
+            lines))
+
+        (defun clang-format-vc-diff ()
+          "Reformat only the changed lines from VC in the buffer"
+          (interactive)
+          (let* ((code-buffer (current-buffer))
+                 (cursor (clang-format--bufferpos-to-filepos (point) 'exact 'utf-8-unix))
+                 ;; vc-working-revision has some bizarre cache bug, it
+                 ;; returns the revision that was HEAD the first time it is
+                 ;; checked in a buffer. If that buffer is saved, and checked
+                 ;; the next call to vc-working-revision is not updated, one
+                 ;; must reload the file. So instead invoke the backend directly.
+                 (head-revision (vc-call-backend (vc-backend buffer-file-name)
+                                                 'working-revision
+                                                 buffer-file-name))
+                 (temp-buffer (generate-new-buffer " *clang-format-temp*"))
+                 (temp-file (make-temp-file "clang-format"))
+                 diff-line-args
+                 head-temp-file)
+            (unwind-protect
+                (if (not head-revision)
+                    (progn
+                      (message "(clang-format-vc-diff: %s not revision controlled, formatting whole buffer"
+                               buffer-file-name)
+                      (clang-format-buffer))
+                  ;; Get the HEAD revision into a temp file
+                  (let ((head-temp-buf (vc-find-revision buffer-file-name head-revision)))
+                    (setq head-temp-file (buffer-file-name head-temp-buf))
+                    (kill-buffer head-temp-buf))
+                  ;; Get the diff of buffer from the HEAD revision
+                  (let ((status (call-process-region
+                                 nil nil (executable-find "diff")
+                                 nil `(,temp-buffer ,temp-file) nil
+                                 "-u0"
+                                 head-temp-file
+                                 "-"))
+                        (stderr (with-temp-buffer
+                                  (unless (zerop (cadr (insert-file-contents temp-file)))
+                                    (insert ": "))
+                                  (buffer-substring-no-properties
+                                   (point-min) (line-end-position)))))
+                    (cond
+                     ((stringp status)
+                      (error "(clang-format-vc-diff diff killed by signal %s%s)" status stderr))
+                     ((zerop status)
+                      (message "(clang-format-vc-diff no diff"))
+                     ((not (= 1 status))
+                       (error "(clang-format-vc-diff diff failed with code %d%s)" status stderr))))
+                  ;; XXX remove
+                  (with-current-buffer temp-buffer (message "diff %s" (buffer-string)))
+
+                  (setq diff-line-args (clang-format-args-from-diff-buffer temp-buffer))
+                  (message "diff-line-args %s" diff-line-args)
+                  ;; empty the temp buffer, and delete the temp file
+                  (with-current-buffer temp-buffer (erase-buffer))
+                  ;; Get xml-replacements into now-empty temp-buffer
+                  (if (not diff-line-args)
+                      (message "(clang-format-vc-diff no differences to format)")
+                    (let ((status (apply #'call-process-region
+                                         nil nil clang-format-executable
+                                         nil `(,temp-buffer ,temp-file) nil
+                                         `("-output-replacements-xml"
+                                           "-assume-filename" ,(file-name-nondirectory buffer-file-name)
+                                           "-fallback-style" ,clang-format-fallback-style
+                                           "-cursor" ,(number-to-string cursor)
+                                           ,@diff-line-args)))
+                          (stderr (with-temp-buffer
+                                    (unless (zerop (cadr (insert-file-contents temp-file)))
+                                      (insert ": "))
+                                    (buffer-substring-no-properties
+                                     (point-min) (line-end-position)))))
+                      (cond
+                       ((stringp status)
+                        (error "(clang-format killed by signal %s%s)" status stderr))
+                       ((not (zerop status))
+                        (error "(clang-format failed with code %d%s)" status stderr)))
+                      (if (= 0 (buffer-size temp-buffer))
+                          (message "(vpp-clang-diff-format-buffer no formatting changes")
+                        (cl-destructuring-bind (replacements cursor incomplete-format)
+                            (with-current-buffer temp-buffer
+                              (clang-format--extract (car (xml-parse-region))))
+                          (save-excursion
+                            (dolist (rpl replacements)
+                              (apply #'clang-format--replace rpl)))
+                          (when cursor
+                            (goto-char (clang-format--filepos-to-bufferpos cursor 'exact
+                                                                           'utf-8-unix)))
+                          (if incomplete-format
+                              (message "(clang-format: incomplete (syntax errors)%s)" stderr)
+                            (message "(clang-format: success%s)" stderr)))))))
+              (ignore-errors (kill-buffer temp-buffer))
+              (ignore-errors (delete-file temp-file))
+              (ignore-errors (delete-file head-temp-file)))))
+
+        (defun vpp-clang-diff-format-buffer-old ()
           "Reformat the buffer using 'clang-format-diff.py'"
           ;; Get HEAD revision of file
           ;; Save buffer to tmp file
@@ -2388,9 +2505,9 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         (defun vpp-format-buffer (&optional force-clang)
           (if (and (eq major-mode 'c++-mode)
                    (boundp 'clang-format-buffer))
-              (vpp-clang-diff-format-buffer)
+              (clang-format-vc-diff)
             (if force-clang
-                (vpp-clang-diff-format-buffer)
+                (clang-format-vc-diff)
               (vpp-indent-format-buffer))))
             ;;(clang-format-buffer)))
 
@@ -2400,7 +2517,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                   (goto-char (point-min))
                   (re-search-forward "coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t))
             (cond
-             ((string= "CLANG" (match-string 1)) (vpp-format-buffer 1) t)
+             ((string= "CLANG" (match-string 1)) (vpp-format-buffer t) t)
              ;; ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
              ((string= "INDENT" (match-string 1)) (vpp-format-buffer) t)
              (t t))))
