@@ -2342,7 +2342,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                 (while (re-search-backward diffu-new-lines-re nil 'noerror)
                   (let ((start (string-to-number (match-string 1)))
                         (count (string-to-number (or (match-string 3) "1"))))
-                    (message "start %d count %d" start count)
                     (unless (= count 0)
                       (setq lines (cons (format "--lines=%d:%d" start (+ start count -1)) lines)))))))
             lines))
@@ -2393,11 +2392,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                       (message "(clang-format-vc-diff no diff"))
                      ((not (= 1 status))
                        (error "(clang-format-vc-diff diff failed with code %d%s)" status stderr))))
-                  ;; XXX remove
-                  (with-current-buffer temp-buffer (message "diff %s" (buffer-string)))
-
                   (setq diff-line-args (clang-format-args-from-diff-buffer temp-buffer))
-                  (message "diff-line-args %s" diff-line-args)
                   ;; empty the temp buffer, and delete the temp file
                   (with-current-buffer temp-buffer (erase-buffer))
                   ;; Get xml-replacements into now-empty temp-buffer
