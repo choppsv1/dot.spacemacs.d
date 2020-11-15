@@ -1,0 +1,10 @@
+# -*- coding: utf-8 -*-
+# name: c_closed
+# key: c_closed
+# contributor: Christian E. Hopps <chopps@gmail.com>
+# --
+//
+// Copyright (c) `(format-time-string "%Y" (current-time))`, ${`user-full-name`}
+// All Rights Reserved.
+//
+$0
