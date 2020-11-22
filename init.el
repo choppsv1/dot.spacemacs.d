@@ -1911,17 +1911,17 @@ This will replace the last notification sent with this function."
                                     :vars '((user-mail-address  . "chopps@labn.net")
                                             (user-full-name . "Christian Hopps")
                                              ;; mu4e
-                                             (mu4e-sent-folder   . "/labn.net/Sent Messages")
-                                             (mu4e-trash-folder  . "/labn.net/Deleted Messages")
+                                             (mu4e-sent-folder   . "/labn.net/Sent Items")
+                                             (mu4e-trash-folder  . "/labn.net/Deleted Items")
                                              (mu4e-drafts-folder . "/labn.net/Drafts")
                                              (mu4e-sent-messages-behavior   . sent)
                                              ;; smtp
-                                             (smtpmail-starttls-credentials . '(("box313.bluehost.com" 465 nil nil)))
-                                             (smtpmail-default-smtp-server  . "box313.bluehost.com")
-                                             (smtpmail-smtp-server          . "box313.bluehost.com")
+                                             (smtpmail-starttls-credentials . '(("smtp.office365.com" 587 nil nil)))
+                                             (smtpmail-default-smtp-server  . "smtp.office365.com")
+                                             (smtpmail-smtp-server          . "smtp.office365.com")
                                              (smtpmail-local-domain         . "labn.net")
-                                             (smtpmail-stream-type          . ssl)
-                                             (smtpmail-smtp-service         . 465)))
+                                             (smtpmail-stream-type          . starttls)
+                                             (smtpmail-smtp-service         . 587)))
                                  ,(make-mu4e-context
                                     :name "gmail.com"
                                     :match-func (lambda (msg)
