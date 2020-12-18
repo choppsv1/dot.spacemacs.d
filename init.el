@@ -2181,6 +2181,9 @@ This will replace the last notification sent with this function."
     ;; =================
     ;; Programming Modes
     ;; =================
+
+    (modify-syntax-entry ?_ "w" sh-mode-syntax-table)
+
     (when-layer-used 'lsp
      (with-eval-after-load 'lsp-mode
      (setq-default lsp-enable-indentation nil
@@ -2953,6 +2956,9 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
        ;;   (evil-define-key estate org-mode-map "H" nil)
        ;;   (evil-define-key estate org-mode-map "M" nil)
        ;;   (evil-define-key estate org-mode-map "L" nil))
+
+       ;; Consider _s parts of words
+       (modify-syntax-entry ?_ "w" org-mode-syntax-table)
 
        ;;
        ;; XXX add back
