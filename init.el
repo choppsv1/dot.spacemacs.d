@@ -2182,7 +2182,8 @@ This will replace the last notification sent with this function."
     ;; Programming Modes
     ;; =================
 
-    (modify-syntax-entry ?_ "w" sh-mode-syntax-table)
+    (with-eval-after-load "sh-script"
+      (modify-syntax-entry ?_ "w" sh-mode-syntax-table))
 
     (when-layer-used 'lsp
      (with-eval-after-load 'lsp-mode
