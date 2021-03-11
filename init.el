@@ -2766,11 +2766,14 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
         ))
 
-    ;; (when-layer-used 'git
-    ;;  (with-eval-after-load 'magit
-    ;;    (magit-todos-mode 1))
-    ;;  ;;   (require 'magit-gerrit))
-    ;;    )
+    (when-layer-used 'git
+                     (with-eval-after-load 'magit
+       ;; (magit-todos-mode 1)
+       ;; (require 'magit-gerrit)
+       (bind-key (kbd "M-RET") 'magit-diff-visit-worktree-file 'magit-diff-mode-map)
+       (bind-key (kbd "C-j") 'magit-diff-visit-worktree-file 'magit-diff-mode-map)
+       )
+     )
 
     (when-layer-used 'python
       (with-eval-after-load 'python
