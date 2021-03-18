@@ -403,20 +403,7 @@ It should only modify the values of Spacemacs settings."
    ;; with `:variables' keyword (similar to layers). Check the editing styles
    ;; section of the documentation for details on available variables.
    ;; (default 'vim)
-   dotspacemacs-editing-style '(hybrid :variables
-                                       ;; if t then some modes will use motion inplace of normal
-                                       ;; hjkl commands -- this really means C-k and other emacs
-                                       ;; keys will be hijacked to mean the non-C version of vim
-                                       ;; command -- ewwww.
-                                       hybrid-mode-enable-hjkl-bindings nil
-                                       ;; if nil this forces evil-emacs-state when trying to enter
-                                       ;; evilified state
-                                       hybrid-mode-enable-evilified-state t
-                                       ;; unknown but needs to be set
-				       hybrid-mode-use-evil-search-module nil
-                                       ;; Default evil state when hybrid editing is enabled
-                                       hybrid-mode-default-state 'normal)
-
+   dotspacemacs-editing-style 'hybrid
 
    ;; If non-nil show the version string in the Spacemacs buffer. It will
    ;; appear as (spacemacs version)@(emacs version)
