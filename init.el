@@ -181,7 +181,7 @@ This function should only modify configuration layer settings."
            yang-pyang-extra-args "--max-line-length=79")
      )
    ;; These systems get full development packages -- the slowest load
-   chopps-dev-systems '("cmf-xe-1" "tops" "hp13" "labnh" "rlk" "slk" "dak"))
+   chopps-dev-systems '("cmf-xe-1" "tops" "hp13" "labnh" "alk" "rlk" "slk" "dak"))
 
   (cond ((eq system-type 'darwin)
          (setq chopps-layers (append chopps-layers osx-layers)))
@@ -1145,10 +1145,14 @@ layers configuration. You are free to put any user code."
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
     (spacemacs/load-theme 'sanityinc-tomorrow-blue))
+   ((or (string-prefix-p "alk" (system-name))
+        )
+    (spacemacs/load-theme 'mandm))
    ((or (string-prefix-p "cmf-" (system-name))
         (string-prefix-p "labnh" (system-name))
-        (string-prefix-p "slk" (system-name))
+        (string-prefix-p "alk" (system-name))
         (string-prefix-p "rlk" (system-name))
+        (string-prefix-p "slk" (system-name))
         (string-prefix-p "builder" (system-name))
         (string-prefix-p "hp13" (system-name))
         )
