@@ -215,7 +215,6 @@ This function should only modify configuration layer settings."
    ;; a layer lazily. (default t)
    dotspacemacs-ask-for-lazy-installation t
 
-   ;; If non-nil layers with lazy install support are lazy installed.
    ;; List of additional paths where to look for configuration layers.
    ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
    dotspacemacs-configuration-layer-path '()
@@ -264,7 +263,6 @@ This function should only modify configuration layer settings."
      powerline
      ;; recentf
      ;; savehist
-     ;; smartparens
      ;; HATE PURPOSE MODE
      eyebrowse
      helm-purpose
@@ -320,8 +318,8 @@ This function is called at the very beginning of Spacemacs startup,
 before layer configuration.
 It should only modify the values of Spacemacs settings."
   ;; mDetermine display size to pick font size
-  (defadvice smartparens-mode (around disable-smartparens activate)
-    "Disable smartparens-mode completely.")
+  ;; (defadvice smartparens-mode (around disable-smartparens activate)
+  ;;   "Disable smartparens-mode completely.")
   (setq custom-file (concat dotspacemacs-directory "custom.el"))
   (load custom-file)
   ;; (dotspacemacs/emacs-custom-settings)
@@ -379,7 +377,9 @@ It should only modify the values of Spacemacs settings."
 
    ;; If non-nil then Spacelpa repository is the primary source to install
    ;; a locked version of packages. If nil then Spacemacs will install the
-   ;; latest version of packages from MELPA. (default nil)
+   ;; latest version of packages from MELPA. Spacelpa is currently in
+   ;; experimental state please use only for testing purposes.
+   ;; (default nil)
    dotspacemacs-use-spacelpa nil
 
    ;; If non-nil then verify the signature for downloaded Spacelpa archives.
@@ -434,9 +434,13 @@ It should only modify the values of Spacemacs settings."
    ;; List of items to show in startup buffer or an association list of
    ;; the form `(list-type . list-size)`. If nil then it is disabled.
    ;; Possible values for list-type are:
-   ;; `recents' `bookmarks' `projects' `agenda' `todos'.
+   ;; `recents' `recents-by-project' `bookmarks' `projects' `agenda' `todos'.
    ;; List sizes may be nil, in which case
    ;; `spacemacs-buffer-startup-lists-length' takes effect.
+   ;; The exceptional case is `recents-by-project', where list-type must be a
+   ;; pair of numbers, e.g. `(recents-by-project . (7 .  5))', where the first
+   ;; number is the project limit and the second the limit on the recent files
+   ;; within a project.
    dotspacemacs-startup-lists '((recents . 5)
                                 (projects . 7))
 
@@ -489,8 +493,9 @@ It should only modify the values of Spacemacs settings."
    ;; (default t)
    dotspacemacs-colorize-cursor-according-to-state nil
 
-   ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
-   ;; quickly tweak the mode-line size to make separators look not too crappy.
+   ;; Default font or prioritized list of fonts. The `:size' can be specified as
+   ;; a non-negative integer (pixel size), or a floating-point (point size).
+   ;; Point size is recommended, because it's device independent. (default 10.0)
    ;; dotspacemacs-default-font `("Office Code Pro D" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
    ;; Perfect UTF-8, good sans serif
    ;; dotspacemacs-default-font `("DejaVu Sans Mono" :size ,ch-def-height :weight normal :width normal)
@@ -655,9 +660,14 @@ It should only modify the values of Spacemacs settings."
    ;; (default 'evil)
    dotspacemacs-folding-method 'evil
 
-   ;; If non-nil `smartparens-strict-mode' will be enabled in programming modes.
+   ;; If non-nil and `dotspacemacs-activate-smartparens-mode' is also non-nil,
+   ;; `smartparens-strict-mode' will be enabled in programming modes.
    ;; (default nil)
    dotspacemacs-smartparens-strict-mode nil
+
+   ;; If non-nil smartparens-mode will be enabled in programming modes.
+   ;; (default t)
+   dotspacemacs-activate-smartparens-mode nil
 
    ;; If non-nil pressing the closing parenthesis `)' key in insert mode passes
    ;; over any automatically added closing parenthesis, bracket, quote, etc...
@@ -712,6 +722,9 @@ It should only modify the values of Spacemacs settings."
    ;; (default nil - same as frame-title-format)
    dotspacemacs-icon-title-format nil
 
+   ;; Show trailing whitespace (default t)
+   dotspacemacs-show-trailing-whitespace t
+
    ;; Delete whitespace while saving buffer. Possible values are `all'
    ;; to aggressively delete empty line and long sequences of whitespace,
    ;; `trailing' to delete only the whitespace at end of lines, `changed' to
@@ -744,7 +757,10 @@ It should only modify the values of Spacemacs settings."
 
    ;; If nil the home buffer shows the full path of agenda items
    ;; and todos. If non nil only the file name is shown.
-   dotspacemacs-home-shorten-agenda-source nil))
+   dotspacemacs-home-shorten-agenda-source nil
+
+   ;; If non-nil then byte-compile some of Spacemacs files.
+   dotspacemacs-byte-compile nil))
 
 (defun dotspacemacs/user-env ()
   "Environment variables setup.
@@ -1234,9 +1250,11 @@ layers configuration. You are free to put any user code."
     ;; take out
     ;; (setq magithub-debug-mode t)
 
+    ;; May be able to remove now
     ;; Hate smart parens but apparently still want code??
-    (remove-hook 'prog-mode-hook #'smartparens-mode)
-    (spacemacs/toggle-smartparens-globally-off)
+    ;; (remove-hook 'prog-mode-hook #'smartparens-mode)
+    ;; (spacemacs/toggle-smartparens-globally-off)
+
     ;; (sp-pair "'" nil :actions :rem)
     ;; (sp-pair "\"" nil :actions :rem)
     ;; (sp-pair "(" nil :actions :rem)
@@ -2278,7 +2296,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
               "uword" "bool" "boolean")))
 
       (with-eval-after-load "cc-mode"
-        (message "adding c mode hooks")
         ;; (modify-syntax-entry ?_ "w" awk-mode-syntax-table)
         (modify-syntax-entry ?_ "w" c-mode-syntax-table)
         (modify-syntax-entry ?_ "w" objc-mode-syntax-table)
@@ -3676,9 +3693,7 @@ a number of clock tables."
             (message "Updating %s with %s" (car tup) (cadr tup))))))
 
     (if (getenv "TMUX")
-        (progn
-          (message "Enabling TMUX signal handling")
-          (define-key special-event-map [sigusr1] 'sigusr1-handler)))
+        (define-key special-event-map [sigusr1] 'sigusr1-handler))
 
     ;; ====
     ;; Evil
