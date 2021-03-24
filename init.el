@@ -236,6 +236,7 @@ This function should only modify configuration layer settings."
      exec-path-from-shell
      ;; This is very cool but too expensive for large projects
      ;; magit-todos
+     github-review
      monky
      nhexl-mode
      org-caldav
@@ -766,6 +767,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
 
   (setq exec-path-from-shell-check-startup-files nil)
+  (setq epa-pinentry-mode 'loopback)
 
   (debug-init-message "USER-INIT: Start")
 
@@ -2577,8 +2579,10 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                               "../openwrt/staging_dir/target-aarch64_cortex-a72_glibc/root-mvebu/usr/include/"))
 
                 (let ((path1 (concat root path)))
-                  (check-flycheck-clang-project-add-path path1))))))
-
+                  (check-flycheck-clang-project-add-path path1))))
+            (dolist (path '("/opt/alt/current/include"))
+              (let ((path1 (concat root path)))
+                (check-flycheck-clang-project-add-path path1)))))
 
         (when-layer-used 'rebox
           (defun rebox-c-hook ()
