@@ -50,13 +50,13 @@ This function should only modify configuration layer settings."
      shell-scripts
      yaml
     )
-   tops-layers
-   '(
-     (mu4e :variables
-           ;; mu4e-enable-async-operations t
-           mu4e-enable-notifications nil
-           mu4e-use-maildirs-extension nil)
-     )
+   ;; tops-layers
+   ;; '(
+   ;;   (mu4e :variables
+   ;;         ;; mu4e-enable-async-operations t
+   ;;         mu4e-enable-notifications nil
+   ;;         mu4e-use-maildirs-extension nil)
+   ;;   )
    linux-layers
    '(
      systemd
@@ -65,10 +65,10 @@ This function should only modify configuration layer settings."
    osx-layers
    '(
      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
-     (mu4e :variables
-           ;; mu4e-enable-async-operations t
-           mu4e-enable-notifications nil
-           mu4e-use-maildirs-extension nil)
+      (mu4e :variables
+            ;; mu4e-enable-async-operations t
+            mu4e-enable-notifications nil
+            mu4e-use-maildirs-extension nil)
      ;; (org2blog :variables org2blog-name "hoppsjots.org")
      (osx :variables
           osx-use-option-as-meta t)
@@ -150,8 +150,7 @@ This function should only modify configuration layer settings."
          go-use-golangci-lint t
          ;; go-use-gometalinter t
          ;; godoc-at-point-function 'godoc-gogetdoc
-         go-backend 'go-mode
-         ;; go-backend 'lsp
+         go-backend 'lsp
          )
      ;; javascript
      (latex :variables latex-build-command "latexmk")
@@ -181,7 +180,7 @@ This function should only modify configuration layer settings."
            yang-pyang-extra-args "--max-line-length=79")
      )
    ;; These systems get full development packages -- the slowest load
-   chopps-dev-systems '("cmf-xe-1" "tops" "hp13" "labnh" "alk" "rlk" "slk" "dak"))
+   chopps-dev-systems '("cmf-xe-1" "tops" "hp13" "labnh" "ja.int.chopps.org" "alk" "rlk" "slk" "dak"))
 
   (cond ((eq system-type 'darwin)
          (setq chopps-layers (append chopps-layers osx-layers)))
@@ -258,7 +257,7 @@ This function should only modify configuration layer settings."
      erc-view-log
      evil-mc
      irfc
-     mu4e-maildirs-extension
+     ;; mu4e-maildirs-extension
      mu4e-alert
      nameless
      powerline
@@ -291,7 +290,7 @@ This function should only modify configuration layer settings."
   (setq ch-def-font "DejaVu Sans Mono")
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
-    (setq ch-def-font "DejaVu Sans Mono")
+    (setq ch-def-font "Iosevka Medium")
     (setq ch-def-height 16.0)
     (debug-init-message "Setting font to %s:%f" ch-def-font ch-def-height))
    ((string-equal system-type "gnu/linux")
@@ -798,6 +797,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu-mac/mu4e/")
+  (add-to-list 'load-path "/opt/homebrew/share/emacs/site-lisp/mu-mac/mu4e/")
   (add-to-list 'custom-theme-load-path "~/p/emacs-mandm-theme/")
 
 
@@ -842,10 +842,9 @@ before packages are loaded. If you are unsure, you should try in setting them in
       (setq dropbox-directory "~/Dropbox")
     (setq dropbox-directory nil))
 
-  (if (file-accessible-directory-p "~/Dropbox/org-mode")
-      (setq org-directory "~/Dropbox/org-mode"
-            org-agenda-files '("~/Dropbox/org-mode"))
-    (setq org-directory "~/org"))
+  (when (file-accessible-directory-p "~/Dropbox/org-mode")
+    (setq-default org-directory "~/Dropbox/org-mode/")
+    (setq org-agenda-files '("~/Dropbox/org-mode/")))
 
   (setq
    evil-search-wrap nil
@@ -1041,6 +1040,13 @@ before packages are loaded. If you are unsure, you should try in setting them in
                 ;; Commented out a while ago
                 ;; (global-set-key (kbd "M-Y") 'yank-from-ssh)
                 ;; (global-set-key (kbd "M-Q") 'rebox-dwim)
+                (defun activate-iterm ()
+                  (interactive)
+                  (do-applescript "tell application \"iTerm\" to activate"))
+
+                (global-unset-key (kbd "C-q"))
+                (global-set-key (kbd "C-q C-SPC") 'activate-iterm)
+                (global-set-key (kbd "C-q C-q") 'quoted-insert)
 
                 ;; Find emacs source
                 (global-set-key (kbd "C-h C-l") 'find-library)
@@ -1177,7 +1183,7 @@ layers configuration. You are free to put any user code."
       (setq recentf-exclude (delete (recentf-expand-file-name package-user-dir) recentf-exclude)))
 
     (cond ((string-equal system-type "darwin") (progn (exec-path-from-shell-copy-env "PATH")
-                                                      (setq insert-directory-program "/usr/local/bin/gls")
+                                                      (setq insert-directory-program "/opt/homebrew/bin/gls")
                                                       ;; (setq insert-directory-program "/bin/ls")
                                                       (setq dired-listing-switchecs "-al --dired")
                                                       ;; (setq dired-listing-switches "-aBhl")
@@ -1429,6 +1435,41 @@ layers configuration. You are free to put any user code."
                   (global-set-key (kbd "C-\\") 'spacemacs/layouts-transient-state/persp-next)
                   (global-set-key (kbd "C-]") 'ggtags-find-tag-dwim)
                   )
+
+    ;; =================
+    ;; Mac Notifications
+    ;; =================
+
+    ;;
+    ;; If we have mac notifications then replace the dbus version
+    ;;
+    (debug-init-message "initializing notifications")
+    (when (fboundp 'mac-notification-send)
+      (require 'notifications)
+
+      (defvar mac-notification-action-hash (make-hash-table :test 'equal))
+        "A hash table for looking up category names by action list")
+      (puthash nil "Generic" mac-notification-action-hash)
+
+      (defun mac-notification-get-category (actions)
+        "Get the category for these actions creating if necessary"
+        (let ((category (gethash actions mac-notification-action-hash)))
+          (unless category
+            ;; Create a new category for this unique action list
+            (setq category (symbol-name (cl-gensym)))
+            (mac-notification-add-category category actions)
+            (puthash actions category mac-notification-action-hash))
+          category))
+
+      ;; Override dbus version
+      (defun notifications-notify (&rest params)
+        (with-demoted-errors
+	    (let* ((actions (plist-get params :actions))
+                   (category (mac-notification-get-category actions))
+	           (title (plist-get params :title))
+	           (body (plist-get params :body)))
+              (setq params (plist-put params :category category))
+              (apply #'mac-notification-send title body params))))
 
     ;; ==========
     ;; Messaging
@@ -1739,7 +1780,7 @@ This will replace the last notification sent with this function."
         :group 'mu4e-folders)
 
       (setq mu4e-attachment-dir "~/Downloads"
-            mu4e-index-cleanup nil
+            ;; mu4e-index-cleanup nil
             mu4e-change-filenames-when-moving t
             mu4e-update-interval nil
             mu4e-hide-index-messages t
@@ -1832,9 +1873,10 @@ This will replace the last notification sent with this function."
             ;; [b]ookmarks
             ;; -----------
 
-            mu4e-inbox-mailbox '("maildir:/gmail.com/INBOX"
-                                 "maildir:/labn.net/INBOX"
-                                 "maildir:/chopps.org/INBOX")
+            mu4e-inbox-mailbox '("maildir:/labn.net/INBOX"
+                                 "maildir:/chopps.org/INBOX"
+                                 "maildir:/nrl.navy.mil/INBOX"
+                                 "maildir:/gmail.com/INBOX")
 
             mu4e-imp-mailbox '("maildir:/chopps.org/ietf-chairs"
                                "maildir:/chopps.org/ietf-chairs-rtg"
@@ -1844,7 +1886,7 @@ This will replace the last notification sent with this function."
                                "maildir:/chopps.org/ietf-wg-netmod"
                                "maildir:/chopps.org/ietf-wg-rtg")
 
-            mu4e-junk-mailbox '("maildir:/gmail.com/[Gmail].Spam"
+            mu4e-junk-mailbox '("maildir:/gmail.com/[Gmail]/Spam"
                                 "maildir:/chopps.org/spam-probable"
                                 "maildir:/chopps.org/spam-train"
                                 "maildir:/chopps.org/spam")
@@ -1861,7 +1903,7 @@ This will replace the last notification sent with this function."
              (list (list (concat "flag:unread AND NOT flag:trashed AND " mu4e-inbox-filter-base) "Unread [i]NBOX messages" ?i)
                    (list (concat mu4e-unread-filter  mu4e-imp-filter-base) "Unread Important messages" ?n)
                    (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-lsr") "Unread LSR messages" ?l)
-                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-netmod") "Unread netmod messages" ?N)
+                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-ipsec") "Unread netmod messages" ?I)
                    (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-*") "Unread IETF messages" ?e)
 
                    ;; (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
@@ -1897,8 +1939,9 @@ This will replace the last notification sent with this function."
 
             ;; [j]ump shortcuts
             mu4e-maildir-shortcuts '(("/chopps.org/INBOX" . ?i)
-                                     ("/gmail.com/INBOX" . ?g)
+                                     ("/nrl.navy.mil/INBOX" . ?N)
                                      ("/labn.net/INBOX" . ?l)
+                                     ("/gmail.com/INBOX" . ?g)
                                      ("/chopps.org/aa-netbsd" . ?n)
                                      ("/chopps.org/ietf-wg-lsr" . ?L)
                                      ("/chopps.org/spam-train" . ?S)
@@ -1915,57 +1958,77 @@ This will replace the last notification sent with this function."
                                                   (and msg (string-match "/chopps.org/.*" (mu4e-message-field msg :maildir))))
                                     :vars '((user-mail-address  . "chopps@chopps.org")
                                             (user-full-name . "Christian Hopps")
-                                             ;; mu4e
-                                             (mu4e-sent-folder   . "/chopps.org/Sent Messages")
-                                             (mu4e-trash-folder  . "/chopps.org/Deleted Messages")
-                                             (mu4e-drafts-folder . "/chopps.org/Drafts")
-                                             (mu4e-sent-messages-behavior   . sent)
-                                             ;; smtp
-                                             (smtpmail-starttls-credentials . '(("smtp.chopps.org" 587 nil nil)))
-                                             (smtpmail-default-smtp-server  . "smtp.chopps.org")
-                                             (smtpmail-smtp-server          . "smtp.chopps.org")
-                                             ;;(smtpmail-starttls-credentials . '(("coffee.chopps.org" 25 nil nil)))
-                                             ;;(smtpmail-default-smtp-server  . "coffee.chopps.org")
-                                             ;;(smtpmail-smtp-server          . "coffee.chopps.org")
-                                             (smtpmail-local-domain         .      "chopps.org")
-                                             (smtpmail-stream-type          . starttls)
-                                             (smtpmail-smtp-service         . 587)))
+                                            ;; mu4e
+                                            (mu4e-drafts-folder . "/chopps.org/Drafts")
+                                            (mu4e-sent-folder   . "/chopps.org/Sent Messages")
+                                            (mu4e-trash-folder  . "/chopps.org/Deleted Messages")
+                                            (mu4e-sent-messages-behavior   . sent)
+                                            ;; smtp
+                                            (message-send-mail-function . smtpmail-send-it)
+                                            (smtpmail-starttls-credentials . '(("smtp.chopps.org" 587 nil nil)))
+                                            (smtpmail-default-smtp-server  . "smtp.chopps.org")
+                                            (smtpmail-smtp-server          . "smtp.chopps.org")
+                                            ;;(smtpmail-starttls-credentials . '(("coffee.chopps.org" 25 nil nil)))
+                                            ;;(smtpmail-default-smtp-server  . "coffee.chopps.org")
+                                            ;;(smtpmail-smtp-server          . "coffee.chopps.org")
+                                            (smtpmail-local-domain         .      "chopps.org")
+                                            (smtpmail-stream-type          . starttls)
+                                            (smtpmail-smtp-service         . 587)))
                                  ,(make-mu4e-context
                                     :name "labn.net"
                                     :match-func (lambda (msg)
                                                   (and msg (string-match "/labn.net/.*" (mu4e-message-field msg :maildir))))
                                     :vars '((user-mail-address  . "chopps@labn.net")
                                             (user-full-name . "Christian Hopps")
-                                             ;; mu4e
-                                             (mu4e-sent-folder   . "/labn.net/Sent Items")
-                                             (mu4e-trash-folder  . "/labn.net/Deleted Items")
-                                             (mu4e-drafts-folder . "/labn.net/Drafts")
-                                             (mu4e-sent-messages-behavior   . sent)
-                                             ;; smtp
-                                             (smtpmail-starttls-credentials . '(("smtp.office365.com" 587 nil nil)))
-                                             (smtpmail-default-smtp-server  . "smtp.office365.com")
-                                             (smtpmail-smtp-server          . "smtp.office365.com")
-                                             (smtpmail-local-domain         . "labn.net")
-                                             (smtpmail-stream-type          . starttls)
-                                             (smtpmail-smtp-service         . 587)))
+                                            ;; mu4e
+                                            (mu4e-drafts-folder . "/labn.net/Drafts")
+                                            (mu4e-sent-folder   . "/labn.net/Sent Items")
+                                            (mu4e-trash-folder  . "/labn.net/Deleted Items")
+                                            (mu4e-sent-messages-behavior   . sent)
+                                            ;; smtp
+                                            (message-send-mail-function . smtpmail-send-it)
+                                            (smtpmail-starttls-credentials . '(("smtp.office365.com" 587 nil nil)))
+                                            (smtpmail-default-smtp-server  . "smtp.office365.com")
+                                            (smtpmail-smtp-server          . "smtp.office365.com")
+                                            (smtpmail-local-domain         . "labn.net")
+                                            (smtpmail-stream-type          . starttls)
+                                            (smtpmail-smtp-service         . 587)))
+                                 ,(make-mu4e-context
+                                    :name "nrl.navy.mil"
+                                    :match-func (lambda (msg)
+                                                  (and msg (string-match "/nrl.navy.mil/.*" (mu4e-message-field msg :maildir))))
+                                    :vars '((user-mail-address  . "christian.hopps.ctr@nrl.navy.mil")
+                                            (user-full-name . "Christian Hopps")
+                                            ;; mu4e
+                                            (mu4e-drafts-folder . "/nrl.navy.mil/Drafts")
+                                            (mu4e-sent-folder   . "/nrl.navy.mil/Sent")
+                                            (mu4e-trash-folder  . "/nrl.navy.mil/Trash")
+                                            (mu4e-sent-messages-behavior   . sent)
+                                            ;; smtp
+                                            (message-send-mail-function . message-send-mail-with-sendmail)
+                                            (sendmail-program . "/opt/homebrew/bin/msmtp")
+                                            (send-mail-function . 'smtpmail-send-it)
+                                            (message-sendmail-extra-arguments . ("--read-envelope-from"))
+                                            (message-sendmail-f-is-evil . t)))
                                  ,(make-mu4e-context
                                     :name "gmail.com"
                                     :match-func (lambda (msg)
                                                   (and msg (string-match "/gmail.com/.*" (mu4e-message-field msg :maildir))))
                                     :vars '((user-mail-address  . "chopps@gmail.com")
                                             (user-full-name . "Christian Hopps")
-                                             ;; mu4e
-                                             (mu4e-drafts-folder . "/gmail.com/[Gmail].Drafts")
-                                             (mu4e-sent-folder   . "/gmail.com/[Gmail].Sent Mail")
-                                             (mu4e-trash-folder  . "/gmail.com/[Gmail].Trash")
-                                             (mu4e-sent-messages-behavior   . delete)
-                                             ;; smtp
-                                             (smtpmail-starttls-credentials . '(("smtp.gmail.com" 587 nil nil)))
-                                             (smtpmail-default-smtp-server  . "smtp.gmail.com")
-                                             (smtpmail-smtp-server          . "smtp.gmail.com")
-                                             (smtpmail-local-domain         .      "gmail.com")
-                                             (smtpmail-stream-type          . starttls)
-                                             (smtpmail-smtp-service . 587)))
+                                            ;; mu4e
+                                            (mu4e-drafts-folder . "/gmail.com/[Gmail]/Drafts")
+                                            (mu4e-sent-folder   . "/gmail.com/[Gmail]/Sent Mail")
+                                            (mu4e-trash-folder  . "/gmail.com/[Gmail]/Trash")
+                                            (mu4e-sent-messages-behavior   . delete)
+                                            ;; smtp
+                                            (message-send-mail-function . smtpmail-send-it)
+                                            (smtpmail-starttls-credentials . '(("smtp.gmail.com" 587 nil nil)))
+                                            (smtpmail-default-smtp-server  . "smtp.gmail.com")
+                                            (smtpmail-smtp-server          . "smtp.gmail.com")
+                                            (smtpmail-local-domain         .      "gmail.com")
+                                            (smtpmail-stream-type          . starttls)
+                                            (smtpmail-smtp-service . 587)))
                                  ))
 
 
@@ -1975,9 +2038,11 @@ This will replace the last notification sent with this function."
               (mu4e-shr2text msg)))
 
           ;; Work around a bug with too long names in the spaceline/modeline
-          (defun trim-modeline-string-chopps (str)
-            (substring str 0 39))
-          (add-function :filter-return (symbol-function 'mu4e~quote-for-modeline) 'trim-modeline-string-chopps)
+
+          ;; This is causing an error now in emacs 27.2
+          ;; (defun trim-modeline-string-chopps (str)
+          ;;   (substring str 0 39))
+          ;; (add-function :filter-return (symbol-function 'mu4e~quote-for-modeline) 'trim-modeline-string-chopps)
 
           ;; Mu4E Keyboard extras
           (bind-key (kbd "'") 'mu4e-headers-next 'mu4e-headers-mode-map)
@@ -1986,6 +2051,11 @@ This will replace the last notification sent with this function."
           ;; (bind-key (kbd "\"") 'mu4e-view-headers-prev 'mu4e-view-mode-map)
           (bind-key (kbd "f") 'mu4e-view-go-to-url 'mu4e-view-mode-map)
 
+          (defun mu4e-update-index-deep ()
+            (interactive)
+            (let ((mu4e-index-cleanup t))
+              (mu4e-update-index)))
+          (bind-key (kbd "U") 'mu4e-update-index-deep 'mu4e-main-mode-map)
 
           (defun ch:ct (clist)
             "Transform candidate into (display . real)"
@@ -2078,6 +2148,12 @@ This will replace the last notification sent with this function."
           ;; ;; XXX causes hangs
           ;; (add-hook 'mu4e-headers-mode-hook (lambda () (progn (setq scroll-up-aggressively .8))))
 
+          (defun mu4e-notify-new-message (title subject msgid)
+            (notifications-notify
+             :title title
+             :body subject
+             :sound-name "Looking Up"
+             :on-close (lambda (id reason) (unless (equal reason 'dismissed) (open-message-id-in-new-frame msgid)))))
 
           (add-to-list 'mu4e-view-actions
                        '("ViewInBrowser" . mu4e-action-view-in-browser))
@@ -2187,6 +2263,15 @@ This will replace the last notification sent with this function."
                                      (mm-default-file-encoding file)
                                      nil "attachment")
                   (message "skipping non-regular file %s" file)))))
+
+          (defun open-message-id-in-new-frame (msgid)
+            (interactive "s")
+            (let ((mailp (persp-get-by-name "@Mu4e"))
+                  (nframe (make-frame)))
+              (select-frame nframe)
+              (and (persp-p mailp) (persp-switch "@Mu4e" nframe))
+              (mu4e-view-message-with-message-id msgid)))
+
           )
         )
       )
@@ -2966,6 +3051,10 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      ;; Save running clock and clock history.
      (setq org-clock-persist t)
 
+     (when (file-accessible-directory-p "~/Dropbox/org-mode")
+       (setq-default org-directory "~/Dropbox/org-mode/")
+       (setq org-agenda-files '("~/Dropbox/org-mode/")))
+
      ;; This is for using xelatex
      (with-eval-after-load "org"
        ;; (dolist (estate '(normal visual motion))
@@ -3027,31 +3116,19 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      ;;   (define-key org-agenda-mode-map (kbd "RET") 'org-agenda-switch-to))
 
      (debug-init-message "debug-init org my-org-mode-hook")
-     (defun my-org-mode-hook ()
-       (if debug-init-msg
-           (debug-init-message "Org-mode-hook"))
-       (require 'ox-rfc)
-       ;; (org-set-local 'yas/trigger-key [tab])
-       ;; (yas-minor-mode)
-       ;; Probably done now.
-       ;; (turn-on-flyspell)
 
-       ;; (define-key yas/keymap [tab] 'yas/next-field-or-maybe-expand)
-       ;; XXX need to redefine this for firefox in archlinux
-       (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)
-       (define-key org-mode-map (kbd "C-c e e") 'org-encrypt-entries)
-       (define-key org-mode-map (kbd "C-c e E") 'org-encrypt-entry)
-       (define-key org-mode-map (kbd "C-c e d") 'org-decrypt-entries)
-       (define-key org-mode-map (kbd "C-c e D") 'org-decrypt-entry)
+     (require 'ox-rfc)
 
-       )
+     (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)
+     (define-key org-mode-map (kbd "C-c e e") 'org-encrypt-entries)
+     (define-key org-mode-map (kbd "C-c e E") 'org-encrypt-entry)
+     (define-key org-mode-map (kbd "C-c e d") 'org-decrypt-entries)
+     (define-key org-mode-map (kbd "C-c e D") 'org-decrypt-entry)
 
      ;; (setq TeX-view-program-selection
      ;;       (append
      ;;        (delq (assoc 'output-pdf TeX-view-program-selection) TeX-view-program-selection)
      ;;        '((output-pdf "PDF Tools"))))
-
-     (add-hook 'org-mode-hook 'my-org-mode-hook)
 
      ;; (defun th/pdf-view-revert-buffer-maybe (file)
      ;;   (when-let ((buf (find-buffer-visiting file)))
@@ -3604,8 +3681,6 @@ a number of clock tables."
 
      (debug-init-message "pre-server-running-notificiation-setup")
 
-     ;; XXX need to change this
-     (when nil
      (when (and (or (daemonp) (and (fboundp 'server-running-p) (server-running-p)))
                 (string-equal system-type "darwin"))
 
@@ -3616,28 +3691,75 @@ a number of clock tables."
        ;; requires 'brew install terminal-notifier'
        ;; stolen from erc-notifier
 
-       (defvar terminal-notifier-command (executable-find "terminal-notifier") "The path to terminal-notifier.")
-                                        ; (terminal-notifier-notify "Emacs notification" "Something amusing happened")
+       ;; Example use of alerter
+       ;; alerter -sound "Second Glance" -sender org.gnu.Emacs -title Foo -subtitle Bar actions YES -closeLabel Close  -message "This is the message"
+       (defvar terminal-alert-command (executable-find "alerter") "The path to the alerter binary.")
 
-       (defun terminal-notifier-notify (title message)
-         "Show a message with terminal-notifier-command ."
-         (start-process "terminal-notifier"
-                        "terminal-notifier"
-                        terminal-notifier-command
-                        "-title" title
-                        "-message" message
-                        "-activate" "org.gnu.Emacs"))
+       ;; (defvar terminal-notifier-command (executable-find "terminal-notifier") "The path to terminal-notifier.")
+       ;;                                  ; (terminal-notifier-notify "Emacs notification" "Something amusing happened")
+
+       ;; (defun terminal-notifier-notify (title message)
+       ;;   "Show a message with terminal-notifier-command ."
+       ;;   (start-process "terminal-notifier"
+       ;;                  "terminal-notifier"
+       ;;                  terminal-notifier-command
+       ;;                  "-title" title
+       ;;                  ; "-sender" "org.gnu.Emacs"
+       ;;                  "-appIcon" "/Applications/Emacs.app/Contents/Resources/etc/images/icons/hicolor/48x48/apps/emacs.png"
+       ;;                  "-message" message
+       ;;                  "-sound" "Gentle Roll"
+       ;;                  "-activate" "org.gnu.Emacs"))
 
        (defun timed-notification (time msg)
          (interactive "sNotification when (e.g: 2 minutes, 60 seconds, 3 days): \nsMessage: ")
-         (run-at-time time nil (lambda (msg) (terminal-notifier-notify "Emacs" msg)) msg))
+         (run-at-time time nil (lambda (msg) (notifications-notify :title "Emacs" :body msg)) msg))
+
 
        (require 'org-notify)
+
+
+       (defun my-action-act (plist key)
+         "User wants to see action."
+         (let ((file (plist-get plist :file))
+               (begin (plist-get plist :begin)))
+           (message "my-action-act file %s begin %s" file begin)
+           (if (string-equal key "show")
+               (progn
+                 (switch-to-buffer (find-file-noselect file))
+                 (org-with-wide-buffer
+                  (goto-char begin)
+                  (outline-show-entry))
+                 (goto-char begin)
+                 (search-forward "DEADLINE: <")
+                 (search-forward ":")
+                 (if (display-graphic-p)
+                     (x-focus-frame nil)))
+             (save-excursion
+               (with-current-buffer (find-file-noselect file)
+                 (org-with-wide-buffer
+                  (goto-char begin)
+                  (search-forward "DEADLINE: <")
+                  (cond
+                   ((string-equal key "done")  (org-todo))
+                   ((string-equal key "hour")  (org-timestamp-change 60 'minute))
+                   ((string-equal key "day")   (org-timestamp-up-day))
+                   ((string-equal key "week")  (org-timestamp-change 7 'day)))))))))
+
+       (defvar todo-action-hash (make-hash-table :test 'equal)
+         "A hash table for looking up notifications by id")
+
+       (defun my-action (id key)
+         (let ((plist (gethash id todo-action-hash)))
+             (message "my-action id %s key %s plist %s" id key plist)
+             (my-action-act plist key)
+             (remhash id todo-action-hash)))
+
        (debug-init-message "in-server-running-notificiation-setup")
-       (defun org-notify-action-notify-urgency (plist)
+
+       (defun org-notify-action-notify-mac (plist)
          "Pop up a notification window."
-         (message "XXX org-notify-action-notify-urgency enter")
-         (require 'notifications)
+         ;; (message "XXX org-notify-action-notify-urgency enter")
+         ;; (require 'notifications)
          (let* ((duration (plist-get plist :duration))
                 (urgency (plist-get plist :urgency))
                 (id (notifications-notify
@@ -3646,10 +3768,9 @@ a number of clock tables."
                      :urgency   (or urgency 'normal)
                      :timeout   (if duration (* duration 1000))
                      :actions   org-notify-actions
-                     :on-action 'org-notify-on-action-notify)))
-           (setq org-notify-on-action-map
-                 (plist-put org-notify-on-action-map id plist))
-           (message "XXX org-notify-action-notify-urgency exit")
+                     :on-action 'my-action)))
+           (puthash id plist todo-action-hash)
+           ;; (message "XXX org-notify-action-notify-urgency exit")
            ))
        (debug-init-message "org notify add")
        (org-notify-add 'default
@@ -3659,7 +3780,7 @@ a number of clock tables."
                                :urgency 'critical
                                :app-icon (concat (configuration-layer/get-layer-path 'org)
                                                  "img/org.png")
-                               :actions org-notify-action-notify-urgency))
+                               :actions org-notify-action-notify-mac))
        (debug-init-message "org notify start")
        (org-notify-start)
        (debug-init-message "org notify started")
@@ -3667,7 +3788,7 @@ a number of clock tables."
 
      (debug-init-message "debug-init POST-server-running-notification-setup")
 
-     ))
+     )
 
 
     ;; ====
