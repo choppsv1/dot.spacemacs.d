@@ -2343,6 +2343,13 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                           (set (make-local-variable 'rebox-style-loop) '(81 82 83)))
                         (add-hook 'go-mode-hook 'rebox-go-hook))))
 
+    (when-layer-used 'yang
+     (add-hook 'yang-mode-hook (function (lambda ()
+                                           (c-set-style "BSD")
+                                           (setq indent-tabs-mode nil)
+                                           (setq c-basic-offset 2)
+                                           (setq font-lock-maximum-decoration t)))))
+
     (when-layer-used 'yaml
      (add-hook 'yaml-mode-hook (function (lambda ()
                                            (when-layer-used 'rebox
@@ -2615,8 +2622,8 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
               (vpp-indent-format-buffer))))
             ;;(clang-format-buffer)))
 
-        (defun vpp-maybe-format-buffer ()
-          "Reformat buffer if contains VPP magic"
+        (defun clang-maybe-format-buffer ()
+          "Reformat buffer if contains VPP magic or has project root level .clang-format config"
           (when (save-excursion
                   (goto-char (point-min))
                   (re-search-forward "coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t))
@@ -2624,14 +2631,15 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
              ((string= "CLANG" (match-string 1)) (vpp-format-buffer t) t)
              ;; ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
              ((string= "INDENT" (match-string 1)) (vpp-format-buffer) t)
-             (t t))))
+             ;; is this FRR
+             ((f-exists? (concat projectile-project-root ".clang-format")) (clang-format-vc-diff)))))
 
-        (defun vpp-maybe-format-buffer-on-save ()
-          (add-hook 'before-save-hook 'vpp-maybe-format-buffer nil t))
+        (defun clang-maybe-format-buffer-on-save ()
+          (add-hook 'before-save-hook 'clang-maybe-format-buffer nil t))
 
         ;; (add-hook 'c-mode-common-hook 'vpp-maybe-format-buffer-on-save)
-        (add-hook 'c-mode-hook 'vpp-maybe-format-buffer-on-save)
-        (add-hook 'c++-mode-hook 'vpp-maybe-format-buffer-on-save)
+        (add-hook 'c-mode-hook 'clang-maybe-format-buffer-on-save)
+        (add-hook 'c++-mode-hook 'clang-maybe-format-buffer-on-save)
 
         (defun check-flycheck-clang-project-add-path (path)
           (when (and path (file-exists-p path))
