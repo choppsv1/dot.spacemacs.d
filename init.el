@@ -2347,8 +2347,21 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      (add-hook 'yang-mode-hook (function (lambda ()
                                            (c-set-style "BSD")
                                            (setq indent-tabs-mode nil)
-                                           (setq c-basic-offset 2)
-                                           (setq font-lock-maximum-decoration t)))))
+                                           (setq c-basic-offset 2)))))
+
+    ;; (with-eval-after-load "yang-mode"
+    ;;   ;; (autoload 'yang-mode "yang-mode")
+    ;;   ;; (add-to-list 'auto-mode-alist '("\\.yang\\'" . yang-mode))
+    ;;   (defun my-yang-mode-hook ()
+    ;;     "Configuration for YANG Mode. Add this to `yang-mode-hook'."
+    ;;     ;; (c-set-style "Procket")
+    ;;     (c-set-style "BSD")
+    ;;     (setq indent-tabs-mode nil)
+    ;;     (setq c-basic-offset 2)
+    ;;     ;; (setq font-lock-maximum-decoration t)
+    ;;     (font-lock-mode t))
+    ;;   (add-hook 'yang-mode-hook 'my-yang-mode-hook))
+
 
     (when-layer-used 'yaml
      (add-hook 'yaml-mode-hook (function (lambda ()
@@ -3851,19 +3864,6 @@ a number of clock tables."
     ;; Map it everywhere else as well.
 
     (define-key evil-normal-state-map (kbd "C-]") 'ggtags-find-tag-dwim)
-
-    (with-eval-after-load "yang-mode"
-                  ;; (autoload 'yang-mode "yang-mode")
-                  ;; (add-to-list 'auto-mode-alist '("\\.yang\\'" . yang-mode))
-                  (defun my-yang-mode-hook ()
-                    "Configuration for YANG Mode. Add this to `yang-mode-hook'."
-                    ;; (c-set-style "Procket")
-                    (c-set-style "BSD")
-                    (setq indent-tabs-mode nil)
-                    (setq c-basic-offset 2)
-                    ;; (setq font-lock-maximum-decoration t)
-                    (font-lock-mode t))
-                  (add-hook 'yang-mode-hook 'my-yang-mode-hook))
 
     ;; ---------------------
     ;; Auto insert templates
