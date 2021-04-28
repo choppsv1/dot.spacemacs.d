@@ -290,7 +290,7 @@ This function should only modify configuration layer settings."
   (setq ch-def-font "DejaVu Sans Mono")
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
-    (setq ch-def-font "Iosevka Medium")
+    (setq ch-def-font "Iosevka Light")
     (setq ch-def-height 16.0)
     (debug-init-message "Setting font to %s:%f" ch-def-font ch-def-height))
    ((string-equal system-type "gnu/linux")
@@ -797,7 +797,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu-mac/mu4e/")
-  (add-to-list 'load-path "/opt/homebrew/share/emacs/site-lisp/mu-mac/mu4e/")
   (add-to-list 'custom-theme-load-path "~/p/emacs-mandm-theme/")
 
 
@@ -2033,12 +2032,8 @@ This will replace the last notification sent with this function."
 
 
           (debug-init-message "debug-init MU4E defuns")
-          (defun my-mu4e-shr2text (msg)
-            (let ((display-graphic-p (lambda () nil)))
-              (mu4e-shr2text msg)))
 
           ;; Work around a bug with too long names in the spaceline/modeline
-
           ;; This is causing an error now in emacs 27.2
           ;; (defun trim-modeline-string-chopps (str)
           ;;   (substring str 0 39))
@@ -2052,6 +2047,7 @@ This will replace the last notification sent with this function."
           (bind-key (kbd "f") 'mu4e-view-go-to-url 'mu4e-view-mode-map)
 
           (defun mu4e-update-index-deep ()
+            "Reindex mu4e with cleanup"
             (interactive)
             (let ((mu4e-index-cleanup t))
               (mu4e-update-index)))
@@ -2154,9 +2150,6 @@ This will replace the last notification sent with this function."
              :body subject
              :sound-name "Looking Up"
              :on-close (lambda (id reason) (unless (equal reason 'dismissed) (open-message-id-in-new-frame msgid)))))
-
-          (add-to-list 'mu4e-view-actions
-                       '("ViewInBrowser" . mu4e-action-view-in-browser))
 
           (debug-init-message "debug-init MU4E mode add to gcal")
           (defun mu4e-action-add-to-gcal (msg)
@@ -3857,10 +3850,10 @@ a number of clock tables."
                   (defun my-yang-mode-hook ()
                     "Configuration for YANG Mode. Add this to `yang-mode-hook'."
                     ;; (c-set-style "Procket")
-                    ;; (c-set-style "KNF")
+                    (c-set-style "BSD")
                     (setq indent-tabs-mode nil)
                     (setq c-basic-offset 2)
-                    (setq font-lock-maximum-decoration t)
+                    ;; (setq font-lock-maximum-decoration t)
                     (font-lock-mode t))
                   (add-hook 'yang-mode-hook 'my-yang-mode-hook))
 
