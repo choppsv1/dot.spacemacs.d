@@ -1446,7 +1446,7 @@ layers configuration. You are free to put any user code."
     (when (fboundp 'mac-notification-send)
       (require 'notifications)
 
-      (defvar mac-notification-action-hash (make-hash-table :test 'equal))
+      (defvar mac-notification-action-hash (make-hash-table :test 'equal)
         "A hash table for looking up category names by action list")
       (puthash nil "Generic" mac-notification-action-hash)
 
@@ -1468,7 +1468,7 @@ layers configuration. You are free to put any user code."
 	           (title (plist-get params :title))
 	           (body (plist-get params :body)))
               (setq params (plist-put params :category category))
-              (apply #'mac-notification-send title body params))))
+              (apply #'mac-notification-send title body params)))))
 
     ;; ==========
     ;; Messaging
