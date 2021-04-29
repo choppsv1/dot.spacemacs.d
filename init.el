@@ -1075,16 +1075,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
                   )
                 )
 
-  (fold-section "Registers (files)"
-                ;; (set-register ?E `(file . ,emacs-init-source))
-                (progn
-                  (set-register ?W `(file . ,(concat org-directory "/work.org")))
-                  (set-register ?N `(file . ,(concat org-directory "/notes.org")))
-                  (set-register ?I `(file . ,(concat org-directory "/ietf.org")))
-                  (set-register ?S `(file . ,(concat org-directory "/status.org")))
-                  (set-register ?P `(file . ,(concat dropbox-directory "/ts-pass.gpg")))
-                  ))
-
   ;; =================
   ;; Programming Modes
   ;; =================
@@ -2546,7 +2536,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                        ((not (zerop status))
                         (error "(clang-format failed with code %d%s)" status stderr)))
                       (if (= 0 (buffer-size temp-buffer))
-                          (message "(vpp-clang-diff-format-buffer no formatting changes")
+                          (message "(clang-format-vc-diff no formatting changes")
                         (cl-destructuring-bind (replacements cursor incomplete-format)
                             (with-current-buffer temp-buffer
                               (clang-format--extract (car (xml-parse-region))))
@@ -2562,6 +2552,15 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
               (ignore-errors (kill-buffer temp-buffer))
               (ignore-errors (delete-file temp-file))
               (ignore-errors (delete-file head-temp-file)))))
+
+        (defun vpp-format-buffer (&optional force-clang)
+          (if (and (eq major-mode 'c++-mode)
+                   (boundp 'clang-format-buffer))
+              (clang-format-vc-diff)
+            (if force-clang
+                (clang-format-vc-diff)
+              (vpp-indent-format-buffer))))
+        ;;(clang-format-buffer)))
 
         (defun vpp-clang-diff-format-buffer-old ()
           "Reformat the buffer using 'clang-format-diff.py'"
@@ -3065,9 +3064,13 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      ;; Save running clock and clock history.
      (setq org-clock-persist t)
 
-     (when (file-accessible-directory-p "~/Dropbox/org-mode")
-       (setq-default org-directory "~/Dropbox/org-mode/")
-       (setq org-agenda-files '("~/Dropbox/org-mode/")))
+     (if (file-accessible-directory-p "~/Dropbox/org-mode")
+         (pogn
+          (setq-default org-directory "~/Dropbox/org-mode/")
+          (setq org-agenda-files '("~/Dropbox/org-mode/")))
+       (setq-default org-directory "~/org/")
+       (setq org-agenda-files '("~/org/")))
+
 
      ;; This is for using xelatex
      (with-eval-after-load "org"
@@ -3080,6 +3083,12 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
        ;; Consider _s parts of words
        (modify-syntax-entry ?_ "w" org-mode-syntax-table)
+
+       (set-register ?W `(file . ,(concat org-directory "/work.org")))
+       (set-register ?N `(file . ,(concat org-directory "/notes.org")))
+       (set-register ?I `(file . ,(concat org-directory "/ietf.org")))
+       (set-register ?S `(file . ,(concat org-directory "/status.org")))
+       (set-register ?P `(file . ,(concat dropbox-directory "/ts-pass.gpg")))
 
        ;;
        ;; XXX add back
