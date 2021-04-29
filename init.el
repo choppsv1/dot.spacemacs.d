@@ -3065,7 +3065,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      (setq org-clock-persist t)
 
      (if (file-accessible-directory-p "~/Dropbox/org-mode")
-         (pogn
+         (progn
           (setq-default org-directory "~/Dropbox/org-mode/")
           (setq org-agenda-files '("~/Dropbox/org-mode/")))
        (setq-default org-directory "~/org/")
