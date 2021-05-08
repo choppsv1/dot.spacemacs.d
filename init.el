@@ -67,7 +67,7 @@ This function should only modify configuration layer settings."
      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
       (mu4e :variables
             ;; mu4e-enable-async-operations t
-            mu4e-enable-notifications nil
+            mu4e-enable-notifications t
             mu4e-use-maildirs-extension nil)
      ;; (org2blog :variables org2blog-name "hoppsjots.org")
      (osx :variables
@@ -258,7 +258,7 @@ This function should only modify configuration layer settings."
      evil-mc
      irfc
      ;; mu4e-maildirs-extension
-     mu4e-alert
+     ;; mu4e-alert
      nameless
      powerline
      ;; recentf
@@ -796,7 +796,8 @@ before packages are loaded. If you are unsure, you should try in setting them in
            (setq epg-gpg-program "/usr/local/MacGPG2/bin/gpg2")))
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
-  (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu-mac/mu4e/")
+  ;; (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu-mac/mu4e/")
+  ;; (add-to-list 'load-path "/opt/homebrew/share/emacs/site-lisp/mu-mac/mu4e/")
   (add-to-list 'custom-theme-load-path "~/p/emacs-mandm-theme/")
 
 
@@ -871,6 +872,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
    ;;                              )
    )
 
+  (setq-default debug-mac-notifications nil)
   (setq-default flycheck-standard-error-navigation nil)
   (setq flycheck-standard-error-navigation nil)
   (with-eval-after-load 'tramp
@@ -987,6 +989,57 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (setq fci-rule-character ?\u250A)
   (setq fci-rule-character-color "#121212")
   ;; (setq fci-rule-color "#222222")
+
+  (setq split-width-threshold 160)
+  (setq split-height-threshold 48)
+  (setq window-min-width 40)
+  (setq window-min-height 4)
+
+  (defun split-window-sensibly-prefer-horizontal (&optional window)
+"Based on split-window-sensibly, but designed to prefer a horizontal split,
+i.e. windows tiled side-by-side."
+  (let ((window (or window (selected-window))))
+    (or (and (window-splittable-p window t)
+             ;; Split window horizontally
+             (message "RIGHT")
+             (with-selected-window window
+               (split-window-right)))
+        (and (window-splittable-p window)
+             ;; Split window vertically
+             (message "WRONG")
+             (with-selected-window window
+               (split-window-below)))
+        (and
+         ;; If WINDOW is the only usable window on its frame (it is
+         ;; the only one or, not being the only one, all the other
+         ;; ones are dedicated) and is not the minibuffer window, try
+         ;; to split it horizontally disregarding the value of
+         ;; `split-height-threshold'.
+         (message "FOOBAR")
+         (let ((frame (window-frame window)))
+           (or
+            (eq window (frame-root-window frame))
+            (catch 'done
+              (walk-window-tree (lambda (w)
+                                  (unless (or (eq w window)
+                                              (window-dedicated-p w))
+                                    (throw 'done nil)))
+                                frame)
+              t)))
+     (not (window-minibuffer-p window))
+     (let ((split-width-threshold 0))
+       (when (window-splittable-p window t)
+         (with-selected-window window
+           (split-window-right))))))))
+
+  (defun split-window-really-sensibly (&optional window)
+    (let ((window (or window (selected-window))))
+      (if (> (window-total-width window) (* 2 (window-total-height window)))
+          (with-selected-window window (split-window-sensibly-prefer-horizontal window))
+        (with-selected-window window (split-window-sensibly window)))))
+
+  ;; (setq split-window-preferred-function 'split-window-really-sensibly)
+  (setq split-window-preferred-function 'split-window-sensibly-prefer-horizontal)
 
   ;; =================================
   ;; Global Key Bindings and Registers
@@ -1433,32 +1486,32 @@ layers configuration. You are free to put any user code."
     ;; If we have mac notifications then replace the dbus version
     ;;
     (debug-init-message "initializing notifications")
-    (when (fboundp 'mac-notification-send)
-      (require 'notifications)
+    (when (fboundp 'mac-notification-os-send)
+      (require 'mac-notifications))
 
-      (defvar mac-notification-action-hash (make-hash-table :test 'equal)
-        "A hash table for looking up category names by action list")
-      (puthash nil "Generic" mac-notification-action-hash)
+      ;; (defvar mac-notification-action-hash (make-hash-table :test 'equal)
+      ;;   "A hash table for looking up category names by action list")
+      ;; (puthash nil "Generic" mac-notification-action-hash)
 
-      (defun mac-notification-get-category (actions)
-        "Get the category for these actions creating if necessary"
-        (let ((category (gethash actions mac-notification-action-hash)))
-          (unless category
-            ;; Create a new category for this unique action list
-            (setq category (symbol-name (cl-gensym)))
-            (mac-notification-add-category category actions)
-            (puthash actions category mac-notification-action-hash))
-          category))
+      ;; (defun mac-notification-get-category (actions)
+      ;;   "Get the category for these actions creating if necessary"
+      ;;   (let ((category (gethash actions mac-notification-action-hash)))
+      ;;     (unless category
+      ;;       ;; Create a new category for this unique action list
+      ;;       (setq category (symbol-name (cl-gensym)))
+      ;;       (mac-notification-add-category category actions)
+      ;;       (puthash actions category mac-notification-action-hash))
+      ;;     category))
 
-      ;; Override dbus version
-      (defun notifications-notify (&rest params)
-        (with-demoted-errors
-	    (let* ((actions (plist-get params :actions))
-                   (category (mac-notification-get-category actions))
-	           (title (plist-get params :title))
-	           (body (plist-get params :body)))
-              (setq params (plist-put params :category category))
-              (apply #'mac-notification-send title body params)))))
+      ;; ;; Override dbus version
+      ;; (defun notifications-notify (&rest params)
+      ;;   (with-demoted-errors
+      ;;       (let* ((actions (plist-get params :actions))
+      ;;              (category (mac-notification-get-category actions))
+      ;;              (title (plist-get params :title))
+      ;;              (body (plist-get params :body)))
+      ;;         (setq params (plist-put params :category category))
+      ;;         (apply #'mac-notification-send title body params)))))
 
     ;; ==========
     ;; Messaging
@@ -1769,7 +1822,8 @@ layers configuration. You are free to put any user code."
         :group 'mu4e-folders)
 
       (setq mu4e-attachment-dir "~/Downloads"
-            ;; mu4e-index-cleanup nil
+            mu4e-index-cleanup nil
+            mu4e-index-lazy-check nil
             mu4e-change-filenames-when-moving t
             mu4e-update-interval nil
             mu4e-hide-index-messages t
@@ -2134,12 +2188,30 @@ layers configuration. You are free to put any user code."
           ;; ;; XXX causes hangs
           ;; (add-hook 'mu4e-headers-mode-hook (lambda () (progn (setq scroll-up-aggressively .8))))
 
-          (defun mu4e-notify-new-message (title subject msgid)
-            (notifications-notify
-             :title title
-             :body subject
-             :sound-name "Looking Up"
-             :on-close (lambda (id reason) (unless (equal reason 'dismissed) (open-message-id-in-new-frame msgid)))))
+          (debug-init-message "debug-init MU4E add notify actions")
+          (defun message-file-to-sexp (path)
+            "Retrieve a mu4e s-expression for the e-mail message at PATH."
+            (car-safe
+             (read-from-string
+              (shell-command-to-string
+               (format "mu view -o sexp %s"
+                       (shell-quote-argument (expand-file-name path)))))))
+
+          (defun mu4e-mac-notify-action (id action content)
+            (let* ((msgid (plist-get content :msgid)))
+              ;; This can cause a request about flags which hangs things.
+              (when msgid
+                (open-message-id-in-new-frame msgid))))
+
+          (defun mu4e-notify-new-message (path)
+            (let* ((msg (message-file-to-sexp path))
+                   (msgid (plist-get msg :message-id))
+                   (subject (plist-get msg :subject))
+                   (title (format "%s" (car (plist-get msg :from)))))
+              (mac-notification-send title subject
+                                     :msgid msgid
+                                     :sound-name "Looking Up"
+                                     :on-action 'mu4e-mac-notify-action)))
 
           (debug-init-message "debug-init MU4E mode add to gcal")
           (defun mu4e-action-add-to-gcal (msg)
@@ -2234,6 +2306,8 @@ layers configuration. You are free to put any user code."
                                          )))
           ;; XXXSLOW
 
+          ;; (require 'mu4e-special)
+
           (debug-init-message "debug-init MU4E defun compose")
           (defun compose-attach-marked-files ()
             "Compose mail and attach all the marked files from a dired buffer."
@@ -2253,8 +2327,8 @@ layers configuration. You are free to put any user code."
                   (nframe (make-frame)))
               (select-frame nframe)
               (and (persp-p mailp) (persp-switch "@Mu4e" nframe))
-              (mu4e-view-message-with-message-id msgid)))
-
+              (mu4e-view-message-with-message-id msgid)
+              (delete-other-windows)))
           )
         )
       )
@@ -3050,7 +3124,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
      (debug-init-message "debug-init org setup")
      ;; Do we want this?
-     (add-hook 'org-mode-hook #'yas-minor-mode)
 
      ;; Custom Agenda View
      (setq org-agenda-custom-commands
@@ -3139,6 +3212,12 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      ;;   (define-key org-agenda-mode-map (kbd "RET") 'org-agenda-switch-to))
 
      (debug-init-message "debug-init org my-org-mode-hook")
+     (defun my-org-mode-hook ()
+       (yas-minor-mode 1)
+       (electric-indent-mode 0)
+       (setq org-adapt-indentation 'headline-data))
+     (add-hook 'org-mode-hook 'my-org-mode-hook)
+
 
      (require 'ox-rfc)
 
@@ -4090,11 +4169,7 @@ a number of clock tables."
     ;;                  (with-selected-window window
     ;;                    (split-window-below))))))))
 
-    ;; (setq split-width-threshold 100)
-    ;; (setq window-min-width 40)
-    ;; (setq split-window-preferred-function 'split-window-sensibly-prefer-horizontal)
-
-    (debug-init-message "list-timers")
+     (debug-init-message "list-timers")
 
     (require 'list-timers)
     (evil-set-initial-state 'timers-menu-mode 'insert)
