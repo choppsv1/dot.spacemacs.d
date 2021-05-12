@@ -2343,7 +2343,7 @@ layers configuration. You are free to put any user code."
     (when-layer-used 'lsp
      (with-eval-after-load 'lsp-mode
      (setq-default lsp-enable-indentation nil
-                   lsp-file-watch-ignored (append '("/usr/include" ".*/build-root/.*") lsp-file-watch-ignored)
+                   lsp-file-watch-ignored (append '("/usr/include" ".*/build-root/.*" "/opt/current/include" ) lsp-file-watch-ignored)
                    lsp-enable-file-watchers t
                    lsp-file-watch-threshold 20000
                    )
@@ -2727,9 +2727,9 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         (add-hook 'c-mode-hook 'clang-maybe-format-buffer-on-save)
         (add-hook 'c++-mode-hook 'clang-maybe-format-buffer-on-save)
 
-        (defun check-flycheck-clang-project-add-path (path)
+        (defun check-flycheck-c-project-add-path (path)
           (when (and path (file-exists-p path))
-            (message "Adding path %s to flycheck-clang-include-path" path)
+            (message "Adding path %s to flycheck-clang/cpp/gcc-include-path" path)
             (add-to-list
              (make-variable-buffer-local 'flycheck-clang-include-path)
              path)
@@ -2752,10 +2752,12 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                               "../openwrt/staging_dir/target-aarch64_cortex-a72_glibc/root-mvebu/usr/include/"))
 
                 (let ((path1 (concat root path)))
-                  (check-flycheck-clang-project-add-path path1))))
-            (dolist (path '("/opt/alt/current/include"))
-              (let ((path1 (concat root path)))
-                (check-flycheck-clang-project-add-path path1)))))
+                  (check-flycheck-c-project-add-path path1))))
+            (dolist (path '("/opt/current/include"))
+              (check-flycheck-c-project-add-path path1))))
+
+        (defun setup-flycheck-gcc-project-path ()
+          (check-flycheck-c-project-add-path path1))
 
         (when-layer-used 'rebox
           (defun rebox-c-hook ()
@@ -2808,6 +2810,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                               (c-toggle-auto-hungry-state 1)
                               (setq c-electric-flag nil)
                               (setq fill-column 80)
+                              (setup-flycheck-gcc-project-path)
                               (setup-flycheck-clang-project-path)
                               (flyspell-prog-mode)
                               )))
