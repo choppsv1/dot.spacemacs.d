@@ -2710,18 +2710,20 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
         (defun clang-maybe-format-buffer ()
           "Reformat buffer if contains VPP magic or has project root level .clang-format config"
+          (message "1")
           (when (save-excursion
-                  (goto-char (point-min))
-                  (re-search-forward "coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t))
+                  (goto-char (point-min)))
+            (re-search-forward "coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t)
             (cond
              ((string= "CLANG" (match-string 1)) (vpp-format-buffer t) t)
              ;; ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
              ((string= "INDENT" (match-string 1)) (vpp-format-buffer) t)
-             ;; is this FRR
-             ((f-exists? (concat projectile-project-root ".clang-format")) (clang-format-vc-diff)))))
+             ;; is this a project with clang format?
+             ((f-exists? (concat (projectile-project-root) ".clang-format")) (clang-format-vc-diff) t)
+             )))
 
         (defun clang-maybe-format-buffer-on-save ()
-          (add-hook 'before-save-hook 'clang-maybe-format-buffer nil t))
+          (add-hook 'before-save-hook 'clang-maybe-format-buffer 90 t))
 
         ;; (add-hook 'c-mode-common-hook 'vpp-maybe-format-buffer-on-save)
         (add-hook 'c-mode-hook 'clang-maybe-format-buffer-on-save)
@@ -2740,7 +2742,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
              (make-variable-buffer-local 'flycheck-gcc-include-path)
              path)))
 
-        (defun setup-flycheck-clang-project-path ()
+        (defun setup-flycheck-c-project-paths ()
           (let ((root (ignore-errors (projectile-project-root))))
             (when (and root (file-exists-p (concat root "src/vppinfra")))
               (dolist (path '("src/" "src/plugins/"
@@ -2754,10 +2756,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                 (let ((path1 (concat root path)))
                   (check-flycheck-c-project-add-path path1))))
             (dolist (path '("/opt/current/include"))
-              (check-flycheck-c-project-add-path path1))))
-
-        (defun setup-flycheck-gcc-project-path ()
-          (check-flycheck-c-project-add-path path1))
+              (check-flycheck-c-project-add-path path))))
 
         (when-layer-used 'rebox
           (defun rebox-c-hook ()
@@ -2810,8 +2809,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                               (c-toggle-auto-hungry-state 1)
                               (setq c-electric-flag nil)
                               (setq fill-column 80)
-                              (setup-flycheck-gcc-project-path)
-                              (setup-flycheck-clang-project-path)
+                              (setup-flycheck-c-project-paths)
                               (flyspell-prog-mode)
                               )))
 
