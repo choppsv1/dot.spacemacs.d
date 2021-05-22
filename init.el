@@ -3,7 +3,7 @@
 ;; It must be stored in your home directory.
 
 
-(setq debug-init-msg t)
+(setq debug-init-msg nil)
 (defun debug-init-message (fmt &rest a)
   (and debug-init-msg
        (let ((ts (format-time-string "%S.%N")))
