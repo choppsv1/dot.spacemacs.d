@@ -1824,7 +1824,7 @@ layers configuration. You are free to put any user code."
 
       (setq mu4e-attachment-dir "~/Downloads"
             mu4e-index-cleanup nil
-            mu4e-index-lazy-check nil
+            mu4e-index-lazy-check t
             mu4e-change-filenames-when-moving t
             mu4e-update-interval nil
             mu4e-hide-index-messages t
@@ -1840,6 +1840,7 @@ layers configuration. You are free to put any user code."
             mu4e-headers-include-related nil
             mu4e-view-show-addresses t
             mu4e-view-use-gnus t
+            mm-text-html-renderer 'lynx
             ;; HTML
             ;; mu4e-html2text-command 'my-mu4e-shr2text
             shr-color-visible-luminance-min 80
@@ -1852,6 +1853,7 @@ layers configuration. You are free to put any user code."
             ;; -----------
             send-mail-function 'smtpmail-send-it
             message-send-mail-function 'smtpmail-send-it
+            message-cite-reply-position 'below
 
             ;; don't keep message buffers around
             message-kill-buffer-on-exit t
@@ -1873,6 +1875,7 @@ layers configuration. You are free to put any user code."
             mu4e-compose-keep-self-cc t
             mu4e-compose-signature-auto-include nil
             mu4e-context-policy 'pick-first
+            mm-verify-option 'known
 
             ;; ------------------
             ;; Address Completion
@@ -2107,14 +2110,13 @@ layers configuration. You are free to put any user code."
                           email))) clist))
 
           (debug-init-message "debug-init MU4E helm")
-          (when (configuration-layer/package-usedp 'helm)
-
-            (defun my-message-expand-name (&optional start)
-              ((interactive "P"))
-              ;; (message "my-message-expand-name called")
-              (helm :prompt "; contact:" :sources
-                    (helm-build-sync-source "mu4e contacts"
-                                            :candidates mu4e~contact-list :candidate-transformer 'ch:ct))))
+          ;; (when (configuration-layer/package-usedp 'helm)
+          ;;   (defun my-message-expand-name (&optional start)
+          ;;     ((interactive "P"))
+          ;;     ;; (message "my-message-expand-name called")
+          ;;     (helm :prompt "; contact:" :sources
+          ;;           (helm-build-sync-source "mu4e contacts"
+          ;;                                   :candidates mu4e~contact-list :candidate-transformer 'ch:ct))))
 
           (defun my-mu4e-compose-hook ()
             "Setup outgoing messages"
@@ -2128,14 +2130,11 @@ layers configuration. You are free to put any user code."
                   ))
               (set-buffer-modified-p buffer-modified))
 
+            ;; This should go elsewhere
+            (require 'visual-fill-column)
+            (visual-fill-column-mode)
             ;; Outgoing mails get format=flowed.
             (use-hard-newlines t 'guess)
-            ;; Sign messages by default
-
-            ;; If we have no contacts try filling them again.
-            (if (not mu4e~contacts)
-                (mu4e~request-contacts))
-
             (mml-secure-message-sign-pgpmime)
             )
           (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
@@ -2190,6 +2189,16 @@ layers configuration. You are free to put any user code."
           ;; (add-hook 'mu4e-headers-mode-hook (lambda () (progn (setq scroll-up-aggressively .8))))
 
           (debug-init-message "debug-init MU4E add notify actions")
+
+          (defun open-message-id-in-new-frame (msgid)
+            (interactive "s")
+            (let ((mailp (persp-get-by-name "@Mu4e"))
+                  (nframe (make-frame)))
+              (select-frame nframe)
+              (and (persp-p mailp) (persp-switch "@Mu4e" nframe))
+              (mu4e-view-message-with-message-id msgid)
+              (delete-other-windows)))
+
           (defun message-file-to-sexp (path)
             "Retrieve a mu4e s-expression for the e-mail message at PATH."
             (car-safe
@@ -2200,7 +2209,6 @@ layers configuration. You are free to put any user code."
 
           (defun mu4e-mac-notify-action (id action content)
             (let* ((msgid (plist-get content :msgid)))
-              ;; This can cause a request about flags which hangs things.
               (when msgid
                 (open-message-id-in-new-frame msgid))))
 
@@ -2322,15 +2330,7 @@ layers configuration. You are free to put any user code."
                                      nil "attachment")
                   (message "skipping non-regular file %s" file)))))
 
-          (defun open-message-id-in-new-frame (msgid)
-            (interactive "s")
-            (let ((mailp (persp-get-by-name "@Mu4e"))
-                  (nframe (make-frame)))
-              (select-frame nframe)
-              (and (persp-p mailp) (persp-switch "@Mu4e" nframe))
-              (mu4e-view-message-with-message-id msgid)
-              (delete-other-windows)))
-          )
+         )
         )
       )
 
@@ -3220,14 +3220,34 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
        (setq org-adapt-indentation 'headline-data))
      (add-hook 'org-mode-hook 'my-org-mode-hook)
 
-
      (require 'ox-rfc)
+
+     (require 'org-id)
 
      (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)
      (define-key org-mode-map (kbd "C-c e e") 'org-encrypt-entries)
      (define-key org-mode-map (kbd "C-c e E") 'org-encrypt-entry)
      (define-key org-mode-map (kbd "C-c e d") 'org-decrypt-entries)
      (define-key org-mode-map (kbd "C-c e D") 'org-decrypt-entry)
+
+     ;;
+     ;; Global org mode clock in/out keys
+     ;;
+     (defun my/start-heading-clock (heading)
+       "Start clock programmatically for heading with ID in FILE."
+       (if-let (marker (org-find-exact-heading-in-directory heading org-directory))
+           (save-current-buffer
+             (save-excursion
+               (set-buffer (marker-buffer marker))
+               (goto-char (marker-position marker))
+               (org-clock-in)))
+         (warn "Clock not started (Could not find ID '%s' in file '%s')" id file)))
+     (defun clock-in-tfs () "Clock-IN TFS" (interactive) (my/start-heading-clock "TFS P2010/AA01"))
+     (defun clock-in-caas () "Clock-IN CAS" (interactive) (my/start-heading-clock "CAAS P1909/01"))
+     (spacemacs/set-leader-keys "oic" 'clock-in-caas)
+     (spacemacs/set-leader-keys "oim" 'clock-in-tfs)
+     (spacemacs/set-leader-keys "oit" 'clock-in-tfs)
+     (spacemacs/set-leader-keys "oo" 'org-clock-out)
 
      ;; (setq TeX-view-program-selection
      ;;       (append
@@ -3386,94 +3406,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         ("wn" "Generic Note" entry (file+headline ,(concat org-directory "/work.org") "Notes")
          "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
         ))
-
-      ;; This is a copy of the function so that we can add "semimonth" steps
-      (defun org-clocktable-steps (params)
-        "Create one or more clock tables, according to PARAMS.
-Step through the range specifications in plist PARAMS to make
-a number of clock tables."
-        (let* ((ignore-empty-tables (plist-get params :stepskip0))
-               (step (plist-get params :step))
-               (step-header
-                (pcase step
-                  (`day "Daily report: ")
-                  (`week "Weekly report starting on: ")
-                  (`semimonth "Bi-Monthly report starting on: ")
-                  (`month "Monthly report starting on: ")
-                  (`year "Annual report starting on: ")
-                  (_ (user-error "Unknown `:step' specification: %S" step))))
-               (week-start (or (plist-get params :wstart) 1))
-               (month-start (or (plist-get params :mstart) 1))
-               (range
-                (pcase (plist-get params :block)
-                  (`nil nil)
-                  (range
-                   (org-clock-special-range range nil t week-start month-start))))
-               ;; For both START and END, any number is an absolute day
-               ;; number from Agenda.  Otherwise, consider value to be an Org
-               ;; timestamp string.  The `:block' property has precedence
-               ;; over `:tstart' and `:tend'.
-               (start
-                (pcase (if range (car range) (plist-get params :tstart))
-                  ((and (pred numberp) n)
-                   (pcase-let ((`(,m ,d ,y) (calendar-gregorian-from-absolute n)))
-                     (apply #'encode-time (list 0 0 org-extend-today-until d m y))))
-                  (timestamp
-                   (seconds-to-time
-                    (org-matcher-time (or timestamp
-                                          ;; The year Org was born.
-                                          "<2003-01-01 Thu 00:00>"))))))
-               (end
-                (pcase (if range (nth 1 range) (plist-get params :tend))
-                  ((and (pred numberp) n)
-                   (pcase-let ((`(,m ,d ,y) (calendar-gregorian-from-absolute n)))
-                     (apply #'encode-time (list 0 0 org-extend-today-until d m y))))
-                  (timestamp (seconds-to-time (org-matcher-time timestamp))))))
-          (while (time-less-p start end)
-            (unless (bolp) (insert "\n"))
-            ;; Insert header before each clock table.
-            (insert "\n"
-                    step-header
-                    (format-time-string (org-time-stamp-format nil t) start)
-                    "\n")
-            ;; Compute NEXT, which is the end of the current clock table,
-            ;; according to step.
-            (let* ((next
-                    (apply #'encode-time
-                           (pcase-let
-                               ((`(,_ ,_ ,_ ,d ,m ,y ,dow . ,_) (decode-time start)))
-                             (pcase step
-                               (`day (list 0 0 org-extend-today-until (1+ d) m y))
-                               (`week
-                                (let ((offset (if (= dow week-start) 7
-                                                (mod (- week-start dow) 7))))
-                                  (list 0 0 org-extend-today-until (+ d offset) m y)))
-                               (`semimonth (list 0 0 0 (if (< d 16) 16 1) (if (< d 16) m (1+ m)) y))
-                               (`month (list 0 0 0 month-start (1+ m) y))
-                               (`year (list 0 0 org-extend-today-until 1 1 (1+ y)))))))
-                   (table-begin (line-beginning-position 0))
-                   (step-time
-                    ;; Write clock table between START and NEXT.
-                    (org-dblock-write:clocktable
-                     (org-combine-plists
-                      params (list :header ""
-                                   :step nil
-                                   :block nil
-                                   :tstart (format-time-string
-                                            (org-time-stamp-format t t)
-                                            start)
-                                   :tend (format-time-string
-                                          (org-time-stamp-format t t)
-                                          ;; Never include clocks past END.
-                                          (if (time-less-p end next) end next)))))))
-              (let ((case-fold-search t)) (re-search-forward "^[ \t]*#\\+END:"))
-              ;; Remove the table if it is empty and `:stepskip0' is
-              ;; non-nil.
-              (when (and ignore-empty-tables (equal step-time 0))
-                (delete-region (line-beginning-position) table-begin))
-              (setq start next))
-            (end-of-line 0))))
-
 
      (defun org-update-inline-images ()
        (when org-inline-image-overlays
