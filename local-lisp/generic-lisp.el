@@ -15,7 +15,6 @@
   (save-excursion
     (goto-char (point-max))
     (while (re-search-backward re-string nil 'noerror)
-      (message "found and folding point: %d" (point))
       (evil-close-fold)
       (goto-char (- (point) 1))
       )))
@@ -26,7 +25,6 @@
   (save-excursion
     (goto-char (point-max))
     (while (re-search-backward re-string)
-      (message "found and folding point: %d" (point))
       (evil-open-fold)
       (goto-char (- (point) 1))
       )))
@@ -75,7 +73,7 @@
                     (buffer-file-name))))
     (when filename
       (kill-new filename)
-      (message "Copied buffer file name '%s' to the clipboard." filename))))
+      )))
 
 ;;-------------------------------
 ;; Disabled commands (not many)
@@ -257,12 +255,10 @@
       (setq sstr (match-string 0))
       (setq sstart (match-end 0))
       (goto-char sstart)
-      (message (format "sstart %d" sstart))
       (re-search-forward sstr)
       (setq send (match-beginning 0))
-      (message (format "send %d" send)))
+      )
     (narrow-to-region sstart send)
-    (message (format "narrowed to %d:%d" sstart send))
     sstart))
 
 (defun narrow-to-line ()
@@ -273,7 +269,7 @@
       (setq end (point))
       (move-beginning-of-line 1)
       (setq beg (point))
-      (message (format "narrow to line %d:%d" beg end)))
+      )
     (narrow-to-region beg end)
     (values beg end)))
 

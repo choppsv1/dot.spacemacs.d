@@ -1014,7 +1014,6 @@ i.e. windows tiled side-by-side."
          ;; ones are dedicated) and is not the minibuffer window, try
          ;; to split it horizontally disregarding the value of
          ;; `split-height-threshold'.
-         (message "FOOBAR")
          (let ((frame (window-frame window)))
            (or
             (eq window (frame-root-window frame))
@@ -1211,7 +1210,6 @@ layers configuration. You are free to put any user code."
 
 
   (defun fix-user-full-name (orig-fun &rest args)
-    (message "Message got adivce")
     (let ((res (apply orig-fun args)))
       (if (= (length res) 0)
           (setq res "Christian Hopps")
@@ -2710,7 +2708,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
         (defun clang-maybe-format-buffer ()
           "Reformat buffer if contains VPP magic or has project root level .clang-format config"
-          (message "1")
           (when (save-excursion
                   (goto-char (point-min)))
             (re-search-forward "coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t)
@@ -2731,7 +2728,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
         (defun check-flycheck-c-project-add-path (path)
           (when (and path (file-exists-p path))
-            (message "Adding path %s to flycheck-clang/cpp/gcc-include-path" path)
             (add-to-list
              (make-variable-buffer-local 'flycheck-clang-include-path)
              path)
@@ -3422,7 +3418,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      ;; Refile Or Delete Me, from my grpahiv file.
      (defun _graphviz/post-init-org ()
        (with-eval-after-load 'org
-         (message "XXXRAN")
          (add-to-list 'org-src-lang-modes  '("dot" . graphviz-dot))))
          ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -3764,7 +3759,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
          "User wants to see action."
          (let ((file (plist-get plist :file))
                (begin (plist-get plist :begin)))
-           (message "my-action-act file %s begin %s" file begin)
            (if (string-equal key "show")
                (progn
                  (switch-to-buffer (find-file-noselect file))
@@ -3792,7 +3786,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
        (defun my-action (id key)
          (let ((plist (gethash id todo-action-hash)))
-             (message "my-action id %s key %s plist %s" id key plist)
              (my-action-act plist key)
              (remhash id todo-action-hash)))
 
@@ -3800,7 +3793,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
        (defun org-notify-action-notify-mac (plist)
          "Pop up a notification window."
-         ;; (message "XXX org-notify-action-notify-urgency enter")
          ;; (require 'notifications)
          (let* ((duration (plist-get plist :duration))
                 (urgency (plist-get plist :urgency))
@@ -3812,7 +3804,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                      :actions   org-notify-actions
                      :on-action 'my-action)))
            (puthash id plist todo-action-hash)
-           ;; (message "XXX org-notify-action-notify-urgency exit")
            ))
        (debug-init-message "org notify add")
        (org-notify-add 'default
@@ -3840,16 +3831,14 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
     (defun sigusr1-handler ()
       (interactive)
-      (message "Caught signel %S" last-input-event)
       (dolist (line (split-string (shell-command-to-string "tmux show-environment") "\n" t))
         (if (string/starts-with line "-")
             (progn
               (setq line (seq-subseq line 1))
-              (message "Removing %s" line)
               (setenv line nil))
           (let ((tup (split-string line "=" t)))
             (setenv (car tup) (cadr tup))
-            (message "Updating %s with %s" (car tup) (cadr tup))))))
+            ))))
 
     (if (getenv "TMUX")
         (define-key special-event-map [sigusr1] 'sigusr1-handler))
@@ -4082,7 +4071,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                         > _ ))
                     ))
 
-    ;; (message "End: %s" inhibit-startup-screen)
     ;; (if inhibit-startup-screen
     ;;     (quit-window))
 
