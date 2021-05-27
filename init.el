@@ -137,6 +137,7 @@ This function should only modify configuration layer settings."
      (c-c++ :variables
             c-c++-default-mode-for-headers 'c-mode
             c-c++-backend 'lsp-ccls
+
             ;; c-c++-adopt-subprojects t
             ;; c-c++-backend 'lsp-ccls
             ;; c-c++-lsp-sem-highlight-rainbow t
@@ -1001,12 +1002,10 @@ i.e. windows tiled side-by-side."
   (let ((window (or window (selected-window))))
     (or (and (window-splittable-p window t)
              ;; Split window horizontally
-             (message "RIGHT")
              (with-selected-window window
                (split-window-right)))
         (and (window-splittable-p window)
              ;; Split window vertically
-             (message "WRONG")
              (with-selected-window window
                (split-window-below)))
         (and
@@ -2744,7 +2743,9 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
              path)))
 
         (defun setup-flycheck-c-project-paths ()
+          (interactive)
           (let ((root (ignore-errors (projectile-project-root))))
+            ;; VPP
             (when (and root (file-exists-p (concat root "src/vppinfra")))
               (dolist (path '("src/" "src/plugins/"
                               "build-root/install-vpp-native/external/include/dpdk/"
@@ -2756,7 +2757,12 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
                 (let ((path1 (concat root path)))
                   (check-flycheck-c-project-add-path path1))))
-            (dolist (path '("/opt/current/include"))
+            ;; FRR
+            (when (and root (file-exists-p (concat root "lib/libfrr.h")))
+              (dolist (path '("staticd/" "include/" "lib/"))
+                (let ((path1 (concat root path)))
+                  (check-flycheck-c-project-add-path path1))))
+            (dolist (path '("/opt/current/include" "/usr/local/include"))
               (check-flycheck-c-project-add-path path))))
 
         (when-layer-used 'rebox
