@@ -1837,7 +1837,10 @@ layers configuration. You are free to put any user code."
             mu4e-headers-include-related nil
             mu4e-view-show-addresses t
             mu4e-view-use-gnus t
-            mm-text-html-renderer 'lynx
+
+            ;; mm-text-html-renderer 'shr
+            mm-text-html-renderer 'gnus-w3m
+            ;; mm-text-html-renderer 'lynx
             ;; HTML
             ;; mu4e-html2text-command 'my-mu4e-shr2text
             shr-color-visible-luminance-min 80
@@ -1882,6 +1885,7 @@ layers configuration. You are free to put any user code."
             mu4e-user-mail-address-list (list "chopps@chopps.org"
                                               "chopps@devhopps.com"
                                               "chopps@labn.net"
+                                              "chopps@us.labn.net"
                                               "chopps@gmail.com"
                                               "chopps@netbsd.org"
 
@@ -1918,6 +1922,7 @@ layers configuration. You are free to put any user code."
             ;; -----------
 
             mu4e-inbox-mailbox '("maildir:/labn.net/INBOX"
+                                 "maildir:/us.labn.net/INBOX"
                                  "maildir:/chopps.org/INBOX"
                                  "maildir:/nrl.navy.mil/INBOX"
                                  "maildir:/gmail.com/INBOX")
@@ -1983,10 +1988,11 @@ layers configuration. You are free to put any user code."
 
             ;; [j]ump shortcuts
             mu4e-maildir-shortcuts '(("/chopps.org/INBOX" . ?i)
-                                     ("/nrl.navy.mil/INBOX" . ?N)
+                                     ("/nrl.navy.mil/INBOX" . ?n)
                                      ("/labn.net/INBOX" . ?l)
+                                     ("/us.labn.net/INBOX" . ?u)
                                      ("/gmail.com/INBOX" . ?g)
-                                     ("/chopps.org/aa-netbsd" . ?n)
+                                     ("/chopps.org/aa-netbsd" . ?N)
                                      ("/chopps.org/ietf-wg-lsr" . ?L)
                                      ("/chopps.org/spam-train" . ?S)
                                      ("/chopps.org/spam-probable" . ?s))
@@ -2035,6 +2041,25 @@ layers configuration. You are free to put any user code."
                                             (smtpmail-default-smtp-server  . "smtp.office365.com")
                                             (smtpmail-smtp-server          . "smtp.office365.com")
                                             (smtpmail-local-domain         . "labn.net")
+                                            (smtpmail-stream-type          . starttls)
+                                            (smtpmail-smtp-service         . 587)))
+                                  ,(make-mu4e-context
+                                    :name "us.labn.net"
+                                    :match-func (lambda (msg)
+                                                  (and msg (string-match "/us.labn.net/.*" (mu4e-message-field msg :maildir))))
+                                    :vars '((user-mail-address  . "chopps@us.labn.net")
+                                            (user-full-name . "Christian Hopps")
+                                            ;; mu4e
+                                            (mu4e-drafts-folder . "/us.labn.net/Drafts")
+                                            (mu4e-sent-folder   . "/us.labn.net/Sent Items")
+                                            (mu4e-trash-folder  . "/us.labn.net/Deleted Items")
+                                            (mu4e-sent-messages-behavior   . sent)
+                                            ;; smtp
+                                            (message-send-mail-function . smtpmail-send-it)
+                                            (smtpmail-starttls-credentials . '(("smtp.office365.us" 587 nil nil)))
+                                            (smtpmail-default-smtp-server  . "smtp.office365.us")
+                                            (smtpmail-smtp-server          . "smtp.office365.us")
+                                            (smtpmail-local-domain         . "us.labn.net")
                                             (smtpmail-stream-type          . starttls)
                                             (smtpmail-smtp-service         . 587)))
                                  ,(make-mu4e-context
@@ -2128,8 +2153,10 @@ layers configuration. You are free to put any user code."
               (set-buffer-modified-p buffer-modified))
 
             ;; This should go elsewhere
-            (require 'visual-fill-column)
-            (visual-fill-column-mode)
+            ;; Actually don't like this.
+            ;; (require 'visual-fill-column)
+            ;; (visual-fill-column-mode)
+
             ;; Outgoing mails get format=flowed.
             (use-hard-newlines t 'guess)
             (mml-secure-message-sign-pgpmime)
