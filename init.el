@@ -4314,6 +4314,3 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 ;; Local Variables:
 ;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when-layer-used\\|(when (configuration-layer\\)")
 ;; End:
-
-;; Do not write anything past this comment. This is where Emacs will
-;; auto-generate custom variable definitions.
