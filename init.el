@@ -136,8 +136,7 @@ This function should only modify configuration layer settings."
      ;; Languages
      (c-c++ :variables
             c-c++-default-mode-for-headers 'c-mode
-            c-c++-backend 'lsp-ccls
-
+            c-c++-backend 'lsp-clangd
             ;; c-c++-adopt-subprojects t
             ;; c-c++-backend 'lsp-ccls
             ;; c-c++-lsp-sem-highlight-rainbow t
@@ -2782,7 +2781,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                   (check-flycheck-c-project-add-path path1))))
             ;; FRR
             (when (and root (file-exists-p (concat root "lib/libfrr.h")))
-              (dolist (path '("staticd/" "include/" "lib/"))
+              (dolist (path '("build/" "build/lib/" "lib/" "include/"))
                 (let ((path1 (concat root path)))
                   (check-flycheck-c-project-add-path path1))))
             (dolist (path '("/opt/current/include" "/usr/local/include"))
