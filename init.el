@@ -2806,6 +2806,20 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         (add-hook 'c-mode-hook 'clang-maybe-format-buffer-on-save)
         (add-hook 'c++-mode-hook 'clang-maybe-format-buffer-on-save)
 
+        (defun my-c-mode-hook ()
+          (message "my-c-mode-hook")
+          (if (string= (shell-command-to-string "uname -s") "NetBSD\n")
+              (c-set-style "KNF")
+            (c-set-style "linux"))
+          ;; (c-toggle-auto-hungry-state 1)
+          ;; (setq c-electric-flag nil)
+          ;; (setq fill-column 80)
+          (setup-flycheck-c-project-paths)
+          (flyspell-prog-mode))
+
+        (add-hook 'c-mode-hook 'my-c-mode-hook)
+        (add-hook 'c++-mode-hook 'my-c-mode-hook)
+
         (defun check-flycheck-c-project-add-path (path)
           (when (and path (file-exists-p path))
             (add-to-list
@@ -2883,18 +2897,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         ;;           (function (lambda ()
         ;;                       (flycheck-select-checker 'c/c++-clang)))
         ;;           t)
-
-        (add-hook 'c-mode-common-hook
-                  (function (lambda ()
-                              (if (string= (shell-command-to-string "uname -s") "NetBSD\n")
-                                  (c-set-style "KNF")
-                                (c-set-style "Procket"))
-                              (c-toggle-auto-hungry-state 1)
-                              (setq c-electric-flag nil)
-                              (setq fill-column 80)
-                              (setup-flycheck-c-project-paths)
-                              (flyspell-prog-mode)
-                              )))
 
         (c-add-style
          "KNF"
@@ -3147,7 +3149,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
         (defun my-python-mode-hook ()
           (setq comment-column 60)
-          (setq flycheck-checker 'python-pylint)
+          (setq flycheck-checker 'python-pyflakes)
           (semantic-mode -1)
 
                 ;; flycheck-checker-error-threshold 900
