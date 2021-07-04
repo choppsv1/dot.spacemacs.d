@@ -1408,14 +1408,6 @@ layers configuration. You are free to put any user code."
                   (spaceline-toggle-buffer-encoding-off)
                   (spaceline-toggle-buffer-encoding-abbrev-off)
 
-                  (if (display-graphic-p)
-                      (progn
-                        (spaceline-toggle-battery-on)
-                        (spaceline-toggle-org-clock-on))
-                    (spaceline-toggle-battery-off)
-                    (spaceline-toggle-org-clock-off)
-                    )
-
                   (setq spaceline-window-numbers-unicode nil
                         spaceline-workspace-numbers-unicode nil)
 
@@ -2031,9 +2023,9 @@ layers configuration. You are free to put any user code."
                        ("date:7d..now" "Last 7 days" ?w)
                        ("date:7d..now from:chopps" "Last 7 days sent" ?W)
                        ("date:14d..now from:chopps" "Last 14 days sent" ?F)
-                       ("mime:*zip" "Messages with ZIP" ?z)
-                       ("mime:*pdf" "Messages with PDF" ?p)
-                       ("mime:*calendar" "Messages with calendar" ?q)
+                       ("mime:application/zip" "Messages with ZIP" ?z)
+                       ("mime:application/pdf" "Messages with PDF" ?p)
+                       ("mime:text/calendar" "Messages with calendar" ?q)
                        ("mime:*cs" "Messages with VCS" ?Q)
                        ))
              )
@@ -2054,6 +2046,7 @@ layers configuration. You are free to put any user code."
       (with-eval-after-load 'mu4e
         (progn
           (debug-init-message "debug-init MU4E setq")
+
           (setq mu4e-contexts `(
                                 ,(make-mu4e-context
                                     :name "chopps.org"
@@ -2176,15 +2169,25 @@ layers configuration. You are free to put any user code."
               (mu4e-update-index)))
           (bind-key (kbd "U") 'mu4e-update-index-deep 'mu4e-main-mode-map)
 
-          (defun ch:ct (clist)
-            "Transform candidate into (display . real)"
-            (mapcar (lambda (candidate)
-                      (let* ((name (plist-get candidate :name))
-                              email (plist-get candidate :mail))
-                        (or (and name (format "%s <%s>" name email))
-                          email))) clist))
+          (defun mu4e-error-handler (errcode errmsg)
+            "Handler function for showing an error."
+            ;; don't use mu4e-error here; it's running in the process filter context
+            (cl-case errcode
+              (102 (progn
+                     (mu4e-update-index-deep)
+                     (error "Message is already read, updating index")))
+              (4 (user-error "No matches for this search query."))
+              (t (error "Error %d: %s" errcode errmsg))))
 
-          (debug-init-message "debug-init MU4E helm")
+
+          ;; (debug-init-message "debug-init MU4E helm")
+          ;; (defun ch:ct (clist)
+          ;;   "Transform candidate into (display . real)"
+          ;;   (mapcar (lambda (candidate)
+          ;;             (let* ((name (plist-get candidate :name))
+          ;;                     email (plist-get candidate :mail))
+          ;;               (or (and name (format "%s <%s>" name email))
+          ;;                 email))) clist))
           ;; (when (configuration-layer/package-usedp 'helm)
           ;;   (defun my-message-expand-name (&optional start)
           ;;     ((interactive "P"))
@@ -2219,8 +2222,11 @@ layers configuration. You are free to put any user code."
           ;; Mark to move to spam folder from headers view.
           (defun mu4e-headers-mark-move-to-spam ()
             (interactive)
-            (mu4e-mark-set 'move mu4e-spam-folder)
-            (mu4e-headers-next))
+            (let ((maildir (mu4e-message-field (mu4e-message-at-point) :maildir)))
+              (if (string-match-p (regexp-quote "gmail.com") maildir)
+                  (mu4e-mark-set 'move "/gmail.com/[Gmail]/Spam")
+                (mu4e-mark-set 'move mu4e-spam-folder))
+              (mu4e-headers-next)))
 
           ;; Mark to move to spam folder from message view.
           (defun mu4e-view-mark-move-to-spam ()
@@ -2298,6 +2304,25 @@ layers configuration. You are free to put any user code."
                                      :msgid msgid
                                      :sound-name "Looking Up"
                                      :on-action 'mu4e-mac-notify-action)))
+
+          ;; Update the index only if non-destructive, otherwise try later
+          (setq mu4e-careful-update-timer nil)
+          (defun mu4e-careful-update-index ()
+            (if (and
+                 (not (get-buffer "*mu4e-headers*"))
+                 (fboundp 'mu4e-update-index))
+                (progn
+                  (if mu4e-careful-update-timer
+                      (cancel-timer mu4e-careful-update-retry))
+                  (message "updating-mail-index")
+                  (mu4e-update-index))
+              (unless mu4e-careful-update-retry
+                (message "setting timer to update mail index")
+                (setq mu4e-careful-update-retry
+                      (run-at-time "1 min" nil
+                                   (lambda ()
+                                     (setq mu4e-careful-update-retry nil)
+                                     (mu4e-careful-update-index)))))))
 
           (debug-init-message "debug-init MU4E mode add to gcal")
           (defun mu4e-action-add-to-gcal (msg)
@@ -2648,7 +2673,8 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                   (let ((status (call-process-region
                                  nil nil (executable-find "diff")
                                  nil `(,temp-buffer ,temp-file) nil
-                                 "-u0"
+                                 "-U"
+                                 "0"
                                  head-temp-file
                                  "-"))
                         (stderr (with-temp-buffer
@@ -3326,7 +3352,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                (goto-char (marker-position marker))
                (org-clock-in)))
          (warn "Clock not started (Could not find ID '%s' in file '%s')" id file)))
-     (defun clock-in-tfs () "Clock-IN TFS" (interactive) (my/start-heading-clock "TFS P2010/AA01"))
+     (defun clock-in-tfs () "Clock-IN TFS" (interactive) (my/start-heading-clock "TFS P2010/BJ"))
      (defun clock-in-caas () "Clock-IN CAS" (interactive) (my/start-heading-clock "CAAS P1909/01"))
      (spacemacs/set-leader-keys "oic" 'clock-in-caas)
      (spacemacs/set-leader-keys "oim" 'clock-in-tfs)
