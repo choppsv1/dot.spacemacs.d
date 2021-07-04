@@ -327,7 +327,6 @@ It should only modify the values of Spacemacs settings."
   (set-fontsize)
   (debug-init-message "def height %s" ch-def-height)
 
-
   ;; this setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
   (setq-default
@@ -765,6 +764,49 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
 
+
+
+  (defun enable-CSI-u ()
+  ;; Take advantage of iterm2's CSI u support (https://gitlab.com/gnachman/iterm2/-/issues/8382).
+  (message "XXX FOobar")
+  (xterm--init-modify-other-keys)
+
+  ;; Courtesy https://emacs.stackexchange.com/a/13957, modified per
+  ;; https://gitlab.com/gnachman/iterm2/-/issues/8382#note_365264207
+  (defun character-apply-modifiers (c &rest modifiers)
+    "Apply modifiers to the character C.
+MODIFIERS must be a list of symbols amongst (meta control shift).
+Return an event vector."
+    (if (memq 'control modifiers) (setq c (if (and (<= ?a c) (<= c ?z))
+                                              (logand c ?\x1f)
+                                            (logior (lsh 1 26) c))))
+    (if (memq 'meta modifiers) (setq c (logior (lsh 1 27) c)))
+    (if (memq 'shift modifiers) (setq c (logior (lsh 1 25) c)))
+    (vector c))
+  (when (and (boundp 'xterm-extra-capabilities) (boundp 'xterm-function-map))
+    (let ((c 32))
+      (while (<= c 126)
+        (mapc (lambda (x)
+                (define-key xterm-function-map (format (car x) c)
+                  (apply 'character-apply-modifiers c (cdr x))))
+              '(;; with ?.VT100.formatOtherKeys: 0
+                ("\e\[27;3;%d~" meta)
+                ("\e\[27;5;%d~" control)
+                ("\e\[27;6;%d~" control shift)
+                ("\e\[27;7;%d~" control meta)
+                ("\e\[27;8;%d~" control meta shift)
+                ;; with ?.VT100.formatOtherKeys: 1
+                ("\e\[%d;3u" meta)
+                ("\e\[%d;5u" control)
+                ("\e\[%d;6u" control shift)
+                ("\e\[%d;7u" control meta)
+                ("\e\[%d;8u" control meta shift)))
+        (setq c (1+ c))))))
+
+  ; (unless (display-graphic-p)
+  ;  (add-hook 'after-make-frame-functions 'enable-CSI-u)
+  ;  (enable-CSI-u))
+
   (setq exec-path-from-shell-check-startup-files nil)
   (setq epa-pinentry-mode 'loopback)
 
@@ -872,9 +914,12 @@ before packages are loaded. If you are unsure, you should try in setting them in
    ;;                              )
    )
 
+1
   (setq-default debug-mac-notifications nil)
   (setq-default flycheck-standard-error-navigation nil)
   (setq flycheck-standard-error-navigation nil)
+  (setq-default spaceline-buffer-id-max-length 120)
+
   (with-eval-after-load 'tramp
     (push "/home/chopps/local/bin" tramp-remote-path))
 
@@ -1361,7 +1406,7 @@ layers configuration. You are free to put any user code."
                   ;;      :priority 100)
                   ;;     (anzu :priority 95)
                   ;;     auto-compile
-                  ;;     ((buffer-modified buffer-size buffer-id remote-host)
+                  ;;     ((buffer-modified buffer-size buffer-id) remote-host)
                   ;;      :priority 98)
                   ;;     (major-mode :priority 79)
                   ;;     (process :when active)
@@ -1400,6 +1445,56 @@ layers configuration. You are free to put any user code."
                   ;;   (spaceline-toggle-battery-off)
                   ;;   (spaceline-toggle-org-clock-off)
                   ;;   )
+
+                  (spaceline-compile
+                                        ; left side
+                    '(((persp-name
+                        workspace-number
+                        window-number)
+                       :fallback evil-state
+                       :face highlight-face
+                       :priority 100)
+                      (anzu :priority 95)
+                      auto-compile
+                      ((buffer-modified buffer-size buffer-id remote-host)
+                       :priority 98)
+                      (major-mode :priority 79)
+                      (process :when active)
+                      ((flycheck-error flycheck-warning flycheck-info)
+                       :when active
+                       :priority 89)
+                      (minor-modes :when active
+                                   :priority 9)
+                      (mu4e-alert-segment :when active)
+                      (erc-track :when active)
+                      (version-control :when active
+                                       :priority 78)
+                      (org-pomodoro :when active)
+                      (org-clock :when active)
+                      nyan-cat)
+                                        ; right side
+                    '(which-function
+                      (python-pyvenv :fallback python-pyenv)
+                      (purpose :priority 94)
+                      (battery :when active)
+                      (selection-info :priority 95)
+                      input-method
+                      ((buffer-encoding-abbrev
+                        point-position
+                        line-column)
+                       :separator " | "
+                       :priority 96)
+                      (global :when active)
+                      (buffer-position :priority 99)
+                      (hud :priority 99)))
+
+                  (if (display-graphic-p)
+                      (progn
+                        (spaceline-toggle-battery-on)
+                        (spaceline-toggle-org-clock-on))
+                    (spaceline-toggle-battery-off)
+                    (spaceline-toggle-org-clock-off)
+                    )
 
 
 
@@ -2822,7 +2917,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
              ;; ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
              ((string= "INDENT" (match-string 1)) (vpp-format-buffer) t)
              ;; is this a project with clang format?
-             ((f-exists? (concat (projectile-project-root) ".clang-format")) (clang-format-vc-diff) t)
+             ((f-exists? (concat (projectile-project-root) ".clang-format")) (message "found .clang-format") (clang-format-vc-diff) t)
              )))
 
         (defun clang-maybe-format-buffer-on-save ()
