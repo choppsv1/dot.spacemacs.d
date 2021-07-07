@@ -2264,13 +2264,20 @@ layers configuration. You are free to put any user code."
               (mu4e-update-index)))
           (bind-key (kbd "U") 'mu4e-update-index-deep 'mu4e-main-mode-map)
 
+          (defun mu4e-deal-with-moved-message ()
+            (if (equal major-mode 'mu4e-loading-mode)
+                (progn
+                  (delete-window)
+                  (mu4e-update-index-deep)
+                  (message "correct!"))))
+
           (defun mu4e-error-handler (errcode errmsg)
             "Handler function for showing an error."
             ;; don't use mu4e-error here; it's running in the process filter context
             (cl-case errcode
-              (102 (progn
-                     (mu4e-update-index-deep)
-                     (error "Message is already read, updating index")))
+              ((102 111) (progn
+                            (mu4e-deal-with-moved-message)
+                            (error "Updating Index: Error %d: %s" errcode errmsg)))
               (4 (user-error "No matches for this search query."))
               (t (error "Error %d: %s" errcode errmsg))))
 
