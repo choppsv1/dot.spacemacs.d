@@ -136,9 +136,9 @@ This function should only modify configuration layer settings."
      ;; Languages
      (c-c++ :variables
             c-c++-default-mode-for-headers 'c-mode
-            c-c++-backend 'lsp-clangd
+            ;; c-c++-backend 'lsp-clangd
             ;; c-c++-adopt-subprojects t
-            ;; c-c++-backend 'lsp-ccls
+            c-c++-backend 'lsp-ccls
             ;; c-c++-lsp-sem-highlight-rainbow t
             c-c++-enable-clang-support t
             c-c++-enable-clang-format-on-save nil
@@ -433,6 +433,12 @@ It should only modify the values of Spacemacs settings."
    ;; True if the home buffer should respond to resize events. (default t)
    dotspacemacs-startup-buffer-responsive t
 
+   ;; Show numbers before the startup list lines. (default t)
+   dotspacemacs-show-startup-list-numbers t
+
+   ;; The minimum delay in seconds between number key presses. (default 0.4)
+   dotspacemacs-startup-buffer-multi-digit-delay 0.4
+
    ;; Default major mode for a new empty buffer. Possible values are mode
    ;; names such as `text-mode'; and `nil' to use Fundamental mode.
    ;; (default `text-mode')
@@ -622,6 +628,10 @@ It should only modify the values of Spacemacs settings."
    ;; when it reaches the top or bottom of the screen. (default t)
    dotspacemacs-smooth-scrolling t
 
+   ;; Show the scroll bar while scrolling. The auto hide time can be configured
+   ;; by setting this variable to a number. (default t)
+   dotspacemacs-scroll-bar-while-scrolling t
+
    ;; Control line numbers activation.
    ;; If set to `t', `relative' or `visual' then line numbers are enabled in all
    ;; `prog-mode' and `text-mode' derivatives. If set to `relative', line
@@ -701,6 +711,9 @@ It should only modify the values of Spacemacs settings."
    ;; %n - Narrow if appropriate
    ;; %z - mnemonics of buffer, terminal, and keyboard coding systems
    ;; %Z - like %z, but including the end-of-line format
+   ;; If nil then Spacemacs uses default `frame-title-format' to avoid
+   ;; performance issues, instead of calculating the frame title by
+   ;; `spacemacs/title-prepare' all the time.
    ;; (default "%I@%S")
    dotspacemacs-frame-title-format "%I@%S"
 
@@ -724,6 +737,9 @@ It should only modify the values of Spacemacs settings."
    ;; If it does deactivate it here.
    ;; (default t)
    dotspacemacs-use-clean-aindent-mode t
+
+   ;; Accept SPC as y for prompts if non nil. (default nil)
+   dotspacemacs-use-SPC-as-y nil
 
    ;; If non-nil shift your number row to match the entered keyboard layout
    ;; (only in insert state). Currently supported keyboard layouts are:
@@ -1438,14 +1454,6 @@ layers configuration. You are free to put any user code."
                   ;;     (buffer-position :priority 99)
                   ;;     (hud :priority 99)))
 
-                  ;; (if (display-graphic-p)
-                  ;;     (progn
-                  ;;       (spaceline-toggle-battery-on)
-                  ;;       (spaceline-toggle-org-clock-on))
-                  ;;   (spaceline-toggle-battery-off)
-                  ;;   (spaceline-toggle-org-clock-off)
-                  ;;   )
-
                   (spaceline-compile
                                         ; left side
                     '(((persp-name
@@ -1488,13 +1496,13 @@ layers configuration. You are free to put any user code."
                       (buffer-position :priority 99)
                       (hud :priority 99)))
 
+
                   (if (display-graphic-p)
                       (progn
                         (spaceline-toggle-battery-on)
                         (spaceline-toggle-org-clock-on))
                     (spaceline-toggle-battery-off)
-                    (spaceline-toggle-org-clock-off)
-                    )
+                    (spaceline-toggle-org-clock-off))
 
 
 
@@ -4285,6 +4293,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     ;;     (quit-window))
 
     ;; (setq powerline-default-separator 'wave)
+    (setq powerline-default-separator 'utf-8)
 
     ;; (defun split-window-sensibly-prefer-horizontal (&optional window)
     ;;   "Same as `split-window-sensibly' except prefer to split horizontally first."
