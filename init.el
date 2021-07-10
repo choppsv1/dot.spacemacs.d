@@ -89,7 +89,7 @@ This function should only modify configuration layer settings."
      ;;        c-c++-enable-clang-support t
      ;;        c-c++-enable-clang-format-on-save nil
      ;;        )
-     (python :variables python-backend 'anaconda
+     (python :variables python-backend 'lsp
              python-fill-column 100
              python-pipenv-activate t
              python-fill-docstring-style 'pep-257-nn
