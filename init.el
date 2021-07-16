@@ -90,6 +90,8 @@ This function should only modify configuration layer settings."
      ;;        c-c++-enable-clang-format-on-save nil
      ;;        )
      (python :variables python-backend 'lsp
+             ;; python-lsp-server 'pyright
+             python-lsp-server 'pylsp
              python-fill-column 100
              python-pipenv-activate t
              python-fill-docstring-style 'pep-257-nn
@@ -159,7 +161,10 @@ This function should only modify configuration layer settings."
      (lua :variables lua-default-application "lua5.1")
      ;; lux
      ;; primary test runner is pytest use 'spc u' prefix to invoke nose
-     (python :variables python-backend 'anaconda
+     (python :variables python-backend 'lsp
+             ;; python-lsp-server 'pyright
+             python-lsp-server 'pylsp
+             python-formatter 'yapf
              python-fill-column 100
              python-pipenv-activate t
              python-fill-docstring-style 'pep-257-nn
@@ -1051,8 +1056,8 @@ Return an event vector."
   (setq fci-rule-character-color "#121212")
   ;; (setq fci-rule-color "#222222")
 
-  (setq split-width-threshold 160)
-  (setq split-height-threshold 48)
+  (setq split-width-threshold 80)
+  (setq split-height-threshold 20)
   (setq window-min-width 40)
   (setq window-min-height 4)
 
@@ -1096,8 +1101,8 @@ i.e. windows tiled side-by-side."
           (with-selected-window window (split-window-sensibly-prefer-horizontal window))
         (with-selected-window window (split-window-sensibly window)))))
 
-  ;; (setq split-window-preferred-function 'split-window-really-sensibly)
-  (setq split-window-preferred-function 'split-window-sensibly-prefer-horizontal)
+  (setq split-window-preferred-function 'split-window-really-sensibly)
+  ;; (setq split-window-preferred-function 'split-window-sensibly-prefer-horizontal)
 
   ;; =================================
   ;; Global Key Bindings and Registers
@@ -3183,6 +3188,24 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      )
 
     (when-layer-used 'python
+                     (setq-default
+                      lsp-pylsp-plugins-autopep8-enabled nil
+                      lsp-pylsp-plugins-flake8-enabled nil
+                      lsp-pylsp-plugins-jedi-completion-enabled t
+                      lsp-pylsp-plugins-jedi-definition-enabled nil
+                      lsp-pylsp-plugins-jedi-hover-enabled nil
+                      lsp-pylsp-plugins-jedi-references-enabled t
+                      lsp-pylsp-plugins-jedi-signature-help-enabled t
+                      lsp-pylsp-plugins-jedi-symbols-enabled t
+                      lsp-pylsp-plugins-mccabe-enabled nil
+                      lsp-pylsp-plugins-preload-enabled nil
+                      lsp-pylsp-plugins-pycodestyle-enabled t
+                      lsp-pylsp-plugins-pydocstyle-enabled nil
+                      lsp-pylsp-plugins-pyflakes-enabled t
+                      lsp-pylsp-plugins-pylint-enabled t
+                      lsp-pylsp-plugins-rope-completion-enabled nil
+                      lsp-pylsp-plugins-yapf-enabled nil
+                      )
       (with-eval-after-load 'python
 
 
