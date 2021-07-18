@@ -33,6 +33,7 @@ This function should only modify configuration layer settings."
                       auto-completion-private-snippets-directory "~/.spacemacs.d/snippets/"
                       auto-completion-tab-key-behavior 'complete)
      better-defaults
+     colors
      git
      rebox
      theming
