@@ -90,4 +90,4 @@
   (frr-scan-imports)
   (frr-remove-topo))
 
-(spacemacs/set-leader-keys-for-major-mode 'python-mode "9" 'fixup-test)
+(spacemacs/set-leader-keys-for-major-mode 'python-mode "9" 'frr-fixup-test)

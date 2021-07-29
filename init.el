@@ -80,27 +80,6 @@ This function should only modify configuration layer settings."
      gtags
      html
 
-     ;; Languages
-     ;; (c-c++ :variables
-     ;;        c-c++-default-mode-for-headers 'c-mode
-     ;;        c-c++-backend 'lsp-clangd
-     ;;        ;; c-c++-adopt-subprojects t
-     ;;        ;; c-c++-backend 'lsp-ccls
-     ;;        ;; c-c++-lsp-sem-highlight-rainbow t
-     ;;        c-c++-enable-clang-support t
-     ;;        c-c++-enable-clang-format-on-save nil
-     ;;        )
-     (python :variables python-backend 'lsp
-             ;; python-lsp-server 'pyright
-             python-lsp-server 'pylsp
-             python-fill-column 100
-             python-pipenv-activate t
-             python-fill-docstring-style 'pep-257-nn
-             python-test-runner '(pytest nose)
-             pytest-global-name "python -m pytest --doctest-modules"
-             ;; python-auto-set-local-pyvenv-virtualenv on-visit
-             ;; python-auto-set-local-pyenv-virtualenv nil
-             python-enable-yapf-format-on-save nil)
      shell-scripts
      (yang :variables
            yang-pyang-rules "lint"
@@ -166,11 +145,12 @@ This function should only modify configuration layer settings."
              ;; python-lsp-server 'pyright
              python-lsp-server 'pylsp
              python-formatter 'yapf
-             python-fill-column 100
+             python-fill-column 88
              python-pipenv-activate t
              python-fill-docstring-style 'pep-257-nn
              python-test-runner '(pytest nose)
              pytest-global-name "python -m pytest --doctest-modules"
+             python-sort-imports-on-save nil
              ;; python-auto-set-local-pyvenv-virtualenv on-visit
              ;; python-auto-set-local-pyenv-virtualenv nil
              python-enable-yapf-format-on-save nil)
@@ -3181,10 +3161,11 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
     (when-layer-used 'git
                      (with-eval-after-load 'magit
-       ;; (magit-todos-mode 1)
-       ;; (require 'magit-gerrit)
-       (bind-key (kbd "M-RET") 'magit-diff-visit-worktree-file 'magit-diff-mode-map)
-       (bind-key (kbd "C-j") 'magit-diff-visit-worktree-file 'magit-diff-mode-map)
+                       ;; (magit-todos-mode 1)
+                       ;; (require 'magit-gerrit)
+                       (magit-wip-mode 1)
+                       (bind-key (kbd "M-RET") 'magit-diff-visit-worktree-file 'magit-diff-mode-map)
+                       (bind-key (kbd "C-j") 'magit-diff-visit-worktree-file 'magit-diff-mode-map)
        )
      )
 
@@ -3309,7 +3290,10 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
         (defun my-python-mode-hook ()
           (setq comment-column 60)
-          (setq flycheck-checker 'python-pyflakes)
+          ;; Check to see if there's a pylint in the project directory maybe?
+          (message "XXX checker set")
+          (flycheck-select-checker 'python-pylint)
+          ;; (setq flycheck-checker 'python-pyflakes)
           (semantic-mode -1)
 
                 ;; flycheck-checker-error-threshold 900
@@ -3464,7 +3448,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
        (setq org-adapt-indentation 'headline-data))
      (add-hook 'org-mode-hook 'my-org-mode-hook)
 
-     (require 'ox-rfc)
+     ; (require 'ox-rfc)
 
      (require 'org-id)
 
