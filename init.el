@@ -1037,10 +1037,10 @@ Return an event vector."
   (setq fci-rule-character-color "#121212")
   ;; (setq fci-rule-color "#222222")
 
-  (setq split-width-threshold 80)
-  (setq split-height-threshold 20)
-  (setq window-min-width 40)
-  (setq window-min-height 4)
+  (setq split-width-threshold 160)
+  (setq split-height-threshold 48)
+  (setq window-min-width 80)
+  (setq window-min-height 10)
 
   (defun split-window-sensibly-prefer-horizontal (&optional window)
 "Based on split-window-sensibly, but designed to prefer a horizontal split,
