@@ -166,7 +166,7 @@ This function should only modify configuration layer settings."
            yang-pyang-extra-args "--max-line-length=79")
      )
    ;; These systems get full development packages -- the slowest load
-   chopps-dev-systems '("cmf-xe-1" "tops" "hp13" "labnh" "ja.int.chopps.org" "alk" "flk" "rlk" "slk" "dak"))
+   chopps-dev-systems '("cmf-xe-1" "tops" "hp13" "labnh" "ja.int.chopps.org" "alk" "dlk" "flk" "rlk" "slk" "dak"))
 
   (cond ((eq system-type 'darwin)
          (setq chopps-layers (append chopps-layers osx-layers)))
@@ -1232,6 +1232,7 @@ layers configuration. You are free to put any user code."
    ((or (string-prefix-p "cmf-" (system-name))
         (string-prefix-p "labnh" (system-name))
         (string-prefix-p "alk" (system-name))
+        (string-prefix-p "dlk" (system-name))
         (string-prefix-p "flk" (system-name))
         (string-prefix-p "rlk" (system-name))
         (string-prefix-p "slk" (system-name))
@@ -2929,7 +2930,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         (add-hook 'c++-mode-hook 'clang-maybe-format-buffer-on-save)
 
         (defun my-c-mode-hook ()
-          (message "my-c-mode-hook")
+          ;;(message "my-c-mode-hook")
           (if (string= (shell-command-to-string "uname -s") "NetBSD\n")
               (c-set-style "KNF")
             (c-set-style "linux"))
