@@ -2918,7 +2918,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
              ((string= "CLANG" (match-string 1)) (vpp-format-buffer t) t)
              ;; ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
              ((string= "INDENT" (match-string 1)) (vpp-format-buffer) t)
-             ;; is this a project with clang format?
+             ;; We need to avoid doing this for files with changes in DEFUN/DEFPY
              ((f-exists? (concat (projectile-project-root) ".clang-format")) (message "found .clang-format") (clang-format-vc-diff) t)
              )))
 
@@ -3165,6 +3165,9 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                        ;; (magit-todos-mode 1)
                        ;; (require 'magit-gerrit)
                        (magit-wip-mode 1)
+
+                       (transient-insert-suffix 'magit-pull "-r" '("-f" "Overwrite local branch" "--force"))
+
                        (bind-key (kbd "M-RET") 'magit-diff-visit-worktree-file 'magit-diff-mode-map)
                        (bind-key (kbd "C-j") 'magit-diff-visit-worktree-file 'magit-diff-mode-map)
        )
