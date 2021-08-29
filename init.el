@@ -144,16 +144,16 @@ This function should only modify configuration layer settings."
      (python :variables python-backend 'lsp
              ;; python-lsp-server 'pyright
              python-lsp-server 'pylsp
-             python-formatter 'yapf
+             python-formatter 'black
              python-fill-column 88
              python-pipenv-activate t
              python-fill-docstring-style 'pep-257-nn
              python-test-runner '(pytest nose)
              pytest-global-name "python -m pytest --doctest-modules"
              python-sort-imports-on-save nil
+             python-enable-yapf-format-on-save nil)
              ;; python-auto-set-local-pyvenv-virtualenv on-visit
              ;; python-auto-set-local-pyenv-virtualenv nil
-             python-enable-yapf-format-on-save nil)
      ;; disable emacs-lisp due to completionion in comments parsing tons
      ;; of .el files https://github.com/syl20bnr/spacemacs/issues/7038
      restructuredtext
