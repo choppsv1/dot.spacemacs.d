@@ -1955,11 +1955,18 @@ layers configuration. You are free to put any user code."
         :group 'mu4e-folders)
 
       (setq mu4e-attachment-dir "~/Downloads"
+            mu4e-debug t
+            mu4e-mu-debug t
+
+            ;;
+            ;; Indexing
+            ;;
             mu4e-index-cleanup nil
             mu4e-index-lazy-check t
             mu4e-change-filenames-when-moving t
             mu4e-update-interval nil
-            mu4e-hide-index-messages t
+
+            ;; mu4e-hide-index-messages t
 
             ;; -------
             ;; Viewing
@@ -1994,8 +2001,8 @@ layers configuration. You are free to put any user code."
             message-kill-buffer-on-exit t
             mu4e-compose-complete-addresses t
             mu4e-compose-complete-only-personal t
-            mu4e-compose-complete-only-after "2017-01-01"
-            mu4e-compose-complete-ignore-address-regexp "\\(no-?reply\\|@dev.terastream.net\\|phoebe.johnson\\|christian.phoebe.hopps\\|phoebe.hopps@helloinnovation.com\\)"
+            mu4e-compose-complete-only-after "2018-01-01"
+            mu4e-compose-complete-ignore-address-regexp "\\(no-?reply\\|@dev.terastream.net\\|phoebe.johnson\\|christian.phoebe.hopps\\|phoebe.hopps@helloinnovation.com\\|lberger@fore.com\\)"
             mu4e-compose-context-policy 'ask-if-none
             mu4e-compose-format-flowed t
             ;; This is an interesting value.. it's where soft-newlines will be
@@ -2252,18 +2259,29 @@ layers configuration. You are free to put any user code."
           ;; (bind-key (kbd "\"") 'mu4e-view-headers-prev 'mu4e-view-mode-map)
           (bind-key (kbd "f") 'mu4e-view-go-to-url 'mu4e-view-mode-map)
 
+          (defun my-mu4e-index-udpated ()
+            (let ((ts (format-time-string "%H:%M:%S.%N")))
+              (message "%s mu4e: full updated complete." ts)))
+
+          (add-hook 'mu4e-index-updated-hook 'my-mu4e-index-udpated)
+
           (defun mu4e-update-index-deep ()
             "Reindex mu4e with cleanup"
             (interactive)
-            (let ((mu4e-index-cleanup t))
-              (mu4e-update-index)))
+            (let ((mu4e-index-cleanup t)
+                  (mu4e-index-lazy-check t))
+              (let ((ts (format-time-string "%H:%M:%S.%N")))
+                (message "%s mu4e: full index update starting..." ts)
+                (mu4e-update-index))))
+
           (bind-key (kbd "U") 'mu4e-update-index-deep 'mu4e-main-mode-map)
+          ;; (bind-key (kbd "U") 'mu4e-update-mail-and-index  'mu4e-main-mode-map)
 
           (defun mu4e-deal-with-moved-message ()
             (if (equal major-mode 'mu4e-loading-mode)
                 (progn
                   (delete-window)
-                  (mu4e-update-index-deep)
+                  (mu4e-update-index)
                   (message "correct!"))))
 
           (defun mu4e-error-handler (errcode errmsg)
@@ -2406,19 +2424,19 @@ layers configuration. You are free to put any user code."
           (setq mu4e-careful-update-timer nil)
           (defun mu4e-careful-update-index ()
             (if (and
-                 (not (get-buffer "*mu4e-headers*"))
+                 (not (get-buffer "*Article*"))
                  (fboundp 'mu4e-update-index))
                 (progn
                   (if mu4e-careful-update-timer
                       (cancel-timer mu4e-careful-update-retry))
                   (message "updating-mail-index")
                   (mu4e-update-index))
-              (unless mu4e-careful-update-retry
+              (unless mu4e-careful-update-timer
                 (message "setting timer to update mail index")
-                (setq mu4e-careful-update-retry
-                      (run-at-time "1 min" nil
+                (setq mu4e-careful-update-timer
+                      (run-at-time "10 sec" nil
                                    (lambda ()
-                                     (setq mu4e-careful-update-retry nil)
+                                     (setq mu4e-careful-update-timer nil)
                                      (mu4e-careful-update-index)))))))
 
           (debug-init-message "debug-init MU4E mode add to gcal")
