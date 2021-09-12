@@ -29,6 +29,8 @@ This function should only modify configuration layer settings."
      helm
      (auto-completion :disabled-for org
                       :variables
+                      auto-completion-enable-snippets-in-popup t
+                      auto-completion-enable-help-tooltip nil
                       auto-completion-complete-with-key-sequence nil
                       auto-completion-private-snippets-directory "~/.spacemacs.d/snippets/"
                       auto-completion-tab-key-behavior 'complete)
@@ -118,11 +120,11 @@ This function should only modify configuration layer settings."
      ;; Languages
      (c-c++ :variables
             c-c++-default-mode-for-headers 'c-mode
-            ;; c-c++-backend 'lsp-clangd
+            c-c++-backend 'lsp-clangd
             ;; c-c++-adopt-subprojects t
-            c-c++-backend 'lsp-ccls
             ;; c-c++-lsp-sem-highlight-rainbow t
-            c-c++-enable-clang-support t
+            ;; c-c++-enable-clang-support nil
+            c-c++-lsp-enable-semantic-highlight nil
             c-c++-enable-clang-format-on-save nil
             )
      (cmake :variables cmake-enable-cmake-ide-support nil)
@@ -147,6 +149,7 @@ This function should only modify configuration layer settings."
              python-formatter 'black
              python-fill-column 88
              python-pipenv-activate t
+             python-poetry-activate t
              python-fill-docstring-style 'pep-257-nn
              python-test-runner '(pytest nose)
              pytest-global-name "python -m pytest --doctest-modules"
