@@ -228,6 +228,7 @@ This function should only modify configuration layer settings."
      package-lint
      persistent-scratch
      polymode
+     python-docstring
      ;; rfcview
      ;; colorsarenice-light
      )
@@ -2631,6 +2632,9 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                                            (setq indent-tabs-mode nil)
                                            (setq c-basic-offset 2)))))
 
+    (with-eval-after-load "transient"
+      (setq transient-values-file "~/.transient-values.el"))
+
     ;; (with-eval-after-load "yang-mode"
     ;;   ;; (autoload 'yang-mode "yang-mode")
     ;;   ;; (add-to-list 'auto-mode-alist '("\\.yang\\'" . yang-mode))
@@ -3312,8 +3316,8 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
         (defun my-python-mode-hook ()
           (setq comment-column 60)
+          (python-docstring-mode 1)
           ;; Check to see if there's a pylint in the project directory maybe?
-          (message "XXX checker set")
           (flycheck-select-checker 'python-pylint)
           ;; (setq flycheck-checker 'python-pyflakes)
           (semantic-mode -1)
@@ -3333,8 +3337,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
           ;;   ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
           ;;   ;; (message "select set exec")
           ;;   ;; (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
-
-          (debug-init-message "Python mode hook done"))
+          )
 
         (add-hook 'python-mode-hook 'my-python-mode-hook)
 
@@ -4141,9 +4144,12 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                             (trim-string (format-time-string " %e" (current-time)))
                             (format-time-string " %Y" (current-time))))
 
-                  (setq work-ai-prefix "/.*/chopps/w/.*")
+                  ;; "/home/chopps/w/foobar/baz.py"
+
+                  (setq work-ai-prefix "chopps/w\\(-[^/]+\\)\?/.*")
 
                   (with-eval-after-load 'autoinsert
+
                     ;; (define-auto-insert
                     ;;   '("\\.org\\'" . "Home Org mode skeleton")
                     ;;   '("Short description: "
@@ -4178,7 +4184,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                     (define-auto-insert
                       '("\\.py\\'" . "# Home python comment skeleton")
                       '("Short description: "
-                        "# -*- coding: utf-8 eval: (yapf-mode 1) -*-" \n
+                        "# -*- coding: utf-8 eval: (blacken-mode 1) -*-" \n
                         > "#" \n
                         > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
                         > "#" \n
@@ -4268,7 +4274,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                     (define-auto-insert
                       (cons (concat work-ai-prefix "\\.py\\'") "# Work python comment skeleton")
                       '("Short description: "
-                        "# -*- coding: utf-8 eval: (yapf-mode 1) -*-" \n
+                        "# -*- coding: utf-8 eval: (blacken-mode 1) -*-" \n
                         > "#" \n
                         > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
                         > "#" \n
