@@ -894,6 +894,9 @@ Return an event vector."
     (setq-default org-directory "~/Dropbox/org-mode/")
     (setq org-agenda-files '("~/Dropbox/org-mode/")))
 
+  (setq labn-365-dir (expand-file-name "~/365.labn.net/OneDrive - LabN Consulting, L.L.C/"))
+  (setq labn-us-dir (expand-file-name "~/us.labn.net/OneDrive - LabN Consulting LLC/"))
+
   (setq
    evil-search-wrap nil
    evil-want-C-i-jump nil
@@ -2005,8 +2008,7 @@ layers configuration. You are free to put any user code."
             message-kill-buffer-on-exit t
             mu4e-compose-complete-addresses t
             mu4e-compose-complete-only-personal t
-            mu4e-compose-complete-only-after "2018-01-01"
-            mu4e-compose-complete-ignore-address-regexp "\\(no-?reply\\|@dev.terastream.net\\|phoebe.johnson\\|christian.phoebe.hopps\\|phoebe.hopps@helloinnovation.com\\|lberger@fore.com\\)"
+            mu4e-compose-complete-only-after "2019-01-01"
             mu4e-compose-context-policy 'ask-if-none
             mu4e-compose-format-flowed t
             ;; This is an interesting value.. it's where soft-newlines will be
@@ -2263,6 +2265,11 @@ layers configuration. You are free to put any user code."
           ;; (bind-key (kbd "\"") 'mu4e-view-headers-prev 'mu4e-view-mode-map)
           (bind-key (kbd "f") 'mu4e-view-go-to-url 'mu4e-view-mode-map)
 
+          (defun my-mu4e-contact-filter (addr)
+            (let ((re "\\(no[t]?[-\\.]?repl\\(y\\|ies\\)\\|@dev.terastream.net\\|phoebe.johnson\\|christian.phoebe.hopps\\|phoebe.hopps@helloinnovation.com\\|lberger@fore.com\\)"))
+              (unless (string-match-p re addr) addr)))
+          (setq mu4e-contact-process-function 'my-mu4e-contact-filter)
+
           (defun my-mu4e-index-udpated ()
             (let ((ts (format-time-string "%H:%M:%S.%N")))
               (message "%s mu4e: full updated complete." ts)))
@@ -2279,6 +2286,7 @@ layers configuration. You are free to put any user code."
                 (mu4e-update-index))))
 
           (bind-key (kbd "U") 'mu4e-update-index-deep 'mu4e-main-mode-map)
+          (bind-key (kbd "u") 'mu4e-update-index 'mu4e-main-mode-map)
           ;; (bind-key (kbd "U") 'mu4e-update-mail-and-index  'mu4e-main-mode-map)
 
           (defun mu4e-deal-with-moved-message ()
@@ -2428,7 +2436,7 @@ layers configuration. You are free to put any user code."
           (setq mu4e-careful-update-timer nil)
           (defun mu4e-careful-update-index ()
             (if (and
-                 (not (get-buffer "*Article*"))
+                 (not (get-buffer-window "*Article*"))
                  (fboundp 'mu4e-update-index))
                 (progn
                   (if mu4e-careful-update-timer
@@ -2494,7 +2502,6 @@ layers configuration. You are free to put any user code."
           ;; (define-key mu4e-headers-mode-map "\\" 'mu4e-headers-mark-move-to-spam)
           ;; (define-key mu4e-view-mode-map "\\" 'mu4e-view-mark-move-to-spam)
 
-          (define-key mu4e-main-mode-map "u" 'mu4e-update-index)
 
           (debug-init-message "debug-init MU4E leader keys")
           (spacemacs/set-leader-keys-for-major-mode 'mu4e-view-mode
@@ -3491,15 +3498,18 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      ;;
      (defun my/start-heading-clock (heading)
        "Start clock programmatically for heading with ID in FILE."
-       (if-let (marker (org-find-exact-heading-in-directory heading org-directory))
+       ;; (if-let (marker (org-find-exact-heading-in-directory heading org-directory))
+       (if-let (marker (org-find-exact-heading-in-directory heading labn-365-dir))
            (save-current-buffer
              (save-excursion
                (set-buffer (marker-buffer marker))
                (goto-char (marker-position marker))
-               (org-clock-in)))
-         (warn "Clock not started (Could not find ID '%s' in file '%s')" id file)))
+               (org-clock-in)
+               (save-buffer)
+               ))
+         (warn "Clock not started (Could not find heading '%s' in '%s')" heading labn-365-dir)))
      (defun clock-in-tfs () "Clock-IN TFS" (interactive) (my/start-heading-clock "TFS P2010/BJ"))
-     (defun clock-in-caas () "Clock-IN CAS" (interactive) (my/start-heading-clock "CAAS P1909/01"))
+     (defun clock-in-caas () "Clock-IN CAS" (interactive) (my/start-heading-clock "CAAS P2109/00"))
      (spacemacs/set-leader-keys "oic" 'clock-in-caas)
      (spacemacs/set-leader-keys "oim" 'clock-in-tfs)
      (spacemacs/set-leader-keys "oit" 'clock-in-tfs)
@@ -3629,6 +3639,8 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         ("x1" "Tramdose 100mg" entry (file+olp+datetree ,(concat org-directory "/tramadol.org"))
          "* NOTE 100mg\nCreated: %U\nPain Level: 3-4" :immediate-finish t)
 
+        ("x/" "Tramdose 75mg" entry (file+olp+datetree ,(concat org-directory "/tramadol.org"))
+         "* NOTE 75mg\nCreated: %U\nPain Level: 3-4" :immediate-finish t)
         ("x." "Tramdose 50mg" entry (file+olp+datetree ,(concat org-directory "/tramadol.org"))
          "* NOTE 50mg\nCreated: %U\nPain Level: 3-4" :immediate-finish t)
 
