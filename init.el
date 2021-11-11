@@ -148,6 +148,7 @@ This function should only modify configuration layer settings."
              python-lsp-server 'pylsp
              python-formatter 'black
              python-fill-column 88
+             python-tab-width 8
              python-pipenv-activate t
              python-poetry-activate t
              python-fill-docstring-style 'pep-257-nn
@@ -225,6 +226,8 @@ This function should only modify configuration layer settings."
      ;; This is very cool but too expensive for large projects
      ;; magit-todos
      github-review
+     magit-delta
+     olivetti
      monky
      nhexl-mode
      org-caldav
@@ -232,6 +235,7 @@ This function should only modify configuration layer settings."
      persistent-scratch
      polymode
      python-docstring
+     protobuf-mode
      ;; rfcview
      ;; colorsarenice-light
      )
@@ -254,11 +258,13 @@ This function should only modify configuration layer settings."
      ;; recentf
      ;; savehist
      ;; HATE PURPOSE MODE
-     eyebrowse
-     helm-purpose
-     ivy-purpose
-     spacemacs-purpose-popwin
-     window-purpose
+
+     ;; eyebrowse
+     ;; helm-purpose
+     ;; ivy-purpose
+     ;; spacemacs-purpose-popwin
+     ;; window-purpose
+
      ) ; evil-org
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
@@ -971,7 +977,11 @@ Return an event vector."
           (mandm ;; (default :background "#F0F0E0")
            (font-lock-doc-face :foreground "#036A07" :slant normal)
            (font-lock-comment-face :foreground "#6D6D64" :slant normal)
-           (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant normal))
+           (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant normal)
+           (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant normal)
+           (lsp-face-highlight-read :foreground "#036A07" :slant normal)
+           )
+
           (leuven ;; (default :background "#F0F0E0")
            (default :background "#ede8da")
            ;;(default :background "#F0F0E5")
@@ -1302,10 +1312,10 @@ layers configuration. You are free to put any user code."
     (debug-init-message "debug-init USER-CONFIG")
 
     ;; Add themes from megapack to dotspacemacs-themes
-    (setq dotspacemacs-themes
-          (mapcar (lambda (package)
-                    (intern (string-remove-suffix "-theme" (symbol-name package))))
-                  themes-megapack-packages))
+    ;; (setq dotspacemacs-themes
+    ;;       (mapcar (lambda (package)
+    ;;                 (intern (string-remove-suffix "-theme" (symbol-name package))))
+    ;;               themes-megapack-packages))
 
     ;;
     ;; Indention
@@ -1384,7 +1394,6 @@ layers configuration. You are free to put any user code."
      tab-always-indent t
      case-fold-search nil
      )
-
 
     (add-to-list 'auto-mode-alist '("\\.xml\\'" . nxml-mode))
     (add-to-list 'auto-mode-alist '("\\.act\\'" . python-mode))
@@ -3200,7 +3209,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
                        (transient-insert-suffix 'magit-pull "-r" '("-f" "Overwrite local branch" "--force"))
 
-                       (bind-key (kbd "M-RET") 'magit-diff-visit-worktree-file 'magit-diff-mode-map)
+                       (bind-key (kbd "M-RET") 'magit-diff-visit-worktree-file-other-window 'magit-diff-mode-map)
                        (bind-key (kbd "C-j") 'magit-diff-visit-worktree-file 'magit-diff-mode-map)
        )
      )
@@ -3324,12 +3333,19 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         ;;     :delimiter-mode nil)))
         ;; (mmm-add-mode-ext-class 'python-mode nil 'rst-python-docstrings)
 
+        (defun my-python-before-save-hook ()
+          (if (bound-and-true-p blacken-mode)
+              (py-isort-before-save)))
+
         (defun my-python-mode-hook ()
           (setq comment-column 60)
           (python-docstring-mode 1)
           ;; Check to see if there's a pylint in the project directory maybe?
+          (message "XXX checker set")
+           ;; flake8 will chain in pylint
+          (add-hook 'before-save-hook 'my-python-before-save-hook)
           (flycheck-select-checker 'python-pylint)
-          ;; (setq flycheck-checker 'python-pyflakes)
+          ;; (flycheck-select-checker 'python-flake8)
           (semantic-mode -1)
 
                 ;; flycheck-checker-error-threshold 900
