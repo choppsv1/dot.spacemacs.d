@@ -230,6 +230,7 @@ This function should only modify configuration layer settings."
      olivetti
      monky
      nhexl-mode
+     nano-theme
      org-caldav
      package-lint
      persistent-scratch
