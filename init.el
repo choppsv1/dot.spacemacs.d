@@ -287,7 +287,7 @@ This function should only modify configuration layer settings."
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
     (setq ch-def-font "Iosevka Light")
-    (setq ch-def-height 16.0)
+    (setq ch-def-height 18.0)
     (debug-init-message "Setting font to %s:%f" ch-def-font ch-def-height))
    ((string-equal system-type "gnu/linux")
     (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
@@ -1972,7 +1972,7 @@ layers configuration. You are free to put any user code."
 
       (setq mu4e-attachment-dir "~/Downloads"
             mu4e-debug t
-            mu4e-mu-debug t
+            mu4e-mu-debug nil
 
             ;;
             ;; Indexing
@@ -1989,7 +1989,7 @@ layers configuration. You are free to put any user code."
             ;; -------
             mu4e-headers-results-limit 500
             mu4e-headers-visible-lines 15
-            mu4e-headers-visible-columns 240
+            mu4e-headers-visible-columns 200
 
             ;; For searches useful as t to find replies to threads?
             mu4e-headers-include-related nil
@@ -2133,8 +2133,8 @@ layers configuration. You are free to put any user code."
                        ("date:24h..now" "Today's messages" ?d)
                        ("date:today..now" "Today's messages" ?t)
                        ("date:7d..now" "Last 7 days" ?w)
-                       ("date:7d..now from:chopps" "Last 7 days sent" ?W)
-                       ("date:14d..now from:chopps" "Last 14 days sent" ?F)
+                       ("date:7d..now AND (from:chopps@chopps.org OR from:chopps@gmail.com OR from:chopps@us.labn.net OR from:chopps@labn.net OR from:christian.hopps.ctr@nrl.navy.mil)" "Last 7 days sent" ?W)
+                       ("date:14d..now AND (from:chopps@chopps.org OR  OR from:chopps@gmail.com OR from:chopps@us.labn.net OR from:chopps@labn.net OR from:christian.hopps.ctr@nrl.navy.mil)" "Last 14 days sent" ?F)
                        ("mime:application/zip" "Messages with ZIP" ?z)
                        ("mime:application/pdf" "Messages with PDF" ?p)
                        ("mime:text/calendar" "Messages with calendar" ?q)
