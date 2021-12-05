@@ -2038,41 +2038,10 @@ layers configuration. You are free to put any user code."
             ;; Address Completion
             ;; ------------------
 
-            ;; only complete addresses found in email to one of the below addresses
-            mu4e-user-mail-address-list (list "chopps@chopps.org"
-                                              "chopps@devhopps.com"
-                                              "chopps@labn.net"
-                                              "chopps@us.labn.net"
-                                              "chopps@gmail.com"
-                                              "chopps@netbsd.org"
-
-                                              "christian@devhopps.com"
-                                              "chris@devhopps.com"
-                                              "chopps@dev.terastrm.net"
-                                              "chopps@rawdofmt.org")
-
-            ;; This isn't used yet but we'd like it to be for getting
-            ;; contact completions from any mail with these addresses in them.
-            mu4e-contacts-user-mail-address-list (list
-                                                  "chopps@chopps.org"
-                                                  "chopps@devhopps.com"
-                                                  "chopps@gmail.com"
-                                                  "chopps@netbsd.org"
-                                                  "chopps@rawdofmt.org"
-                                                  ;; we want contacts added from these mailing lists
-                                                  "isis-wg@ietf.org"
-                                                  "lsr@ietf.org"
-                                                  "ipsec@ietf.org"
-                                                  "developers@netbsd.org"
-                                                  "netbsd-developers@netbsd.org"
-                                                  "chopps@dev.terastrm.net"
-                                                  )
-
             message-completion-alistp '(("^\\(Newsgroups\\|Followup-To\\|Posted-To\\|Gcc\\):" . message-expand-group)
                                         ("^\\(Resent-\\)?\\(To\\|B?Cc\\):" . message-expand-name)
                                         ("^\\(Reply-To\\|From\\|Mail-Followup-To\\|Mail-Copies-To\\):" . message-expand-name)
                                         ("^\\(Disposition-Notification-To\\|Return-Receipt-To\\):" . message-expand-name))
-
 
             ;; -----------
             ;; [b]ookmarks
@@ -2260,6 +2229,20 @@ layers configuration. You are free to put any user code."
 
 
           (debug-init-message "debug-init MU4E defuns")
+
+          (defun mu4e~headers-jump-to-maildir-unread (maildir)
+            "Show the unread messages in maildir.
+The user is prompted to ask what maildir.  If prefix arg EDIT is
+given, offer to edit the search query before executing it."
+            (interactive
+             (let ((maildir (mu4e-ask-maildir "Jump to maildir: ")))
+               (list maildir current-prefix-arg)))
+            (when maildir
+              (let* ((query (format "maildir:\"%s\" AND flag:unread" maildir)))
+                (mu4e-mark-handle-when-leaving)
+                (mu4e-headers-search query))))
+
+          (define-key mu4e-main-mode-map (kbd "J") 'mu4e~headers-jump-to-maildir-unread)
 
           ;; Work around a bug with too long names in the spaceline/modeline
           ;; This is causing an error now in emacs 27.2
@@ -3524,8 +3507,8 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                (save-buffer)
                ))
          (warn "Clock not started (Could not find heading '%s' in '%s')" heading labn-365-dir)))
-     (defun clock-in-tfs () "Clock-IN TFS" (interactive) (my/start-heading-clock "TFS P2010/BJ"))
-     (defun clock-in-caas () "Clock-IN CAS" (interactive) (my/start-heading-clock "CAAS P2109/00"))
+     (defun clock-in-tfs () "Clock-IN TFS" (interactive) (my/start-heading-clock "TFS P2010/AX"))
+     (defun clock-in-caas () "Clock-IN CAS" (interactive) (my/start-heading-clock "CAAS P2109/02"))
      (spacemacs/set-leader-keys "oic" 'clock-in-caas)
      (spacemacs/set-leader-keys "oim" 'clock-in-tfs)
      (spacemacs/set-leader-keys "oit" 'clock-in-tfs)
