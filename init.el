@@ -208,13 +208,9 @@ This function should only modify configuration layer settings."
    ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
    dotspacemacs-configuration-layer-path '()
 
-   ;; List of configuration layers to load.
    dotspacemacs-configuration-layers chopps-layers
 
-   ;; List of additional packages that will be installed without being
-   ;; wrapped in a layer. If you need some configuration for these
-   ;; packages, then consider creating a layer. You can also put the
-   ;; configuration in `dotspacemacs/user-config'.
+   ;; List of configuration layers to load.
    dotspacemacs-additional-packages
    '(
      base16-theme
@@ -2555,12 +2551,19 @@ given, offer to edit the search query before executing it."
         )
       )
 
-    ;; =================
-    ;; Programming Modes
-    ;; =================
+    ;; ===========
+    ;; Basic Modes
+    ;; ===========
+
+    (with-eval-after-load 'make-mode
+      (delq (assoc "^\t+#" makefile-font-lock-keywords) makefile-font-lock-keywords))
 
     (with-eval-after-load "sh-script"
       (modify-syntax-entry ?_ "w" sh-mode-syntax-table))
+
+    ;; =================
+    ;; Programming Modes
+    ;; =================
 
     (when-layer-used 'lsp
      (with-eval-after-load 'lsp-mode
@@ -3366,24 +3369,11 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      (with-eval-after-load 'lua-mode
        (setq-default lua-indent-level 4)))
 
-    ;; This is breaking now.
-    ;; (with-eval-after-load 'magit-mode
-    ;;   (magit-define-popup-switch 'magit-push-popup ?t "Push associated annotated tags" "--follow-tags")
-    ;;   )
-
-    ;;   (progn
-    ;;     (delq (assoc "^\t+#" makefile-font-lock-keywords) makefile-font-lock-keywords)))
-    (with-eval-after-load 'make-mode
-      (delq (assoc "^\t+#" makefile-font-lock-keywords) makefile-font-lock-keywords))
-
-    ;; ============
-    ;; Org Exports
-    ;; ============
-    (setq image-transform-scale 2.0)
-
     ;; ===
     ;; Org
     ;; ===
+
+    (setq image-transform-scale 2.0)
 
     (when-layer-used 'org
 
@@ -4089,10 +4079,10 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
      )
 
-
     ;; ====
     ;; TMUX
     ;; ====
+
     (debug-init-message "debug-init tmux")
 
     (defun sigusr1-handler ()
