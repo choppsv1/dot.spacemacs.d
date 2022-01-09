@@ -2202,6 +2202,12 @@ layers configuration. You are free to put any user code."
                                             (sendmail-program . "/opt/homebrew/bin/msmtp")
                                             (send-mail-function . 'smtpmail-send-it)
                                             (message-sendmail-extra-arguments . ("--read-envelope-from"))
+
+                                            ;;ms
+                                            ;; (smtpmail-starttls-credentials . '(("outgoing.cmf.nrl.navy.mil" 587 nil nil)))
+                                            ;; (smtpmail-stream-type          . starttls)
+                                            ;; (smtpmail-smtp-service         . 587)
+
                                             (message-sendmail-f-is-evil . t)))
                                  ,(make-mu4e-context
                                     :name "gmail.com"
@@ -2232,14 +2238,46 @@ layers configuration. You are free to put any user code."
 The user is prompted to ask what maildir.  If prefix arg EDIT is
 given, offer to edit the search query before executing it."
             (interactive
-             (let ((maildir (mu4e-ask-maildir "Jump to maildir: ")))
-               (list maildir current-prefix-arg)))
+             (let ((maildir (mu4e-ask-maildir "Jump to maildir: ")))))
             (when maildir
               (let* ((query (format "maildir:\"%s\" AND flag:unread" maildir)))
                 (mu4e-mark-handle-when-leaving)
                 (mu4e-headers-search query))))
 
-          (define-key mu4e-main-mode-map (kbd "J") 'mu4e~headers-jump-to-maildir-unread)
+          ;; (define-key mu4e-main-mode-map (kbd "J") 'mu4e~headers-jump-to-maildir-unread)
+          ;; (define-key evilified-state--normal-state-map (kbd "J") 'mu4e~headers-jump-to-maildir-unread)
+          ;; (define-key evilified-state--visual-state-map (kbd "J") 'mu4e~headers-jump-to-maildir-unread)
+
+          (defun ch/mu4e--query-insert-something (something)
+            (interactive)
+            (unless (looking-back "\\(:\\|and\\|or\\|not\\)[ \t]*")
+              (insert " and "))
+            (unless (looking-back "[ \t]")
+              (insert " "))
+            (insert something))
+
+          (defun ch/mu4e-query-insert-flag:unread ()
+            (interactive)
+            (ch/mu4e--query-insert-something "flag:unread"))
+
+          (defun ch/mu4e-query-insert-flag:flagged ()
+            (interactive)
+            (ch/mu4e--query-insert-something "flag:flagged"))
+
+          (defun ch/mu4e-query-insert-flag:attach ()
+            (interactive)
+            (ch/mu4e--query-insert-something "flag:attach"))
+
+          (defvar ch/mu4e-minibuffer-quick-insert-map
+            (let ((map (make-sparse-keymap)))
+              (define-key map (kbd "u") #'ch/mu4e-query-insert-flag:unread)
+              (define-key map (kbd "f") #'ch/mu4e-query-insert-flag:flagged)
+              (define-key map (kbd "a") #'ch/mu4e-query-insert-flag:attach)
+              map))
+
+          (define-key mu4e-minibuffer-search-query-map (kbd "C-u")
+            ch/mu4e-minibuffer-quick-insert-map)
+
 
           ;; Work around a bug with too long names in the spaceline/modeline
           ;; This is causing an error now in emacs 27.2
@@ -3498,12 +3536,23 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                (save-buffer)
                ))
          (warn "Clock not started (Could not find heading '%s' in '%s')" heading labn-365-dir)))
+     (defun my/stop-clock-save-file-with-heading (heading)
+       "Stop clock and save file"
+       ;; (if-let (marker (org-find-exact-heading-in-directory heading org-directory))
+       (if-let (marker (org-find-exact-heading-in-directory heading labn-365-dir))
+           (save-current-buffer
+             (save-excursion
+               (set-buffer (marker-buffer marker))
+               (save-buffer)
+               ))
+         (warn "Clock not started (Could not find heading '%s' in '%s')" heading labn-365-dir)))
      (defun clock-in-tfs () "Clock-IN TFS" (interactive) (my/start-heading-clock "TFS P2010/AX"))
      (defun clock-in-caas () "Clock-IN CAS" (interactive) (my/start-heading-clock "CAAS P2109/02"))
+     (defun clock-out-save () "Clock-Out Save" (interactive) (my/stop-clock-save-file-with-heading "TFS P2010/AX"))
      (spacemacs/set-leader-keys "oic" 'clock-in-caas)
      (spacemacs/set-leader-keys "oim" 'clock-in-tfs)
      (spacemacs/set-leader-keys "oit" 'clock-in-tfs)
-     (spacemacs/set-leader-keys "oo" 'org-clock-out)
+     (spacemacs/set-leader-keys "oo" 'clock-out-save)
 
      ;; (setq TeX-view-program-selection
      ;;       (append
