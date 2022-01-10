@@ -647,6 +647,7 @@ It should only modify the values of Spacemacs settings."
 
    ;; Code folding method. Possible values are `evil', `origami' and `vimish'.
    ;; (default 'evil)
+   ;; dotspacemacs-folding-method 'evil
    dotspacemacs-folding-method 'evil
 
    ;; If non-nil and `dotspacemacs-activate-smartparens-mode' is also non-nil,
@@ -774,6 +775,9 @@ before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
 
 
+  (add-hook 'grep-mode-hook
+            (lambda()
+              (kill-local-variable 'compilation-auto-jump-to-next)))
 
   (defun enable-CSI-u ()
   ;; Take advantage of iterm2's CSI u support (https://gitlab.com/gnachman/iterm2/-/issues/8382).
@@ -3300,34 +3304,41 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         ;; XXX Hack to get rid of warning, need to fix this differently.
         ;; (setq python-shell-completion-native-enable nil)
 
-        (defun python-sort-import-list ()
-          "Split an single import lines with multiple module imports into separate lines sort results"
-          (interactive)
-          (if (not (use-region-p))
-              (error "No region defined"))
-          (let* ((start (region-beginning))
-                 (end (region-end))
-                 (value 0)
-                 found)
-            (save-excursion
-              (let* (modlist impstart impend bigstr)
-                (setq modlist '())
-                (goto-char start)
-                (when (re-search-forward "^import \\([[:alnum:]_,\\. ]+\\)$" end t)
-                  (setq impstart (match-beginning 0))
-                  (setq impend (match-end 0))
-                  (setq modlist (append modlist (mapcar 's-trim (s-split "," (match-string 1)))))
-                  (while (setq found (re-search-forward "^import \\([[:alnum:]_,\\. ]+\\)$" end t))
-                    (setq impend (match-end 0))
-                    (setq modlist (append modlist (mapcar 's-trim (s-split "," (match-string 1))))))
-                  (setq modlist (sort modlist 's-less?))
-                  (setq modlist (mapcar (lambda (x) (concat "import " x)) modlist))
-                  (setq bigstr (s-join "\n" modlist))
-                  (save-restriction
-                    (narrow-to-region impstart impend)
-                    (delete-region impstart impend)
-                    (goto-char impstart)
-                    (insert bigstr)))))))
+        (when-layer-used 'rebox
+                         (defun rebox-python-hook ()
+                           (set (make-local-variable 'rebox-style-loop) '(71 82 73)))
+                         (add-hook 'python-mode-hook 'rebox-python-hook))
+
+
+
+        ;; (defun python-sort-import-list ()
+        ;;   "Split an single import lines with multiple module imports into separate lines sort results"
+        ;;   (interactive)
+        ;;   (if (not (use-region-p))
+        ;;       (error "No region defined"))
+        ;;   (let* ((start (region-beginning))
+        ;;          (end (region-end))
+        ;;          (value 0)
+        ;;          found)
+        ;;     (save-excursion
+        ;;       (let* (modlist impstart impend bigstr)
+        ;;         (setq modlist '())
+        ;;         (goto-char start)
+        ;;         (when (re-search-forward "^import \\([[:alnum:]_,\\. ]+\\)$" end t)
+        ;;           (setq impstart (match-beginning 0))
+        ;;           (setq impend (match-end 0))
+        ;;           (setq modlist (append modlist (mapcar 's-trim (s-split "," (match-string 1)))))
+        ;;           (while (setq found (re-search-forward "^import \\([[:alnum:]_,\\. ]+\\)$" end t))
+        ;;             (setq impend (match-end 0))
+        ;;             (setq modlist (append modlist (mapcar 's-trim (s-split "," (match-string 1))))))
+        ;;           (setq modlist (sort modlist 's-less?))
+        ;;           (setq modlist (mapcar (lambda (x) (concat "import " x)) modlist))
+        ;;           (setq bigstr (s-join "\n" modlist))
+        ;;           (save-restriction
+        ;;             (narrow-to-region impstart impend)
+        ;;             (delete-region impstart impend)
+        ;;             (goto-char impstart)
+        ;;             (insert bigstr)))))))
 
         (defun rst-python-statement-is-docstring (begin)
           "Return true if beginning of statiment is :begin"
