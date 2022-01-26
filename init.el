@@ -19,6 +19,72 @@ This function should only modify configuration layer settings."
 
   (setq
 
+   chopps-lite-layers
+   '(
+     ;; Choose either ivy or helm as completion framework
+     ;; ivy
+     helm
+     ;; (auto-completion :disabled-for org
+                      ;; :variables
+                      ;; auto-completion-enable-snippets-in-popup t
+                      ;; auto-completion-enable-help-tooltip nil
+                      ;; auto-completion-complete-with-key-sequence nil
+                      ;; auto-completion-private-snippets-directory "~/.spacemacs.d/snippets/"
+                      ;; auto-completion-tab-key-behavior 'complete)
+     better-defaults
+     git
+     theming
+
+     ;; Languages
+     emacs-lisp
+
+     ;; File Formats
+     markdown
+     (org :variables
+          org-clock-idle-time 15
+          org-enable-rfc-support nil)
+     shell-scripts
+     yaml
+    )
+
+   dev-lite-layers
+   '(
+     syntax-checking
+     ;; (syntax-checking :variables syntax-checking-enable-tooltips t)
+     (c-c++ :variables
+            c-c++-backend 'lsp-ccls
+            c-c++-adopt-subprojects t
+            c-c++-default-mode-for-headers 'c-mode
+            c-c++-enable-clang-format-on-save nil
+            c-c++-lsp-enable-semantic-highlight nil
+            )
+     (lsp :variables
+          lsp-lens-enable nil)
+     gtags
+
+     (python :variables python-backend 'lsp
+             ;; python-lsp-server 'pyright
+             python-lsp-server 'pylsp
+             python-formatter 'black
+             python-fill-column 88
+             python-tab-width 8
+             python-pipenv-activate t
+             python-poetry-activate t
+             python-fill-docstring-style 'pep-257-nn
+             python-test-runner '(pytest nose)
+             pytest-global-name "python -m pytest --doctest-modules"
+             python-sort-imports-on-save nil
+             python-enable-yapf-format-on-save nil)
+             ;; python-auto-set-local-pyvenv-virtualenv on-visit
+             ;; python-auto-set-local-pyenv-virtualenv nil
+
+     ;; restructuredtext
+     ;; (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
+     (yang :variables
+           yang-pyang-rules "lint"
+           yang-pyang-extra-args "--max-line-length=79")
+     )
+
    ;;
    ;; All systems get these layers -- keep it small!
    ;;
@@ -39,7 +105,7 @@ This function should only modify configuration layer settings."
      git
      rebox
      theming
-     themes-megapack
+     ;; themes-megapack
 
      ;; Languages
      emacs-lisp
@@ -169,13 +235,16 @@ This function should only modify configuration layer settings."
            yang-pyang-rules "lint"
            yang-pyang-extra-args "--max-line-length=79")
      )
+   chopps-dev-lite-systems '("flk")
    ;; These systems get full development packages -- the slowest load
-   chopps-dev-systems '("cmf-xe-1" "morn1" "tops" "hp13" "labnh" "ja.int.chopps.org" "alk" "dlk" "flk" "rlk" "slk" "dak"))
+   chopps-dev-systems '("cmf-xe-1" "morn1" "tops" "hp13" "labnh" "ja.int.chopps.org" "alk" "dlk" "rlk" "slk" "dak"))
 
   (cond ((eq system-type 'darwin)
          (setq chopps-layers (append chopps-layers osx-layers)))
         ((eq system-type 'gnu/linux)
          (setq chopps-layers (append chopps-layers linux-layers))))
+  (when (member system-name chopps-dev-lite-systems)
+    (setq chopps-layers (append chopps-layers dev-lite-layers)))
   (when (member system-name chopps-dev-systems)
     (setq chopps-layers (append chopps-layers dev-layers)))
   (when (member system-name '("tops"))
@@ -221,7 +290,8 @@ This function should only modify configuration layer settings."
      exec-path-from-shell
      ;; This is very cool but too expensive for large projects
      ;; magit-todos
-     github-review
+     ;; XXX problems?
+     ;; github-review
      magit-delta
      olivetti
      monky
@@ -244,9 +314,11 @@ This function should only modify configuration layer settings."
    '(
      ;; vi-tilde-fringe
      applescript-mode
+     helm-ls-git
      erc-yt
      erc-view-log
      evil-mc
+     helm-gtags
      irfc
      ;; mu4e-maildirs-extension
      ;; mu4e-alert
@@ -456,14 +528,14 @@ It should only modify the values of Spacemacs settings."
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(
-                         sanityinc-tomorrow-blue
-                         borland-blue
-                         sanityinc-solarized-dark
-                         misterioso
+                         ;; sanityinc-tomorrow-blue
+                         ;; borland-blue
+                         ;; sanityinc-solarized-dark
+                         ;; misterioso
                          mandm
-                         gruvbox-light-hard
-                         molokai
-                         leuven
+                         ;; gruvbox-light-hard
+                         ;; molokai
+                         ;; leuven
                          )
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
    ;; `all-the-icons', `custom', `doom', `vim-powerline' and `vanilla'. The
@@ -1245,13 +1317,13 @@ layers configuration. You are free to put any user code."
    ((string-equal system-type "darwin") ; Mac OS X
     (spacemacs/load-theme 'sanityinc-tomorrow-blue))
    ((or (string-prefix-p "alk" (system-name))
+        (string-prefix-p "flk" (system-name))
         )
     (spacemacs/load-theme 'mandm))
    ((or (string-prefix-p "cmf-" (system-name))
         (string-prefix-p "labnh" (system-name))
         (string-prefix-p "alk" (system-name))
         (string-prefix-p "dlk" (system-name))
-        (string-prefix-p "flk" (system-name))
         (string-prefix-p "rlk" (system-name))
         (string-prefix-p "slk" (system-name))
         (string-prefix-p "builder" (system-name))
@@ -2613,6 +2685,9 @@ given, offer to edit the search query before executing it."
                    lsp-file-watch-ignored (append '("/usr/include" ".*/build-root/.*" "/opt/current/include" ) lsp-file-watch-ignored)
                    lsp-enable-file-watchers t
                    lsp-file-watch-threshold 20000
+
+                   lsp-ui-peek-peek-height 40
+                   lsp-ui-peek-list-width 50
                    )
 
        ))
@@ -3304,12 +3379,10 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         ;; XXX Hack to get rid of warning, need to fix this differently.
         ;; (setq python-shell-completion-native-enable nil)
 
-        (when-layer-used 'rebox
-                         (defun rebox-python-hook ()
-                           (set (make-local-variable 'rebox-style-loop) '(71 82 73)))
-                         (add-hook 'python-mode-hook 'rebox-python-hook))
-
-
+        (with-eval-after-load 'python
+          (defun rebox-python-hook ()
+            (set (make-local-variable 'rebox-style-loop) '(71 82 73)))
+          (add-hook 'python-mode-hook 'rebox-python-hook))
 
         ;; (defun python-sort-import-list ()
         ;;   "Split an single import lines with multiple module imports into separate lines sort results"
