@@ -58,13 +58,13 @@ This function should only modify configuration layer settings."
             c-c++-enable-clang-format-on-save nil
             c-c++-lsp-enable-semantic-highlight nil
             )
+
+     ;; lsp-diagnostics-provider :none
      (lsp :variables
-          lsp-diagnostics-provider :none
           lsp-lens-enable nil)
      gtags
 
      (python :variables python-backend 'lsp
-             ;; python-lsp-server 'pyright
              python-lsp-server 'pylsp
              python-formatter 'black
              python-fill-column 88
@@ -76,18 +76,7 @@ This function should only modify configuration layer settings."
              pytest-global-name "python -m pytest --doctest-modules"
              python-sort-imports-on-save nil
              python-enable-yapf-format-on-save nil
-             ;; lsp-pylsp-plugins-pylint-enabled t ;; was t by spacemacs but nil before
-             ;; lsp-pylsp-plugins-pyflakes-enabled nil ;; was t by spacemacs but nil before
-             ;; lsp-pylsp-plugins-autopep8-enabled nil ;; was nil is nil
-             ;; lsp-pylsp-plugins-flake8-enabled nil ;; was nil by spacemacs but t before
-             ;; lsp-pylsp-plugins-pycodestyle-enabled nil ;; was t by spacemacs but nil before
-             ;; lsp-pylsp-plugins-mccabe-enabled nil ;; was nil by spacemacs but t before
-             ;; python-auto-set-local-pyvenv-virtualenv on-visit
-             ;; python-auto-set-local-pyenv-virtualenv nil
      )
-
-     ;; restructuredtext
-     ;; (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
      (yang :variables
            yang-pyang-rules "lint"
            yang-pyang-extra-args "--max-line-length=79")
@@ -229,13 +218,17 @@ This function should only modify configuration layer settings."
              python-test-runner '(pytest nose)
              pytest-global-name "python -m pytest --doctest-modules"
              python-sort-imports-on-save nil
-             python-enable-yapf-format-on-save nil)
+             python-enable-yapf-format-on-save nil
+             ;; lsp-pylsp-plugins-pylint-enabled t ;; was t by spacemacs but nil before
+             ;; lsp-pylsp-plugins-pyflakes-enabled nil ;; was t by spacemacs but nil before
+             ;; lsp-pylsp-plugins-autopep8-enabled nil ;; was nil is nil
+             ;; lsp-pylsp-plugins-flake8-enabled nil ;; was nil by spacemacs but t before
+             ;; lsp-pylsp-plugins-pycodestyle-enabled nil ;; was t by spacemacs but nil before
+             ;; lsp-pylsp-plugins-mccabe-enabled nil ;; was nil by spacemacs but t before
              ;; python-auto-set-local-pyvenv-virtualenv on-visit
              ;; python-auto-set-local-pyenv-virtualenv nil
-     ;; disable emacs-lisp due to completionion in comments parsing tons
-     ;; of .el files https://github.com/syl20bnr/spacemacs/issues/7038
+             )
      restructuredtext
-     ;; (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
      (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
      sphinx
 
@@ -243,9 +236,9 @@ This function should only modify configuration layer settings."
            yang-pyang-rules "lint"
            yang-pyang-extra-args "--max-line-length=79")
      )
-   chopps-dev-lite-systems '("flk")
+   chopps-dev-lite-systems '("dlk" "flk" "ubb" "uff")
    ;; These systems get full development packages -- the slowest load
-   chopps-dev-systems '("cmf-xe-1" "morn1" "tops" "hp13" "labnh" "ja.int.chopps.org" "alk" "dlk" "rlk" "slk" "dak"))
+   chopps-dev-systems '("cmf-xe-1" "morn1" "tops" "hp13" "labnh" "ja.int.chopps.org" "rlk" "dak"))
 
   (cond ((eq system-type 'darwin)
          (setq chopps-layers (append chopps-layers osx-layers)))
@@ -1324,16 +1317,15 @@ layers configuration. You are free to put any user code."
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
     (spacemacs/load-theme 'sanityinc-tomorrow-blue))
-   ((or (string-prefix-p "alk" (system-name))
+   ((or (string-prefix-p "dlk" (system-name))
         (string-prefix-p "flk" (system-name))
+        (string-prefix-p "ubb" (system-name))
+        (string-prefix-p "uff" (system-name))
         )
     (spacemacs/load-theme 'mandm))
    ((or (string-prefix-p "cmf-" (system-name))
         (string-prefix-p "labnh" (system-name))
-        (string-prefix-p "alk" (system-name))
-        (string-prefix-p "dlk" (system-name))
         (string-prefix-p "rlk" (system-name))
-        (string-prefix-p "slk" (system-name))
         (string-prefix-p "builder" (system-name))
         (string-prefix-p "hp13" (system-name))
         )
