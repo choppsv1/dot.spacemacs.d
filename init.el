@@ -59,6 +59,7 @@ This function should only modify configuration layer settings."
             c-c++-lsp-enable-semantic-highlight nil
             )
      (lsp :variables
+          lsp-diagnostics-provider :none
           lsp-lens-enable nil)
      gtags
 
@@ -74,9 +75,16 @@ This function should only modify configuration layer settings."
              python-test-runner '(pytest nose)
              pytest-global-name "python -m pytest --doctest-modules"
              python-sort-imports-on-save nil
-             python-enable-yapf-format-on-save nil)
+             python-enable-yapf-format-on-save nil
+             ;; lsp-pylsp-plugins-pylint-enabled t ;; was t by spacemacs but nil before
+             ;; lsp-pylsp-plugins-pyflakes-enabled nil ;; was t by spacemacs but nil before
+             ;; lsp-pylsp-plugins-autopep8-enabled nil ;; was nil is nil
+             ;; lsp-pylsp-plugins-flake8-enabled nil ;; was nil by spacemacs but t before
+             ;; lsp-pylsp-plugins-pycodestyle-enabled nil ;; was t by spacemacs but nil before
+             ;; lsp-pylsp-plugins-mccabe-enabled nil ;; was nil by spacemacs but t before
              ;; python-auto-set-local-pyvenv-virtualenv on-visit
              ;; python-auto-set-local-pyenv-virtualenv nil
+     )
 
      ;; restructuredtext
      ;; (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
@@ -3318,28 +3326,34 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
        )
      )
 
-    (when-layer-used 'python
-                     (setq-default
-                      lsp-pylsp-plugins-autopep8-enabled nil
-                      lsp-pylsp-plugins-flake8-enabled nil
-                      lsp-pylsp-plugins-jedi-completion-enabled t
-                      lsp-pylsp-plugins-jedi-definition-enabled nil
-                      lsp-pylsp-plugins-jedi-hover-enabled nil
-                      lsp-pylsp-plugins-jedi-references-enabled t
-                      lsp-pylsp-plugins-jedi-signature-help-enabled t
-                      lsp-pylsp-plugins-jedi-symbols-enabled t
-                      lsp-pylsp-plugins-mccabe-enabled nil
-                      lsp-pylsp-plugins-preload-enabled nil
-                      lsp-pylsp-plugins-pycodestyle-enabled t
-                      lsp-pylsp-plugins-pydocstyle-enabled nil
-                      lsp-pylsp-plugins-pyflakes-enabled t
-                      lsp-pylsp-plugins-pylint-enabled t
-                      lsp-pylsp-plugins-rope-completion-enabled nil
-                      lsp-pylsp-plugins-yapf-enabled nil
-                      )
-      (with-eval-after-load 'python
-
-
+    ;; python
+    (when-layer-used
+     'python
+     (when-layer-used
+      'lsp
+      (setq-default
+       lsp-pylsp-plugins-autopep8-enabled nil
+       lsp-pylsp-plugins-flake8-enabled nil
+       lsp-pylsp-plugins-flake8-ignore ["E203"]
+       lsp-pylsp-plugins-flake8-max-line-length 88
+       lsp-pylsp-plugins-jedi-completion-enabled t
+       lsp-pylsp-plugins-jedi-definition-enabled nil
+       lsp-pylsp-plugins-jedi-hover-enabled nil
+       lsp-pylsp-plugins-jedi-references-enabled t
+       lsp-pylsp-plugins-jedi-signature-help-enabled t
+       lsp-pylsp-plugins-jedi-symbols-enabled t
+       lsp-pylsp-plugins-mccabe-enabled nil
+       lsp-pylsp-plugins-preload-enabled nil
+       lsp-pylsp-plugins-pycodestyle-enabled t
+       lsp-pylsp-plugins-pycodestyle-ignore ["E203"]
+       lsp-pylsp-plugins-pycodestyle-max-line-length 88
+       lsp-pylsp-plugins-pydocstyle-enabled nil
+       lsp-pylsp-plugins-pyflakes-enabled t
+       lsp-pylsp-plugins-pylint-enabled t
+       lsp-pylsp-plugins-rope-completion-enabled nil
+       lsp-pylsp-plugins-yapf-enabled nil
+       ))
+     (with-eval-after-load 'python
         (autoload 'pycoverage-mode "pycoverage" "python coverage mode" t)
 
         ;; (setq python-fill-docstring-style 'symmetric
@@ -3658,7 +3672,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                 (string= lang "dot")
                 (string= lang "gnuplot")
                 (string= lang "plantuml")
-                ;; (string= lang "yang")
+                (string= lang "yang")
                 )))
      ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
 
@@ -3842,6 +3856,29 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      ;; not defined
      ;; (org-crypt-use-before-save-magic)
 
+     (debug-init-message "debug-init org-babel-do-load-languges setup")
+     ;; (org-babel-do-load-languages
+     (setq org-babel-load-languages
+           '((emacs-lisp . t)
+             (C . t)
+             (calc . t)
+             (dot . t)
+             (gnuplot . t)
+             (ditaa . t)
+             (latex . t)
+             (pic . t)
+             (plantuml . t)
+             (python . t)
+             (shell . t)
+             (yang . t)
+             ;; (sh . t)
+             )
+           )
+     ;;  (dot2tex . t))
+
+
+
+
      ;; In mail map todo to mail-todo
      ;; org-capture-templates-contexts '(("t" "m" ((in-mode . "mu4e-headers-mode")))
      ;;                                  ("t" "m" ((in-mode . "mu4e-view-mode"))))
@@ -3922,25 +3959,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
      ;; spacemacs default
      ;; Its value is ((shell . t) (python . t) (dot . t) (emacs-lisp . t))
      ;; Original value was ((emacs-lisp . t))
-
-     (debug-init-message "debug-init org-babel-do-load-languges setup")
-     ;; (org-babel-do-load-languages
-     (setq org-babel-load-languages
-      '((emacs-lisp . t)
-        (C . t)
-        (calc . t)
-        (dot . t)
-        (gnuplot . t)
-        (ditaa . t)
-        (latex . t)
-        (pic . t)
-        (plantuml . t)
-        (python . t)
-        (shell . t)
-        ;; (sh . t)
-        )
-      )
-     ;;  (dot2tex . t))
 
 
      ;; (eval-after-load "org"
