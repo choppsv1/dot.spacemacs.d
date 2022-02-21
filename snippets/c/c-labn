@@ -4,7 +4,7 @@
 # contributor: Christian E. Hopps <chopps@gmail.com>
 # --
 /*
-* Copyright `(format-time-string "%Y" (current-time))`, ${LabN Consulting, L.L.C.}
+* Copyright (c) `(format-time-string "%Y" (current-time))`, ${LabN Consulting, L.L.C.}
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
