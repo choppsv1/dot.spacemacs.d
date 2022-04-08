@@ -856,8 +856,12 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   (defun enable-CSI-u ()
   ;; Take advantage of iterm2's CSI u support (https://gitlab.com/gnachman/iterm2/-/issues/8382).
-  (message "XXX FOobar")
+
   (xterm--init-modify-other-keys)
+
+  ;; Do not pop an annoying window up constantly to tell us about async
+  ;; compilation warnings
+  (setq native-comp-async-report-warnings-errors 'silent)
 
   ;; Courtesy https://emacs.stackexchange.com/a/13957, modified per
   ;; https://gitlab.com/gnachman/iterm2/-/issues/8382#note_365264207
