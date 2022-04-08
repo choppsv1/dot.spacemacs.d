@@ -1,3 +1,10 @@
+;;
+;; April 2 2022, Christian Hopps <chopps@gmail.com>
+;;
+;; Copyright (c) 2022 by Christian E. Hopps
+;; All rights reserved.
+;;
+
 ;; -*- mode: emacs-lisp; lexical-binding: t -*-
 ;; This file is loaded by Spacemacs at startup.
 ;; It must be stored in your home directory.
@@ -49,7 +56,6 @@ This function should only modify configuration layer settings."
 
    dev-lite-layers
    '(
-     syntax-checking
      ;; (syntax-checking :variables syntax-checking-enable-tooltips t)
      (c-c++ :variables
             c-c++-backend 'lsp-ccls
@@ -58,12 +64,11 @@ This function should only modify configuration layer settings."
             c-c++-enable-clang-format-on-save nil
             c-c++-lsp-enable-semantic-highlight nil
             )
-
+     (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
+     gtags
      ;; lsp-diagnostics-provider :none
      (lsp :variables
           lsp-lens-enable nil)
-     gtags
-
      (python :variables python-backend 'lsp
              python-lsp-server 'pylsp
              python-formatter 'black
@@ -75,8 +80,14 @@ This function should only modify configuration layer settings."
              python-test-runner '(pytest nose)
              pytest-global-name "python -m pytest --doctest-modules"
              python-sort-imports-on-save nil
-             python-enable-yapf-format-on-save nil
-     )
+             python-enable-yapf-format-on-save nil)
+     syntax-checking
+     (version-control :variables
+                      version-control-diff-tool 'git-gutter+
+                      ;; version-control-diff-tool 'git-gutter
+                      ;; version-control-diff-tool 'diff-hl
+                      version-control-diff-side 'right
+                      version-control-global-margin t)
      (yang :variables
            yang-pyang-rules "lint"
            yang-pyang-extra-args "--max-line-length=79")
@@ -134,7 +145,7 @@ This function should only modify configuration layer settings."
       (mu4e :variables
             ;; mu4e-enable-async-operations t
             mu4e-enable-notifications t
-            mu4e-enable-mode-line nil
+            ;; mu4e-enable-mode-line nil
             mu4e-use-maildirs-extension nil)
      ;; (org2blog :variables org2blog-name "hoppsjots.org")
      (osx :variables
@@ -3883,7 +3894,9 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
              (plantuml . t)
              (python . t)
              (shell . t)
+             ;; Why did this used to work??
              ;; (yang . t)
+
              ;; (sh . t)
              )
            )
@@ -4366,13 +4379,13 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                       '("\\.sh\'" . "# Home shell comment skeleton")
                       '("Short description: "
                         "#!/bin/bash" \n
-                        > "#" \n
-                        > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
-                        > "#" \n
-                        > "# Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
-                        > "# All rights reserved." \n
-                        > "#" \n
-                        > _ ))
+                        "#" \n
+                        "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
+                        "#" \n
+                        "# Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
+                        "#" \n
+                        "" \n
+                        _ ))
                     (define-auto-insert
                       '("\\.\\(pl\\|tcl\\)" . "# Home comment skeleton")
                       '("Short description: "
@@ -4415,83 +4428,83 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                         > _ ))
 
 
-                    ;;-----------+
-                    ;;      Work
-                    ;;-----------+
-                    (setq labn-copyright-name "LabN Consulting, L.L.C")
+                    ;; ;;-----------+
+                    ;; ;;      Work
+                    ;; ;;-----------+
+                    ;; (setq labn-copyright-name "LabN Consulting, L.L.C.")
 
+                    ;; ;; (define-auto-insert
+                    ;; ;;   (cons (concat work-ai-prefix "\\.org\\'") "Work org mode skeleton")
+                    ;; ;;   '("Short description: "
+                    ;; ;;     "#+TITLE: " _ \n
+                    ;; ;;     > "#+AUTHOR: Christian E. Hopps" \n
+                    ;; ;;     > "#+EMAIL: chopps@gmail.com" \n
+                    ;; ;;     > "#+STARTUP: indent" \n
+                    ;; ;;     > "" \n
+                    ;; ;;     ))
                     ;; (define-auto-insert
-                    ;;   (cons (concat work-ai-prefix "\\.org\\'") "Work org mode skeleton")
+                    ;;   (cons (concat work-ai-prefix "\\.el\\'") "Work Lisp comment skeleton")
                     ;;   '("Short description: "
-                    ;;     "#+TITLE: " _ \n
-                    ;;     > "#+AUTHOR: Christian E. Hopps" \n
-                    ;;     > "#+EMAIL: chopps@gmail.com" \n
-                    ;;     > "#+STARTUP: indent" \n
-                    ;;     > "" \n
+                    ;;     ";;" \n
+                    ;;     > ";; " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
+                    ;;     > ";;" \n
+                    ;;     > ";; Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                    ;;     > ";; All rights reserved." \n
+                    ;;     > ";;" \n
+                    ;;     > _
                     ;;     ))
-                    (define-auto-insert
-                      (cons (concat work-ai-prefix "\\.el\\'") "Work Lisp comment skeleton")
-                      '("Short description: "
-                        ";;" \n
-                        > ";; " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
-                        > ";;" \n
-                        > ";; Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
-                        > ";; All rights reserved." \n
-                        > ";;" \n
-                        > _
-                        ))
-                    (define-auto-insert
-                      (cons (concat work-ai-prefix "\\.py\\'") "# Work python comment skeleton")
-                      '("Short description: "
-                        "# -*- coding: utf-8 eval: (blacken-mode 1) -*-" \n
-                        > "#" \n
-                        > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
-                        > "#" \n
-                        > "# Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
-                        > "#" \n
-                        > _ \n
-                        ))
-                    (define-auto-insert
-                      (cons (concat work-ai-prefix "\\.sh\\'") "# Work comment skeleton")
-                      '("Short description: "
-                        "#!/bin/bash" \n
-                        > "#" \n
-                        > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
-                        > "#" \n
-                        > "# Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
-                        > "#" \n
-                        > "#" \n
-                        > _ ))
-                    (define-auto-insert
-                      (cons (concat work-ai-prefix "\\.\\(pl\\|tcl\\)\\'") "# Work comment skeleton")
-                      '("Short description: "
-                        "#" \n
-                        > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
-                        > "#" \n
-                        > "# Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
-                        > "#" \n
-                        > "#" \n
-                        > _ ))
-                    (define-auto-insert
-                      (cons (concat work-ai-prefix "\\.rst\\'") "Work ReST skeleton")
-                      '("Short description: "
-                        ".." \n
-                        > ".. " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
-                        > ".." \n
-                        > ".. Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
-                        > ".." \n
-                        > ".." \n
-                        > _ ))
-                    (define-auto-insert
-                      (cons (concat work-ai-prefix "\\.\\(h\\|c\\|CC?\\|cc\\|cxx\\|cpp\\|c++\\|m\\)\\'") "Work C-style skeleton")
-                      '("Short description: "
-                        "/*" \n
-                        > "* " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
-                        > "*" \n
-                        > "* Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
-                        > "*" \n
-                        > "*/" \n
-                        > _ ))
+                    ;; (define-auto-insert
+                    ;;   (cons (concat work-ai-prefix "\\.py\\'") "# Work python comment skeleton")
+                    ;;   '("Short description: "
+                    ;;     "# -*- coding: utf-8 eval: (blacken-mode 1) -*-" \n
+                    ;;     > "#" \n
+                    ;;     > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
+                    ;;     > "#" \n
+                    ;;     > "# Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                    ;;     > "#" \n
+                    ;;     > _ \n
+                    ;;     ))
+                    ;; (define-auto-insert
+                    ;;   (cons (concat work-ai-prefix "\\.sh\\'") "# Work comment skeleton")
+                    ;;   '("Short description: "
+                    ;;     "#!/bin/bash" \n
+                    ;;     > "#" \n
+                    ;;     > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
+                    ;;     > "#" \n
+                    ;;     > "# Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                    ;;     > "#" \n
+                    ;;     > "#" \n
+                    ;;     > _ ))
+                    ;; (define-auto-insert
+                    ;;   (cons (concat work-ai-prefix "\\.\\(pl\\|tcl\\)\\'") "# Work comment skeleton")
+                    ;;   '("Short description: "
+                    ;;     "#" \n
+                    ;;     > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
+                    ;;     > "#" \n
+                    ;;     > "# Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                    ;;     > "#" \n
+                    ;;     > "#" \n
+                    ;;     > _ ))
+                    ;; (define-auto-insert
+                    ;;   (cons (concat work-ai-prefix "\\.rst\\'") "Work ReST skeleton")
+                    ;;   '("Short description: "
+                    ;;     ".." \n
+                    ;;     > ".. " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
+                    ;;     > ".." \n
+                    ;;     > ".. Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                    ;;     > ".." \n
+                    ;;     > ".." \n
+                    ;;     > _ ))
+                    ;; (define-auto-insert
+                    ;;   (cons (concat work-ai-prefix "\\.\\(h\\|c\\|CC?\\|cc\\|cxx\\|cpp\\|c++\\|m\\)\\'") "Work C-style skeleton")
+                    ;;   '("Short description: "
+                    ;;     "/*" \n
+                    ;;     > "* " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
+                    ;;     > "*" \n
+                    ;;     > "* Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                    ;;     > "*" \n
+                    ;;     > "*/" \n
+                    ;;     > _ ))
                     ))
 
     ;; (if inhibit-startup-screen
