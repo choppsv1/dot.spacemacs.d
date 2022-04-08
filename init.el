@@ -102,7 +102,7 @@ This function should only modify configuration layer settings."
      git
      rebox
      theming
-     ;; themes-megapack
+     themes-megapack
 
      ;; Languages
      emacs-lisp
@@ -111,7 +111,7 @@ This function should only modify configuration layer settings."
      csv
      markdown
      (org :variables
-          org-clock-idle-time 15
+          org-clock-idle-time 5
           org-enable-rfc-support t)
      shell-scripts
      yaml
@@ -134,6 +134,7 @@ This function should only modify configuration layer settings."
       (mu4e :variables
             ;; mu4e-enable-async-operations t
             mu4e-enable-notifications t
+            mu4e-enable-mode-line nil
             mu4e-use-maildirs-extension nil)
      ;; (org2blog :variables org2blog-name "hoppsjots.org")
      (osx :variables
@@ -154,7 +155,7 @@ This function should only modify configuration layer settings."
    dev-layers
    '(
      ;; ditaa
-     github
+     ;; github
      gtags
      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
      ;; pandoc
@@ -322,7 +323,7 @@ This function should only modify configuration layer settings."
      helm-gtags
      irfc
      ;; mu4e-maildirs-extension
-     ;; mu4e-alert
+     mu4e-alert
      nameless
      powerline
      ;; recentf
@@ -1320,25 +1321,28 @@ layers configuration. You are free to put any user code."
   ;; gruvbox-light-hard
   ;; molokai
   ;; leuven
-  (cond
-   ((string-equal system-type "darwin") ; Mac OS X
-    (spacemacs/load-theme 'sanityinc-tomorrow-blue))
-   ((or (string-prefix-p "dlk" (system-name))
-        (string-prefix-p "flk" (system-name))
-        (string-prefix-p "ubb" (system-name))
-        (string-prefix-p "uff" (system-name))
-        )
-    (spacemacs/load-theme 'mandm))
-   ((or (string-prefix-p "cmf-" (system-name))
-        (string-prefix-p "labnh" (system-name))
-        (string-prefix-p "rlk" (system-name))
-        (string-prefix-p "builder" (system-name))
-        (string-prefix-p "hp13" (system-name))
-        )
-    (spacemacs/load-theme 'afternoon))
-   ((string-equal system-type "gnu/linux")
-    (spacemacs/load-theme 'sanityinc-tomorrow-blue))
-   (t (spacemacs/load-theme 'sanityinc-tomorrow-blue)))
+
+;; Put this back
+  ;; (cond
+  ;;  ((string-equal system-type "darwin") ; Mac OS X
+  ;;   (spacemacs/load-theme 'spacemacs-dark))
+  ;;  ((or (string-prefix-p "dlk" (system-name))
+  ;;       (string-prefix-p "flk" (system-name))
+  ;;       (string-prefix-p "ubb" (system-name))
+  ;;       (string-prefix-p "uff" (system-name))
+  ;;       )
+  ;;   (spacemacs/load-theme 'mandm)
+  ;;   )
+  ;;  ((or (string-prefix-p "cmf-" (system-name))
+  ;;       (string-prefix-p "labnh" (system-name))
+  ;;       (string-prefix-p "rlk" (system-name))
+  ;;       (string-prefix-p "builder" (system-name))
+  ;;       (string-prefix-p "hp13" (system-name))
+  ;;       )
+  ;;   (spacemacs/load-theme 'afternoon))
+  ;;  ((string-equal system-type "gnu/linux")
+  ;;   (spacemacs/load-theme 'sanityinc-tomorrow-blue))
+  ;;  (t (spacemacs/load-theme 'sanityinc-tomorrow-blue)))
 
   ;; XXX is this going to make everything fail?
   (defun et/semantic-remove-hooks ()
@@ -1555,7 +1559,7 @@ layers configuration. You are free to put any user code."
                        :priority 89)
                       (minor-modes :when active
                                    :priority 9)
-                      (mu4e-alert-segment :when active)
+                      ;; (mu4e-alert-segment :when active)
                       (erc-track :when active)
                       (version-control :when active
                                        :priority 78)
@@ -1717,7 +1721,7 @@ layers configuration. You are free to put any user code."
     (when (fboundp 'mac-notification-os-send)
       (require 'mac-notifications))
 
-      ;; (defvar mac-notification-action-hash (make-hash-table :test 'equal)
+    ;; (defvar mac-notification-action-hash (make-hash-table :test 'equal)
       ;;   "A hash table for looking up category names by action list")
       ;; (puthash nil "Generic" mac-notification-action-hash)
 
@@ -2022,15 +2026,12 @@ layers configuration. You are free to put any user code."
     ;; ======
 
     (when (configuration-layer/package-usedp 'helm)
-
       (require 'helm-net)
-
       (push '("Stack Snippet" . (lambda (candidate)
                                   (helm-search-suggest-perform-additional-action
                                    "http://www.stacksnippet.com/#gsc.tab=0&gsc.q=%s"
                                    candidate)))
             helm-google-suggest-actions)
-
       (defun my-helm-google-suggest ()
         (interactive)
         ;; set debug-on-error to swallow potential network errors
@@ -3670,7 +3671,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                 (string= lang "dot")
                 (string= lang "gnuplot")
                 (string= lang "plantuml")
-                (string= lang "yang")
+                ;; (string= lang "yang")
                 )))
      ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
 
@@ -3767,17 +3768,31 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
         ;; ("s" "Status" entry (file+weektree ,(concat org-directory "/status.org"))
         ;;  "* NOTE %?\n%u\n")
 
-        ("y" "Advil dose 200mg" entry (file+olp+datetree ,(concat org-directory "/advil.org") "Advil")
-         "* NOTE 200mg\nCreated: %U\nPain Level: 1-2" :immediate-finish t)
-
-        ("x" "Tramadol")
-        ("x1" "Tramdose 100mg" entry (file+olp+datetree ,(concat org-directory "/tramadol.org"))
-         "* NOTE 100mg\nCreated: %U\nPain Level: 3-4" :immediate-finish t)
-
-        ("x/" "Tramdose 75mg" entry (file+olp+datetree ,(concat org-directory "/tramadol.org"))
-         "* NOTE 75mg\nCreated: %U\nPain Level: 3-4" :immediate-finish t)
-        ("x." "Tramdose 50mg" entry (file+olp+datetree ,(concat org-directory "/tramadol.org"))
-         "* NOTE 50mg\nCreated: %U\nPain Level: 3-4" :immediate-finish t)
+        ("x" "Food/Medication")
+        ("xa" "Augmentin 875-125" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+         "* NOTE 875-125 amox/clav\nCreated: %U" :immediate-finish t)
+        ("xc" "Creon 36K" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+         "* NOTE 36000 creon\nCreated: %U" :immediate-finish t)
+        ("xC" "Compazine 5mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+         "* NOTE 5mg Compazine\nCreated: %U" :immediate-finish t)
+        ("xn" "Nortriptyline 50mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+         "* NOTE 50mg Nortriptyline 2x25\nCreated: %U" :immediate-finish t)
+        ("xf" "Food" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+         "* NOTE Food\nCreated: %U\nFood:%^{food}" :immediate-finish t)
+        ("xp" "Prilosec 20mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+         "* NOTE 20mg Prilosec\nCreated: %U" :immediate-finish t)
+        ("xt" "Tylenol dose 1g" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+         "* NOTE 1g Tylenol\nCreated: %U" :immediate-finish t)
+        ("x1" "Tramadol 100mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+         "* NOTE 100mg 2x50 Tramadol\nCreated: %U" :immediate-finish t)
+        ("x/" "Tramadol 75mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+         "* NOTE 75mg 1.5x50 Tramadol\nCreated: %U" :immediate-finish t)
+        ("x." "Tramadol 50mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+         "* NOTE 50mg Tramadol\nCreated: %U" :immediate-finish t)
+        ("xv" "Vitamin A and D" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+         "* NOTE 2000-vD/10000-vA\nCreated: %U" :immediate-finish t)
+        ("xx" "Xifaxan 550mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+         "* NOTE 50mg xifaxan\nCreated: %U" :immediate-finish t)
 
         ("g" "Google Calendars")
         ("gh" "Todo" entry (file ,(concat org-directory "/calendar/goog-home.org"))
@@ -3868,7 +3883,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
              (plantuml . t)
              (python . t)
              (shell . t)
-             (yang . t)
+             ;; (yang . t)
              ;; (sh . t)
              )
            )
