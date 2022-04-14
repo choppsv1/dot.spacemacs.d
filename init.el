@@ -3656,7 +3656,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
          (warn "Clock not started (Could not find heading '%s' in '%s')" heading labn-365-dir)))
      (defun clock-in-tfs () "Clock-IN TFS" (interactive) (my/start-heading-clock "TFS DO7.002"))
      (defun clock-in-caas () "Clock-IN CAS" (interactive) (my/start-heading-clock "CAAS DO9.002"))
-     (defun clock-out-save () "Clock-Out Save" (interactive) (my/stop-clock-save-file-with-heading "TFS D07"))
+     (defun clock-out-save () "Clock-Out Save" (interactive) (my/stop-clock-save-file-with-heading "TFS DO7.002"))
      (spacemacs/set-leader-keys "oic" 'clock-in-caas)
      (spacemacs/set-leader-keys "oim" 'clock-in-tfs)
      (spacemacs/set-leader-keys "oit" 'clock-in-tfs)
