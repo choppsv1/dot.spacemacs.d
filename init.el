@@ -122,7 +122,7 @@ This function should only modify configuration layer settings."
      csv
      markdown
      (org :variables
-          org-clock-idle-time 5
+          org-clock-idle-time 15
           org-enable-rfc-support t)
      shell-scripts
      yaml
@@ -1605,7 +1605,7 @@ layers configuration. You are free to put any user code."
 
                   (spaceline-toggle-minor-modes-off)
                   (spaceline-toggle-point-position-off)
-                  (spaceline-toggle-buffer-encoding-off)
+                  (spaceline-toggle-buffer-encoding-on)
                   (spaceline-toggle-buffer-encoding-abbrev-off)
 
                   (setq spaceline-window-numbers-unicode nil
@@ -4511,7 +4511,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     ;;     (quit-window))
 
     ;; (setq powerline-default-separator 'wave)
-    (setq powerline-default-separator 'utf-8)
+    ;; (setq powerline-default-separator 'utf-8)
 
     ;; (defun split-window-sensibly-prefer-horizontal (&optional window)
     ;;   "Same as `split-window-sensibly' except prefer to split horizontally first."
