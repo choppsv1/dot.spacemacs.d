@@ -1442,7 +1442,7 @@ layers configuration. You are free to put any user code."
     ;; (setq ispell-program-name "hunspell")
 
     (setq-default magit-todos-ignored-keywords '("NOTE" "DONE" "FAIL"))
-    (setq-default transient-default-level 6)
+    (setq-default transient-default-level 7)
     (setq-default evil-escape-key-sequence nil)
 
     ;; take out
