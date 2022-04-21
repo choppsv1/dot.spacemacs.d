@@ -166,6 +166,7 @@ This function should only modify configuration layer settings."
    dev-layers
    '(
      ;; ditaa
+     debug
      ;; github
      gtags
      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
@@ -873,7 +874,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   ;; Do not pop an annoying window up constantly to tell us about async
   ;; compilation warnings
-  (setq native-comp-async-report-warnings-errors 'silent)
+  (setq-default native-comp-async-report-warnings-errors 'silent)
 
   ;; Courtesy https://emacs.stackexchange.com/a/13957, modified per
   ;; https://gitlab.com/gnachman/iterm2/-/issues/8382#note_365264207
@@ -937,6 +938,8 @@ Return an event vector."
   ;; ---------
   ;; User-init
   ;; ---------
+  (setq-default gdb-default-window-configuration-file "gdb-window-config")
+  (setq-default gdb-window-configuration-directory "~/.spacemacs.d/")
 
   (cond ((string-equal system-type "darwin")
            (setq epg-gpg-program "/usr/local/MacGPG2/bin/gpg2")))
@@ -2991,15 +2994,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
               (ignore-errors (delete-file temp-file))
               (ignore-errors (delete-file head-temp-file)))))
 
-        (defun vpp-format-buffer (&optional force-clang)
-          (if (and (eq major-mode 'c++-mode)
-                   (boundp 'clang-format-buffer))
-              (clang-format-vc-diff)
-            (if force-clang
-                (clang-format-vc-diff)
-              (vpp-indent-format-buffer))))
-        ;;(clang-format-buffer)))
-
         (defun vpp-clang-diff-format-buffer-old ()
           "Reformat the buffer using 'clang-format-diff.py'"
           ;; Get HEAD revision of file
@@ -3072,18 +3066,27 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
               (vpp-indent-format-buffer))))
             ;;(clang-format-buffer)))
 
+        (setq-default clang-maybe-format-buffer-enabled t)
+
+        (spacemacs|add-toggle format-buffer
+          :status clang-maybe-format-buffer-enabled
+          :on (setq clang-maybe-format-buffer-enabled t)
+          :off (setq clang-maybe-format-buffer-enabled nil)
+          :documentation "Toggle maybe formatting changes in buffer on save"
+          :evil-leader "T\C-f")
+
         (defun clang-maybe-format-buffer ()
           "Reformat buffer if contains VPP magic or has project root level .clang-format config"
-          (when (save-excursion
-                  (goto-char (point-min)))
-            (re-search-forward "coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t)
-            (cond
-             ((string= "CLANG" (match-string 1)) (vpp-format-buffer t) t)
-             ;; ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
-             ((string= "INDENT" (match-string 1)) (vpp-format-buffer) t)
-             ;; We need to avoid doing this for files with changes in DEFUN/DEFPY
-             ((f-exists? (concat (projectile-project-root) ".clang-format")) (message "found .clang-format") (clang-format-vc-diff) t)
-             )))
+          (when (and clang-maybe-format-buffer-enabled
+                     (save-excursion
+                       (goto-char (point-min))
+                     (re-search-forward "coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t)
+                     (cond
+                      ((string= "CLANG" (match-string 1)) (vpp-format-buffer t) t)
+                      ;; ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
+                      ((string= "INDENT" (match-string 1)) (vpp-format-buffer) t)
+                      ;; We need to avoid doing this for files with changes in DEFUN/DEFPY
+                      ((f-exists? (concat (projectile-project-root) ".clang-format")) (message "found .clang-format") (clang-format-vc-diff) t))))))
 
         (defun clang-maybe-format-buffer-on-save ()
           (add-hook 'before-save-hook 'clang-maybe-format-buffer 90 t))
@@ -3301,6 +3304,48 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                                (cpp-macro             . -1000)
                                ))))
         ))
+
+    (with-eval-after-load 'gdb-mi
+      ;; gdb-default-window-configuration-file
+      ;; (defun gdb-setup-windows ()
+      ;;   "Lay out the window pattern for option `gdb-many-windows'."
+      ;;   (if gdb-default-window-configuration-file
+      ;;       (gdb-load-window-configuration
+      ;;        (if (file-name-absolute-p gdb-default-window-configuration-file)
+      ;;            gdb-default-window-configuration-file
+      ;;          (expand-file-name gdb-default-window-configuration-file
+      ;;                            gdb-window-configuration-directory)))
+      ;;     ;; Create default layout as before.
+      ;;     ;; Make sure that local values are updated before locals.
+      ;;     (gdb-get-buffer-create 'gdb-locals-values-buffer)
+      ;;     (gdb-get-buffer-create 'gdb-locals-buffer)
+      ;;     (gdb-get-buffer-create 'gdb-stack-buffer)
+      ;;     (gdb-get-buffer-create 'gdb-breakpoints-buffer)
+      ;;     (set-window-dedicated-p (selected-window) nil)
+      ;;     (switch-to-buffer gud-comint-buffer)
+      ;;     (delete-other-windows)
+      ;;     (let ((win0 (selected-window))
+      ;;           (win1 (split-window nil ( / ( * (window-height) 3) 4)))
+      ;;           (win2 (split-window nil ( / (window-height) 3)))
+      ;;           (win3 (split-window-right)))
+      ;;       (gdb-set-window-buffer (gdb-locals-buffer-name) nil win3)
+      ;;       (select-window win2)
+      ;;       (set-window-buffer win2 (or (gdb-get-source-buffer)
+      ;;                                   (list-buffers-noselect)))
+      ;;       (setq gdb-source-window-list (list (selected-window)))
+      ;;       (let ((win4 (split-window-right)))
+      ;;         (gdb-set-window-buffer
+      ;;          (gdb-get-buffer-create 'gdb-inferior-io) nil win4))
+      ;;       (select-window win1)
+      ;;       (gdb-set-window-buffer (gdb-stack-buffer-name))
+      ;;       (let ((win5 (split-window-right)))
+      ;;         (gdb-set-window-buffer (if gdb-show-threads-by-default
+      ;;                                    (gdb-threads-buffer-name)
+      ;;                                  (gdb-breakpoints-buffer-name))
+      ;;                                nil win5))
+      ;;       (select-window win0))))
+      )
+
 
     (when-layer-used 'restructuredtext
       (with-eval-after-load 'rst
