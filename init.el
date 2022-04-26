@@ -3344,6 +3344,13 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
       ;;                                  (gdb-breakpoints-buffer-name))
       ;;                                nil win5))
       ;;       (select-window win0))))
+
+      ;; (add-hook gdb-mode-hook)
+      ;; (add-hook gdb-locals-mode-{map,hook})
+      ;; (add-hook gdb-registers-mode-{map,hook})
+      ;; (add-hook gdb-threads-mode-{map,hook})
+      ;; (add-hook gdb-breakpoints-mode-{map,hook})
+      ;; (add-hook gdb-frames-mode-{map,hook})
       )
 
 
@@ -3388,7 +3395,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
       'lsp
       (setq-default
        lsp-pylsp-plugins-autopep8-enabled nil
-       lsp-pylsp-plugins-flake8-enabled nil
+       lsp-pylsp-plugins-flake8-enabled t
        lsp-pylsp-plugins-flake8-ignore ["E203"]
        lsp-pylsp-plugins-flake8-max-line-length 88
        lsp-pylsp-plugins-jedi-completion-enabled t
@@ -3403,7 +3410,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
        lsp-pylsp-plugins-pycodestyle-ignore ["E203"]
        lsp-pylsp-plugins-pycodestyle-max-line-length 88
        lsp-pylsp-plugins-pydocstyle-enabled nil
-       lsp-pylsp-plugins-pyflakes-enabled t
+       lsp-pylsp-plugins-pyflakes-enabled nil
        lsp-pylsp-plugins-pylint-enabled t
        lsp-pylsp-plugins-rope-completion-enabled nil
        lsp-pylsp-plugins-yapf-enabled nil
