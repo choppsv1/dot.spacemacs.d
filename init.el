@@ -3703,6 +3703,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
            (save-current-buffer
              (save-excursion
                (set-buffer (marker-buffer marker))
+               (org-clock-out)
                (save-buffer)
                ))
          (warn "Clock not started (Could not find heading '%s' in '%s')" heading labn-365-dir)))
