@@ -42,6 +42,8 @@ This function should only modify configuration layer settings."
      git
      theming
 
+     neotree
+
      ;; Languages
      emacs-lisp
 
@@ -114,6 +116,8 @@ This function should only modify configuration layer settings."
      rebox
      theming
      themes-megapack
+
+     neotree
 
      ;; Languages
      emacs-lisp
