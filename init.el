@@ -167,7 +167,6 @@ This function should only modify configuration layer settings."
    '(
      ;; ditaa
      debug
-     ;; github
      gtags
      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
      ;; pandoc
@@ -304,8 +303,6 @@ This function should only modify configuration layer settings."
      exec-path-from-shell
      ;; This is very cool but too expensive for large projects
      ;; magit-todos
-     ;; XXX problems?
-     ;; github-review
      magit-delta
      olivetti
      monky
@@ -414,6 +411,10 @@ It should only modify the values of Spacemacs settings."
    ;; If non-nil then enable support for the portable dumper. You'll need
    ;; to compile Emacs 27 from source following the instructions in file
    ;; EXPERIMENTAL.org at to root of the git repository.
+   ;;
+   ;; WARNING: pdumper does not work with Native Compilation, so it's disabled
+   ;; regardless of the following setting when native compilation is in effect.
+   ;;
    ;; (default nil)
    dotspacemacs-enable-emacs-pdumper nil
 
@@ -519,6 +520,11 @@ It should only modify the values of Spacemacs settings."
 
    ;; The minimum delay in seconds between number key presses. (default 0.4)
    dotspacemacs-startup-buffer-multi-digit-delay 0.4
+
+   ;; If non-nil, show file icons for entries and headings on Spacemacs home buffer.
+   ;; This has no effect in terminal or if "all-the-icons" package or the font
+   ;; is not installed. (default nil)
+   dotspacemacs-startup-buffer-show-icons nil
 
    ;; Default major mode for a new empty buffer. Possible values are mode
    ;; names such as `text-mode'; and `nil' to use Fundamental mode.
@@ -852,7 +858,8 @@ This function defines the environment variables for your Emacs session. By
 default it calls `spacemacs/load-spacemacs-env' which loads the environment
 variables declared in `~/.spacemacs.env' or `~/.spacemacs.d/.spacemacs.env'.
 See the header of this file for more information."
-  (spacemacs/load-spacemacs-env))
+  (spacemacs/load-spacemacs-env)
+)
 
 (defun dotspacemacs/user-init ()
   "Initialization function for user code.
@@ -2110,8 +2117,8 @@ layers configuration. You are free to put any user code."
             ;; don't keep message buffers around
             message-kill-buffer-on-exit t
             mu4e-compose-complete-addresses t
-            mu4e-compose-complete-only-personal t
-            mu4e-compose-complete-only-after "2019-01-01"
+            ;; mu4e-compose-complete-only-personal t
+            ;; mu4e-compose-complete-only-after "2019-01-01"
             mu4e-compose-context-policy 'ask-if-none
             mu4e-compose-format-flowed t
             ;; This is an interesting value.. it's where soft-newlines will be
@@ -2156,6 +2163,8 @@ layers configuration. You are free to put any user code."
                                "maildir:/chopps.org/ietf-wg-rtg")
 
             mu4e-junk-mailbox '("maildir:/gmail.com/[Gmail]/Spam"
+                                "maildir:/labn.net/Junk Email"
+                                "maildir:/us.labn.net/Junk Email"
                                 "maildir:/chopps.org/spam-probable"
                                 "maildir:/chopps.org/spam-train"
                                 "maildir:/chopps.org/spam")
