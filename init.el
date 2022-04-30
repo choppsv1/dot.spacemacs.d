@@ -32,12 +32,12 @@ This function should only modify configuration layer settings."
      ;; ivy
      helm
      ;; (auto-completion :disabled-for org
-                      ;; :variables
-                      ;; auto-completion-enable-snippets-in-popup t
-                      ;; auto-completion-enable-help-tooltip nil
-                      ;; auto-completion-complete-with-key-sequence nil
-                      ;; auto-completion-private-snippets-directory "~/.spacemacs.d/snippets/"
-                      ;; auto-completion-tab-key-behavior 'complete)
+     ;; :variables
+     ;; auto-completion-enable-snippets-in-popup t
+     ;; auto-completion-enable-help-tooltip nil
+     ;; auto-completion-complete-with-key-sequence nil
+     ;; auto-completion-private-snippets-directory "~/.spacemacs.d/snippets/"
+     ;; auto-completion-tab-key-behavior 'complete)
      better-defaults
      git
      theming
@@ -54,7 +54,7 @@ This function should only modify configuration layer settings."
           org-enable-rfc-support nil)
      shell-scripts
      yaml
-    )
+     )
 
    dev-lite-layers
    '(
@@ -130,7 +130,7 @@ This function should only modify configuration layer settings."
           org-enable-rfc-support t)
      shell-scripts
      yaml
-    )
+     )
    ;; tops-layers
    ;; '(
    ;;   (mu4e :variables
@@ -146,11 +146,11 @@ This function should only modify configuration layer settings."
    osx-layers
    '(
      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
-      (mu4e :variables
-            ;; mu4e-enable-async-operations t
-            mu4e-enable-notifications t
-            ;; mu4e-enable-mode-line nil
-            mu4e-use-maildirs-extension nil)
+     (mu4e :variables
+           ;; mu4e-enable-async-operations t
+           mu4e-enable-notifications t
+           ;; mu4e-enable-mode-line nil
+           mu4e-use-maildirs-extension nil)
      ;; (org2blog :variables org2blog-name "hoppsjots.org")
      (osx :variables
           osx-use-option-as-meta t)
@@ -863,7 +863,7 @@ default it calls `spacemacs/load-spacemacs-env' which loads the environment
 variables declared in `~/.spacemacs.env' or `~/.spacemacs.d/.spacemacs.env'.
 See the header of this file for more information."
   (spacemacs/load-spacemacs-env)
-)
+  )
 
 (defun dotspacemacs/user-init ()
   "Initialization function for user code.
@@ -879,49 +879,49 @@ before packages are loaded. If you are unsure, you should try in setting them in
               (kill-local-variable 'compilation-auto-jump-to-next)))
 
   (defun enable-CSI-u ()
-  ;; Take advantage of iterm2's CSI u support (https://gitlab.com/gnachman/iterm2/-/issues/8382).
+    ;; Take advantage of iterm2's CSI u support (https://gitlab.com/gnachman/iterm2/-/issues/8382).
 
-  (xterm--init-modify-other-keys)
+    (xterm--init-modify-other-keys)
 
-  ;; Do not pop an annoying window up constantly to tell us about async
-  ;; compilation warnings
-  (setq-default native-comp-async-report-warnings-errors 'silent)
+    ;; Do not pop an annoying window up constantly to tell us about async
+    ;; compilation warnings
+    (setq-default native-comp-async-report-warnings-errors 'silent)
 
-  ;; Courtesy https://emacs.stackexchange.com/a/13957, modified per
-  ;; https://gitlab.com/gnachman/iterm2/-/issues/8382#note_365264207
-  (defun character-apply-modifiers (c &rest modifiers)
-    "Apply modifiers to the character C.
+    ;; Courtesy https://emacs.stackexchange.com/a/13957, modified per
+    ;; https://gitlab.com/gnachman/iterm2/-/issues/8382#note_365264207
+    (defun character-apply-modifiers (c &rest modifiers)
+      "Apply modifiers to the character C.
 MODIFIERS must be a list of symbols amongst (meta control shift).
 Return an event vector."
-    (if (memq 'control modifiers) (setq c (if (and (<= ?a c) (<= c ?z))
-                                              (logand c ?\x1f)
-                                            (logior (lsh 1 26) c))))
-    (if (memq 'meta modifiers) (setq c (logior (lsh 1 27) c)))
-    (if (memq 'shift modifiers) (setq c (logior (lsh 1 25) c)))
-    (vector c))
-  (when (and (boundp 'xterm-extra-capabilities) (boundp 'xterm-function-map))
-    (let ((c 32))
-      (while (<= c 126)
-        (mapc (lambda (x)
-                (define-key xterm-function-map (format (car x) c)
-                  (apply 'character-apply-modifiers c (cdr x))))
-              '(;; with ?.VT100.formatOtherKeys: 0
-                ("\e\[27;3;%d~" meta)
-                ("\e\[27;5;%d~" control)
-                ("\e\[27;6;%d~" control shift)
-                ("\e\[27;7;%d~" control meta)
-                ("\e\[27;8;%d~" control meta shift)
-                ;; with ?.VT100.formatOtherKeys: 1
-                ("\e\[%d;3u" meta)
-                ("\e\[%d;5u" control)
-                ("\e\[%d;6u" control shift)
-                ("\e\[%d;7u" control meta)
-                ("\e\[%d;8u" control meta shift)))
-        (setq c (1+ c))))))
+      (if (memq 'control modifiers) (setq c (if (and (<= ?a c) (<= c ?z))
+                                                (logand c ?\x1f)
+                                              (logior (lsh 1 26) c))))
+      (if (memq 'meta modifiers) (setq c (logior (lsh 1 27) c)))
+      (if (memq 'shift modifiers) (setq c (logior (lsh 1 25) c)))
+      (vector c))
+    (when (and (boundp 'xterm-extra-capabilities) (boundp 'xterm-function-map))
+      (let ((c 32))
+        (while (<= c 126)
+          (mapc (lambda (x)
+                  (define-key xterm-function-map (format (car x) c)
+                              (apply 'character-apply-modifiers c (cdr x))))
+                '(;; with ?.VT100.formatOtherKeys: 0
+                  ("\e\[27;3;%d~" meta)
+                  ("\e\[27;5;%d~" control)
+                  ("\e\[27;6;%d~" control shift)
+                  ("\e\[27;7;%d~" control meta)
+                  ("\e\[27;8;%d~" control meta shift)
+                  ;; with ?.VT100.formatOtherKeys: 1
+                  ("\e\[%d;3u" meta)
+                  ("\e\[%d;5u" control)
+                  ("\e\[%d;6u" control shift)
+                  ("\e\[%d;7u" control meta)
+                  ("\e\[%d;8u" control meta shift)))
+          (setq c (1+ c))))))
 
-  ; (unless (display-graphic-p)
-  ;  (add-hook 'after-make-frame-functions 'enable-CSI-u)
-  ;  (enable-CSI-u))
+                                        ; (unless (display-graphic-p)
+                                        ;  (add-hook 'after-make-frame-functions 'enable-CSI-u)
+                                        ;  (enable-CSI-u))
 
   (setq exec-path-from-shell-check-startup-files nil)
   (setq epa-pinentry-mode 'loopback)
@@ -953,7 +953,7 @@ Return an event vector."
   (setq-default gdb-window-configuration-directory "~/.spacemacs.d/")
 
   (cond ((string-equal system-type "darwin")
-           (setq epg-gpg-program "/usr/local/MacGPG2/bin/gpg2")))
+         (setq epg-gpg-program "/usr/local/MacGPG2/bin/gpg2")))
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   ;; (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu-mac/mu4e/")
@@ -1023,10 +1023,10 @@ Return an event vector."
    ;; This really should be a file local variable.
    rebox-style-loop '(71 72 73)
 
-  ;; (with-eval-after-load "evil-evilified-state"
-  ;;   (define-key evil-evilified-state-map-original "H" 'evil-window-top)
-  ;;   (define-key evil-evilified-state-map-original "L" 'evil-window-bottom)
-  ;;   (define-key evil-evilified-state-map-original "M" 'evil-window-middle))
+   ;; (with-eval-after-load "evil-evilified-state"
+   ;;   (define-key evil-evilified-state-map-original "H" 'evil-window-top)
+   ;;   (define-key evil-evilified-state-map-original "L" 'evil-window-bottom)
+   ;;   (define-key evil-evilified-state-map-original "M" 'evil-window-middle))
    projectile-globally-unignored-files '(".gitlab-ci.yml" ".pylintrc" ".travis.yml")
 
    ;; This should be set below automatically from hitting ! when queried.
@@ -1035,7 +1035,7 @@ Return an event vector."
    ;;                              )
    )
 
-1
+  1
   (setq-default debug-mac-notifications nil)
   (setq-default flycheck-standard-error-navigation nil)
   (setq flycheck-standard-error-navigation nil)
@@ -1054,14 +1054,14 @@ Return an event vector."
         `(
           ;; (mandm (default :background "#011827"))
           (cobalt
-            (modeline :background "#111111" :foreground "white")
-            (modeline-inactive :background "#222222" :foreground "white")
-            (spaceline-evil-emacs :foreground "black" :background "SkyBlue2")
-            (spaceline-evil-insert :foreground "black" :background "chartreuse3")
-            (spaceline-evil-motion :foreground "black" :background "plum3")
-            (spaceline-evil-normal :foreground "black" :background "DarkGoldenrod2")
-            (spaceline-evil-replace :foreground "black" :background "chocolate")
-            (spaceline-evil-visual :foreground "black" :background "grey"))
+           (modeline :background "#111111" :foreground "white")
+           (modeline-inactive :background "#222222" :foreground "white")
+           (spaceline-evil-emacs :foreground "black" :background "SkyBlue2")
+           (spaceline-evil-insert :foreground "black" :background "chartreuse3")
+           (spaceline-evil-motion :foreground "black" :background "plum3")
+           (spaceline-evil-normal :foreground "black" :background "DarkGoldenrod2")
+           (spaceline-evil-replace :foreground "black" :background "chocolate")
+           (spaceline-evil-visual :foreground "black" :background "grey"))
           (misterioso (erc-input-face :foreground "cornflowerblue")
                       (font-lock-comment-face :foreground "DarkGrey" :slant italic)
                       (evil-search-highlight-persist-highlight-face :background "#338f86")
@@ -1166,38 +1166,38 @@ Return an event vector."
   (setq window-min-height 10)
 
   (defun split-window-sensibly-prefer-horizontal (&optional window)
-"Based on split-window-sensibly, but designed to prefer a horizontal split,
+    "Based on split-window-sensibly, but designed to prefer a horizontal split,
 i.e. windows tiled side-by-side."
-  (let ((window (or window (selected-window))))
-    (or (and (window-splittable-p window t)
-             ;; Split window horizontally
-             (with-selected-window window
-               (split-window-right)))
-        (and (window-splittable-p window)
-             ;; Split window vertically
-             (with-selected-window window
-               (split-window-below)))
-        (and
-         ;; If WINDOW is the only usable window on its frame (it is
-         ;; the only one or, not being the only one, all the other
-         ;; ones are dedicated) and is not the minibuffer window, try
-         ;; to split it horizontally disregarding the value of
-         ;; `split-height-threshold'.
-         (let ((frame (window-frame window)))
-           (or
-            (eq window (frame-root-window frame))
-            (catch 'done
-              (walk-window-tree (lambda (w)
-                                  (unless (or (eq w window)
-                                              (window-dedicated-p w))
-                                    (throw 'done nil)))
-                                frame)
-              t)))
-     (not (window-minibuffer-p window))
-     (let ((split-width-threshold 0))
-       (when (window-splittable-p window t)
-         (with-selected-window window
-           (split-window-right))))))))
+    (let ((window (or window (selected-window))))
+      (or (and (window-splittable-p window t)
+               ;; Split window horizontally
+               (with-selected-window window
+                 (split-window-right)))
+          (and (window-splittable-p window)
+               ;; Split window vertically
+               (with-selected-window window
+                 (split-window-below)))
+          (and
+           ;; If WINDOW is the only usable window on its frame (it is
+           ;; the only one or, not being the only one, all the other
+           ;; ones are dedicated) and is not the minibuffer window, try
+           ;; to split it horizontally disregarding the value of
+           ;; `split-height-threshold'.
+           (let ((frame (window-frame window)))
+             (or
+              (eq window (frame-root-window frame))
+              (catch 'done
+                (walk-window-tree (lambda (w)
+                                    (unless (or (eq w window)
+                                                (window-dedicated-p w))
+                                      (throw 'done nil)))
+                                  frame)
+                t)))
+           (not (window-minibuffer-p window))
+           (let ((split-width-threshold 0))
+             (when (window-splittable-p window t)
+               (with-selected-window window
+                 (split-window-right))))))))
 
   (defun split-window-really-sensibly (&optional window)
     (let ((window (or window (selected-window))))
@@ -1347,7 +1347,7 @@ layers configuration. You are free to put any user code."
   ;; molokai
   ;; leuven
 
-;; Put this back
+  ;; Put this back
   ;; (cond
   ;;  ((string-equal system-type "darwin") ; Mac OS X
   ;;   (spacemacs/load-theme 'spacemacs-dark))
@@ -1406,13 +1406,13 @@ layers configuration. You are free to put any user code."
     ;; (cond ((not (string-equal system-type "darwin"))
     ;;        (add-hook after-make-frame-functions (lambda () (load-theme 'mandm)))))
 
-  (if (not (daemonp)) (server-start))
-  ; (if (daemonp)
-  ;    (add-hook 'after-make-frame-functions
-  ;            (lambda (frame)
-  ;                        (with-selected-frame frame
-  ;                                          (load-theme 'mandm t))))
-  ;                                              (load-theme 'mandm t))
+    (if (not (daemonp)) (server-start))
+                                        ; (if (daemonp)
+                                        ;    (add-hook 'after-make-frame-functions
+                                        ;            (lambda (frame)
+                                        ;                        (with-selected-frame frame
+                                        ;                                          (load-theme 'mandm t))))
+                                        ;                                              (load-theme 'mandm t))
 
     ;; (if (string= (getenv "HOSTNAME") "tops")
     ;;     (load-theme 'mandm))
@@ -1438,7 +1438,7 @@ layers configuration. You are free to put any user code."
         (dolist (x (cdr e)) (set-default x 4))))
 
     ;; (setq-default lisp-indent-offset nil)
-      ;; (setq emacs-lisp-mode lisp-mode) . lisp-indent-offset)
+    ;; (setq emacs-lisp-mode lisp-mode) . lisp-indent-offset)
     (setq python-indent-offset 4)
     ;; overrides
     (setq-default nxml-child-indent 2)
@@ -1493,7 +1493,7 @@ layers configuration. You are free to put any user code."
       (defadvice browse-url-can-use-xdg-open (after ad-browse-url-can-use-xdg-open activate)
         "Always use xdg-open"
         (setq ad-return-value t)))
-        ;;(setq ad-return-value (executable-find "xdg-open"))))
+    ;;(setq ad-return-value (executable-find "xdg-open"))))
     ;; (ad-activate 'browse-url-can-use-xdg-open)
 
     (setq
@@ -1650,66 +1650,66 @@ layers configuration. You are free to put any user code."
 
     (fold-section "layouts"
 
-      ;; (spacemacs|define-custom-layout "agenda"
-      ;;   :binding "a"
-      ;;   :body
-      ;;   (org-agenda-list))
+                  ;; (spacemacs|define-custom-layout "agenda"
+                  ;;   :binding "a"
+                  ;;   :body
+                  ;;   (org-agenda-list))
 
-      ;; (spacemacs|define-custom-layout "dot"
-      ;;   :binding "d"
-      ;;   :body
-      ;;   (progn
-      ;;     (find-file "~/homeroot/dot.files/dot.profile")
-      ;;     (split-window-right)
-      ;;     (find-file "~/homeroot/dot.files/dot.bashrc")
-      ;;     ))
+                  ;; (spacemacs|define-custom-layout "dot"
+                  ;;   :binding "d"
+                  ;;   :body
+                  ;;   (progn
+                  ;;     (find-file "~/homeroot/dot.files/dot.profile")
+                  ;;     (split-window-right)
+                  ;;     (find-file "~/homeroot/dot.files/dot.bashrc")
+                  ;;     ))
 
-      ;; (spacemacs|define-custom-layout "mail"
-      ;;   :binding "m"
-      ;;   :body
-      ;;   (mu4e))
+                  ;; (spacemacs|define-custom-layout "mail"
+                  ;;   :binding "m"
+                  ;;   :body
+                  ;;   (mu4e))
 
-      (setq persp-add-buffer-on-after-change-major-mode 'free)
+                  (setq persp-add-buffer-on-after-change-major-mode 'free)
 
-      (spacemacs|define-custom-layout "notes"
-        :binding "n"
-        :body
-        (progn
-          (find-file "~/Dropbox/org-mode/work.org")
-          (split-window-right)
-          (find-file "~/Dropbox/org-mode/notes.org")
-          )
-        )
+                  (spacemacs|define-custom-layout "notes"
+                    :binding "n"
+                    :body
+                    (progn
+                      (find-file "~/Dropbox/org-mode/work.org")
+                      (split-window-right)
+                      (find-file "~/Dropbox/org-mode/notes.org")
+                      )
+                    )
 
-      ;; (defun persp-mode-buffer-assoc (buffer layout-name)
-      ;;   (let* ((npersp (or (persp-get-by-name layout-name)
-      ;;                      ;;(and (message "XXX Adding new persp %s" layout-name)
-      ;;                      ;;     (persp-add-new layout-name))))
-      ;;                      (persp-add-new layout-name)))
-      ;;          (cpersp (get-frame-persp)))
-      ;;     ;; (message "XXX persp-mode-buffer-assoc current layout: %s target layout %s target name %s buffer: %s"
-      ;;     ;;  (persp-name cpersp) (persp-name npersp) layout-name buffer)
-      ;;     ;; Add to correct perspective
-      ;;     (if (memq buffer (persp-buffers npersp))
-      ;;         ;; (message "XXX buffer %s already in %s" buffer npersp)
-      ;;         ;; (message "XXX Adding buffer %s to %s" buffer (persp-name npersp))
-      ;;         (persp-add-buffer buffer npersp t))))
-      ;; (spacemacs|define-custom-layout "@ERC"
-      ;;   :binding "i"
-      ;;   :body
-      ;;   (progn
-      ;;     (add-hook 'erc-connect-pre-hook '(lambda (x)
-      ;;                                        (persp-mode-buffer-assoc x "@ERC")))
-      ;;     ;; (launch-irc-jabber)
-      ;;     ;; (launch-irc-netbsd)
-      ;;     ;; (split-window-right)
-      ;;     ;; (launch-irc-freenode)
-      ;;     ;; (split-window-right)
-      ;;     ;; (launch-irc-gitter)
-      ;;     )
-      ;;   )
+                  ;; (defun persp-mode-buffer-assoc (buffer layout-name)
+                  ;;   (let* ((npersp (or (persp-get-by-name layout-name)
+                  ;;                      ;;(and (message "XXX Adding new persp %s" layout-name)
+                  ;;                      ;;     (persp-add-new layout-name))))
+                  ;;                      (persp-add-new layout-name)))
+                  ;;          (cpersp (get-frame-persp)))
+                  ;;     ;; (message "XXX persp-mode-buffer-assoc current layout: %s target layout %s target name %s buffer: %s"
+                  ;;     ;;  (persp-name cpersp) (persp-name npersp) layout-name buffer)
+                  ;;     ;; Add to correct perspective
+                  ;;     (if (memq buffer (persp-buffers npersp))
+                  ;;         ;; (message "XXX buffer %s already in %s" buffer npersp)
+                  ;;         ;; (message "XXX Adding buffer %s to %s" buffer (persp-name npersp))
+                  ;;         (persp-add-buffer buffer npersp t))))
+                  ;; (spacemacs|define-custom-layout "@ERC"
+                  ;;   :binding "i"
+                  ;;   :body
+                  ;;   (progn
+                  ;;     (add-hook 'erc-connect-pre-hook '(lambda (x)
+                  ;;                                        (persp-mode-buffer-assoc x "@ERC")))
+                  ;;     ;; (launch-irc-jabber)
+                  ;;     ;; (launch-irc-netbsd)
+                  ;;     ;; (split-window-right)
+                  ;;     ;; (launch-irc-freenode)
+                  ;;     ;; (split-window-right)
+                  ;;     ;; (launch-irc-gitter)
+                  ;;     )
+                  ;;   )
 
-    )
+                  )
 
     ;; ===========
     ;; Keybindings
@@ -1747,28 +1747,28 @@ layers configuration. You are free to put any user code."
       (require 'mac-notifications))
 
     ;; (defvar mac-notification-action-hash (make-hash-table :test 'equal)
-      ;;   "A hash table for looking up category names by action list")
-      ;; (puthash nil "Generic" mac-notification-action-hash)
+    ;;   "A hash table for looking up category names by action list")
+    ;; (puthash nil "Generic" mac-notification-action-hash)
 
-      ;; (defun mac-notification-get-category (actions)
-      ;;   "Get the category for these actions creating if necessary"
-      ;;   (let ((category (gethash actions mac-notification-action-hash)))
-      ;;     (unless category
-      ;;       ;; Create a new category for this unique action list
-      ;;       (setq category (symbol-name (cl-gensym)))
-      ;;       (mac-notification-add-category category actions)
-      ;;       (puthash actions category mac-notification-action-hash))
-      ;;     category))
+    ;; (defun mac-notification-get-category (actions)
+    ;;   "Get the category for these actions creating if necessary"
+    ;;   (let ((category (gethash actions mac-notification-action-hash)))
+    ;;     (unless category
+    ;;       ;; Create a new category for this unique action list
+    ;;       (setq category (symbol-name (cl-gensym)))
+    ;;       (mac-notification-add-category category actions)
+    ;;       (puthash actions category mac-notification-action-hash))
+    ;;     category))
 
-      ;; ;; Override dbus version
-      ;; (defun notifications-notify (&rest params)
-      ;;   (with-demoted-errors
-      ;;       (let* ((actions (plist-get params :actions))
-      ;;              (category (mac-notification-get-category actions))
-      ;;              (title (plist-get params :title))
-      ;;              (body (plist-get params :body)))
-      ;;         (setq params (plist-put params :category category))
-      ;;         (apply #'mac-notification-send title body params)))))
+    ;; ;; Override dbus version
+    ;; (defun notifications-notify (&rest params)
+    ;;   (with-demoted-errors
+    ;;       (let* ((actions (plist-get params :actions))
+    ;;              (category (mac-notification-get-category actions))
+    ;;              (title (plist-get params :title))
+    ;;              (body (plist-get params :body)))
+    ;;         (setq params (plist-put params :category category))
+    ;;         (apply #'mac-notification-send title body params)))))
 
     ;; ==========
     ;; Messaging
@@ -1781,213 +1781,213 @@ layers configuration. You are free to put any user code."
     ;;   (persp-switch "freenode.net")
     ;;   (erc :server "irc.freenode.net" :port "6667" :nick "chopps"))
 
-;;     (when-layer-used 'erc
-;;      (setq erc-prompt-for-nickserv-password nil
-;;             erc-autojoin-channels-alist '(("irc.gitter.im" "#syl20bnr/spacemacs")
-;;                                           ("192.168.1.6" "#syl20bnr/spacemacs")
-;;                                           ("mollari.netbsd.org" "#NetBSD")
-;;                                           ("freenode.net" "#choppstest")
-;;                                           )
-;;             erc-auto-query 'window
-;;             erc-fill-mode nil
-;;             ;; erc-hl-nicks-minimum-contrast-ratio 3.5
-;;             ;; erc-hl-nicks-color-contrast-strategy 'contrast
-;;             ;; erc-hl-nicks-color-contrast-strategy 'invert
-;;             erc-hl-nicks-skip-nicks '("gitter")
-;;             erc-join-buffer 'bury
+    ;;     (when-layer-used 'erc
+    ;;      (setq erc-prompt-for-nickserv-password nil
+    ;;             erc-autojoin-channels-alist '(("irc.gitter.im" "#syl20bnr/spacemacs")
+    ;;                                           ("192.168.1.6" "#syl20bnr/spacemacs")
+    ;;                                           ("mollari.netbsd.org" "#NetBSD")
+    ;;                                           ("freenode.net" "#choppstest")
+    ;;                                           )
+    ;;             erc-auto-query 'window
+    ;;             erc-fill-mode nil
+    ;;             ;; erc-hl-nicks-minimum-contrast-ratio 3.5
+    ;;             ;; erc-hl-nicks-color-contrast-strategy 'contrast
+    ;;             ;; erc-hl-nicks-color-contrast-strategy 'invert
+    ;;             erc-hl-nicks-skip-nicks '("gitter")
+    ;;             erc-join-buffer 'bury
 
-;;             ;; Logging
-;;             erc-log-channels-directory "~/Dropbox/logs/erclogs"
-;;             ;; erc-log-all-but-server-buffers t
-;;             erc-log-insert-log-on-open nil ;; this inserts after the prompt which is scary as it
-;;             ;; might send
-;;             erc-save-buffer-on-part nil
-;;             erc-save-queries-on-quit nil
-;;             erc-log-write-after-send t
-;;             erc-log-write-after-insert t
+    ;;             ;; Logging
+    ;;             erc-log-channels-directory "~/Dropbox/logs/erclogs"
+    ;;             ;; erc-log-all-but-server-buffers t
+    ;;             erc-log-insert-log-on-open nil ;; this inserts after the prompt which is scary as it
+    ;;             ;; might send
+    ;;             erc-save-buffer-on-part nil
+    ;;             erc-save-queries-on-quit nil
+    ;;             erc-log-write-after-send t
+    ;;             erc-log-write-after-insert t
 
-;;             ;; Notifcations
-;;             erc-notifications-icon (concat user-emacs-directory "./layers/+chat/rcirc/img/irc.png")
-;;             erc-spelling-mode t
+    ;;             ;; Notifcations
+    ;;             erc-notifications-icon (concat user-emacs-directory "./layers/+chat/rcirc/img/irc.png")
+    ;;             erc-spelling-mode t
 
-;;             erc-track-switch-direction 'importance
-;;             )
-;;       ;; We want to be in normal state most of the time so we can flip in and out.
-;;       (evil-set-initial-state 'erc-mode 'normal)
-
-
-;;     ;; https://github.com/syl20bnr/spacemacs/issues/11152
-;;     (setq projectile-keymap-prefix (kbd "C-c C-p"))
-
-;;       ;; Simplify this function so it works
-;;       (with-eval-after-load 'erc-log
-;;         (defun erc-log-all-but-server-buffers (buffer)
-;;           (not (erc-server-buffer-p buffer))))
+    ;;             erc-track-switch-direction 'importance
+    ;;             )
+    ;;       ;; We want to be in normal state most of the time so we can flip in and out.
+    ;;       (evil-set-initial-state 'erc-mode 'normal)
 
 
-;;       ;; Actually we really only want this when we move away from the buffer?
-;;       ;; (add-hook 'erc-send-post-hook 'evil-normal-state)
-;;       ;; (remove-hook 'erc-send-post-hook 'evil-normal-state)
+    ;;     ;; https://github.com/syl20bnr/spacemacs/issues/11152
+    ;;     (setq projectile-keymap-prefix (kbd "C-c C-p"))
+
+    ;;       ;; Simplify this function so it works
+    ;;       (with-eval-after-load 'erc-log
+    ;;         (defun erc-log-all-but-server-buffers (buffer)
+    ;;           (not (erc-server-buffer-p buffer))))
 
 
-;;       ;; '(erc-autoaway-idle-seconds 600)
-;;       ;; '(erc-autojoin-mode t)
-;;       ;; '(erc-button-mode t)
-;;       ;; '(erc-current-nick-highlight-type (quote all))
-;;       ;; '(erc-fill-mode t)
-;;       ;; '(erc-hl-nicks-mode t)
-;;       ;; '(erc-hl-nicks-trim-nick-for-face nil)
-;;       ;; '(erc-irccontrols-mode t)
-;;       ;; '(erc-kill-buffer-on-part t)
-;;       ;; '(erc-kill-queries-on-quit t)
-;;       ;; '(erc-kill-server-buffer-on-quit t)
-;;       ;; '(erc-list-mode t)
-;;       ;; '(erc-log-channels-directory "/Users/chopps/Dropbox/erclogs" t)
-;;       ;; '(erc-log-mode t)
-;;       ;; '(erc-match-mode t)
-;;       ;; '(erc-menu-mode t)
-;;       ;; '(erc-move-to-prompt-mode t)
-;;       ;; '(erc-netsplit-mode t)
-;;       ;; '(erc-networks-mode t)
-;;       ;; '(erc-noncommands-mode t)
-;;       ;; '(erc-pcomplete-mode t)
-;;       ;; '(erc-prompt (lambda nil (concat "[" (buffer-name) "]")))
-;;       ;; '(erc-readonly-mode t)
-;;       ;; '(erc-ring-mode t)
-;;       ;; '(erc-server-coding-system (quote (utf-8 . utf-8)))
-;;       ;; '(erc-services-mode t)
-;;       ;; '(erc-social-graph-dynamic-graph t)
-;;       ;; '(erc-stamp-mode t)
-;;       ;; '(erc-track-minor-mode t)
-;;       ;; '(erc-track-mode t)
-;;       ;; '(erc-youtube-mode t)
+    ;;       ;; Actually we really only want this when we move away from the buffer?
+    ;;       ;; (add-hook 'erc-send-post-hook 'evil-normal-state)
+    ;;       ;; (remove-hook 'erc-send-post-hook 'evil-normal-state)
 
-;;       (defun erc-acct-get-password (user host port)
-;;         (let* ((auth-source-creation-defaults nil)
-;;                (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
-;;                (secret (plist-get (nth 0 (auth-source-search
-;;                                           :type 'netrc
-;;                                           :max 1
-;;                                           :host host
-;;                                           :user user
-;;                                           :port port))
-;;                                   :secret)))
-;;                (if (functionp secret)
-;;                    (funcall secret)
-;;                  secret)))
 
-;;       (with-eval-after-load 'erc
-;;        (setq erc-nickserv-passwords
-;;              `((freenode (("chopps" . ,(erc-acct-get-password "chopps" "freenode.net" "nickserv"))))
-;;                (localhost (("chopps" . ,(erc-acct-get-password "chopps" "localhost" "bitlbee")))))))
+    ;;       ;; '(erc-autoaway-idle-seconds 600)
+    ;;       ;; '(erc-autojoin-mode t)
+    ;;       ;; '(erc-button-mode t)
+    ;;       ;; '(erc-current-nick-highlight-type (quote all))
+    ;;       ;; '(erc-fill-mode t)
+    ;;       ;; '(erc-hl-nicks-mode t)
+    ;;       ;; '(erc-hl-nicks-trim-nick-for-face nil)
+    ;;       ;; '(erc-irccontrols-mode t)
+    ;;       ;; '(erc-kill-buffer-on-part t)
+    ;;       ;; '(erc-kill-queries-on-quit t)
+    ;;       ;; '(erc-kill-server-buffer-on-quit t)
+    ;;       ;; '(erc-list-mode t)
+    ;;       ;; '(erc-log-channels-directory "/Users/chopps/Dropbox/erclogs" t)
+    ;;       ;; '(erc-log-mode t)
+    ;;       ;; '(erc-match-mode t)
+    ;;       ;; '(erc-menu-mode t)
+    ;;       ;; '(erc-move-to-prompt-mode t)
+    ;;       ;; '(erc-netsplit-mode t)
+    ;;       ;; '(erc-networks-mode t)
+    ;;       ;; '(erc-noncommands-mode t)
+    ;;       ;; '(erc-pcomplete-mode t)
+    ;;       ;; '(erc-prompt (lambda nil (concat "[" (buffer-name) "]")))
+    ;;       ;; '(erc-readonly-mode t)
+    ;;       ;; '(erc-ring-mode t)
+    ;;       ;; '(erc-server-coding-system (quote (utf-8 . utf-8)))
+    ;;       ;; '(erc-services-mode t)
+    ;;       ;; '(erc-social-graph-dynamic-graph t)
+    ;;       ;; '(erc-stamp-mode t)
+    ;;       ;; '(erc-track-minor-mode t)
+    ;;       ;; '(erc-track-mode t)
+    ;;       ;; '(erc-youtube-mode t)
 
-;;       (defun launch-irc-gitter ()
-;;         "Launch irc connection to giter.im"
-;;         (interactive)
-;;         (erc :server "localhost" :port 6669 :nick "choppsv1"
-;;             :password (erc-acct-get-password "choppsv1" "192.168.1.6" 6669)))
-;;         ;; (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1"
-;;         ;;         :password (erc-acct-get-password "choppsv1" "irc.gitter.im" 6667)))
+    ;;       (defun erc-acct-get-password (user host port)
+    ;;         (let* ((auth-source-creation-defaults nil)
+    ;;                (auth-source-creation-prompts '((password . "Enter IRC password for %h:%p")))
+    ;;                (secret (plist-get (nth 0 (auth-source-search
+    ;;                                           :type 'netrc
+    ;;                                           :max 1
+    ;;                                           :host host
+    ;;                                           :user user
+    ;;                                           :port port))
+    ;;                                   :secret)))
+    ;;                (if (functionp secret)
+    ;;                    (funcall secret)
+    ;;                  secret)))
 
-;;       (defun launch-irc-netbsd ()
-;;         "Launch irc connection to netbsd"
-;;         (interactive)
-;;         (erc-tls :server "mollari.netbsd.org" :port 7001 :nick "chopps" :full-name "Christian E. Hopps"))
+    ;;       (with-eval-after-load 'erc
+    ;;        (setq erc-nickserv-passwords
+    ;;              `((freenode (("chopps" . ,(erc-acct-get-password "chopps" "freenode.net" "nickserv"))))
+    ;;                (localhost (("chopps" . ,(erc-acct-get-password "chopps" "localhost" "bitlbee")))))))
 
-;;       (defun launch-irc-freenode ()
-;;         "Launch irc connection to freenode"
-;;         (interactive)
-;;         (erc-tls :server "irc.freenode.net" :port 6697 :nick "chopps"
-;;                  :password (erc-acct-get-password "chopps" "freenode.net" 6697)))
+    ;;       (defun launch-irc-gitter ()
+    ;;         "Launch irc connection to giter.im"
+    ;;         (interactive)
+    ;;         (erc :server "localhost" :port 6669 :nick "choppsv1"
+    ;;             :password (erc-acct-get-password "choppsv1" "192.168.1.6" 6669)))
+    ;;         ;; (erc-tls :server "irc.gitter.im" :port 6667 :nick "choppsv1"
+    ;;         ;;         :password (erc-acct-get-password "choppsv1" "irc.gitter.im" 6667)))
 
-;;       (defun launch-irc-jabber ()
-;;         "Launch irc connection to jabber"
-;;         (interactive)
-;;         (erc :server "localhost" :port 6667 :nick "chopps" :full-name "Christian E. Hopps"))
+    ;;       (defun launch-irc-netbsd ()
+    ;;         "Launch irc connection to netbsd"
+    ;;         (interactive)
+    ;;         (erc-tls :server "mollari.netbsd.org" :port 7001 :nick "chopps" :full-name "Christian E. Hopps"))
 
-;;       (defun launch-erc ()
-;;         "Launch all our connections to IRC"
-;;         (interactive)
-;;         (launch-irc-gitter)
-;;         (launch-irc-freenode)
-;;         (launch-irc-netbsd)
-;;         (launch-irc-jabber))
+    ;;       (defun launch-irc-freenode ()
+    ;;         "Launch irc connection to freenode"
+    ;;         (interactive)
+    ;;         (erc-tls :server "irc.freenode.net" :port 6697 :nick "chopps"
+    ;;                  :password (erc-acct-get-password "chopps" "freenode.net" 6697)))
 
-;;       (spacemacs/set-leader-keys
-;;         "aif" 'launch-irc-freenode
-;;         "aij" 'launch-irc-jabber
-;;         "ain" 'launch-irc-netbsd
-;;         "aig" 'launch-irc-gitter
-;;         "aiL" 'launch-erc)
+    ;;       (defun launch-irc-jabber ()
+    ;;         "Launch irc connection to jabber"
+    ;;         (interactive)
+    ;;         (erc :server "localhost" :port 6667 :nick "chopps" :full-name "Christian E. Hopps"))
 
-;;       (defun bitlbee-netrc-identify ()
-;;         "Auto-identify for Bitlbee channels using authinfo or netrc.
+    ;;       (defun launch-erc ()
+    ;;         "Launch all our connections to IRC"
+    ;;         (interactive)
+    ;;         (launch-irc-gitter)
+    ;;         (launch-irc-freenode)
+    ;;         (launch-irc-netbsd)
+    ;;         (launch-irc-jabber))
 
-;;         The entries that we look for in netrc or authinfo files
-;;         have their 'port' set to 'bitlbee', their 'login' or
-;;         'user' set to the current nickname and 'server' set to
-;;         the current IRC server's name. A sample value that works
-;;         for authenticating as user 'keramida' on server
-;;         'localhost' is:
+    ;;       (spacemacs/set-leader-keys
+    ;;         "aif" 'launch-irc-freenode
+    ;;         "aij" 'launch-irc-jabber
+    ;;         "ain" 'launch-irc-netbsd
+    ;;         "aig" 'launch-irc-gitter
+    ;;         "aiL" 'launch-erc)
 
-;;             machine localhost port bitlbee login keramida password supersecret"
+    ;;       (defun bitlbee-netrc-identify ()
+    ;;         "Auto-identify for Bitlbee channels using authinfo or netrc.
 
-;;         (interactive)
-;;         (when (string= (buffer-name) "&bitlbee")
-;;           (let ((pass (erc-acct-get-password (erc-current-nick) erc-session-server "bitlbee")))
-;;             ;; (message "Sending privmsg to &bitlbee server %s" erc-session-server)
-;;             (erc-message "PRIVMSG"
-;;                          (format "%s identify %s"
-;;                                  (erc-default-target)
-;;                                  pass)))))
-;;       (add-hook 'erc-join-hook 'bitlbee-netrc-identify)
+    ;;         The entries that we look for in netrc or authinfo files
+    ;;         have their 'port' set to 'bitlbee', their 'login' or
+    ;;         'user' set to the current nickname and 'server' set to
+    ;;         the current IRC server's name. A sample value that works
+    ;;         for authenticating as user 'keramida' on server
+    ;;         'localhost' is:
 
-;;       ;; We only need this if we aren't using our local bridge
-;;       ;; ;; add a user to the current channel
-;;       ;; (defun add-nick-insert-pre-hook (line)
-;;       ;;   "Add user to ERC channel list"
-;;       ;;   (when (string= erc-session-server "irc.gitter.im")
-;;       ;;     (save-match-data
-;;       ;;       (when (string-match "^<\\([^>]+\\)> .*" line)
-;;       ;;         (let ((nick (match-string 1 line)))
-;;       ;;           (erc-update-current-channel-member nick nick 'add-if-new))))))
-;;       ;; (add-hook 'erc-insert-pre-hook 'add-nick-insert-pre-hook)
+    ;;             machine localhost port bitlbee login keramida password supersecret"
 
-;;       ;; (setq erc-modules (delete 'fill erc-modules))
+    ;;         (interactive)
+    ;;         (when (string= (buffer-name) "&bitlbee")
+    ;;           (let ((pass (erc-acct-get-password (erc-current-nick) erc-session-server "bitlbee")))
+    ;;             ;; (message "Sending privmsg to &bitlbee server %s" erc-session-server)
+    ;;             (erc-message "PRIVMSG"
+    ;;                          (format "%s identify %s"
+    ;;                                  (erc-default-target)
+    ;;                                  pass)))))
+    ;;       (add-hook 'erc-join-hook 'bitlbee-netrc-identify)
 
-;;       ;; XXX debug mode-line muckup
-;;       ;; (defvar evil-normal-state-on-unfocus-modes
-;;       ;;   '(erc-mode))
-;;       ;; (defun evil-normal-state-on-unfocus ()
-;;       ;;   "Return to normal state when a buffer in a given major mode is unfocussed"
-;;       ;;   (when (member major-mode evil-normal-state-on-unfocus-modes)
-;;       ;;     (evil-normal-state)))
-;;       ;; (add-hook 'unfocus-buffer-hook 'evil-normal-state-on-unfocus)
+    ;;       ;; We only need this if we aren't using our local bridge
+    ;;       ;; ;; add a user to the current channel
+    ;;       ;; (defun add-nick-insert-pre-hook (line)
+    ;;       ;;   "Add user to ERC channel list"
+    ;;       ;;   (when (string= erc-session-server "irc.gitter.im")
+    ;;       ;;     (save-match-data
+    ;;       ;;       (when (string-match "^<\\([^>]+\\)> .*" line)
+    ;;       ;;         (let ((nick (match-string 1 line)))
+    ;;       ;;           (erc-update-current-channel-member nick nick 'add-if-new))))))
+    ;;       ;; (add-hook 'erc-insert-pre-hook 'add-nick-insert-pre-hook)
 
-;;       (with-eval-after-load 'erc
-;;         (erc-fill-disable)
-;;         ;; (erc-log-enable)
-;;         (add-to-list 'erc-modules 'notifications)
-;;         (setq erc-modules (cons 'log (delete 'fill erc-modules))))
-;;         ;; (erc-services-mode 1)
-;;         ;; (erc-spelling-mode 1))
-;;       (with-eval-after-load 'erc-desktop-notifications
-;;         ;; Redefine this so that we can set a timeout
-;;         ;; normally it uses the server and we use awesome so it would be nice to
-;;         ;; fix that there.
-;;         (defun erc-notifications-notify (nick msg)
-;;           "Notify that NICK send some MSG.
-;; This will replace the last notification sent with this function."
-;;           (dbus-ignore-errors
-;;             (setq erc-notifications-last-notification
-;;                   (notifications-notify :title (xml-escape-string nick)
-;;                                         :timeout 0
-;;                                         :body (xml-escape-string msg)
-;;                                         :replaces-id erc-notifications-last-notification
-;;                                         :app-icon erc-notifications-icon))))
+    ;;       ;; (setq erc-modules (delete 'fill erc-modules))
 
-;;         )
-;;       )
+    ;;       ;; XXX debug mode-line muckup
+    ;;       ;; (defvar evil-normal-state-on-unfocus-modes
+    ;;       ;;   '(erc-mode))
+    ;;       ;; (defun evil-normal-state-on-unfocus ()
+    ;;       ;;   "Return to normal state when a buffer in a given major mode is unfocussed"
+    ;;       ;;   (when (member major-mode evil-normal-state-on-unfocus-modes)
+    ;;       ;;     (evil-normal-state)))
+    ;;       ;; (add-hook 'unfocus-buffer-hook 'evil-normal-state-on-unfocus)
+
+    ;;       (with-eval-after-load 'erc
+    ;;         (erc-fill-disable)
+    ;;         ;; (erc-log-enable)
+    ;;         (add-to-list 'erc-modules 'notifications)
+    ;;         (setq erc-modules (cons 'log (delete 'fill erc-modules))))
+    ;;         ;; (erc-services-mode 1)
+    ;;         ;; (erc-spelling-mode 1))
+    ;;       (with-eval-after-load 'erc-desktop-notifications
+    ;;         ;; Redefine this so that we can set a timeout
+    ;;         ;; normally it uses the server and we use awesome so it would be nice to
+    ;;         ;; fix that there.
+    ;;         (defun erc-notifications-notify (nick msg)
+    ;;           "Notify that NICK send some MSG.
+    ;; This will replace the last notification sent with this function."
+    ;;           (dbus-ignore-errors
+    ;;             (setq erc-notifications-last-notification
+    ;;                   (notifications-notify :title (xml-escape-string nick)
+    ;;                                         :timeout 0
+    ;;                                         :body (xml-escape-string msg)
+    ;;                                         :replaces-id erc-notifications-last-notification
+    ;;                                         :app-icon erc-notifications-icon))))
+
+    ;;         )
+    ;;       )
 
     ;; (when-layer-used 'rcirc
     ;;  (defun get-gitter-password ()
@@ -2070,634 +2070,634 @@ layers configuration. You are free to put any user code."
     ;; ======
 
     (when-layer-used 'mu4e
-     (defcustom mu4e-spam-folder "/chopps.org/spam-train"
-        "Folder for spam email"
-        :type '(string :tag "Folder name")
-        :group 'mu4e-folders)
+                     (defcustom mu4e-spam-folder "/chopps.org/spam-train"
+                       "Folder for spam email"
+                       :type '(string :tag "Folder name")
+                       :group 'mu4e-folders)
 
-      (setq mu4e-attachment-dir "~/Downloads"
-            mu4e-debug t
-            mu4e-mu-debug nil
+                     (setq mu4e-attachment-dir "~/Downloads"
+                           mu4e-debug t
+                           mu4e-mu-debug nil
 
-            ;;
-            ;; Indexing
-            ;;
-            mu4e-index-cleanup nil
-            mu4e-index-lazy-check t
-            mu4e-change-filenames-when-moving t
-            mu4e-update-interval nil
+                           ;;
+                           ;; Indexing
+                           ;;
+                           mu4e-index-cleanup nil
+                           mu4e-index-lazy-check t
+                           mu4e-change-filenames-when-moving t
+                           mu4e-update-interval nil
 
-            ;; mu4e-hide-index-messages t
+                           ;; mu4e-hide-index-messages t
 
-            ;; -------
-            ;; Viewing
-            ;; -------
-            mu4e-headers-results-limit 500
-            mu4e-headers-visible-lines 15
-            mu4e-headers-visible-columns 200
+                           ;; -------
+                           ;; Viewing
+                           ;; -------
+                           mu4e-headers-results-limit 500
+                           mu4e-headers-visible-lines 15
+                           mu4e-headers-visible-columns 200
 
-            ;; For searches useful as t to find replies to threads?
-            mu4e-headers-include-related nil
-            mu4e-view-show-addresses t
-            mu4e-view-use-gnus t
+                           ;; For searches useful as t to find replies to threads?
+                           mu4e-headers-include-related nil
+                           mu4e-view-show-addresses t
+                           mu4e-view-use-gnus t
 
-            ;; mm-text-html-renderer 'shr
-            mm-text-html-renderer 'gnus-w3m
-            ;; mm-text-html-renderer 'lynx
-            ;; HTML
-            ;; mu4e-html2text-command 'my-mu4e-shr2text
-            shr-color-visible-luminance-min 80
-            shr-use-fonts nil
+                           ;; mm-text-html-renderer 'shr
+                           mm-text-html-renderer 'gnus-w3m
+                           ;; mm-text-html-renderer 'lynx
+                           ;; HTML
+                           ;; mu4e-html2text-command 'my-mu4e-shr2text
+                           shr-color-visible-luminance-min 80
+                           shr-use-fonts nil
 
-            mu4e-use-fancy-chars t
+                           mu4e-use-fancy-chars t
 
-            ;; -----------
-            ;; Composition
-            ;; -----------
-            send-mail-function 'smtpmail-send-it
-            message-send-mail-function 'smtpmail-send-it
-            message-cite-reply-position 'below
+                           ;; -----------
+                           ;; Composition
+                           ;; -----------
+                           send-mail-function 'smtpmail-send-it
+                           message-send-mail-function 'smtpmail-send-it
+                           message-cite-reply-position 'below
 
-            ;; don't keep message buffers around
-            message-kill-buffer-on-exit t
-            mu4e-compose-complete-addresses t
-            ;; mu4e-compose-complete-only-personal t
-            ;; mu4e-compose-complete-only-after "2019-01-01"
-            mu4e-compose-context-policy 'ask-if-none
-            mu4e-compose-format-flowed t
-            ;; This is an interesting value.. it's where soft-newlines will be
-            ;; inserted for wrapping. The suggestion is 66, but that's based on
-            ;; the ancient assumption of very small dumb-terminals with old
-            ;; clients. In fact smart phones (the target now) will support
-            ;; format=flowed. So the affect; viewing on clients that do not
-            ;; support format=flowed (e.g. mu4e emacs!) line-wrapping even if
-            ;; the window is quite large. This sucks so we choose a huge value.
-            fill-flowed-encode-column 100000
-            mu4e-compose-in-new-frame t
-            mu4e-compose-keep-self-cc t
-            mu4e-compose-signature-auto-include nil
-            mu4e-context-policy 'pick-first
-            mm-verify-option 'known
+                           ;; don't keep message buffers around
+                           message-kill-buffer-on-exit t
+                           mu4e-compose-complete-addresses t
+                           ;; mu4e-compose-complete-only-personal t
+                           ;; mu4e-compose-complete-only-after "2019-01-01"
+                           mu4e-compose-context-policy 'ask-if-none
+                           mu4e-compose-format-flowed t
+                           ;; This is an interesting value.. it's where soft-newlines will be
+                           ;; inserted for wrapping. The suggestion is 66, but that's based on
+                           ;; the ancient assumption of very small dumb-terminals with old
+                           ;; clients. In fact smart phones (the target now) will support
+                           ;; format=flowed. So the affect; viewing on clients that do not
+                           ;; support format=flowed (e.g. mu4e emacs!) line-wrapping even if
+                           ;; the window is quite large. This sucks so we choose a huge value.
+                           fill-flowed-encode-column 100000
+                           mu4e-compose-in-new-frame t
+                           mu4e-compose-keep-self-cc t
+                           mu4e-compose-signature-auto-include nil
+                           mu4e-context-policy 'pick-first
+                           mm-verify-option 'known
 
-            ;; ------------------
-            ;; Address Completion
-            ;; ------------------
+                           ;; ------------------
+                           ;; Address Completion
+                           ;; ------------------
 
-            message-completion-alistp '(("^\\(Newsgroups\\|Followup-To\\|Posted-To\\|Gcc\\):" . message-expand-group)
-                                        ("^\\(Resent-\\)?\\(To\\|B?Cc\\):" . message-expand-name)
-                                        ("^\\(Reply-To\\|From\\|Mail-Followup-To\\|Mail-Copies-To\\):" . message-expand-name)
-                                        ("^\\(Disposition-Notification-To\\|Return-Receipt-To\\):" . message-expand-name))
+                           message-completion-alistp '(("^\\(Newsgroups\\|Followup-To\\|Posted-To\\|Gcc\\):" . message-expand-group)
+                                                       ("^\\(Resent-\\)?\\(To\\|B?Cc\\):" . message-expand-name)
+                                                       ("^\\(Reply-To\\|From\\|Mail-Followup-To\\|Mail-Copies-To\\):" . message-expand-name)
+                                                       ("^\\(Disposition-Notification-To\\|Return-Receipt-To\\):" . message-expand-name))
 
-            ;; -----------
-            ;; [b]ookmarks
-            ;; -----------
+                           ;; -----------
+                           ;; [b]ookmarks
+                           ;; -----------
 
-            mu4e-inbox-mailbox '("maildir:/labn.net/INBOX"
-                                 "maildir:/us.labn.net/INBOX"
-                                 "maildir:/chopps.org/INBOX"
-                                 "maildir:/nrl.navy.mil/INBOX"
-                                 "maildir:/gmail.com/INBOX")
+                           mu4e-inbox-mailbox '("maildir:/labn.net/INBOX"
+                                                "maildir:/us.labn.net/INBOX"
+                                                "maildir:/chopps.org/INBOX"
+                                                "maildir:/nrl.navy.mil/INBOX"
+                                                "maildir:/gmail.com/INBOX")
 
-            mu4e-imp-mailbox '("maildir:/chopps.org/ietf-chairs"
-                               "maildir:/chopps.org/ietf-chairs-rtg"
-                               "maildir:/chopps.org/ietf-rtg-dir"
-                               "maildir:/chopps.org/ietf-wg-ipsec"
-                               "maildir:/chopps.org/ietf-wg-lsr"
-                               "maildir:/chopps.org/ietf-wg-netmod"
-                               "maildir:/chopps.org/ietf-wg-rtg")
+                           mu4e-imp-mailbox '("maildir:/chopps.org/ietf-chairs"
+                                              "maildir:/chopps.org/ietf-chairs-rtg"
+                                              "maildir:/chopps.org/ietf-rtg-dir"
+                                              "maildir:/chopps.org/ietf-wg-ipsec"
+                                              "maildir:/chopps.org/ietf-wg-lsr"
+                                              "maildir:/chopps.org/ietf-wg-netmod"
+                                              "maildir:/chopps.org/ietf-wg-rtg")
 
-            mu4e-junk-mailbox '("maildir:/gmail.com/[Gmail]/Spam"
-                                "maildir:/labn.net/Junk Email"
-                                "maildir:/us.labn.net/Junk Email"
-                                "maildir:/chopps.org/spam-probable"
-                                "maildir:/chopps.org/spam-train"
-                                "maildir:/chopps.org/spam")
+                           mu4e-junk-mailbox '("maildir:/gmail.com/[Gmail]/Spam"
+                                               "maildir:/labn.net/Junk Email"
+                                               "maildir:/us.labn.net/Junk Email"
+                                               "maildir:/chopps.org/spam-probable"
+                                               "maildir:/chopps.org/spam-train"
+                                               "maildir:/chopps.org/spam")
 
-            mu4e-unread-filter "(flag:unread AND NOT flag:flagged AND NOT flag:trashed)"
-            mu4e-not-junk-folder-filter (concat " AND NOT (" (string-join mu4e-junk-mailbox " OR " ) ")")
-            mu4e-inbox-filter-base (concat "(" (string-join mu4e-inbox-mailbox " OR ") ")")
-            mu4e-imp-filter-base (concat "(" (string-join mu4e-imp-mailbox " OR ") ")")
-            mu4e-unread-filter "(flag:unread AND NOT flag:flagged AND NOT flag:trashed)"
-            mu4e-unread-flagged-filter "(flag:unread AND flag:flagged AND NOT flag:trashed)"
+                           mu4e-unread-filter "(flag:unread AND NOT flag:flagged AND NOT flag:trashed)"
+                           mu4e-not-junk-folder-filter (concat " AND NOT (" (string-join mu4e-junk-mailbox " OR " ) ")")
+                           mu4e-inbox-filter-base (concat "(" (string-join mu4e-inbox-mailbox " OR ") ")")
+                           mu4e-imp-filter-base (concat "(" (string-join mu4e-imp-mailbox " OR ") ")")
+                           mu4e-unread-filter "(flag:unread AND NOT flag:flagged AND NOT flag:trashed)"
+                           mu4e-unread-flagged-filter "(flag:unread AND flag:flagged AND NOT flag:trashed)"
 
-            mu4e-bookmarks
-            (append
-             (list (list (concat "flag:unread AND NOT flag:trashed AND " mu4e-inbox-filter-base) "Unread [i]NBOX messages" ?i)
-                   (list (concat mu4e-unread-filter  mu4e-imp-filter-base) "Unread Important messages" ?n)
-                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-lsr") "Unread LSR messages" ?l)
-                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-ipsec") "Unread netmod messages" ?I)
-                   (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-*") "Unread IETF messages" ?e)
+                           mu4e-bookmarks
+                           (append
+                            (list (list (concat "flag:unread AND NOT flag:trashed AND " mu4e-inbox-filter-base) "Unread [i]NBOX messages" ?i)
+                                  (list (concat mu4e-unread-filter  mu4e-imp-filter-base) "Unread Important messages" ?n)
+                                  (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-lsr") "Unread LSR messages" ?l)
+                                  (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-ipsec") "Unread netmod messages" ?I)
+                                  (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-*") "Unread IETF messages" ?e)
 
-                   ;; (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
-                   ;; (list (concat "flag:flagged AND NOT flag:trashed AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "[F]lagged Non-INBOX messages" ?F)
+                                  ;; (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
+                                  ;; (list (concat "flag:flagged AND NOT flag:trashed AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "[F]lagged Non-INBOX messages" ?F)
 
-                   ;; (list (concat mu4e-unread-flagged-filter mu4e-imp-filter-base) "Unread-Flagged Important messages" ?N)
+                                  ;; (list (concat mu4e-unread-flagged-filter mu4e-imp-filter-base) "Unread-Flagged Important messages" ?N)
 
-                   (list (concat mu4e-unread-filter         " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread [u]nimportant messages" ?u)
-                   ;; (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged [U]nimportant messages" ?U)
+                                  (list (concat mu4e-unread-filter         " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread [u]nimportant messages" ?u)
+                                  ;; (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged [U]nimportant messages" ?U)
 
-                   (list (concat mu4e-unread-filter         " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread Non-INBOX messages" ?o)
-                   ;; (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged Non-INBOX messages" ?O)
+                                  (list (concat mu4e-unread-filter         " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread Non-INBOX messages" ?o)
+                                  ;; (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged Non-INBOX messages" ?O)
 
-                   (list (concat mu4e-unread-filter         mu4e-not-junk-folder-filter) "Unread messages" ?a)
-                   ;; (list (concat mu4e-unread-flagged-filter mu4e-not-junk-folder-filter) "Unread-flagged messages" ?A)
+                                  (list (concat mu4e-unread-filter         mu4e-not-junk-folder-filter) "Unread messages" ?a)
+                                  ;; (list (concat mu4e-unread-flagged-filter mu4e-not-junk-folder-filter) "Unread-flagged messages" ?A)
 
-                   (list "(maildir:/chopps.org/spam-probable                                              )" "Probable spam messages" ?s))
-             (mapcar (lambda (x) (cons (concat (car x) mu4e-not-junk-folder-filter) (cdr x)))
-                     '(("flag:unread AND NOT flag:trashed" "Unread messages" ?u)
-                       ("date:1h..now" "Last hours messages" ?h)
-                       ("date:24h..now" "Today's messages" ?d)
-                       ("date:today..now" "Today's messages" ?t)
-                       ("date:7d..now" "Last 7 days" ?w)
-                       ("date:7d..now AND (from:chopps@chopps.org OR from:chopps@gmail.com OR from:chopps@us.labn.net OR from:chopps@labn.net OR from:christian.hopps.ctr@nrl.navy.mil)" "Last 7 days sent" ?W)
-                       ("date:14d..now AND (from:chopps@chopps.org OR  OR from:chopps@gmail.com OR from:chopps@us.labn.net OR from:chopps@labn.net OR from:christian.hopps.ctr@nrl.navy.mil)" "Last 14 days sent" ?F)
-                       ("mime:application/zip" "Messages with ZIP" ?z)
-                       ("mime:application/pdf" "Messages with PDF" ?p)
-                       ("mime:text/calendar" "Messages with calendar" ?q)
-                       ("mime:*cs" "Messages with VCS" ?Q)
-                       ))
-             )
-
-
-            ;; [j]ump shortcuts
-            mu4e-maildir-shortcuts '(("/chopps.org/INBOX" . ?i)
-                                     ("/nrl.navy.mil/INBOX" . ?n)
-                                     ("/labn.net/INBOX" . ?l)
-                                     ("/us.labn.net/INBOX" . ?u)
-                                     ("/gmail.com/INBOX" . ?g)
-                                     ("/chopps.org/aa-netbsd" . ?N)
-                                     ("/chopps.org/ietf-wg-lsr" . ?L)
-                                     ("/chopps.org/spam-train" . ?S)
-                                     ("/chopps.org/spam-probable" . ?s))
-       )
-
-      (with-eval-after-load 'mu4e
-        (progn
-          (debug-init-message "debug-init MU4E setq")
-
-          (setq mu4e-contexts `(
-                                ,(make-mu4e-context
-                                    :name "chopps.org"
-                                    :match-func (lambda (msg)
-                                                  (and msg (string-match "/chopps.org/.*" (mu4e-message-field msg :maildir))))
-                                    :vars '((user-mail-address  . "chopps@chopps.org")
-                                            (user-full-name . "Christian Hopps")
-                                            ;; mu4e
-                                            (mu4e-drafts-folder . "/chopps.org/Drafts")
-                                            (mu4e-sent-folder   . "/chopps.org/Sent Messages")
-                                            (mu4e-trash-folder  . "/chopps.org/Deleted Messages")
-                                            (mu4e-sent-messages-behavior   . sent)
-                                            ;; smtp
-                                            (message-send-mail-function . smtpmail-send-it)
-                                            (smtpmail-starttls-credentials . '(("smtp.chopps.org" 587 nil nil)))
-                                            (smtpmail-default-smtp-server  . "smtp.chopps.org")
-                                            (smtpmail-smtp-server          . "smtp.chopps.org")
-                                            ;;(smtpmail-starttls-credentials . '(("coffee.chopps.org" 25 nil nil)))
-                                            ;;(smtpmail-default-smtp-server  . "coffee.chopps.org")
-                                            ;;(smtpmail-smtp-server          . "coffee.chopps.org")
-                                            (smtpmail-local-domain         .      "chopps.org")
-                                            (smtpmail-stream-type          . starttls)
-                                            (smtpmail-smtp-service         . 587)))
-                                 ,(make-mu4e-context
-                                    :name "labn.net"
-                                    :match-func (lambda (msg)
-                                                  (and msg (string-match "/labn.net/.*" (mu4e-message-field msg :maildir))))
-                                    :vars '((user-mail-address  . "chopps@labn.net")
-                                            (user-full-name . "Christian Hopps")
-                                            ;; mu4e
-                                            (mu4e-drafts-folder . "/labn.net/Drafts")
-                                            (mu4e-sent-folder   . "/labn.net/Sent Items")
-                                            (mu4e-trash-folder  . "/labn.net/Deleted Items")
-                                            (mu4e-sent-messages-behavior   . sent)
-                                            ;; smtp
-                                            (message-send-mail-function . smtpmail-send-it)
-                                            (smtpmail-starttls-credentials . '(("smtp.office365.com" 587 nil nil)))
-                                            (smtpmail-default-smtp-server  . "smtp.office365.com")
-                                            (smtpmail-smtp-server          . "smtp.office365.com")
-                                            (smtpmail-local-domain         . "labn.net")
-                                            (smtpmail-stream-type          . starttls)
-                                            (smtpmail-smtp-service         . 587)))
-                                  ,(make-mu4e-context
-                                    :name "us.labn.net"
-                                    :match-func (lambda (msg)
-                                                  (and msg (string-match "/us.labn.net/.*" (mu4e-message-field msg :maildir))))
-                                    :vars '((user-mail-address  . "chopps@us.labn.net")
-                                            (user-full-name . "Christian Hopps")
-                                            ;; mu4e
-                                            (mu4e-drafts-folder . "/us.labn.net/Drafts")
-                                            (mu4e-sent-folder   . "/us.labn.net/Sent Items")
-                                            (mu4e-trash-folder  . "/us.labn.net/Deleted Items")
-                                            (mu4e-sent-messages-behavior   . sent)
-                                            ;; smtp
-                                            (message-send-mail-function . smtpmail-send-it)
-                                            (smtpmail-starttls-credentials . '(("smtp.office365.us" 587 nil nil)))
-                                            (smtpmail-default-smtp-server  . "smtp.office365.us")
-                                            (smtpmail-smtp-server          . "smtp.office365.us")
-                                            (smtpmail-local-domain         . "us.labn.net")
-                                            (smtpmail-stream-type          . starttls)
-                                            (smtpmail-smtp-service         . 587)))
-                                 ,(make-mu4e-context
-                                    :name "nrl.navy.mil"
-                                    :match-func (lambda (msg)
-                                                  (and msg (string-match "/nrl.navy.mil/.*" (mu4e-message-field msg :maildir))))
-                                    :vars '((user-mail-address  . "christian.hopps.ctr@nrl.navy.mil")
-                                            (user-full-name . "Christian Hopps")
-                                            ;; mu4e
-                                            (mu4e-drafts-folder . "/nrl.navy.mil/Drafts")
-                                            (mu4e-sent-folder   . "/nrl.navy.mil/Sent")
-                                            (mu4e-trash-folder  . "/nrl.navy.mil/Trash")
-                                            (mu4e-sent-messages-behavior   . sent)
-                                            ;; smtp
-                                            (message-send-mail-function . message-send-mail-with-sendmail)
-                                            (sendmail-program . "/opt/homebrew/bin/msmtp")
-                                            (send-mail-function . 'smtpmail-send-it)
-                                            (message-sendmail-extra-arguments . ("--read-envelope-from"))
-
-                                            ;;ms
-                                            ;; (smtpmail-starttls-credentials . '(("outgoing.cmf.nrl.navy.mil" 587 nil nil)))
-                                            ;; (smtpmail-stream-type          . starttls)
-                                            ;; (smtpmail-smtp-service         . 587)
-
-                                            (message-sendmail-f-is-evil . t)))
-                                 ,(make-mu4e-context
-                                    :name "gmail.com"
-                                    :match-func (lambda (msg)
-                                                  (and msg (string-match "/gmail.com/.*" (mu4e-message-field msg :maildir))))
-                                    :vars '((user-mail-address  . "chopps@gmail.com")
-                                            (user-full-name . "Christian Hopps")
-                                            ;; mu4e
-                                            (mu4e-drafts-folder . "/gmail.com/[Gmail]/Drafts")
-                                            (mu4e-sent-folder   . "/gmail.com/[Gmail]/Sent Mail")
-                                            (mu4e-trash-folder  . "/gmail.com/[Gmail]/Trash")
-                                            (mu4e-sent-messages-behavior   . delete)
-                                            ;; smtp
-                                            (message-send-mail-function . smtpmail-send-it)
-                                            (smtpmail-starttls-credentials . '(("smtp.gmail.com" 587 nil nil)))
-                                            (smtpmail-default-smtp-server  . "smtp.gmail.com")
-                                            (smtpmail-smtp-server          . "smtp.gmail.com")
-                                            (smtpmail-local-domain         .      "gmail.com")
-                                            (smtpmail-stream-type          . starttls)
-                                            (smtpmail-smtp-service . 587)))
-                                 ))
+                                  (list "(maildir:/chopps.org/spam-probable                                              )" "Probable spam messages" ?s))
+                            (mapcar (lambda (x) (cons (concat (car x) mu4e-not-junk-folder-filter) (cdr x)))
+                                    '(("flag:unread AND NOT flag:trashed" "Unread messages" ?u)
+                                      ("date:1h..now" "Last hours messages" ?h)
+                                      ("date:24h..now" "Today's messages" ?d)
+                                      ("date:today..now" "Today's messages" ?t)
+                                      ("date:7d..now" "Last 7 days" ?w)
+                                      ("date:7d..now AND (from:chopps@chopps.org OR from:chopps@gmail.com OR from:chopps@us.labn.net OR from:chopps@labn.net OR from:christian.hopps.ctr@nrl.navy.mil)" "Last 7 days sent" ?W)
+                                      ("date:14d..now AND (from:chopps@chopps.org OR  OR from:chopps@gmail.com OR from:chopps@us.labn.net OR from:chopps@labn.net OR from:christian.hopps.ctr@nrl.navy.mil)" "Last 14 days sent" ?F)
+                                      ("mime:application/zip" "Messages with ZIP" ?z)
+                                      ("mime:application/pdf" "Messages with PDF" ?p)
+                                      ("mime:text/calendar" "Messages with calendar" ?q)
+                                      ("mime:*cs" "Messages with VCS" ?Q)
+                                      ))
+                            )
 
 
-          (debug-init-message "debug-init MU4E defuns")
+                           ;; [j]ump shortcuts
+                           mu4e-maildir-shortcuts '(("/chopps.org/INBOX" . ?i)
+                                                    ("/nrl.navy.mil/INBOX" . ?n)
+                                                    ("/labn.net/INBOX" . ?l)
+                                                    ("/us.labn.net/INBOX" . ?u)
+                                                    ("/gmail.com/INBOX" . ?g)
+                                                    ("/chopps.org/aa-netbsd" . ?N)
+                                                    ("/chopps.org/ietf-wg-lsr" . ?L)
+                                                    ("/chopps.org/spam-train" . ?S)
+                                                    ("/chopps.org/spam-probable" . ?s))
+                           )
 
-          (defun mu4e~headers-jump-to-maildir-unread (maildir)
-            "Show the unread messages in maildir.
+                     (with-eval-after-load 'mu4e
+                       (progn
+                         (debug-init-message "debug-init MU4E setq")
+
+                         (setq mu4e-contexts `(
+                                               ,(make-mu4e-context
+                                                 :name "chopps.org"
+                                                 :match-func (lambda (msg)
+                                                               (and msg (string-match "/chopps.org/.*" (mu4e-message-field msg :maildir))))
+                                                 :vars '((user-mail-address  . "chopps@chopps.org")
+                                                         (user-full-name . "Christian Hopps")
+                                                         ;; mu4e
+                                                         (mu4e-drafts-folder . "/chopps.org/Drafts")
+                                                         (mu4e-sent-folder   . "/chopps.org/Sent Messages")
+                                                         (mu4e-trash-folder  . "/chopps.org/Deleted Messages")
+                                                         (mu4e-sent-messages-behavior   . sent)
+                                                         ;; smtp
+                                                         (message-send-mail-function . smtpmail-send-it)
+                                                         (smtpmail-starttls-credentials . '(("smtp.chopps.org" 587 nil nil)))
+                                                         (smtpmail-default-smtp-server  . "smtp.chopps.org")
+                                                         (smtpmail-smtp-server          . "smtp.chopps.org")
+                                                         ;;(smtpmail-starttls-credentials . '(("coffee.chopps.org" 25 nil nil)))
+                                                         ;;(smtpmail-default-smtp-server  . "coffee.chopps.org")
+                                                         ;;(smtpmail-smtp-server          . "coffee.chopps.org")
+                                                         (smtpmail-local-domain         .      "chopps.org")
+                                                         (smtpmail-stream-type          . starttls)
+                                                         (smtpmail-smtp-service         . 587)))
+                                               ,(make-mu4e-context
+                                                 :name "labn.net"
+                                                 :match-func (lambda (msg)
+                                                               (and msg (string-match "/labn.net/.*" (mu4e-message-field msg :maildir))))
+                                                 :vars '((user-mail-address  . "chopps@labn.net")
+                                                         (user-full-name . "Christian Hopps")
+                                                         ;; mu4e
+                                                         (mu4e-drafts-folder . "/labn.net/Drafts")
+                                                         (mu4e-sent-folder   . "/labn.net/Sent Items")
+                                                         (mu4e-trash-folder  . "/labn.net/Deleted Items")
+                                                         (mu4e-sent-messages-behavior   . sent)
+                                                         ;; smtp
+                                                         (message-send-mail-function . smtpmail-send-it)
+                                                         (smtpmail-starttls-credentials . '(("smtp.office365.com" 587 nil nil)))
+                                                         (smtpmail-default-smtp-server  . "smtp.office365.com")
+                                                         (smtpmail-smtp-server          . "smtp.office365.com")
+                                                         (smtpmail-local-domain         . "labn.net")
+                                                         (smtpmail-stream-type          . starttls)
+                                                         (smtpmail-smtp-service         . 587)))
+                                               ,(make-mu4e-context
+                                                 :name "us.labn.net"
+                                                 :match-func (lambda (msg)
+                                                               (and msg (string-match "/us.labn.net/.*" (mu4e-message-field msg :maildir))))
+                                                 :vars '((user-mail-address  . "chopps@us.labn.net")
+                                                         (user-full-name . "Christian Hopps")
+                                                         ;; mu4e
+                                                         (mu4e-drafts-folder . "/us.labn.net/Drafts")
+                                                         (mu4e-sent-folder   . "/us.labn.net/Sent Items")
+                                                         (mu4e-trash-folder  . "/us.labn.net/Deleted Items")
+                                                         (mu4e-sent-messages-behavior   . sent)
+                                                         ;; smtp
+                                                         (message-send-mail-function . smtpmail-send-it)
+                                                         (smtpmail-starttls-credentials . '(("smtp.office365.us" 587 nil nil)))
+                                                         (smtpmail-default-smtp-server  . "smtp.office365.us")
+                                                         (smtpmail-smtp-server          . "smtp.office365.us")
+                                                         (smtpmail-local-domain         . "us.labn.net")
+                                                         (smtpmail-stream-type          . starttls)
+                                                         (smtpmail-smtp-service         . 587)))
+                                               ,(make-mu4e-context
+                                                 :name "nrl.navy.mil"
+                                                 :match-func (lambda (msg)
+                                                               (and msg (string-match "/nrl.navy.mil/.*" (mu4e-message-field msg :maildir))))
+                                                 :vars '((user-mail-address  . "christian.hopps.ctr@nrl.navy.mil")
+                                                         (user-full-name . "Christian Hopps")
+                                                         ;; mu4e
+                                                         (mu4e-drafts-folder . "/nrl.navy.mil/Drafts")
+                                                         (mu4e-sent-folder   . "/nrl.navy.mil/Sent")
+                                                         (mu4e-trash-folder  . "/nrl.navy.mil/Trash")
+                                                         (mu4e-sent-messages-behavior   . sent)
+                                                         ;; smtp
+                                                         (message-send-mail-function . message-send-mail-with-sendmail)
+                                                         (sendmail-program . "/opt/homebrew/bin/msmtp")
+                                                         (send-mail-function . 'smtpmail-send-it)
+                                                         (message-sendmail-extra-arguments . ("--read-envelope-from"))
+
+                                                         ;;ms
+                                                         ;; (smtpmail-starttls-credentials . '(("outgoing.cmf.nrl.navy.mil" 587 nil nil)))
+                                                         ;; (smtpmail-stream-type          . starttls)
+                                                         ;; (smtpmail-smtp-service         . 587)
+
+                                                         (message-sendmail-f-is-evil . t)))
+                                               ,(make-mu4e-context
+                                                 :name "gmail.com"
+                                                 :match-func (lambda (msg)
+                                                               (and msg (string-match "/gmail.com/.*" (mu4e-message-field msg :maildir))))
+                                                 :vars '((user-mail-address  . "chopps@gmail.com")
+                                                         (user-full-name . "Christian Hopps")
+                                                         ;; mu4e
+                                                         (mu4e-drafts-folder . "/gmail.com/[Gmail]/Drafts")
+                                                         (mu4e-sent-folder   . "/gmail.com/[Gmail]/Sent Mail")
+                                                         (mu4e-trash-folder  . "/gmail.com/[Gmail]/Trash")
+                                                         (mu4e-sent-messages-behavior   . delete)
+                                                         ;; smtp
+                                                         (message-send-mail-function . smtpmail-send-it)
+                                                         (smtpmail-starttls-credentials . '(("smtp.gmail.com" 587 nil nil)))
+                                                         (smtpmail-default-smtp-server  . "smtp.gmail.com")
+                                                         (smtpmail-smtp-server          . "smtp.gmail.com")
+                                                         (smtpmail-local-domain         .      "gmail.com")
+                                                         (smtpmail-stream-type          . starttls)
+                                                         (smtpmail-smtp-service . 587)))
+                                               ))
+
+
+                         (debug-init-message "debug-init MU4E defuns")
+
+                         (defun mu4e~headers-jump-to-maildir-unread (maildir)
+                           "Show the unread messages in maildir.
 The user is prompted to ask what maildir.  If prefix arg EDIT is
 given, offer to edit the search query before executing it."
-            (interactive
-             (let ((maildir (mu4e-ask-maildir "Jump to maildir: ")))))
-            (when maildir
-              (let* ((query (format "maildir:\"%s\" AND flag:unread" maildir)))
-                (mu4e-mark-handle-when-leaving)
-                (mu4e-headers-search query))))
+                           (interactive
+                            (let ((maildir (mu4e-ask-maildir "Jump to maildir: ")))))
+                           (when maildir
+                             (let* ((query (format "maildir:\"%s\" AND flag:unread" maildir)))
+                               (mu4e-mark-handle-when-leaving)
+                               (mu4e-headers-search query))))
 
-          ;; (define-key mu4e-main-mode-map (kbd "J") 'mu4e~headers-jump-to-maildir-unread)
-          ;; (define-key evilified-state--normal-state-map (kbd "J") 'mu4e~headers-jump-to-maildir-unread)
-          ;; (define-key evilified-state--visual-state-map (kbd "J") 'mu4e~headers-jump-to-maildir-unread)
+                         ;; (define-key mu4e-main-mode-map (kbd "J") 'mu4e~headers-jump-to-maildir-unread)
+                         ;; (define-key evilified-state--normal-state-map (kbd "J") 'mu4e~headers-jump-to-maildir-unread)
+                         ;; (define-key evilified-state--visual-state-map (kbd "J") 'mu4e~headers-jump-to-maildir-unread)
 
-          (defun ch/mu4e--query-insert-something (something)
-            (interactive)
-            (unless (looking-back "\\(:\\|and\\|or\\|not\\)[ \t]*")
-              (insert " and "))
-            (unless (looking-back "[ \t]")
-              (insert " "))
-            (insert something))
+                         (defun ch/mu4e--query-insert-something (something)
+                           (interactive)
+                           (unless (looking-back "\\(:\\|and\\|or\\|not\\)[ \t]*")
+                             (insert " and "))
+                           (unless (looking-back "[ \t]")
+                             (insert " "))
+                           (insert something))
 
-          (defun ch/mu4e-query-insert-flag:unread ()
-            (interactive)
-            (ch/mu4e--query-insert-something "flag:unread"))
+                         (defun ch/mu4e-query-insert-flag:unread ()
+                           (interactive)
+                           (ch/mu4e--query-insert-something "flag:unread"))
 
-          (defun ch/mu4e-query-insert-flag:flagged ()
-            (interactive)
-            (ch/mu4e--query-insert-something "flag:flagged"))
+                         (defun ch/mu4e-query-insert-flag:flagged ()
+                           (interactive)
+                           (ch/mu4e--query-insert-something "flag:flagged"))
 
-          (defun ch/mu4e-query-insert-flag:attach ()
-            (interactive)
-            (ch/mu4e--query-insert-something "flag:attach"))
+                         (defun ch/mu4e-query-insert-flag:attach ()
+                           (interactive)
+                           (ch/mu4e--query-insert-something "flag:attach"))
 
-          (defvar ch/mu4e-minibuffer-quick-insert-map
-            (let ((map (make-sparse-keymap)))
-              (define-key map (kbd "u") #'ch/mu4e-query-insert-flag:unread)
-              (define-key map (kbd "f") #'ch/mu4e-query-insert-flag:flagged)
-              (define-key map (kbd "a") #'ch/mu4e-query-insert-flag:attach)
-              map))
+                         (defvar ch/mu4e-minibuffer-quick-insert-map
+                           (let ((map (make-sparse-keymap)))
+                             (define-key map (kbd "u") #'ch/mu4e-query-insert-flag:unread)
+                             (define-key map (kbd "f") #'ch/mu4e-query-insert-flag:flagged)
+                             (define-key map (kbd "a") #'ch/mu4e-query-insert-flag:attach)
+                             map))
 
-          (define-key mu4e-minibuffer-search-query-map (kbd "C-u")
-            ch/mu4e-minibuffer-quick-insert-map)
-
-
-          ;; Work around a bug with too long names in the spaceline/modeline
-          ;; This is causing an error now in emacs 27.2
-          ;; (defun trim-modeline-string-chopps (str)
-          ;;   (substring str 0 39))
-          ;; (add-function :filter-return (symbol-function 'mu4e~quote-for-modeline) 'trim-modeline-string-chopps)
-
-          ;; Mu4E Keyboard extras
-          (bind-key (kbd "'") 'mu4e-headers-next 'mu4e-headers-mode-map)
-          ;; XXXerror with vimification
-          ;; (bind-key (kbd "\"") 'mu4e-headers-prev 'mu4e-headers-mode-map)
-          ;; (bind-key (kbd "\"") 'mu4e-view-headers-prev 'mu4e-view-mode-map)
-          (bind-key (kbd "f") 'mu4e-view-go-to-url 'mu4e-view-mode-map)
-
-          (defun my-mu4e-contact-filter (addr)
-            (let ((re "\\(no[t]?[-\\.]?repl\\(y\\|ies\\)\\|@dev.terastream.net\\|@nrl.nav.mil\\|@cmf.nrl.navy.mil\\|phoebe.johnson\\|christian.phoebe.hopps\\|phoebe.hopps@helloinnovation.com\\|lberger@fore.com\\)"))
-              (unless (string-match-p re addr) addr)))
-          (setq mu4e-contact-process-function 'my-mu4e-contact-filter)
-
-          (defun my-mu4e-index-udpated ()
-            (let ((ts (format-time-string "%H:%M:%S.%N")))
-              (message "%s mu4e: full updated complete." ts)))
-
-          (add-hook 'mu4e-index-updated-hook 'my-mu4e-index-udpated)
-
-          (defun mu4e-update-index-deep ()
-            "Reindex mu4e with cleanup"
-            (interactive)
-            (let ((mu4e-index-cleanup t)
-                  (mu4e-index-lazy-check t))
-              (let ((ts (format-time-string "%H:%M:%S.%N")))
-                (message "%s mu4e: full index update starting..." ts)
-                (mu4e-update-index))))
-
-          (bind-key (kbd "U") 'mu4e-update-index-deep 'mu4e-main-mode-map)
-          (bind-key (kbd "u") 'mu4e-update-index 'mu4e-main-mode-map)
-          ;; (bind-key (kbd "U") 'mu4e-update-mail-and-index  'mu4e-main-mode-map)
-
-          (defun mu4e-deal-with-moved-message ()
-            (if (equal major-mode 'mu4e-loading-mode)
-                (progn
-                  (delete-window)
-                  (mu4e-update-index)
-                  (message "correct!"))))
-
-          (defun mu4e-error-handler (errcode errmsg)
-            "Handler function for showing an error."
-            ;; don't use mu4e-error here; it's running in the process filter context
-            (cl-case errcode
-              ((102 111) (progn
-                            (mu4e-deal-with-moved-message)
-                            (error "Updating Index: Error %d: %s" errcode errmsg)))
-              (4 (user-error "No matches for this search query."))
-              (t (error "Error %d: %s" errcode errmsg))))
+                         (define-key mu4e-minibuffer-search-query-map (kbd "C-u")
+                                     ch/mu4e-minibuffer-quick-insert-map)
 
 
-          ;; (debug-init-message "debug-init MU4E helm")
-          ;; (defun ch:ct (clist)
-          ;;   "Transform candidate into (display . real)"
-          ;;   (mapcar (lambda (candidate)
-          ;;             (let* ((name (plist-get candidate :name))
-          ;;                     email (plist-get candidate :mail))
-          ;;               (or (and name (format "%s <%s>" name email))
-          ;;                 email))) clist))
-          ;; (when (configuration-layer/package-usedp 'helm)
-          ;;   (defun my-message-expand-name (&optional start)
-          ;;     ((interactive "P"))
-          ;;     ;; (message "my-message-expand-name called")
-          ;;     (helm :prompt "; contact:" :sources
-          ;;           (helm-build-sync-source "mu4e contacts"
-          ;;                                   :candidates mu4e~contact-list :candidate-transformer 'ch:ct))))
+                         ;; Work around a bug with too long names in the spaceline/modeline
+                         ;; This is causing an error now in emacs 27.2
+                         ;; (defun trim-modeline-string-chopps (str)
+                         ;;   (substring str 0 39))
+                         ;; (add-function :filter-return (symbol-function 'mu4e~quote-for-modeline) 'trim-modeline-string-chopps)
 
-          (defun my-mu4e-compose-hook ()
-            "Setup outgoing messages"
-            ;; Add chopps@<account-sending-from> to CC
-            ;; Add chopps@chopps.org to Bcc if not sending from @chopps.org
-            (let ((buffer-modified (buffer-modified-p)))
-              (save-excursion
-                (message-add-header (concat "Cc: " user-mail-address))
-                (if (not (string= user-mail-address "chopps@chopps.org"))
-                    (message-add-header "Bcc: chopps@chopps.org")
-                  ))
-              (set-buffer-modified-p buffer-modified))
+                         ;; Mu4E Keyboard extras
+                         (bind-key (kbd "'") 'mu4e-headers-next 'mu4e-headers-mode-map)
+                         ;; XXXerror with vimification
+                         ;; (bind-key (kbd "\"") 'mu4e-headers-prev 'mu4e-headers-mode-map)
+                         ;; (bind-key (kbd "\"") 'mu4e-view-headers-prev 'mu4e-view-mode-map)
+                         (bind-key (kbd "f") 'mu4e-view-go-to-url 'mu4e-view-mode-map)
 
-            ;; This should go elsewhere
-            ;; Actually don't like this.
-            ;; (require 'visual-fill-column)
-            ;; (visual-fill-column-mode)
+                         (defun my-mu4e-contact-filter (addr)
+                           (let ((re "\\(no[t]?[-\\.]?repl\\(y\\|ies\\)\\|@dev.terastream.net\\|@nrl.nav.mil\\|@cmf.nrl.navy.mil\\|phoebe.johnson\\|christian.phoebe.hopps\\|phoebe.hopps@helloinnovation.com\\|lberger@fore.com\\)"))
+                             (unless (string-match-p re addr) addr)))
+                         (setq mu4e-contact-process-function 'my-mu4e-contact-filter)
 
-            ;; Outgoing mails get format=flowed.
-            (use-hard-newlines t 'guess)
-            (mml-secure-message-sign-pgpmime)
-            )
-          (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
+                         (defun my-mu4e-index-udpated ()
+                           (let ((ts (format-time-string "%H:%M:%S.%N")))
+                             (message "%s mu4e: full updated complete." ts)))
 
-          ;; Mark to move to spam folder from headers view.
-          (defun mu4e-headers-mark-move-to-spam ()
-            (interactive)
-            (let ((maildir (mu4e-message-field (mu4e-message-at-point) :maildir)))
-              (if (string-match-p (regexp-quote "gmail.com") maildir)
-                  (mu4e-mark-set 'move "/gmail.com/[Gmail]/Spam")
-                (mu4e-mark-set 'move mu4e-spam-folder))
-              (mu4e-headers-next)))
+                         (add-hook 'mu4e-index-updated-hook 'my-mu4e-index-udpated)
 
-          ;; Mark to move to spam folder from message view.
-          (defun mu4e-view-mark-move-to-spam ()
-            (interactive)
-            (mu4e~view-in-headers-context
-              (mu4e-headers-mark-move-to-spam)))
-          (debug-init-message "post-init end mu4e eval after load")
+                         (defun mu4e-update-index-deep ()
+                           "Reindex mu4e with cleanup"
+                           (interactive)
+                           (let ((mu4e-index-cleanup t)
+                                 (mu4e-index-lazy-check t))
+                             (let ((ts (format-time-string "%H:%M:%S.%N")))
+                               (message "%s mu4e: full index update starting..." ts)
+                               (mu4e-update-index))))
 
-          ;; XXX these aren't defined
-          ;; (define-key mu4e-headers-mode-map (kbd "C-c c") 'org-mu4e-store-and-capture)
-          ;; (define-key mu4e-view-mode-map    (kbd "C-c c") 'org-mu4e-store-and-capture)
+                         (bind-key (kbd "U") 'mu4e-update-index-deep 'mu4e-main-mode-map)
+                         (bind-key (kbd "u") 'mu4e-update-index 'mu4e-main-mode-map)
+                         ;; (bind-key (kbd "U") 'mu4e-update-mail-and-index  'mu4e-main-mode-map)
 
-          ;; removed 20200426
-          ;; (require 'mu4e-contrib)
+                         (defun mu4e-deal-with-moved-message ()
+                           (if (equal major-mode 'mu4e-loading-mode)
+                               (progn
+                                 (delete-window)
+                                 (mu4e-update-index)
+                                 (message "correct!"))))
 
-          ;; XXX also add this back
-          ;;
-          ;; error in process sentinel: mu4e-alert--parse-mails: End of file during parsing
-          ;; error in process sentinel: End of file during parsing
-          ;; (mu4e-alert-enable-mode-line-display)
-          ;; (mu4e-alert-enable-notifications)
-
-          ;; removed 20200426
-          ;; ;; ;; XXX disabled trying to find hang XXX THIS CAUSED IT
-          ;; (debug-init-message "debug-init MU4E mode hook")
-          ;; (add-hook 'mu4e-headers-mode-hook
-          ;;   (lambda () (progn
-          ;;                (make-local-variable 'scroll-conservatively)
-          ;;                (setq
-          ;;                  show-trailing-whitespace nil
-          ;;                  scroll-conservatively 0
-          ;;                  ;; XXX These two cause hangs
-          ;;                  ;; scroll-up-aggressively .8
-          ;;                  ;; scroll-down-aggressively .8)
-          ;;                  )
-          ;;                )))
-          ;; (add-hook 'mu4e-view-mode-hook
-          ;;           (lambda () (setq show-trailing-whitespace nil)))
-          ;; ;; Need exit hook from headers mode to do an immediate index update.
-          ;; (add-hook 'mu4e-main-mode-hook (lambda () (mu4e-update-index)))
-
-          ;; ;; XXX causes hangs
-          ;; (add-hook 'mu4e-headers-mode-hook (lambda () (progn (setq scroll-up-aggressively .8))))
-
-          (debug-init-message "debug-init MU4E add notify actions")
-
-          (defun open-message-id-in-new-frame (msgid)
-            (interactive "s")
-            (let ((mailp (persp-get-by-name "@Mu4e"))
-                  (nframe (make-frame)))
-              (select-frame nframe)
-              (and (persp-p mailp) (persp-switch "@Mu4e" nframe))
-              (mu4e-view-message-with-message-id msgid)
-              (delete-other-windows)))
-
-          (defun message-file-to-sexp (path)
-            "Retrieve a mu4e s-expression for the e-mail message at PATH."
-            (car-safe
-             (read-from-string
-              (shell-command-to-string
-               (format "mu view -o sexp %s"
-                       (shell-quote-argument (expand-file-name path)))))))
-
-          (defun mu4e-mac-notify-action (id action content)
-            (let* ((msgid (plist-get content :msgid)))
-              (when msgid
-                (open-message-id-in-new-frame msgid))))
-
-          (defun mu4e-notify-new-message (path)
-            (let* ((msg (message-file-to-sexp path))
-                   (msgid (plist-get msg :message-id))
-                   (subject (plist-get msg :subject))
-                   (title (format "%s" (car (plist-get msg :from)))))
-              (mac-notification-send title subject
-                                     :msgid msgid
-                                     :sound-name "Looking Up"
-                                     :on-action 'mu4e-mac-notify-action)))
-
-          ;; Update the index only if non-destructive, otherwise try later
-          (setq mu4e-careful-update-timer nil)
-          (defun mu4e-careful-update-index ()
-            (if (and
-                 (not (get-buffer-window "*Article*"))
-                 (fboundp 'mu4e-update-index))
-                (progn
-                  (if mu4e-careful-update-timer
-                      (cancel-timer mu4e-careful-update-retry))
-                  (message "updating-mail-index")
-                  (mu4e-update-index))
-              (unless mu4e-careful-update-timer
-                (message "setting timer to update mail index")
-                (setq mu4e-careful-update-timer
-                      (run-at-time "10 sec" nil
-                                   (lambda ()
-                                     (setq mu4e-careful-update-timer nil)
-                                     (mu4e-careful-update-index)))))))
-
-          (debug-init-message "debug-init MU4E mode add to gcal")
-          (defun mu4e-action-add-to-gcal (msg)
-            "Add to a calendar"
-            (interactive)
-            (let* ((calendar "Work")    ; fix this to query user or have default I guess
-                   (count (hash-table-count mu4e~view-attach-map))
-                   (attachnums (mu4e-split-ranges-to-numbers "a" count)))
-              (dolist (num attachnums)
-                (let* ((att (mu4e~view-get-attach msg num))
-                       (name (plist-get att :name))
-                       (index (plist-get att :index)))
-                  (if (or (s-suffix? ".vcs" name) (s-suffix? ".ics" name))
-                      (progn
-                        (message "%s %s%s%s" "mu4e-view-pipe-attachment " num " (concat \"gcalcli import --calendar=\"" calendar)
-                        (mu4e-view-pipe-attachment msg num (concat "gcalcli import --calendar=" calendar)))
-                    (message "No .[iv]cs attachment"))))))
-
-                      ;; (let* ((save-info (mu4e~view-temp-action
-                      ;;                    (mu4e-message-field msg :docid) index))
-                      ;;        (path (plist-get save-info :path))
-                      ;;        (calendar "Work"))
-                      ;;   (message (concat "gcalcli import --calendar=" calendar " " path))
-                      ;;   (message (shell-command-to-string (concat "gcalcli import --calendar=" calendar " " path)))))))))
-
-          (add-to-list 'mu4e-view-actions
-                       '("GoogleCalendar" . mu4e-action-add-to-gcal))
-
-            ;; (let ((calendar "Work"))
-            ;;   (shell-command-to-string (concat "gcalcli import --calendar=" calendar " " file))
-
-            ;;   (let* ((html (mu4e-message-field msg :body-html))
-            ;;          (txt (mu4e-message-field msg :body-txt))
-            ;;          (tmpfile (format "%s%x.html" temporary-file-directory (random t))))
-            ;;     (unless (or html txt)
-            ;;       (mu4e-error "No body part for this message"))
-            ;;     (with-temp-buffer
-            ;;       ;; simplistic -- but note that it's only an example...
-            ;;       (insert (or html (concat "<pre>" txt "</pre>")))
-            ;;       (write-file tmpfile)
-            ;;       (browse-url (concat "file://" tmpfile)))))))
+                         (defun mu4e-error-handler (errcode errmsg)
+                           "Handler function for showing an error."
+                           ;; don't use mu4e-error here; it's running in the process filter context
+                           (cl-case errcode
+                             ((102 111) (progn
+                                          (mu4e-deal-with-moved-message)
+                                          (error "Updating Index: Error %d: %s" errcode errmsg)))
+                             (4 (user-error "No matches for this search query."))
+                             (t (error "Error %d: %s" errcode errmsg))))
 
 
-          (define-key mu4e-headers-mode-map "d" 'mu4e-headers-mark-for-read)
-          (define-key mu4e-view-mode-map "d" 'mu4e-view-mark-for-read)
-          (define-key mu4e-headers-mode-map "@" 'mu4e-headers-mark-move-to-spam)
-          (define-key mu4e-view-mode-map "@" 'mu4e-view-mark-move-to-spam)
+                         ;; (debug-init-message "debug-init MU4E helm")
+                         ;; (defun ch:ct (clist)
+                         ;;   "Transform candidate into (display . real)"
+                         ;;   (mapcar (lambda (candidate)
+                         ;;             (let* ((name (plist-get candidate :name))
+                         ;;                     email (plist-get candidate :mail))
+                         ;;               (or (and name (format "%s <%s>" name email))
+                         ;;                 email))) clist))
+                         ;; (when (configuration-layer/package-usedp 'helm)
+                         ;;   (defun my-message-expand-name (&optional start)
+                         ;;     ((interactive "P"))
+                         ;;     ;; (message "my-message-expand-name called")
+                         ;;     (helm :prompt "; contact:" :sources
+                         ;;           (helm-build-sync-source "mu4e contacts"
+                         ;;                                   :candidates mu4e~contact-list :candidate-transformer 'ch:ct))))
 
-          ;; XXXerror with auto vimification
-          ;; (define-key mu4e-headers-mode-map "\\" 'mu4e-headers-mark-move-to-spam)
-          ;; (define-key mu4e-view-mode-map "\\" 'mu4e-view-mark-move-to-spam)
+                         (defun my-mu4e-compose-hook ()
+                           "Setup outgoing messages"
+                           ;; Add chopps@<account-sending-from> to CC
+                           ;; Add chopps@chopps.org to Bcc if not sending from @chopps.org
+                           (let ((buffer-modified (buffer-modified-p)))
+                             (save-excursion
+                               (message-add-header (concat "Cc: " user-mail-address))
+                               (if (not (string= user-mail-address "chopps@chopps.org"))
+                                   (message-add-header "Bcc: chopps@chopps.org")
+                                 ))
+                             (set-buffer-modified-p buffer-modified))
+
+                           ;; This should go elsewhere
+                           ;; Actually don't like this.
+                           ;; (require 'visual-fill-column)
+                           ;; (visual-fill-column-mode)
+
+                           ;; Outgoing mails get format=flowed.
+                           (use-hard-newlines t 'guess)
+                           (mml-secure-message-sign-pgpmime)
+                           )
+                         (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
+
+                         ;; Mark to move to spam folder from headers view.
+                         (defun mu4e-headers-mark-move-to-spam ()
+                           (interactive)
+                           (let ((maildir (mu4e-message-field (mu4e-message-at-point) :maildir)))
+                             (if (string-match-p (regexp-quote "gmail.com") maildir)
+                                 (mu4e-mark-set 'move "/gmail.com/[Gmail]/Spam")
+                               (mu4e-mark-set 'move mu4e-spam-folder))
+                             (mu4e-headers-next)))
+
+                         ;; Mark to move to spam folder from message view.
+                         (defun mu4e-view-mark-move-to-spam ()
+                           (interactive)
+                           (mu4e~view-in-headers-context
+                            (mu4e-headers-mark-move-to-spam)))
+                         (debug-init-message "post-init end mu4e eval after load")
+
+                         ;; XXX these aren't defined
+                         ;; (define-key mu4e-headers-mode-map (kbd "C-c c") 'org-mu4e-store-and-capture)
+                         ;; (define-key mu4e-view-mode-map    (kbd "C-c c") 'org-mu4e-store-and-capture)
+
+                         ;; removed 20200426
+                         ;; (require 'mu4e-contrib)
+
+                         ;; XXX also add this back
+                         ;;
+                         ;; error in process sentinel: mu4e-alert--parse-mails: End of file during parsing
+                         ;; error in process sentinel: End of file during parsing
+                         ;; (mu4e-alert-enable-mode-line-display)
+                         ;; (mu4e-alert-enable-notifications)
+
+                         ;; removed 20200426
+                         ;; ;; ;; XXX disabled trying to find hang XXX THIS CAUSED IT
+                         ;; (debug-init-message "debug-init MU4E mode hook")
+                         ;; (add-hook 'mu4e-headers-mode-hook
+                         ;;   (lambda () (progn
+                         ;;                (make-local-variable 'scroll-conservatively)
+                         ;;                (setq
+                         ;;                  show-trailing-whitespace nil
+                         ;;                  scroll-conservatively 0
+                         ;;                  ;; XXX These two cause hangs
+                         ;;                  ;; scroll-up-aggressively .8
+                         ;;                  ;; scroll-down-aggressively .8)
+                         ;;                  )
+                         ;;                )))
+                         ;; (add-hook 'mu4e-view-mode-hook
+                         ;;           (lambda () (setq show-trailing-whitespace nil)))
+                         ;; ;; Need exit hook from headers mode to do an immediate index update.
+                         ;; (add-hook 'mu4e-main-mode-hook (lambda () (mu4e-update-index)))
+
+                         ;; ;; XXX causes hangs
+                         ;; (add-hook 'mu4e-headers-mode-hook (lambda () (progn (setq scroll-up-aggressively .8))))
+
+                         (debug-init-message "debug-init MU4E add notify actions")
+
+                         (defun open-message-id-in-new-frame (msgid)
+                           (interactive "s")
+                           (let ((mailp (persp-get-by-name "@Mu4e"))
+                                 (nframe (make-frame)))
+                             (select-frame nframe)
+                             (and (persp-p mailp) (persp-switch "@Mu4e" nframe))
+                             (mu4e-view-message-with-message-id msgid)
+                             (delete-other-windows)))
+
+                         (defun message-file-to-sexp (path)
+                           "Retrieve a mu4e s-expression for the e-mail message at PATH."
+                           (car-safe
+                            (read-from-string
+                             (shell-command-to-string
+                              (format "mu view -o sexp %s"
+                                      (shell-quote-argument (expand-file-name path)))))))
+
+                         (defun mu4e-mac-notify-action (id action content)
+                           (let* ((msgid (plist-get content :msgid)))
+                             (when msgid
+                               (open-message-id-in-new-frame msgid))))
+
+                         (defun mu4e-notify-new-message (path)
+                           (let* ((msg (message-file-to-sexp path))
+                                  (msgid (plist-get msg :message-id))
+                                  (subject (plist-get msg :subject))
+                                  (title (format "%s" (car (plist-get msg :from)))))
+                             (mac-notification-send title subject
+                                                    :msgid msgid
+                                                    :sound-name "Looking Up"
+                                                    :on-action 'mu4e-mac-notify-action)))
+
+                         ;; Update the index only if non-destructive, otherwise try later
+                         (setq mu4e-careful-update-timer nil)
+                         (defun mu4e-careful-update-index ()
+                           (if (and
+                                (not (get-buffer-window "*Article*"))
+                                (fboundp 'mu4e-update-index))
+                               (progn
+                                 (if mu4e-careful-update-timer
+                                     (cancel-timer mu4e-careful-update-retry))
+                                 (message "updating-mail-index")
+                                 (mu4e-update-index))
+                             (unless mu4e-careful-update-timer
+                               (message "setting timer to update mail index")
+                               (setq mu4e-careful-update-timer
+                                     (run-at-time "10 sec" nil
+                                                  (lambda ()
+                                                    (setq mu4e-careful-update-timer nil)
+                                                    (mu4e-careful-update-index)))))))
+
+                         (debug-init-message "debug-init MU4E mode add to gcal")
+                         (defun mu4e-action-add-to-gcal (msg)
+                           "Add to a calendar"
+                           (interactive)
+                           (let* ((calendar "Work")    ; fix this to query user or have default I guess
+                                  (count (hash-table-count mu4e~view-attach-map))
+                                  (attachnums (mu4e-split-ranges-to-numbers "a" count)))
+                             (dolist (num attachnums)
+                               (let* ((att (mu4e~view-get-attach msg num))
+                                      (name (plist-get att :name))
+                                      (index (plist-get att :index)))
+                                 (if (or (s-suffix? ".vcs" name) (s-suffix? ".ics" name))
+                                     (progn
+                                       (message "%s %s%s%s" "mu4e-view-pipe-attachment " num " (concat \"gcalcli import --calendar=\"" calendar)
+                                       (mu4e-view-pipe-attachment msg num (concat "gcalcli import --calendar=" calendar)))
+                                   (message "No .[iv]cs attachment"))))))
+
+                         ;; (let* ((save-info (mu4e~view-temp-action
+                         ;;                    (mu4e-message-field msg :docid) index))
+                         ;;        (path (plist-get save-info :path))
+                         ;;        (calendar "Work"))
+                         ;;   (message (concat "gcalcli import --calendar=" calendar " " path))
+                         ;;   (message (shell-command-to-string (concat "gcalcli import --calendar=" calendar " " path)))))))))
+
+                         (add-to-list 'mu4e-view-actions
+                                      '("GoogleCalendar" . mu4e-action-add-to-gcal))
+
+                         ;; (let ((calendar "Work"))
+                         ;;   (shell-command-to-string (concat "gcalcli import --calendar=" calendar " " file))
+
+                         ;;   (let* ((html (mu4e-message-field msg :body-html))
+                         ;;          (txt (mu4e-message-field msg :body-txt))
+                         ;;          (tmpfile (format "%s%x.html" temporary-file-directory (random t))))
+                         ;;     (unless (or html txt)
+                         ;;       (mu4e-error "No body part for this message"))
+                         ;;     (with-temp-buffer
+                         ;;       ;; simplistic -- but note that it's only an example...
+                         ;;       (insert (or html (concat "<pre>" txt "</pre>")))
+                         ;;       (write-file tmpfile)
+                         ;;       (browse-url (concat "file://" tmpfile)))))))
 
 
-          (debug-init-message "debug-init MU4E leader keys")
-          (spacemacs/set-leader-keys-for-major-mode 'mu4e-view-mode
-            "g" 'mu4e-view-go-to-url
-            "h" 'mu4e-view-toggle-html
-            "j" 'mu4e-view-headers-next
-            "k" 'mu4e-view-headers-prev
-            "K" 'mu4e-view-save-url
-            "n" 'mu4e-view-headers-next
-            "p" 'mu4e-view-headers-prev
-            "v" 'mu4e-view-verify-msg-popup
-            "\\" 'mu4e-view-verify-msg-popup
-            ;; "y" 'mu4e- selejjj
-            "s" 'mu4e-view-search-narrow
-            "e" 'mu4e-view-search-edit
-            ;; "b" 'mu4e-view-bookmark-make-record
-            )
+                         (define-key mu4e-headers-mode-map "d" 'mu4e-headers-mark-for-read)
+                         (define-key mu4e-view-mode-map "d" 'mu4e-view-mark-for-read)
+                         (define-key mu4e-headers-mode-map "@" 'mu4e-headers-mark-move-to-spam)
+                         (define-key mu4e-view-mode-map "@" 'mu4e-view-mark-move-to-spam)
 
-          ;; ;; XXXSLOW
-          ;; (add-to-list 'mu4e-header-info-custom
-          ;;   '(:list-or-dir .
-          ;;      (:name "ML or maildir" ;; long name, as seen in message view
-          ;;        :shortname "ML-D"     ;; short name, as seen in the headers view
-          ;;        :help "Mailing list or maildir if not set"
-          ;;        :function
-          ;;        (lambda (msg)
-          ;;          (or (mu4e-message-field msg :mailing-list)
-          ;;            (mu4e-message-field msg :maildir))))))
+                         ;; XXXerror with auto vimification
+                         ;; (define-key mu4e-headers-mode-map "\\" 'mu4e-headers-mark-move-to-spam)
+                         ;; (define-key mu4e-view-mode-map "\\" 'mu4e-view-mark-move-to-spam)
 
-          (setq
-            ;; "Date         Flgs   List       From                   Subject
-            mu4e-headers-fields (quote (
-                                         (:flags          .  4)
-                                         (:human-date     . 12)
-                                         (:from           . 24)
-                                         (:maildir        . 30)
-                                         ;;(:thread-subject . nil)
-                                         (:subject . nil)
-                                         )))
-          ;; XXXSLOW
 
-          ;; (require 'mu4e-special)
+                         (debug-init-message "debug-init MU4E leader keys")
+                         (spacemacs/set-leader-keys-for-major-mode 'mu4e-view-mode
+                           "g" 'mu4e-view-go-to-url
+                           "h" 'mu4e-view-toggle-html
+                           "j" 'mu4e-view-headers-next
+                           "k" 'mu4e-view-headers-prev
+                           "K" 'mu4e-view-save-url
+                           "n" 'mu4e-view-headers-next
+                           "p" 'mu4e-view-headers-prev
+                           "v" 'mu4e-view-verify-msg-popup
+                           "\\" 'mu4e-view-verify-msg-popup
+                           ;; "y" 'mu4e- selejjj
+                           "s" 'mu4e-view-search-narrow
+                           "e" 'mu4e-view-search-edit
+                           ;; "b" 'mu4e-view-bookmark-make-record
+                           )
 
-          (debug-init-message "debug-init MU4E defun compose")
-          (defun compose-attach-marked-files ()
-            "Compose mail and attach all the marked files from a dired buffer."
-            (interactive)
-            (let ((files (dired-get-marked-files)))
-              (compose-mail nil nil nil t)
-              (dolist (file files)
-                (if (file-regular-p file)
-                    (mml-attach-file file
-                                     (mm-default-file-encoding file)
-                                     nil "attachment")
-                  (message "skipping non-regular file %s" file)))))
+                         ;; ;; XXXSLOW
+                         ;; (add-to-list 'mu4e-header-info-custom
+                         ;;   '(:list-or-dir .
+                         ;;      (:name "ML or maildir" ;; long name, as seen in message view
+                         ;;        :shortname "ML-D"     ;; short name, as seen in the headers view
+                         ;;        :help "Mailing list or maildir if not set"
+                         ;;        :function
+                         ;;        (lambda (msg)
+                         ;;          (or (mu4e-message-field msg :mailing-list)
+                         ;;            (mu4e-message-field msg :maildir))))))
 
-         )
-        )
-      )
+                         (setq
+                          ;; "Date         Flgs   List       From                   Subject
+                          mu4e-headers-fields (quote (
+                                                      (:flags          .  4)
+                                                      (:human-date     . 12)
+                                                      (:from           . 24)
+                                                      (:maildir        . 30)
+                                                      ;;(:thread-subject . nil)
+                                                      (:subject . nil)
+                                                      )))
+                         ;; XXXSLOW
+
+                         ;; (require 'mu4e-special)
+
+                         (debug-init-message "debug-init MU4E defun compose")
+                         (defun compose-attach-marked-files ()
+                           "Compose mail and attach all the marked files from a dired buffer."
+                           (interactive)
+                           (let ((files (dired-get-marked-files)))
+                             (compose-mail nil nil nil t)
+                             (dolist (file files)
+                               (if (file-regular-p file)
+                                   (mml-attach-file file
+                                                    (mm-default-file-encoding file)
+                                                    nil "attachment")
+                                 (message "skipping non-regular file %s" file)))))
+
+                         )
+                       )
+                     )
 
     ;; ===========
     ;; Basic Modes
@@ -2714,80 +2714,80 @@ given, offer to edit the search query before executing it."
     ;; =================
 
     (when-layer-used 'lsp
-     (with-eval-after-load 'lsp-mode
-     (setq-default lsp-enable-indentation nil
-                   lsp-file-watch-ignored (append '("/usr/include" ".*/build-root/.*" "/opt/current/include" ) lsp-file-watch-ignored)
-                   lsp-enable-file-watchers t
-                   lsp-file-watch-threshold 20000
+                     (with-eval-after-load 'lsp-mode
+                       (setq-default lsp-enable-indentation nil
+                                     lsp-file-watch-ignored (append '("/usr/include" ".*/build-root/.*" "/opt/current/include" ) lsp-file-watch-ignored)
+                                     lsp-enable-file-watchers t
+                                     lsp-file-watch-threshold 20000
 
-                   lsp-ui-peek-peek-height 40
-                   lsp-ui-peek-list-width 50
-                   )
+                                     lsp-ui-peek-peek-height 40
+                                     lsp-ui-peek-list-width 50
+                                     )
 
-       ))
+                       ))
 
     (when-layer-used 'syntax-checking
-     (with-eval-after-load "flycheck"
-       ;; (setq flycheck-highlighting-mode 'lines)
-       (add-hook 'flycheck-mode-hook (lambda () (setq next-error-function nil)))
-       (setq flycheck-highlighting-mode 'sexps)
-       (setq flycheck-temp-prefix ".flycheck")
+                     (with-eval-after-load "flycheck"
+                       ;; (setq flycheck-highlighting-mode 'lines)
+                       (add-hook 'flycheck-mode-hook (lambda () (setq next-error-function nil)))
+                       (setq flycheck-highlighting-mode 'sexps)
+                       (setq flycheck-temp-prefix ".flycheck")
 
-       (when-layer-used
-        'lsp
-        ;; (progn
-        ;;   (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-gcc)))
-        )
+                       (when-layer-used
+                        'lsp
+                        ;; (progn
+                        ;;   (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-gcc)))
+                        )
 
-        ;; the pos-tip window doesn't seem to work with my awesome setup (anymore)
-        (setq flycheck-display-errors-function #'flycheck-display-error-messages)
-        (setq-default flycheck-pylint-use-symbolic-id nil)
+                       ;; the pos-tip window doesn't seem to work with my awesome setup (anymore)
+                       (setq flycheck-display-errors-function #'flycheck-display-error-messages)
+                       (setq-default flycheck-pylint-use-symbolic-id nil)
 
-        ;; Chain pylint after flake8 to get benefit of both.
-        ;; (flycheck-add-next-checker 'python-flake8 'python-pylint)
-        ;; (flycheck-add-next-checker 'python-pylint 'python-pycompile)
+                       ;; Chain pylint after flake8 to get benefit of both.
+                       ;; (flycheck-add-next-checker 'python-flake8 'python-pylint)
+                       ;; (flycheck-add-next-checker 'python-pylint 'python-pycompile)
 
-        (flycheck-define-checker python-pyflakes
-          "A Python syntax and style checker using the pyflakes utility.
+                       (flycheck-define-checker python-pyflakes
+                         "A Python syntax and style checker using the pyflakes utility.
 To override the path to the pyflakes executable, set
 `flycheck-python-pyflakes-executable'.
 See URL `http://pypi.python.org/pypi/pyflakes'."
-          :command ("pyflakes" source-inplace)
-          :error-patterns
-          ((error line-start (file-name) ":" line ":" (message) line-end))
-          :modes python-mode)
+                         :command ("pyflakes" source-inplace)
+                         :error-patterns
+                         ((error line-start (file-name) ":" line ":" (message) line-end))
+                         :modes python-mode)
 
-        (add-to-list 'flycheck-checkers 'python-pyflakes)
+                       (add-to-list 'flycheck-checkers 'python-pyflakes)
 
-        ;; (setq flycheck-checkers (delq 'python-pycompile flycheck-checkers))
-        ;; (setq flycheck-checkers (cons 'python-pylint (delq 'python-pylint flycheck-checkers)))
+                       ;; (setq flycheck-checkers (delq 'python-pycompile flycheck-checkers))
+                       ;; (setq flycheck-checkers (cons 'python-pylint (delq 'python-pylint flycheck-checkers)))
 
-        (define-key flycheck-mode-map (kbd "M-n") 'flycheck-next-error)
-        (define-key flycheck-mode-map (kbd "M-p") 'flycheck-previous-error)))
+                       (define-key flycheck-mode-map (kbd "M-n") 'flycheck-next-error)
+                       (define-key flycheck-mode-map (kbd "M-p") 'flycheck-previous-error)))
 
     (when-layer-used 'emacs-lisp
-     (with-eval-after-load "lisp-mode"
-        ;; hyphens are words in emacs lisp
-        (modify-syntax-entry ?- "w" lisp-mode-syntax-table)
-        (modify-syntax-entry ?- "w" emacs-lisp-mode-syntax-table)
-        (when-layer-used 'rebox
-                         (defun rebox-lisp-hook ()
-                           (set (make-local-variable 'rebox-style-loop) '(81 82 83)))
-                         (add-hook 'lisp-mode-hook 'rebox-lisp-hook)
-                         (add-hook 'emacs-lisp-mode-hook 'rebox-lisp-hook))))
+                     (with-eval-after-load "lisp-mode"
+                       ;; hyphens are words in emacs lisp
+                       (modify-syntax-entry ?- "w" lisp-mode-syntax-table)
+                       (modify-syntax-entry ?- "w" emacs-lisp-mode-syntax-table)
+                       (when-layer-used 'rebox
+                                        (defun rebox-lisp-hook ()
+                                          (set (make-local-variable 'rebox-style-loop) '(81 82 83)))
+                                        (add-hook 'lisp-mode-hook 'rebox-lisp-hook)
+                                        (add-hook 'emacs-lisp-mode-hook 'rebox-lisp-hook))))
 
     (when-layer-used 'go
-     (with-eval-after-load "go-mode"
-       (when-layer-used 'rebox
-                        (defun rebox-go-hook ()
-                          (set (make-local-variable 'rebox-style-loop) '(81 82 83)))
-                        (add-hook 'go-mode-hook 'rebox-go-hook))))
+                     (with-eval-after-load "go-mode"
+                       (when-layer-used 'rebox
+                                        (defun rebox-go-hook ()
+                                          (set (make-local-variable 'rebox-style-loop) '(81 82 83)))
+                                        (add-hook 'go-mode-hook 'rebox-go-hook))))
 
     (when-layer-used 'yang
-     (add-hook 'yang-mode-hook (function (lambda ()
-                                           (c-set-style "BSD")
-                                           (setq indent-tabs-mode nil)
-                                           (setq c-basic-offset 2)))))
+                     (add-hook 'yang-mode-hook (function (lambda ()
+                                                           (c-set-style "BSD")
+                                                           (setq indent-tabs-mode nil)
+                                                           (setq c-basic-offset 2)))))
 
     (with-eval-after-load "transient"
       (setq transient-values-file "~/.transient-values.el"))
@@ -2807,516 +2807,516 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
 
     (when-layer-used 'yaml
-     (add-hook 'yaml-mode-hook (function (lambda ()
-                                           (when-layer-used 'rebox
-                                            (rebox-mode))
-                                            (flyspell-prog-mode)))))
+                     (add-hook 'yaml-mode-hook (function (lambda ()
+                                                           (when-layer-used 'rebox
+                                                                            (rebox-mode))
+                                                           (flyspell-prog-mode)))))
 
     (when-layer-used 'c-c++
-     (let ((binpath))
-       (dolist (suffix '("-11" "-10" "-9" "-8" "-7" ""))
-         (unless binpath
-           (setq binpath (executable-find (concat "clang-format" suffix)))))
-       (when binpath
-         (setq-default clang-format-executable binpath)))
+                     (let ((binpath))
+                       (dolist (suffix '("-11" "-10" "-9" "-8" "-7" ""))
+                         (unless binpath
+                           (setq binpath (executable-find (concat "clang-format" suffix)))))
+                       (when binpath
+                         (setq-default clang-format-executable binpath)))
 
-     (setq c-font-lock-extra-types
-            (quote
-             ("FILE"
-              "\\sw+_st" "\\sw+_t" "\\sw+type" ; procket types
-              "u\\(8\\|16\\|32\\|64\\)"
-              "i\\(8\\|16\\|32\\|64\\)"
-              "ushort" "uchar"
-              "\\(u_?\\)?int\\(8\\|16\\|32\\|64\\)_t" "ushort" "uchar"
-              "uword" "bool" "boolean")))
+                     (setq c-font-lock-extra-types
+                           (quote
+                            ("FILE"
+                             "\\sw+_st" "\\sw+_t" "\\sw+type" ; procket types
+                             "u\\(8\\|16\\|32\\|64\\)"
+                             "i\\(8\\|16\\|32\\|64\\)"
+                             "ushort" "uchar"
+                             "\\(u_?\\)?int\\(8\\|16\\|32\\|64\\)_t" "ushort" "uchar"
+                             "uword" "bool" "boolean")))
 
-      (with-eval-after-load "cc-mode"
-        ;; (modify-syntax-entry ?_ "w" awk-mode-syntax-table)
-        (modify-syntax-entry ?_ "w" c-mode-syntax-table)
-        (modify-syntax-entry ?_ "w" objc-mode-syntax-table)
-        (modify-syntax-entry ?_ "w" c++-mode-syntax-table)
-        ;; (modify-syntax-entry ?_ "w" java-mode-syntax-table)
-        ;; (modify-syntax-entry ?_ "w" objc-mode-syntax-table)
+                     (with-eval-after-load "cc-mode"
+                       ;; (modify-syntax-entry ?_ "w" awk-mode-syntax-table)
+                       (modify-syntax-entry ?_ "w" c-mode-syntax-table)
+                       (modify-syntax-entry ?_ "w" objc-mode-syntax-table)
+                       (modify-syntax-entry ?_ "w" c++-mode-syntax-table)
+                       ;; (modify-syntax-entry ?_ "w" java-mode-syntax-table)
+                       ;; (modify-syntax-entry ?_ "w" objc-mode-syntax-table)
 
-        (defun vpp-indent-format-buffer ()
-          "Reformat the buffer using 'indent'"
-          (interactive)
-          (let ((oldbuf (current-buffer))
-                fmtbuf
-                errbuf)
-            (with-temp-buffer
-              (insert-buffer-substring oldbuf)
-              (shell-command-on-region (point-min) (point-max) "indent -gnu" (current-buffer) t nil t)
-              (unless (= 0 (compare-buffer-substrings oldbuf nil nil (current-buffer) nil nil))
-                (setq fmtbuf (current-buffer))
-                (with-temp-buffer
-                  (insert-buffer-substring fmtbuf)
-                  (shell-command-on-region (point-min) (point-max) "indent -gnu" (current-buffer) t nil t)
-                  (if (not (= 0 (compare-buffer-substrings fmtbuf nil nil (current-buffer) nil nil)))
-                      (progn
-                        (message "INDENT FAILED second invocation different from first")
-                        (let ((cbuf (current-buffer))
-                              (tmp1 (make-temp-file "vppfmt1"))
-                              (tmp2 (make-temp-file "vppfmt2")))
-                          (unwind-protect
-                              (progn
-                                (with-temp-file tmp2 (insert-buffer-substring cbuf))
-                                (with-temp-file tmp1 (insert-buffer-substring fmtbuf))
-                                (let ((newbuf (get-buffer-create "*vpp-indent-non-deterministic*")))
-                                  (shell-command (format "diff -u %s %s" tmp1 tmp2) newbuf)
-                                  (if (= 0 (buffer-size newbuf))
-                                      (kill-buffer newbuf)
-                                    (setq errbuf newbuf))))
-                            (delete-file tmp1)
-                            (delete-file tmp2))))
-                    (with-current-buffer oldbuf
-                      (if (boundp 'replace-buffer-contents)
-                          ;; emacs 26 retains properties in buffer
-                          (replace-buffer-contents fmtbuf)
-                        (let ((oldpoint (point)))
-                          (erase-buffer)
-                          (insert-buffer-substring fmtbuf)
-                          (goto-char (min (point-max) oldpoint)))))))))
-            (if errbuf (display-buffer errbuf))))
+                       (defun vpp-indent-format-buffer ()
+                         "Reformat the buffer using 'indent'"
+                         (interactive)
+                         (let ((oldbuf (current-buffer))
+                               fmtbuf
+                               errbuf)
+                           (with-temp-buffer
+                             (insert-buffer-substring oldbuf)
+                             (shell-command-on-region (point-min) (point-max) "indent -gnu" (current-buffer) t nil t)
+                             (unless (= 0 (compare-buffer-substrings oldbuf nil nil (current-buffer) nil nil))
+                               (setq fmtbuf (current-buffer))
+                               (with-temp-buffer
+                                 (insert-buffer-substring fmtbuf)
+                                 (shell-command-on-region (point-min) (point-max) "indent -gnu" (current-buffer) t nil t)
+                                 (if (not (= 0 (compare-buffer-substrings fmtbuf nil nil (current-buffer) nil nil)))
+                                     (progn
+                                       (message "INDENT FAILED second invocation different from first")
+                                       (let ((cbuf (current-buffer))
+                                             (tmp1 (make-temp-file "vppfmt1"))
+                                             (tmp2 (make-temp-file "vppfmt2")))
+                                         (unwind-protect
+                                             (progn
+                                               (with-temp-file tmp2 (insert-buffer-substring cbuf))
+                                               (with-temp-file tmp1 (insert-buffer-substring fmtbuf))
+                                               (let ((newbuf (get-buffer-create "*vpp-indent-non-deterministic*")))
+                                                 (shell-command (format "diff -u %s %s" tmp1 tmp2) newbuf)
+                                                 (if (= 0 (buffer-size newbuf))
+                                                     (kill-buffer newbuf)
+                                                   (setq errbuf newbuf))))
+                                           (delete-file tmp1)
+                                           (delete-file tmp2))))
+                                   (with-current-buffer oldbuf
+                                     (if (boundp 'replace-buffer-contents)
+                                         ;; emacs 26 retains properties in buffer
+                                         (replace-buffer-contents fmtbuf)
+                                       (let ((oldpoint (point)))
+                                         (erase-buffer)
+                                         (insert-buffer-substring fmtbuf)
+                                         (goto-char (min (point-max) oldpoint)))))))))
+                           (if errbuf (display-buffer errbuf))))
 
-        (defun vpp-clang-diff-git-root-directory (file)
-          (with-temp-buffer
-            (when (git-gutter+-insert-git-output '("rev-parse" "--show-toplevel") file)
-              (goto-char (point-min))
-              (let ((root (buffer-substring-no-properties (point) (line-end-position))))
-                (unless (string= root "")
-                  (file-name-as-directory root))))))
+                       (defun vpp-clang-diff-git-root-directory (file)
+                         (with-temp-buffer
+                           (when (git-gutter+-insert-git-output '("rev-parse" "--show-toplevel") file)
+                             (goto-char (point-min))
+                             (let ((root (buffer-substring-no-properties (point) (line-end-position))))
+                               (unless (string= root "")
+                                 (file-name-as-directory root))))))
 
-        (defun file-name-git-root-relative-fn (filepath)
-          (let ((base-path
-                 (let ((vc-backend (ignore-errors (vc-responsible-backend filepath))))
-                   (when vc-backend
-                     (vc-call-backend vc-backend 'root filepath)))))
-            (if base-path (file-relative-name filepath base-path))))
+                       (defun file-name-git-root-relative-fn (filepath)
+                         (let ((base-path
+                                (let ((vc-backend (ignore-errors (vc-responsible-backend filepath))))
+                                  (when vc-backend
+                                    (vc-call-backend vc-backend 'root filepath)))))
+                           (if base-path (file-relative-name filepath base-path))))
 
-        ;; start_line = int(match.group(1))
-        ;; line_count = 1
-        ;; if match.group(3):
-        ;; line_count = int(match.group(3))
-        ;; if line_count == 0:
-        ;; continue
-        ;; end_line = start_line + line_count - 1
-        ;; lines_by_file.setdefault(filename, []).extend(['-lines', str(start_line) + ':' + str(end_line)])
+                       ;; start_line = int(match.group(1))
+                       ;; line_count = 1
+                       ;; if match.group(3):
+                       ;; line_count = int(match.group(3))
+                       ;; if line_count == 0:
+                       ;; continue
+                       ;; end_line = start_line + line_count - 1
+                       ;; lines_by_file.setdefault(filename, []).extend(['-lines', str(start_line) + ':' + str(end_line)])
 
-        (defvar diffu-new-lines-re "^@@.*\\+\\([0-9]+\\)\\(,\\([0-9]+\\)\\)?")
+                       (defvar diffu-new-lines-re "^@@.*\\+\\([0-9]+\\)\\(,\\([0-9]+\\)\\)?")
 
-        (defun clang-format-args-from-diff-buffer (&optional buffer)
-          (let ((use-buf (or buffer (current-buffer)))
-                lines)
-            (with-current-buffer use-buf
-              (save-excursion
-                (goto-char (point-max))
-                (while (re-search-backward diffu-new-lines-re nil 'noerror)
-                  (let ((start (string-to-number (match-string 1)))
-                        (count (string-to-number (or (match-string 3) "1"))))
-                    (unless (= count 0)
-                      (setq lines (cons (format "--lines=%d:%d" start (+ start count -1)) lines)))))))
-            lines))
+                       (defun clang-format-args-from-diff-buffer (&optional buffer)
+                         (let ((use-buf (or buffer (current-buffer)))
+                               lines)
+                           (with-current-buffer use-buf
+                             (save-excursion
+                               (goto-char (point-max))
+                               (while (re-search-backward diffu-new-lines-re nil 'noerror)
+                                 (let ((start (string-to-number (match-string 1)))
+                                       (count (string-to-number (or (match-string 3) "1"))))
+                                   (unless (= count 0)
+                                     (setq lines (cons (format "--lines=%d:%d" start (+ start count -1)) lines)))))))
+                           lines))
 
-        (defun clang-format-vc-diff ()
-          "Reformat only the changed lines from VC in the buffer"
-          (interactive)
-          (let* ((code-buffer (current-buffer))
-                 (cursor (clang-format--bufferpos-to-filepos (point) 'exact 'utf-8-unix))
-                 ;; vc-working-revision has some bizarre cache bug, it
-                 ;; returns the revision that was HEAD the first time it is
-                 ;; checked in a buffer. If that buffer is saved, and checked
-                 ;; the next call to vc-working-revision is not updated, one
-                 ;; must reload the file. So instead invoke the backend directly.
-                 (head-revision (vc-call-backend (vc-backend buffer-file-name)
-                                                 'working-revision
-                                                 buffer-file-name))
-                 (temp-buffer (generate-new-buffer " *clang-format-temp*"))
-                 (temp-file (make-temp-file "clang-format"))
-                 diff-line-args
-                 head-temp-file)
-            (unwind-protect
-                (if (not head-revision)
-                    (progn
-                      (message "(clang-format-vc-diff: %s not revision controlled, formatting whole buffer"
-                               buffer-file-name)
-                      (clang-format-buffer))
-                  ;; Get the HEAD revision into a temp file
-                  (let ((head-temp-buf (vc-find-revision buffer-file-name head-revision)))
-                    (setq head-temp-file (buffer-file-name head-temp-buf))
-                    (kill-buffer head-temp-buf))
-                  ;; Get the diff of buffer from the HEAD revision
-                  (let ((status (call-process-region
-                                 nil nil (executable-find "diff")
-                                 nil `(,temp-buffer ,temp-file) nil
-                                 "-U"
-                                 "0"
-                                 head-temp-file
-                                 "-"))
-                        (stderr (with-temp-buffer
-                                  (unless (zerop (cadr (insert-file-contents temp-file)))
-                                    (insert ": "))
-                                  (buffer-substring-no-properties
-                                   (point-min) (line-end-position)))))
-                    (cond
-                     ((stringp status)
-                      (error "(clang-format-vc-diff diff killed by signal %s%s)" status stderr))
-                     ((zerop status)
-                      (message "(clang-format-vc-diff no diff"))
-                     ((not (= 1 status))
-                       (error "(clang-format-vc-diff diff failed with code %d%s)" status stderr))))
-                  (setq diff-line-args (clang-format-args-from-diff-buffer temp-buffer))
-                  ;; empty the temp buffer, and delete the temp file
-                  (with-current-buffer temp-buffer (erase-buffer))
-                  ;; Get xml-replacements into now-empty temp-buffer
-                  (if (not diff-line-args)
-                      (message "(clang-format-vc-diff no differences to format)")
-                    (let ((status (apply #'call-process-region
-                                         nil nil clang-format-executable
-                                         nil `(,temp-buffer ,temp-file) nil
-                                         `("-output-replacements-xml"
-                                           "-assume-filename" ,(file-name-nondirectory buffer-file-name)
-                                           "-fallback-style" ,clang-format-fallback-style
-                                           "-cursor" ,(number-to-string cursor)
-                                           ,@diff-line-args)))
-                          (stderr (with-temp-buffer
-                                    (unless (zerop (cadr (insert-file-contents temp-file)))
-                                      (insert ": "))
-                                    (buffer-substring-no-properties
-                                     (point-min) (line-end-position)))))
-                      (cond
-                       ((stringp status)
-                        (error "(clang-format killed by signal %s%s)" status stderr))
-                       ((not (zerop status))
-                        (error "(clang-format failed with code %d%s)" status stderr)))
-                      (if (= 0 (buffer-size temp-buffer))
-                          (message "(clang-format-vc-diff no formatting changes")
-                        (cl-destructuring-bind (replacements cursor incomplete-format)
-                            (with-current-buffer temp-buffer
-                              (clang-format--extract (car (xml-parse-region))))
-                          (save-excursion
-                            (dolist (rpl replacements)
-                              (apply #'clang-format--replace rpl)))
-                          (when cursor
-                            (goto-char (clang-format--filepos-to-bufferpos cursor 'exact
-                                                                           'utf-8-unix)))
-                          (if incomplete-format
-                              (message "(clang-format: incomplete (syntax errors)%s)" stderr)
-                            (message "(clang-format: success%s)" stderr)))))))
-              (ignore-errors (kill-buffer temp-buffer))
-              (ignore-errors (delete-file temp-file))
-              (ignore-errors (delete-file head-temp-file)))))
+                       (defun clang-format-vc-diff ()
+                         "Reformat only the changed lines from VC in the buffer"
+                         (interactive)
+                         (let* ((code-buffer (current-buffer))
+                                (cursor (clang-format--bufferpos-to-filepos (point) 'exact 'utf-8-unix))
+                                ;; vc-working-revision has some bizarre cache bug, it
+                                ;; returns the revision that was HEAD the first time it is
+                                ;; checked in a buffer. If that buffer is saved, and checked
+                                ;; the next call to vc-working-revision is not updated, one
+                                ;; must reload the file. So instead invoke the backend directly.
+                                (head-revision (vc-call-backend (vc-backend buffer-file-name)
+                                                                'working-revision
+                                                                buffer-file-name))
+                                (temp-buffer (generate-new-buffer " *clang-format-temp*"))
+                                (temp-file (make-temp-file "clang-format"))
+                                diff-line-args
+                                head-temp-file)
+                           (unwind-protect
+                               (if (not head-revision)
+                                   (progn
+                                     (message "(clang-format-vc-diff: %s not revision controlled, formatting whole buffer"
+                                              buffer-file-name)
+                                     (clang-format-buffer))
+                                 ;; Get the HEAD revision into a temp file
+                                 (let ((head-temp-buf (vc-find-revision buffer-file-name head-revision)))
+                                   (setq head-temp-file (buffer-file-name head-temp-buf))
+                                   (kill-buffer head-temp-buf))
+                                 ;; Get the diff of buffer from the HEAD revision
+                                 (let ((status (call-process-region
+                                                nil nil (executable-find "diff")
+                                                nil `(,temp-buffer ,temp-file) nil
+                                                "-U"
+                                                "0"
+                                                head-temp-file
+                                                "-"))
+                                       (stderr (with-temp-buffer
+                                                 (unless (zerop (cadr (insert-file-contents temp-file)))
+                                                   (insert ": "))
+                                                 (buffer-substring-no-properties
+                                                  (point-min) (line-end-position)))))
+                                   (cond
+                                    ((stringp status)
+                                     (error "(clang-format-vc-diff diff killed by signal %s%s)" status stderr))
+                                    ((zerop status)
+                                     (message "(clang-format-vc-diff no diff"))
+                                    ((not (= 1 status))
+                                     (error "(clang-format-vc-diff diff failed with code %d%s)" status stderr))))
+                                 (setq diff-line-args (clang-format-args-from-diff-buffer temp-buffer))
+                                 ;; empty the temp buffer, and delete the temp file
+                                 (with-current-buffer temp-buffer (erase-buffer))
+                                 ;; Get xml-replacements into now-empty temp-buffer
+                                 (if (not diff-line-args)
+                                     (message "(clang-format-vc-diff no differences to format)")
+                                   (let ((status (apply #'call-process-region
+                                                        nil nil clang-format-executable
+                                                        nil `(,temp-buffer ,temp-file) nil
+                                                        `("-output-replacements-xml"
+                                                          "-assume-filename" ,(file-name-nondirectory buffer-file-name)
+                                                          "-fallback-style" ,clang-format-fallback-style
+                                                          "-cursor" ,(number-to-string cursor)
+                                                          ,@diff-line-args)))
+                                         (stderr (with-temp-buffer
+                                                   (unless (zerop (cadr (insert-file-contents temp-file)))
+                                                     (insert ": "))
+                                                   (buffer-substring-no-properties
+                                                    (point-min) (line-end-position)))))
+                                     (cond
+                                      ((stringp status)
+                                       (error "(clang-format killed by signal %s%s)" status stderr))
+                                      ((not (zerop status))
+                                       (error "(clang-format failed with code %d%s)" status stderr)))
+                                     (if (= 0 (buffer-size temp-buffer))
+                                         (message "(clang-format-vc-diff no formatting changes")
+                                       (cl-destructuring-bind (replacements cursor incomplete-format)
+                                           (with-current-buffer temp-buffer
+                                             (clang-format--extract (car (xml-parse-region))))
+                                         (save-excursion
+                                           (dolist (rpl replacements)
+                                             (apply #'clang-format--replace rpl)))
+                                         (when cursor
+                                           (goto-char (clang-format--filepos-to-bufferpos cursor 'exact
+                                                                                          'utf-8-unix)))
+                                         (if incomplete-format
+                                             (message "(clang-format: incomplete (syntax errors)%s)" stderr)
+                                           (message "(clang-format: success%s)" stderr)))))))
+                             (ignore-errors (kill-buffer temp-buffer))
+                             (ignore-errors (delete-file temp-file))
+                             (ignore-errors (delete-file head-temp-file)))))
 
-        (defun vpp-clang-diff-format-buffer-old ()
-          "Reformat the buffer using 'clang-format-diff.py'"
-          ;; Get HEAD revision of file
-          ;; Save buffer to tmp file
-          ;; Get diff of those 2 files
-          ;; run clang-format-diff.py
-          ;; copy reformatted file to new file
-          ;; run clang-format-diff.py
-          ;; check diff of new file and saved file
-          (interactive)
-          (let* ((oldbuf (current-buffer))
-                 (fname (file-name-nondirectory buffer-file-name))
-                 (tmp1name (concat ".fmt1." fname))
-                 (tmp2name (concat ".fmt2." fname))
-                 binpath hfname fmtbuf errbuf)
-            (unwind-protect
-                (progn
-                  (dolist (suffix '("-11" "-10" "-9" "-8" "-7" ""))
-                    (unless binpath
-                      (setq binpath (executable-find (concat "clang-format" suffix)))))
-                  (ignore-errors
-                    (let ((headbuf (vc-find-revision buffer-file-name (vc-working-revision buffer-file-name))))
-                      (setq hfname (buffer-file-name headbuf))
-                      (kill-buffer headbuf)))
-                  (if (not hfname)
-                      (clang-format-buffer)
-                    (with-temp-file tmp1name (insert-buffer-substring oldbuf))
-                    (with-temp-buffer
-                      ;; Format the buffer content into tmp1name
-                      (shell-command (format "diff -u0 %s %s" hfname tmp1name) (current-buffer))
-                      (shell-command-on-region (point-min) (point-max)
-                                               (concat "clang-format-diff.py -i -binary " binpath))
-                      ;; Format the formatted content into tmp1name
-                      (shell-command (format "cp %s %s" tmp1name tmp2name))
-                      (shell-command (format "diff -u0 %s %s" hfname tmp1name) (current-buffer))
-                      (shell-command-on-region (point-min) (point-max)
-                                               (concat "clang-format-diff.py -i -binary " binpath))
-                      (erase-buffer)
-                      (insert-file-contents tmp1name)
-                      ;; If something changed
-                      (unless (= 0 (compare-buffer-substrings oldbuf nil nil (current-buffer) nil nil))
-                        (setq fmtbuf (current-buffer))
-                        ;; Check for non-deterministic results
-                        (let ((newbuf (get-buffer-create "*vpp-clang-non-deterministic*")))
-                          (shell-command (format "diff -u0 %s %s" tmp1name tmp2name) newbuf)
-                          (if (= 0 (buffer-size newbuf))
-                              (kill-buffer newbuf)
-                            (setq errbuf newbuf)
-                            (error "non-deterministic clang-format results")))
-                        ;; Replace buffer content with formatted results
-                        (with-current-buffer oldbuf
-                          (if (boundp 'replace-buffer-contents)
-                              ;; emacs 26 retains properties in buffer
-                              (replace-buffer-contents fmtbuf)
-                            (let ((oldpoint (point)))
-                              (erase-buffer)
-                              (insert-buffer-substring fmtbuf)
-                              (goto-char (min (point-max) oldpoint))))))))
-                  (ignore-errors (delete-file hfname))
-                  (ignore-errors (delete-file tmp1name))
-                  (ignore-errors (delete-file tmp2name)))
-              (if errbuf (display-buffer errbuf)))))
+                       (defun vpp-clang-diff-format-buffer-old ()
+                         "Reformat the buffer using 'clang-format-diff.py'"
+                         ;; Get HEAD revision of file
+                         ;; Save buffer to tmp file
+                         ;; Get diff of those 2 files
+                         ;; run clang-format-diff.py
+                         ;; copy reformatted file to new file
+                         ;; run clang-format-diff.py
+                         ;; check diff of new file and saved file
+                         (interactive)
+                         (let* ((oldbuf (current-buffer))
+                                (fname (file-name-nondirectory buffer-file-name))
+                                (tmp1name (concat ".fmt1." fname))
+                                (tmp2name (concat ".fmt2." fname))
+                                binpath hfname fmtbuf errbuf)
+                           (unwind-protect
+                               (progn
+                                 (dolist (suffix '("-11" "-10" "-9" "-8" "-7" ""))
+                                   (unless binpath
+                                     (setq binpath (executable-find (concat "clang-format" suffix)))))
+                                 (ignore-errors
+                                   (let ((headbuf (vc-find-revision buffer-file-name (vc-working-revision buffer-file-name))))
+                                     (setq hfname (buffer-file-name headbuf))
+                                     (kill-buffer headbuf)))
+                                 (if (not hfname)
+                                     (clang-format-buffer)
+                                   (with-temp-file tmp1name (insert-buffer-substring oldbuf))
+                                   (with-temp-buffer
+                                     ;; Format the buffer content into tmp1name
+                                     (shell-command (format "diff -u0 %s %s" hfname tmp1name) (current-buffer))
+                                     (shell-command-on-region (point-min) (point-max)
+                                                              (concat "clang-format-diff.py -i -binary " binpath))
+                                     ;; Format the formatted content into tmp1name
+                                     (shell-command (format "cp %s %s" tmp1name tmp2name))
+                                     (shell-command (format "diff -u0 %s %s" hfname tmp1name) (current-buffer))
+                                     (shell-command-on-region (point-min) (point-max)
+                                                              (concat "clang-format-diff.py -i -binary " binpath))
+                                     (erase-buffer)
+                                     (insert-file-contents tmp1name)
+                                     ;; If something changed
+                                     (unless (= 0 (compare-buffer-substrings oldbuf nil nil (current-buffer) nil nil))
+                                       (setq fmtbuf (current-buffer))
+                                       ;; Check for non-deterministic results
+                                       (let ((newbuf (get-buffer-create "*vpp-clang-non-deterministic*")))
+                                         (shell-command (format "diff -u0 %s %s" tmp1name tmp2name) newbuf)
+                                         (if (= 0 (buffer-size newbuf))
+                                             (kill-buffer newbuf)
+                                           (setq errbuf newbuf)
+                                           (error "non-deterministic clang-format results")))
+                                       ;; Replace buffer content with formatted results
+                                       (with-current-buffer oldbuf
+                                         (if (boundp 'replace-buffer-contents)
+                                             ;; emacs 26 retains properties in buffer
+                                             (replace-buffer-contents fmtbuf)
+                                           (let ((oldpoint (point)))
+                                             (erase-buffer)
+                                             (insert-buffer-substring fmtbuf)
+                                             (goto-char (min (point-max) oldpoint))))))))
+                                 (ignore-errors (delete-file hfname))
+                                 (ignore-errors (delete-file tmp1name))
+                                 (ignore-errors (delete-file tmp2name)))
+                             (if errbuf (display-buffer errbuf)))))
 
-        (defun vpp-format-buffer (&optional force-clang)
-          (if (and (eq major-mode 'c++-mode)
-                   (boundp 'clang-format-buffer))
-              (clang-format-vc-diff)
-            (if force-clang
-                (clang-format-vc-diff)
-              (vpp-indent-format-buffer))))
-            ;;(clang-format-buffer)))
+                       (defun vpp-format-buffer (&optional force-clang)
+                         (if (and (eq major-mode 'c++-mode)
+                                  (boundp 'clang-format-buffer))
+                             (clang-format-vc-diff)
+                           (if force-clang
+                               (clang-format-vc-diff)
+                             (vpp-indent-format-buffer))))
+                       ;;(clang-format-buffer)))
 
-        (setq-default clang-maybe-format-buffer-enabled t)
+                       (setq-default clang-maybe-format-buffer-enabled t)
 
-        (spacemacs|add-toggle format-buffer
-          :status clang-maybe-format-buffer-enabled
-          :on (setq clang-maybe-format-buffer-enabled t)
-          :off (setq clang-maybe-format-buffer-enabled nil)
-          :documentation "Toggle maybe formatting changes in buffer on save"
-          :evil-leader "T\C-f")
+                       (spacemacs|add-toggle format-buffer
+                         :status clang-maybe-format-buffer-enabled
+                         :on (setq clang-maybe-format-buffer-enabled t)
+                         :off (setq clang-maybe-format-buffer-enabled nil)
+                         :documentation "Toggle maybe formatting changes in buffer on save"
+                         :evil-leader "T\C-f")
 
-        (defun clang-maybe-format-buffer ()
-          "Reformat buffer if contains VPP magic or has project root level .clang-format config"
-          (when (and clang-maybe-format-buffer-enabled
-                     (save-excursion
-                       (goto-char (point-min))
-                     (re-search-forward "coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t)
-                     (cond
-                      ((string= "CLANG" (match-string 1)) (vpp-format-buffer t) t)
-                      ;; ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
-                      ((string= "INDENT" (match-string 1)) (vpp-format-buffer) t)
-                      ;; We need to avoid doing this for files with changes in DEFUN/DEFPY
-                      ((f-exists? (concat (projectile-project-root) ".clang-format")) (message "found .clang-format") (clang-format-vc-diff) t))))))
+                       (defun clang-maybe-format-buffer ()
+                         "Reformat buffer if contains VPP magic or has project root level .clang-format config"
+                         (when (and clang-maybe-format-buffer-enabled
+                                    (save-excursion
+                                      (goto-char (point-min))
+                                      (re-search-forward "coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t)
+                                      (cond
+                                       ((string= "CLANG" (match-string 1)) (vpp-format-buffer t) t)
+                                       ;; ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
+                                       ((string= "INDENT" (match-string 1)) (vpp-format-buffer) t)
+                                       ;; We need to avoid doing this for files with changes in DEFUN/DEFPY
+                                       ((f-exists? (concat (projectile-project-root) ".clang-format")) (message "found .clang-format") (clang-format-vc-diff) t))))))
 
-        (defun clang-maybe-format-buffer-on-save ()
-          (add-hook 'before-save-hook 'clang-maybe-format-buffer 90 t))
+                       (defun clang-maybe-format-buffer-on-save ()
+                         (add-hook 'before-save-hook 'clang-maybe-format-buffer 90 t))
 
-        ;; (add-hook 'c-mode-common-hook 'vpp-maybe-format-buffer-on-save)
-        (add-hook 'c-mode-hook 'clang-maybe-format-buffer-on-save)
-        (add-hook 'c++-mode-hook 'clang-maybe-format-buffer-on-save)
+                       ;; (add-hook 'c-mode-common-hook 'vpp-maybe-format-buffer-on-save)
+                       (add-hook 'c-mode-hook 'clang-maybe-format-buffer-on-save)
+                       (add-hook 'c++-mode-hook 'clang-maybe-format-buffer-on-save)
 
-        (defun my-c-mode-hook ()
-          ;;(message "my-c-mode-hook")
-          (if (string= (shell-command-to-string "uname -s") "NetBSD\n")
-              (c-set-style "KNF")
-            (c-set-style "linux"))
-          ;; (c-toggle-auto-hungry-state 1)
-          ;; (setq c-electric-flag nil)
-          ;; (setq fill-column 80)
-          (setup-flycheck-c-project-paths)
-          (flyspell-prog-mode))
+                       (defun my-c-mode-hook ()
+                         ;;(message "my-c-mode-hook")
+                         (if (string= (shell-command-to-string "uname -s") "NetBSD\n")
+                             (c-set-style "KNF")
+                           (c-set-style "linux"))
+                         ;; (c-toggle-auto-hungry-state 1)
+                         ;; (setq c-electric-flag nil)
+                         ;; (setq fill-column 80)
+                         (setup-flycheck-c-project-paths)
+                         (flyspell-prog-mode))
 
-        (add-hook 'c-mode-hook 'my-c-mode-hook)
-        (add-hook 'c++-mode-hook 'my-c-mode-hook)
+                       (add-hook 'c-mode-hook 'my-c-mode-hook)
+                       (add-hook 'c++-mode-hook 'my-c-mode-hook)
 
-        (defun check-flycheck-c-project-add-path (path)
-          (when (and path (file-exists-p path))
-            (add-to-list
-             (make-variable-buffer-local 'flycheck-clang-include-path)
-             path)
-            (add-to-list
-             (make-variable-buffer-local 'flycheck-cppcheck-include-path)
-             path)
-            (add-to-list
-             (make-variable-buffer-local 'flycheck-gcc-include-path)
-             path)))
+                       (defun check-flycheck-c-project-add-path (path)
+                         (when (and path (file-exists-p path))
+                           (add-to-list
+                            (make-variable-buffer-local 'flycheck-clang-include-path)
+                            path)
+                           (add-to-list
+                            (make-variable-buffer-local 'flycheck-cppcheck-include-path)
+                            path)
+                           (add-to-list
+                            (make-variable-buffer-local 'flycheck-gcc-include-path)
+                            path)))
 
-        (defun setup-flycheck-c-project-paths ()
-          (interactive)
-          (let ((root (ignore-errors (projectile-project-root))))
-            ;; VPP
-            (when (and root (file-exists-p (concat root "src/vppinfra")))
-              (dolist (path '("src/" "src/plugins/"
-                              "build-root/install-vpp-native/external/include/dpdk/"
-                              "build-root/install-vpp-native/vpp/include/"
-                              "build-root/install-vpp_debug-native/external/include/dpdk/"
-                              "build-root/install-vpp_debug-native/vpp/include/"
-                              "../openwrt-dd/staging_dir/target-aarch64_cortex-a53+neon-vfpv4_glibc-2.22/root-mvebu64/usr/include/"
-                              "../openwrt/staging_dir/target-aarch64_cortex-a72_glibc/root-mvebu/usr/include/"))
+                       (defun setup-flycheck-c-project-paths ()
+                         (interactive)
+                         (let ((root (ignore-errors (projectile-project-root))))
+                           ;; VPP
+                           (when (and root (file-exists-p (concat root "src/vppinfra")))
+                             (dolist (path '("src/" "src/plugins/"
+                                             "build-root/install-vpp-native/external/include/dpdk/"
+                                             "build-root/install-vpp-native/vpp/include/"
+                                             "build-root/install-vpp_debug-native/external/include/dpdk/"
+                                             "build-root/install-vpp_debug-native/vpp/include/"
+                                             "../openwrt-dd/staging_dir/target-aarch64_cortex-a53+neon-vfpv4_glibc-2.22/root-mvebu64/usr/include/"
+                                             "../openwrt/staging_dir/target-aarch64_cortex-a72_glibc/root-mvebu/usr/include/"))
 
-                (let ((path1 (concat root path)))
-                  (check-flycheck-c-project-add-path path1))))
-            ;; FRR
-            (when (and root (file-exists-p (concat root "lib/libfrr.h")))
-              (dolist (path '("build/" "build/lib/" "lib/" "include/"))
-                (let ((path1 (concat root path)))
-                  (check-flycheck-c-project-add-path path1))))
-            (dolist (path '("/opt/current/include" "/usr/local/include"))
-              (check-flycheck-c-project-add-path path))))
+                               (let ((path1 (concat root path)))
+                                 (check-flycheck-c-project-add-path path1))))
+                           ;; FRR
+                           (when (and root (file-exists-p (concat root "lib/libfrr.h")))
+                             (dolist (path '("build/" "build/lib/" "lib/" "include/"))
+                               (let ((path1 (concat root path)))
+                                 (check-flycheck-c-project-add-path path1))))
+                           (dolist (path '("/opt/current/include" "/usr/local/include"))
+                             (check-flycheck-c-project-add-path path))))
 
-        (when-layer-used 'rebox
-          (defun rebox-c-hook ()
-            (set (make-local-variable 'rebox-style-loop) '(241 213 215))
-            (bind-key "M-q" 'rebox-dwim c-mode-map))
-          (add-hook 'c-mode-hook 'rebox-c-hook)
+                       (when-layer-used 'rebox
+                                        (defun rebox-c-hook ()
+                                          (set (make-local-variable 'rebox-style-loop) '(241 213 215))
+                                          (bind-key "M-q" 'rebox-dwim c-mode-map))
+                                        (add-hook 'c-mode-hook 'rebox-c-hook)
 
-         (with-eval-after-load "rebox2"
-           (rebox-register-template 252 286 '("/* ---------"
-                                              " * box123456"
-                                              " * ---------*/"))
-           (rebox-register-template 253 386 '("/* ========="
-                                              " * box123456"
-                                              " * =========*/"))
-           (rebox-register-template 254 486 '("/* *********"
-                                              " * box123456"
-                                              " * **********/"))
-            (rebox-register-template 281 186 '("//"
-                                               "// box123456"
-                                               "//"))
-           (rebox-register-template 282 286 '("// ---------"
-                                              "// box123456"
-                                              "// ---------"))
-           (rebox-register-template 283 486 '("// ========="
-                                              "// box123456"
-                                              "// =========")))
+                                        (with-eval-after-load "rebox2"
+                                          (rebox-register-template 252 286 '("/* ---------"
+                                                                             " * box123456"
+                                                                             " * ---------*/"))
+                                          (rebox-register-template 253 386 '("/* ========="
+                                                                             " * box123456"
+                                                                             " * =========*/"))
+                                          (rebox-register-template 254 486 '("/* *********"
+                                                                             " * box123456"
+                                                                             " * **********/"))
+                                          (rebox-register-template 281 186 '("//"
+                                                                             "// box123456"
+                                                                             "//"))
+                                          (rebox-register-template 282 286 '("// ---------"
+                                                                             "// box123456"
+                                                                             "// ---------"))
+                                          (rebox-register-template 283 486 '("// ========="
+                                                                             "// box123456"
+                                                                             "// =========")))
 
-        (spacemacs/set-leader-keys-for-major-mode 'c-mode
-          "q" 'rebox-dwim)
-        (spacemacs/set-leader-keys-for-major-mode 'cc-mode
-          "q" 'rebox-dwim)
-        (spacemacs/set-leader-keys-for-major-mode 'c++-mode
-          "q" 'rebox-dwim))
+                                        (spacemacs/set-leader-keys-for-major-mode 'c-mode
+                                          "q" 'rebox-dwim)
+                                        (spacemacs/set-leader-keys-for-major-mode 'cc-mode
+                                          "q" 'rebox-dwim)
+                                        (spacemacs/set-leader-keys-for-major-mode 'c++-mode
+                                          "q" 'rebox-dwim))
 
-        (setq-default c-electric-flag nil)
+                       (setq-default c-electric-flag nil)
 
-        ;; (setq c-mode-local-vars-hook (delete 'spacemacs//c-c++-setup-flycheck c-mode-local-vars-hook))
+                       ;; (setq c-mode-local-vars-hook (delete 'spacemacs//c-c++-setup-flycheck c-mode-local-vars-hook))
 
-        ;; XXX with LSP working now this is not correct
-        ;; (add-hook 'c-mode-local-vars-hook
-        ;;           (function (lambda ()
-        ;;                       (flycheck-select-checker 'c/c++-clang)))
-        ;;           t)
+                       ;; XXX with LSP working now this is not correct
+                       ;; (add-hook 'c-mode-local-vars-hook
+                       ;;           (function (lambda ()
+                       ;;                       (flycheck-select-checker 'c/c++-clang)))
+                       ;;           t)
 
-        (c-add-style
-         "KNF"
-         '((indent-tabs-mode . t)
-           (c-basic-offset . 8)
-           (c-comment-only-line-offset . 0)
-           (c-label-minimum-indentation . 0)
-           (c-tab-always-indent    . t)
-           (c-hanging-semi&comma-criteria (lambda () 'stop))
-           (c-hanging-braces-alist . ((class-open) (class-close) (defun-open)
-                                      (defun-close) (inline-open) (inline-close)
-                                      (brace-list-open) (brace-list-close)
-                                      (brace-list-intro) (brace-list-entry)
-                                      (block-open) (block-close) (substatement-open)
-                                      (statement-case-open) (extern-lang-open)
-                                      (extern-lang-close)))
-           (c-hanging-colons-alist     . ((access-label)
-                                          (case-label)
-                                          (label)
-                                          (member-init-intro)
-                                          (inher-intro)))
+                       (c-add-style
+                        "KNF"
+                        '((indent-tabs-mode . t)
+                          (c-basic-offset . 8)
+                          (c-comment-only-line-offset . 0)
+                          (c-label-minimum-indentation . 0)
+                          (c-tab-always-indent    . t)
+                          (c-hanging-semi&comma-criteria (lambda () 'stop))
+                          (c-hanging-braces-alist . ((class-open) (class-close) (defun-open)
+                                                     (defun-close) (inline-open) (inline-close)
+                                                     (brace-list-open) (brace-list-close)
+                                                     (brace-list-intro) (brace-list-entry)
+                                                     (block-open) (block-close) (substatement-open)
+                                                     (statement-case-open) (extern-lang-open)
+                                                     (extern-lang-close)))
+                          (c-hanging-colons-alist     . ((access-label)
+                                                         (case-label)
+                                                         (label)
+                                                         (member-init-intro)
+                                                         (inher-intro)))
                                         ;   (c-cleanup-list             . (scope-operator
                                         ;                                 empty-defun-braces
                                         ;                                 defun-close-semi))
-           (c-offsets-alist . ((string                . -1000)
-                               (c                     . c-lineup-C-comments)
-                               (defun-open            . 0)
-                               (defun-close           . 0)
-                               (defun-block-intro     . +)
-                               (func-decl-cont        . 0)
+                          (c-offsets-alist . ((string                . -1000)
+                                              (c                     . c-lineup-C-comments)
+                                              (defun-open            . 0)
+                                              (defun-close           . 0)
+                                              (defun-block-intro     . +)
+                                              (func-decl-cont        . 0)
                                         ; above is ansi        (func-decl-cont        . 0)
-                               (knr-argdecl-intro     . 0)
-                               (knr-argdecl           . 0)
-                               (topmost-intro         . 0)
-                               (topmost-intro-cont    . 0)
-                               (block-open            . 0)
-                               (block-close           . 0)
-                               (brace-list-open       . 0)
-                               (brace-list-close      . 0)
-                               (brace-list-intro      . +)
-                               (brace-list-entry      . 0)
-                               (statement             . 0)
-                               (statement-cont        . 4)
-                               (statement-block-intro . +)
-                               (statement-case-intro  . +)
-                               (statement-case-open   . 0)
-                               (substatement          . +)
-                               (substatement-open     . 0)
-                               (case-label            . 0)
-                               (label                 . -)
-                               (do-while-closure      . 0)
-                               (else-clause           . 0)
-                               (comment-intro         . c-lineup-comment)
-                               (arglist-intro         . 4)
-                               (arglist-cont          . 0)
-                               (arglist-cont-nonempty . 4)
-                               (arglist-close         . 4)
-                               (cpp-macro             . -1000)
-                               ))))
+                                              (knr-argdecl-intro     . 0)
+                                              (knr-argdecl           . 0)
+                                              (topmost-intro         . 0)
+                                              (topmost-intro-cont    . 0)
+                                              (block-open            . 0)
+                                              (block-close           . 0)
+                                              (brace-list-open       . 0)
+                                              (brace-list-close      . 0)
+                                              (brace-list-intro      . +)
+                                              (brace-list-entry      . 0)
+                                              (statement             . 0)
+                                              (statement-cont        . 4)
+                                              (statement-block-intro . +)
+                                              (statement-case-intro  . +)
+                                              (statement-case-open   . 0)
+                                              (substatement          . +)
+                                              (substatement-open     . 0)
+                                              (case-label            . 0)
+                                              (label                 . -)
+                                              (do-while-closure      . 0)
+                                              (else-clause           . 0)
+                                              (comment-intro         . c-lineup-comment)
+                                              (arglist-intro         . 4)
+                                              (arglist-cont          . 0)
+                                              (arglist-cont-nonempty . 4)
+                                              (arglist-close         . 4)
+                                              (cpp-macro             . -1000)
+                                              ))))
 
-        (c-add-style
-         "Procket"
-         '((c-basic-offset . 4)
-           (c-comment-only-line-offset . 0)
-           (c-label-minimum-indentation . 0)
-           (c-tab-always-indent    . t)
-           (c-hanging-semi&comma-criteria (lambda () 'stop))
-           (c-hanging-braces-alist . ((class-open) (class-close) (defun-open)
-                                      (defun-close) (inline-open) (inline-close)
-                                      (brace-list-open) (brace-list-close)
-                                      (brace-list-intro) (brace-list-entry)
-                                      (block-open) (block-close) (substatement-open)
-                                      (statement-case-open) (extern-lang-open)
-                                      (extern-lang-close)))
-           (c-hanging-colons-alist     . ((access-label)
-                                          (case-label)
-                                          (label)
-                                          (member-init-intro)
-                                          (inher-intro)))
+                       (c-add-style
+                        "Procket"
+                        '((c-basic-offset . 4)
+                          (c-comment-only-line-offset . 0)
+                          (c-label-minimum-indentation . 0)
+                          (c-tab-always-indent    . t)
+                          (c-hanging-semi&comma-criteria (lambda () 'stop))
+                          (c-hanging-braces-alist . ((class-open) (class-close) (defun-open)
+                                                     (defun-close) (inline-open) (inline-close)
+                                                     (brace-list-open) (brace-list-close)
+                                                     (brace-list-intro) (brace-list-entry)
+                                                     (block-open) (block-close) (substatement-open)
+                                                     (statement-case-open) (extern-lang-open)
+                                                     (extern-lang-close)))
+                          (c-hanging-colons-alist     . ((access-label)
+                                                         (case-label)
+                                                         (label)
+                                                         (member-init-intro)
+                                                         (inher-intro)))
                                         ;   (c-cleanup-list             . (scope-operator
                                         ;                                 empty-defun-braces
                                         ;                                 defun-close-semi))
-           (c-offsets-alist . ((string                . -1000)
-                               (c                     . c-lineup-C-comments)
-                               (defun-open            . 0)
-                               (defun-close           . 0)
-                               (defun-block-intro     . +)
-                               (func-decl-cont        . 0)
+                          (c-offsets-alist . ((string                . -1000)
+                                              (c                     . c-lineup-C-comments)
+                                              (defun-open            . 0)
+                                              (defun-close           . 0)
+                                              (defun-block-intro     . +)
+                                              (func-decl-cont        . 0)
                                         ; above is ansi        (func-decl-cont        . 0)
-                               (knr-argdecl-intro     . 0)
-                               (knr-argdecl           . 0)
-                               (topmost-intro         . 0)
-                               (topmost-intro-cont    . 0)
-                               (block-open            . 0)
-                               (block-close           . 0)
-                               (brace-list-open       . 0)
-                               (brace-list-close      . 0)
-                               (brace-list-intro      . +)
-                               (brace-list-entry      . 0)
-                               (statement             . 0)
-                               (statement-cont        . c-lineup-math)
-                               (statement-block-intro . +)
-                               (statement-case-intro  . +)
-                               (statement-case-open   . 0)
-                               (substatement          . +)
-                               (substatement-open     . 0)
-                               (case-label            . 0)
-                               (label                 . -)
-                               (do-while-closure      . 0)
-                               (else-clause           . 0)
-                               (comment-intro         . c-lineup-comment)
-                               (arglist-intro         . 4)
-                               (arglist-cont          . 0)
-                               (arglist-cont-nonempty . c-lineup-arglist)
-                               (arglist-close         . 4)
-                               (cpp-macro             . -1000)
-                               ))))
-        ))
+                                              (knr-argdecl-intro     . 0)
+                                              (knr-argdecl           . 0)
+                                              (topmost-intro         . 0)
+                                              (topmost-intro-cont    . 0)
+                                              (block-open            . 0)
+                                              (block-close           . 0)
+                                              (brace-list-open       . 0)
+                                              (brace-list-close      . 0)
+                                              (brace-list-intro      . +)
+                                              (brace-list-entry      . 0)
+                                              (statement             . 0)
+                                              (statement-cont        . c-lineup-math)
+                                              (statement-block-intro . +)
+                                              (statement-case-intro  . +)
+                                              (statement-case-open   . 0)
+                                              (substatement          . +)
+                                              (substatement-open     . 0)
+                                              (case-label            . 0)
+                                              (label                 . -)
+                                              (do-while-closure      . 0)
+                                              (else-clause           . 0)
+                                              (comment-intro         . c-lineup-comment)
+                                              (arglist-intro         . 4)
+                                              (arglist-cont          . 0)
+                                              (arglist-cont-nonempty . c-lineup-arglist)
+                                              (arglist-close         . 4)
+                                              (cpp-macro             . -1000)
+                                              ))))
+                       ))
 
     (with-eval-after-load 'gdb-mi
       ;; gdb-default-window-configuration-file
@@ -3368,25 +3368,25 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
 
     (when-layer-used 'restructuredtext
-      (with-eval-after-load 'rst
-        (setq rst-preferred-adornments
-        '((?# over-and-under 0)
-         (?* over-and-under 0)
-         (?= simple 0)
-         (?- simple 0)
-         (?^ simple 0)
-         (34 simple 0)))
+                     (with-eval-after-load 'rst
+                       (setq rst-preferred-adornments
+                             '((?# over-and-under 0)
+                               (?* over-and-under 0)
+                               (?= simple 0)
+                               (?- simple 0)
+                               (?^ simple 0)
+                               (34 simple 0)))
 
-        ;; (require 'poly-rest-mode)
-        ;; (add-hook 'rst-mode-hook 'poly-rest-mode)
+                       ;; (require 'poly-rest-mode)
+                       ;; (add-hook 'rst-mode-hook 'poly-rest-mode)
 
-        ;; (defun my-rst-hook ()
-        ;;   (message "my-rst-hook called")
-        ;;   (semantic-mode -1))
+                       ;; (defun my-rst-hook ()
+                       ;;   (message "my-rst-hook called")
+                       ;;   (semantic-mode -1))
 
-        ;; (add-hook 'rst-mode-hook 'my-rst-hook)
+                       ;; (add-hook 'rst-mode-hook 'my-rst-hook)
 
-        ))
+                       ))
 
     (when-layer-used 'git
                      (with-eval-after-load 'magit
@@ -3398,8 +3398,8 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
                        (bind-key (kbd "M-RET") 'magit-diff-visit-worktree-file-other-window 'magit-diff-mode-map)
                        (bind-key (kbd "C-j") 'magit-diff-visit-worktree-file 'magit-diff-mode-map)
-       )
-     )
+                       )
+                     )
 
     ;; python
     (when-layer-used
@@ -3429,156 +3429,156 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
        lsp-pylsp-plugins-yapf-enabled nil
        ))
      (with-eval-after-load 'python
-        (autoload 'pycoverage-mode "pycoverage" "python coverage mode" t)
+       (autoload 'pycoverage-mode "pycoverage" "python coverage mode" t)
 
-        ;; (setq python-fill-docstring-style 'symmetric
-        ;;       python-fill-string-function 'my-python-fill-string-function)
+       ;; (setq python-fill-docstring-style 'symmetric
+       ;;       python-fill-string-function 'my-python-fill-string-function)
 
-        ;; (defun my-python-fill-comment-function (&optional justify)
-        ;;   (let ((fill-column 80))
-        ;;     (python-fill-comment justify)))
+       ;; (defun my-python-fill-comment-function (&optional justify)
+       ;;   (let ((fill-column 80))
+       ;;     (python-fill-comment justify)))
 
-        (require 'pyfixers)
-        (spacemacs/declare-prefix-for-mode 'python-mode "e" "errors-prefix")
-        ;; (define-key python-mode-map (kbd "C-c M-\\") 'pyfixer:ignore-current-line)
-        ;; SPC m e i[gnore]
-        (spacemacs/set-leader-keys-for-major-mode 'python-mode "ei" 'pyfixer:ignore-current-line)
-        ;; (define-key python-mode-map (kbd "C-c C-\\") 'pyfixer:fix-current-line)
-        ;; SPC m e f[ix]
-        (spacemacs/set-leader-keys-for-major-mode 'python-mode "ef" 'pyfixer:fix-current-line)
-        ;; (define-key python-mode-map (kbd "C-c C-M-\\") 'pyfixer:fix-all-errors)
-        ;; (define-key python-mode-map (kbd "C-c 8") 'pyfixer:fix-all-errors)
-        (spacemacs/set-leader-keys-for-major-mode 'python-mode "eF" 'pyfixer:fix-all-errors)
-        ;; (bind-key "C-c C-h" 'pylookup-lookup python-mode-map)
+       (require 'pyfixers)
+       (spacemacs/declare-prefix-for-mode 'python-mode "e" "errors-prefix")
+       ;; (define-key python-mode-map (kbd "C-c M-\\") 'pyfixer:ignore-current-line)
+       ;; SPC m e i[gnore]
+       (spacemacs/set-leader-keys-for-major-mode 'python-mode "ei" 'pyfixer:ignore-current-line)
+       ;; (define-key python-mode-map (kbd "C-c C-\\") 'pyfixer:fix-current-line)
+       ;; SPC m e f[ix]
+       (spacemacs/set-leader-keys-for-major-mode 'python-mode "ef" 'pyfixer:fix-current-line)
+       ;; (define-key python-mode-map (kbd "C-c C-M-\\") 'pyfixer:fix-all-errors)
+       ;; (define-key python-mode-map (kbd "C-c 8") 'pyfixer:fix-all-errors)
+       (spacemacs/set-leader-keys-for-major-mode 'python-mode "eF" 'pyfixer:fix-all-errors)
+       ;; (bind-key "C-c C-h" 'pylookup-lookup python-mode-map)
 
-        (spacemacs/set-leader-keys-for-major-mode 'python-mode "en" 'flycheck-next-error)
-        (spacemacs/set-leader-keys-for-major-mode 'python-mode "ep" 'flycheck-prev-error)
+       (spacemacs/set-leader-keys-for-major-mode 'python-mode "en" 'flycheck-next-error)
+       (spacemacs/set-leader-keys-for-major-mode 'python-mode "ep" 'flycheck-prev-error)
 
-        ;;
-        (add-to-list 'python-shell-extra-pythonpaths "/opt/Acton/modules")
+       ;;
+       (add-to-list 'python-shell-extra-pythonpaths "/opt/Acton/modules")
 
-        ;; Consider _ a part of words for python
-        (modify-syntax-entry ?_ "w" python-mode-syntax-table)
+       ;; Consider _ a part of words for python
+       (modify-syntax-entry ?_ "w" python-mode-syntax-table)
 
-        ;; (define-key global-map (kbd "C-c o") 'iedit-mode)
+       ;; (define-key global-map (kbd "C-c o") 'iedit-mode)
 
-        ;; (if (file-exists-p "/usr/local/bin/python"  )
-        ;; (setenv "PYMACS_PYTHON" "/usr/local/bin/python"))
+       ;; (if (file-exists-p "/usr/local/bin/python"  )
+       ;; (setenv "PYMACS_PYTHON" "/usr/local/bin/python"))
 
-        ;; XXX Hack to get rid of warning, need to fix this differently.
-        ;; (setq python-shell-completion-native-enable nil)
+       ;; XXX Hack to get rid of warning, need to fix this differently.
+       ;; (setq python-shell-completion-native-enable nil)
 
-        (with-eval-after-load 'python
-          (defun rebox-python-hook ()
-            (set (make-local-variable 'rebox-style-loop) '(71 82 73)))
-          (add-hook 'python-mode-hook 'rebox-python-hook))
+       (with-eval-after-load 'python
+         (defun rebox-python-hook ()
+           (set (make-local-variable 'rebox-style-loop) '(71 82 73)))
+         (add-hook 'python-mode-hook 'rebox-python-hook))
 
-        ;; (defun python-sort-import-list ()
-        ;;   "Split an single import lines with multiple module imports into separate lines sort results"
-        ;;   (interactive)
-        ;;   (if (not (use-region-p))
-        ;;       (error "No region defined"))
-        ;;   (let* ((start (region-beginning))
-        ;;          (end (region-end))
-        ;;          (value 0)
-        ;;          found)
-        ;;     (save-excursion
-        ;;       (let* (modlist impstart impend bigstr)
-        ;;         (setq modlist '())
-        ;;         (goto-char start)
-        ;;         (when (re-search-forward "^import \\([[:alnum:]_,\\. ]+\\)$" end t)
-        ;;           (setq impstart (match-beginning 0))
-        ;;           (setq impend (match-end 0))
-        ;;           (setq modlist (append modlist (mapcar 's-trim (s-split "," (match-string 1)))))
-        ;;           (while (setq found (re-search-forward "^import \\([[:alnum:]_,\\. ]+\\)$" end t))
-        ;;             (setq impend (match-end 0))
-        ;;             (setq modlist (append modlist (mapcar 's-trim (s-split "," (match-string 1))))))
-        ;;           (setq modlist (sort modlist 's-less?))
-        ;;           (setq modlist (mapcar (lambda (x) (concat "import " x)) modlist))
-        ;;           (setq bigstr (s-join "\n" modlist))
-        ;;           (save-restriction
-        ;;             (narrow-to-region impstart impend)
-        ;;             (delete-region impstart impend)
-        ;;             (goto-char impstart)
-        ;;             (insert bigstr)))))))
+       ;; (defun python-sort-import-list ()
+       ;;   "Split an single import lines with multiple module imports into separate lines sort results"
+       ;;   (interactive)
+       ;;   (if (not (use-region-p))
+       ;;       (error "No region defined"))
+       ;;   (let* ((start (region-beginning))
+       ;;          (end (region-end))
+       ;;          (value 0)
+       ;;          found)
+       ;;     (save-excursion
+       ;;       (let* (modlist impstart impend bigstr)
+       ;;         (setq modlist '())
+       ;;         (goto-char start)
+       ;;         (when (re-search-forward "^import \\([[:alnum:]_,\\. ]+\\)$" end t)
+       ;;           (setq impstart (match-beginning 0))
+       ;;           (setq impend (match-end 0))
+       ;;           (setq modlist (append modlist (mapcar 's-trim (s-split "," (match-string 1)))))
+       ;;           (while (setq found (re-search-forward "^import \\([[:alnum:]_,\\. ]+\\)$" end t))
+       ;;             (setq impend (match-end 0))
+       ;;             (setq modlist (append modlist (mapcar 's-trim (s-split "," (match-string 1))))))
+       ;;           (setq modlist (sort modlist 's-less?))
+       ;;           (setq modlist (mapcar (lambda (x) (concat "import " x)) modlist))
+       ;;           (setq bigstr (s-join "\n" modlist))
+       ;;           (save-restriction
+       ;;             (narrow-to-region impstart impend)
+       ;;             (delete-region impstart impend)
+       ;;             (goto-char impstart)
+       ;;             (insert bigstr)))))))
 
-        (defun rst-python-statement-is-docstring (begin)
-          "Return true if beginning of statiment is :begin"
-          (save-excursion
-            (save-match-data
-              (python-nav-beginning-of-statement)
-              (looking-at-p begin))))
+       (defun rst-python-statement-is-docstring (begin)
+         "Return true if beginning of statiment is :begin"
+         (save-excursion
+           (save-match-data
+             (python-nav-beginning-of-statement)
+             (looking-at-p begin))))
 
-        (defun rst-python-front-verify ()
-          (rst-python-statement-is-docstring (match-string 0)))
+       (defun rst-python-front-verify ()
+         (rst-python-statement-is-docstring (match-string 0)))
 
-        ;; XXX26 (require 'mmm-mode)
-        ;; (add-to-list 'mmm-save-local-variables 'adaptive-fill-regexp)
-        ;; (add-to-list 'mmm-save-local-variables 'fill-paragraph-function)
-        ;; (mmm-add-classes
-        ;;  '((rst-python-docstrings
-        ;;     :submode rst-mode
-        ;;     :face mmm-comment-submode-face
-        ;;     :front "u?\\(\"\"\"\\|\'\'\'\\)"
-        ;;     :front-verify rst-python-front-verify
-        ;;     :back "~1"
-        ;;     :end-not-begin t
-        ;;     ;; :creation-hook (lambda () semantic-mode -1)
-        ;;     :save-matches 1
-        ;;     ;; :front rst-python-docstrings-find-front
-        ;;     ;; :back rst-python-docstrings-find-back
-        ;;     :insert ((?d embdocstring nil @ "u\"\"\"" @ _ @ "\"\"\"" @))
-        ;;     :delimiter-mode nil)))
-        ;; (mmm-add-mode-ext-class 'python-mode nil 'rst-python-docstrings)
+       ;; XXX26 (require 'mmm-mode)
+       ;; (add-to-list 'mmm-save-local-variables 'adaptive-fill-regexp)
+       ;; (add-to-list 'mmm-save-local-variables 'fill-paragraph-function)
+       ;; (mmm-add-classes
+       ;;  '((rst-python-docstrings
+       ;;     :submode rst-mode
+       ;;     :face mmm-comment-submode-face
+       ;;     :front "u?\\(\"\"\"\\|\'\'\'\\)"
+       ;;     :front-verify rst-python-front-verify
+       ;;     :back "~1"
+       ;;     :end-not-begin t
+       ;;     ;; :creation-hook (lambda () semantic-mode -1)
+       ;;     :save-matches 1
+       ;;     ;; :front rst-python-docstrings-find-front
+       ;;     ;; :back rst-python-docstrings-find-back
+       ;;     :insert ((?d embdocstring nil @ "u\"\"\"" @ _ @ "\"\"\"" @))
+       ;;     :delimiter-mode nil)))
+       ;; (mmm-add-mode-ext-class 'python-mode nil 'rst-python-docstrings)
 
-        (defun my-python-before-save-hook ()
-          (if (bound-and-true-p blacken-mode)
-              (py-isort-before-save)))
+       (defun my-python-before-save-hook ()
+         (if (bound-and-true-p blacken-mode)
+             (py-isort-before-save)))
 
-        (defun my-python-mode-hook ()
-          (setq comment-column 60)
-          (python-docstring-mode 1)
-          ;; Check to see if there's a pylint in the project directory maybe?
-          (message "XXX checker set")
-           ;; flake8 will chain in pylint
-          (add-hook 'before-save-hook 'my-python-before-save-hook)
-          (flycheck-select-checker 'python-pylint)
-          ;; (flycheck-select-checker 'python-flake8)
-          (semantic-mode -1)
+       (defun my-python-mode-hook ()
+         (setq comment-column 60)
+         (python-docstring-mode 1)
+         ;; Check to see if there's a pylint in the project directory maybe?
+         (message "XXX checker set")
+         ;; flake8 will chain in pylint
+         (add-hook 'before-save-hook 'my-python-before-save-hook)
+         (flycheck-select-checker 'python-pylint)
+         ;; (flycheck-select-checker 'python-flake8)
+         (semantic-mode -1)
 
-                ;; flycheck-checker-error-threshold 900
-                ;; flycheck-pylintrc "~/.pylintrc")))
+         ;; flycheck-checker-error-threshold 900
+         ;; flycheck-pylintrc "~/.pylintrc")))
 
-          ;;   ;; This gives and error
-          ;;   ;; (message "select checker")
-          ;;   ;; This is required b/c for some reason it's still not loaded at this point.
-          ;;   ;; (require 'flycheck)
+         ;;   ;; This gives and error
+         ;;   ;; (message "select checker")
+         ;;   ;; This is required b/c for some reason it's still not loaded at this point.
+         ;;   ;; (require 'flycheck)
 
-          ;;   ;; not needed now that we chain
-          ;;   ;; (flycheck-select-checker 'python-pycheckers)
-          ;;   ;; (message "post select checker")
+         ;;   ;; not needed now that we chain
+         ;;   ;; (flycheck-select-checker 'python-pycheckers)
+         ;;   ;; (message "post select checker")
 
-          ;;   ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
-          ;;   ;; (message "select set exec")
-          ;;   ;; (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
-          )
+         ;;   ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
+         ;;   ;; (message "select set exec")
+         ;;   ;; (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
+         )
 
-        (add-hook 'python-mode-hook 'my-python-mode-hook)
+       (add-hook 'python-mode-hook 'my-python-mode-hook)
 
-        ;; (require 'nadvice)
-        (defun my-save-kill-ring (fun &rest _args)
-          (let ((kill-ring nil))
-            (funcall fun)))
-        (advice-add 'yapffy-region :around 'my-save-kill-ring)
+       ;; (require 'nadvice)
+       (defun my-save-kill-ring (fun &rest _args)
+         (let ((kill-ring nil))
+           (funcall fun)))
+       (advice-add 'yapffy-region :around 'my-save-kill-ring)
 
-        )
+       )
 
-      )
+     )
 
     ;; remove when added to spacemacs--indent-variable-alist
     (when-layer-used 'lua
-     (with-eval-after-load 'lua-mode
-       (setq-default lua-indent-level 4)))
+                     (with-eval-after-load 'lua-mode
+                       (setq-default lua-indent-level 4)))
 
     ;; ===
     ;; Org
@@ -3588,739 +3588,739 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
     (when-layer-used 'org
 
-     (debug-init-message "debug-init org setup")
-     ;; Do we want this?
+                     (debug-init-message "debug-init org setup")
+                     ;; Do we want this?
 
-     ;; Custom Agenda View
-     (setq org-agenda-custom-commands
-           '(("c" . "Custom searches") ; describe prefix "h"
-             ("cc" "Closed in the last week" tags "CLOSED>=\"<-1w>\"")))
+                     ;; Custom Agenda View
+                     (setq org-agenda-custom-commands
+                           '(("c" . "Custom searches") ; describe prefix "h"
+                             ("cc" "Closed in the last week" tags "CLOSED>=\"<-1w>\"")))
 
-     ;; key desc (cmd1 cmd2 ...) settings-for-whole-set files
+                     ;; key desc (cmd1 cmd2 ...) settings-for-whole-set files
 
-     (setq org-html-doctype "html5")
+                     (setq org-html-doctype "html5")
 
-     ;; Save running clock and clock history.
-     (setq org-clock-persist t)
+                     ;; Save running clock and clock history.
+                     (setq org-clock-persist t)
 
-     (if (file-accessible-directory-p "~/Dropbox/org-mode")
-         (progn
-          (setq-default org-directory "~/Dropbox/org-mode/")
-          (setq org-agenda-files '("~/Dropbox/org-mode/")))
-       (setq-default org-directory "~/org/")
-       (setq org-agenda-files '("~/org/")))
-
-
-     ;; This is for using xelatex
-     (with-eval-after-load "org"
-       ;; (dolist (estate '(normal visual motion))
-       ;;   (evil-define-key estate evil-org-mode-map "H" nil)
-       ;;   (evil-define-key estate evil-org-mode-map "L" nil)
-       ;;   (evil-define-key estate org-mode-map "H" nil)
-       ;;   (evil-define-key estate org-mode-map "M" nil)
-       ;;   (evil-define-key estate org-mode-map "L" nil))
-
-       ;; Consider _s parts of words
-       (modify-syntax-entry ?_ "w" org-mode-syntax-table)
-
-       (set-register ?W `(file . ,(concat org-directory "/work.org")))
-       (set-register ?N `(file . ,(concat org-directory "/notes.org")))
-       (set-register ?I `(file . ,(concat org-directory "/ietf.org")))
-       (set-register ?S `(file . ,(concat org-directory "/status.org")))
-       (set-register ?P `(file . ,(concat dropbox-directory "/ts-pass.gpg")))
-
-       ;;
-       ;; XXX add back
-       ;; (add-to-list 'org-file-apps '("\\.pdf\\'" . emacs))
-
-       (setq-default org-use-sub-superscripts '{})
-       ;; (setq-default org-export-with-sub-superscripts nil)
-       (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
-
-       (setq org-taskjuggler-default-global-properties
-             "shift normal \"Full time shift\" { workinghours mon - fri 09:00 - 17:00 } ")
-       ;; Make duration values make a lot more sense
-       (setq org-duration-units
-             `(("min" . 1)
-               ("h" . 60)
-               ("d" . ,(* 60 8))
-               ("w" . ,(* 60 8 5))
-               ("m" . ,(* 60 8 5 4.2))
-               ("m" . ,(* 60 8 5 4.2 12)))
-             org-duration-format '(("h") (special . 2))
-             )
-       (org-duration-set-regexps)
-
-       (require 'ox-latex)
-
-       ;; ;; lualatex preview
-       ;; (setq org-latex-pdf-process
-       ;;       '("lualatex -shell-escape -interaction nonstopmode %f"
-       ;;         "lualatex -shell-escape -interaction nonstopmode %f"))
-
-       ;; (setq luamagick '(luamagick :programs ("lualatex" "convert")
-       ;;                             :description "pdf > png"
-       ;;                             :message "you need to install lualatex and imagemagick."
-       ;;                             :use-xcolor t
-       ;;                             :image-input-type "pdf"
-       ;;                             :image-output-type "png"
-       ;;                             :image-size-adjust (1.0 . 1.0)
-       ;;                             :latex-compiler ("lualatex -interaction nonstopmode -output-directory %o %f")
-       ;;                             :image-converter ("convert -density %D -trim -antialias %f -quality 100 %O")))
-
-       ;; (add-to-list 'org-preview-latex-process-alist luamagick)
-
-       ;; (setq org-preview-latex-default-process 'luamagick)
-       )
+                     (if (file-accessible-directory-p "~/Dropbox/org-mode")
+                         (progn
+                           (setq-default org-directory "~/Dropbox/org-mode/")
+                           (setq org-agenda-files '("~/Dropbox/org-mode/")))
+                       (setq-default org-directory "~/org/")
+                       (setq org-agenda-files '("~/org/")))
 
 
-     ;; (with-eval-after-load "org-agenda"
-     ;;   (define-key org-agenda-mode-map (kbd "RET") 'org-agenda-switch-to))
+                     ;; This is for using xelatex
+                     (with-eval-after-load "org"
+                       ;; (dolist (estate '(normal visual motion))
+                       ;;   (evil-define-key estate evil-org-mode-map "H" nil)
+                       ;;   (evil-define-key estate evil-org-mode-map "L" nil)
+                       ;;   (evil-define-key estate org-mode-map "H" nil)
+                       ;;   (evil-define-key estate org-mode-map "M" nil)
+                       ;;   (evil-define-key estate org-mode-map "L" nil))
 
-     (debug-init-message "debug-init org my-org-mode-hook")
-     (defun my-org-mode-hook ()
-       (yas-minor-mode 1)
-       (electric-indent-mode 0)
-       (setq org-adapt-indentation 'headline-data))
-     (add-hook 'org-mode-hook 'my-org-mode-hook)
+                       ;; Consider _s parts of words
+                       (modify-syntax-entry ?_ "w" org-mode-syntax-table)
 
-     ; (require 'ox-rfc)
+                       (set-register ?W `(file . ,(concat org-directory "/work.org")))
+                       (set-register ?N `(file . ,(concat org-directory "/notes.org")))
+                       (set-register ?I `(file . ,(concat org-directory "/ietf.org")))
+                       (set-register ?S `(file . ,(concat org-directory "/status.org")))
+                       (set-register ?P `(file . ,(concat dropbox-directory "/ts-pass.gpg")))
 
-     (require 'org-id)
+                       ;;
+                       ;; XXX add back
+                       ;; (add-to-list 'org-file-apps '("\\.pdf\\'" . emacs))
 
-     (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)
-     (define-key org-mode-map (kbd "C-c e e") 'org-encrypt-entries)
-     (define-key org-mode-map (kbd "C-c e E") 'org-encrypt-entry)
-     (define-key org-mode-map (kbd "C-c e d") 'org-decrypt-entries)
-     (define-key org-mode-map (kbd "C-c e D") 'org-decrypt-entry)
+                       (setq-default org-use-sub-superscripts '{})
+                       ;; (setq-default org-export-with-sub-superscripts nil)
+                       (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
 
-     ;;
-     ;; Global org mode clock in/out keys
-     ;;
-     (defun my/start-heading-clock (heading)
-       "Start clock programmatically for heading with ID in FILE."
-       ;; (if-let (marker (org-find-exact-heading-in-directory heading org-directory))
-       (if-let (marker (org-find-exact-heading-in-directory heading labn-365-dir))
-           (save-current-buffer
-             (save-excursion
-               (set-buffer (marker-buffer marker))
-               (goto-char (marker-position marker))
-               (org-clock-in)
-               (save-buffer)
-               ))
-         (warn "Clock not started (Could not find heading '%s' in '%s')" heading labn-365-dir)))
-     (defun my/stop-clock-save-file-with-heading (heading)
-       "Stop clock and save file"
-       ;; (if-let (marker (org-find-exact-heading-in-directory heading org-directory))
-       (if-let (marker (org-find-exact-heading-in-directory heading labn-365-dir))
-           (save-current-buffer
-             (save-excursion
-               (set-buffer (marker-buffer marker))
-               (org-clock-out)
-               (save-buffer)
-               ))
-         (warn "Clock not started (Could not find heading '%s' in '%s')" heading labn-365-dir)))
-     (defun clock-in-tfs () "Clock-IN TFS" (interactive) (my/start-heading-clock "TFS DO7.002"))
-     (defun clock-in-caas () "Clock-IN CAS" (interactive) (my/start-heading-clock "CAAS DO9.002"))
-     (defun clock-out-save () "Clock-Out Save" (interactive) (my/stop-clock-save-file-with-heading "TFS DO7.002"))
-     (spacemacs/set-leader-keys "oic" 'clock-in-caas)
-     (spacemacs/set-leader-keys "oim" 'clock-in-tfs)
-     (spacemacs/set-leader-keys "oit" 'clock-in-tfs)
-     (spacemacs/set-leader-keys "oo" 'clock-out-save)
+                       (setq org-taskjuggler-default-global-properties
+                             "shift normal \"Full time shift\" { workinghours mon - fri 09:00 - 17:00 } ")
+                       ;; Make duration values make a lot more sense
+                       (setq org-duration-units
+                             `(("min" . 1)
+                               ("h" . 60)
+                               ("d" . ,(* 60 8))
+                               ("w" . ,(* 60 8 5))
+                               ("m" . ,(* 60 8 5 4.2))
+                               ("m" . ,(* 60 8 5 4.2 12)))
+                             org-duration-format '(("h") (special . 2))
+                             )
+                       (org-duration-set-regexps)
 
-     ;; (setq TeX-view-program-selection
-     ;;       (append
-     ;;        (delq (assoc 'output-pdf TeX-view-program-selection) TeX-view-program-selection)
-     ;;        '((output-pdf "PDF Tools"))))
+                       (require 'ox-latex)
 
-     ;; (defun th/pdf-view-revert-buffer-maybe (file)
-     ;;   (when-let ((buf (find-buffer-visiting file)))
-     ;;             (with-current-buffer buf
-     ;;               (when (derived-mode-p 'pdf-view-mode)
-     ;;                 (pdf-view-revert-buffer nil t)))))
+                       ;; ;; lualatex preview
+                       ;; (setq org-latex-pdf-process
+                       ;;       '("lualatex -shell-escape -interaction nonstopmode %f"
+                       ;;         "lualatex -shell-escape -interaction nonstopmode %f"))
 
-     ;; (add-hook 'TeX-after-TeX-LaTeX-command-finished-hook
-     ;;           #'th/pdf-view-revert-buffer-maybe)
+                       ;; (setq luamagick '(luamagick :programs ("lualatex" "convert")
+                       ;;                             :description "pdf > png"
+                       ;;                             :message "you need to install lualatex and imagemagick."
+                       ;;                             :use-xcolor t
+                       ;;                             :image-input-type "pdf"
+                       ;;                             :image-output-type "png"
+                       ;;                             :image-size-adjust (1.0 . 1.0)
+                       ;;                             :latex-compiler ("lualatex -interaction nonstopmode -output-directory %o %f")
+                       ;;                             :image-converter ("convert -density %D -trim -antialias %f -quality 100 %O")))
 
-     (defun my-org-confirm-babel-evaluate (lang body)
-       (not (or (string= lang "ditaa")
-                (string= lang "dot2tex")
-                (string= lang "dot")
-                (string= lang "gnuplot")
-                (string= lang "plantuml")
-                ;; (string= lang "yang")
-                )))
-     ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
+                       ;; (add-to-list 'org-preview-latex-process-alist luamagick)
 
-     (debug-init-message "debug-init org setq")
-     (setq
-      ;; Crypt
-      org-tags-exclude-from-inheritance '("crypt")
-      org-crypt-disable-auto-save t
-      org-crypt-key "D7B83025"
-      org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
-      org-src-fontify-natively t
-      org-default-notes-file (concat org-directory "/notes.org")
-      ;; Display
-      org-display-inline-images t
-
-      ;; General
-      ;; org-agenda-start-day "-8d"
-      org-agenda-start-on-weekday 1
-      org-hide-leading-stars t
-      org-log-done 'time
-      org-outline-path-complete-in-steps t
-      org-plantuml-jar-path "/opt/plantuml/plantuml.jar"
-      org-refile-use-outline-path 'file
-      org-src-tab-acts-natively t
-      org-src-window-setup 'current-window
-
-      ;; Exports
-      org-export-latex-emphasis-alist (quote (("*" "\\textbf{%s}" nil)
-                                              ("/" "\\emph{%s}" nil)
-                                              ("_" "\\underline{%s}" nil)
-                                              ("+" "\\texttt{%s}" nil)
-                                              ("=" "\\verb=%s=" nil)
-                                              ("~" "\\verb~%s~" t)
-                                              ("@" "\\alert{%s}" nil)))
-
-      org-latex-listings 'minted
-      ;; org-latex-packages-alist '(("" "graphicx" t)
-      ;;                            ("" "longtable" nil)
-      ;;                            ("" "minted" nil)
-      ;;                            ("" "float" nil))
-
-      ;; we do this above
-      ;; org-latex-packages-alist '(("" "minted" nil))
-      org-latex-create-formula-image-program 'imagemagick
-
-      org-latex-pdf-process
-      '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f")
-
-      ;; capture the search instead of the highlighted message in
-      ;; headers view
-      org-mu4e-link-query-in-headers-mode nil
-
-      ;; XXX investigate this more
-      ;; org-icalendar-include-todo t
-      ;; org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
-      ;; org-icalendar-use-scheduled '(event-if-todo event-if-not-todo todo-start)
-      ;; org-icalendar-with-timestamps t
-
-      ;; (setq org-capture-templates
-      ;; '(
-      ;;   ("m" "Mail options")
-
-      ;;   ("mt" "mailtodo"
-      ;;    entry (file+datetree "~/s/notes/tasks.org")
-      ;;    "* TODO %^{Task} : %:subject %^G\nSCHEDULED: %t\n- From :: %:from\n- Subject :: %:subject\n- Email :: %a\n\n%?" :kill-buffer t)
-
-      ;;   ("mn" "mailnote"
-      ;;    entry (file+headline "~/s/notes/notes.org" "general notes and tasks")
-      ;;    "* %^{Title} : %:subject %^G\n- From :: %:from\n- Subject :: %:subject\n- Email :: %a\n\n%?\n\n%U")
-      ;;   ))
-
-      org-capture-templates
-      `(
-        ("t" "Todo" entry (file+headline ,(concat org-directory "/notes.org") "Tasks")
-         "* TODO %^{Title}%?\nDEADLINE: %^t CREATED: %u\nAnnotation: %a\n\n")
-
-        ("m" "Mail Todo" entry (file+headline ,(concat org-directory "/notes.org") "Mail")
-         "* TODO [Mail] %^{Title|%:subject}%? ([%:from])\nDEADLINE: %^t CREATED: %u\nMessage: %a\n\n")
-
-        ("c" "Code Todo" entry (file+headline ,(concat org-directory "/notes.org") "Code Todo")
-         "* TODO [Code] %^{Title}\nDEADLINE: %^t\nCREATED: %u\nAnnotation: %a\n%?\n\n")
-
-        ("n" "Generic Note" entry (file+headline ,(concat org-directory "/notes.org") "Notes")
-         "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
-
-        ("L" "Mac Link Note" entry (file+headline ,(concat org-directory "/notes.org") "Notes")
-         "* NOTE %?\n%u\n%(org-mac-safari-get-frontmost-url)\n")
-
-        ("s" "Status" item (file+olp+datetree ,(concat org-directory "/work.org") "Working" "Status Items")
-         "- %^{Status Item} %u\n" :tree-type week :immediate-finish t)
-
-        ;; ("s" "Status" entry (file+weektree ,(concat org-directory "/status.org"))
-        ;;  "* NOTE %?\n%u\n")
-
-        ("x" "Food/Medication")
-        ("xa" "Augmentin 875-125" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-         "* NOTE 875-125 amox/clav\nCreated: %U" :immediate-finish t)
-        ("xc" "Creon 36K" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-         "* NOTE 36000 creon\nCreated: %U" :immediate-finish t)
-        ("xC" "Compazine 5mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-         "* NOTE 5mg Compazine\nCreated: %U" :immediate-finish t)
-        ("xn" "Nortriptyline 50mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-         "* NOTE 50mg Nortriptyline 2x25\nCreated: %U" :immediate-finish t)
-        ("xf" "Food" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-         "* NOTE Food\nCreated: %U\nFood:%^{food}" :immediate-finish t)
-        ("xp" "Prilosec 20mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-         "* NOTE 20mg Prilosec\nCreated: %U" :immediate-finish t)
-        ("xt" "Tylenol dose 1g" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-         "* NOTE 1g Tylenol\nCreated: %U" :immediate-finish t)
-        ("x1" "Tramadol 100mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-         "* NOTE 100mg 2x50 Tramadol\nCreated: %U" :immediate-finish t)
-        ("x/" "Tramadol 75mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-         "* NOTE 75mg 1.5x50 Tramadol\nCreated: %U" :immediate-finish t)
-        ("x." "Tramadol 50mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-         "* NOTE 50mg Tramadol\nCreated: %U" :immediate-finish t)
-        ("xv" "Vitamin A and D" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-         "* NOTE 2000-vD/10000-vA\nCreated: %U" :immediate-finish t)
-        ("xx" "Xifaxan 550mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-         "* NOTE 50mg xifaxan\nCreated: %U" :immediate-finish t)
-
-        ("g" "Google Calendars")
-        ("gh" "Todo" entry (file ,(concat org-directory "/calendar/goog-home.org"))
-         "* TODO %?\n%T\nAnnotation: %a\n")
-
-        ("gf" "Todo" entry (file ,(concat org-directory "/calendar/goog-family.org"))
-         "* TODO %?\n%T\nAnnotation: %a\n")
-
-        ("gw" "Todo" entry (file ,(concat org-directory "/calendar/goog-work.org"))
-         "* TODO %?\n%T\nAnnotation: %a\n")
+                       ;; (setq org-preview-latex-default-process 'luamagick)
+                       )
 
 
-        ("i" "IETF related")
+                     ;; (with-eval-after-load "org-agenda"
+                     ;;   (define-key org-agenda-mode-map (kbd "RET") 'org-agenda-switch-to))
+
+                     (debug-init-message "debug-init org my-org-mode-hook")
+                     (defun my-org-mode-hook ()
+                       (yas-minor-mode 1)
+                       (electric-indent-mode 0)
+                       (setq org-adapt-indentation 'headline-data))
+                     (add-hook 'org-mode-hook 'my-org-mode-hook)
+
+                                        ; (require 'ox-rfc)
+
+                     (require 'org-id)
+
+                     (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)
+                     (define-key org-mode-map (kbd "C-c e e") 'org-encrypt-entries)
+                     (define-key org-mode-map (kbd "C-c e E") 'org-encrypt-entry)
+                     (define-key org-mode-map (kbd "C-c e d") 'org-decrypt-entries)
+                     (define-key org-mode-map (kbd "C-c e D") 'org-decrypt-entry)
+
+                     ;;
+                     ;; Global org mode clock in/out keys
+                     ;;
+                     (defun my/start-heading-clock (heading)
+                       "Start clock programmatically for heading with ID in FILE."
+                       ;; (if-let (marker (org-find-exact-heading-in-directory heading org-directory))
+                       (if-let (marker (org-find-exact-heading-in-directory heading labn-365-dir))
+                           (save-current-buffer
+                             (save-excursion
+                               (set-buffer (marker-buffer marker))
+                               (goto-char (marker-position marker))
+                               (org-clock-in)
+                               (save-buffer)
+                               ))
+                         (warn "Clock not started (Could not find heading '%s' in '%s')" heading labn-365-dir)))
+                     (defun my/stop-clock-save-file-with-heading (heading)
+                       "Stop clock and save file"
+                       ;; (if-let (marker (org-find-exact-heading-in-directory heading org-directory))
+                       (if-let (marker (org-find-exact-heading-in-directory heading labn-365-dir))
+                           (save-current-buffer
+                             (save-excursion
+                               (set-buffer (marker-buffer marker))
+                               (org-clock-out)
+                               (save-buffer)
+                               ))
+                         (warn "Clock not started (Could not find heading '%s' in '%s')" heading labn-365-dir)))
+                     (defun clock-in-tfs () "Clock-IN TFS" (interactive) (my/start-heading-clock "TFS DO7.002"))
+                     (defun clock-in-caas () "Clock-IN CAS" (interactive) (my/start-heading-clock "CAAS DO9.002"))
+                     (defun clock-out-save () "Clock-Out Save" (interactive) (my/stop-clock-save-file-with-heading "TFS DO7.002"))
+                     (spacemacs/set-leader-keys "oic" 'clock-in-caas)
+                     (spacemacs/set-leader-keys "oim" 'clock-in-tfs)
+                     (spacemacs/set-leader-keys "oit" 'clock-in-tfs)
+                     (spacemacs/set-leader-keys "oo" 'clock-out-save)
+
+                     ;; (setq TeX-view-program-selection
+                     ;;       (append
+                     ;;        (delq (assoc 'output-pdf TeX-view-program-selection) TeX-view-program-selection)
+                     ;;        '((output-pdf "PDF Tools"))))
+
+                     ;; (defun th/pdf-view-revert-buffer-maybe (file)
+                     ;;   (when-let ((buf (find-buffer-visiting file)))
+                     ;;             (with-current-buffer buf
+                     ;;               (when (derived-mode-p 'pdf-view-mode)
+                     ;;                 (pdf-view-revert-buffer nil t)))))
+
+                     ;; (add-hook 'TeX-after-TeX-LaTeX-command-finished-hook
+                     ;;           #'th/pdf-view-revert-buffer-maybe)
+
+                     (defun my-org-confirm-babel-evaluate (lang body)
+                       (not (or (string= lang "ditaa")
+                                (string= lang "dot2tex")
+                                (string= lang "dot")
+                                (string= lang "gnuplot")
+                                (string= lang "plantuml")
+                                ;; (string= lang "yang")
+                                )))
+                     ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
+
+                     (debug-init-message "debug-init org setq")
+                     (setq
+                      ;; Crypt
+                      org-tags-exclude-from-inheritance '("crypt")
+                      org-crypt-disable-auto-save t
+                      org-crypt-key "D7B83025"
+                      org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
+                      org-src-fontify-natively t
+                      org-default-notes-file (concat org-directory "/notes.org")
+                      ;; Display
+                      org-display-inline-images t
+
+                      ;; General
+                      ;; org-agenda-start-day "-8d"
+                      org-agenda-start-on-weekday 1
+                      org-hide-leading-stars t
+                      org-log-done 'time
+                      org-outline-path-complete-in-steps t
+                      org-plantuml-jar-path "/opt/plantuml/plantuml.jar"
+                      org-refile-use-outline-path 'file
+                      org-src-tab-acts-natively t
+                      org-src-window-setup 'current-window
+
+                      ;; Exports
+                      org-export-latex-emphasis-alist (quote (("*" "\\textbf{%s}" nil)
+                                                              ("/" "\\emph{%s}" nil)
+                                                              ("_" "\\underline{%s}" nil)
+                                                              ("+" "\\texttt{%s}" nil)
+                                                              ("=" "\\verb=%s=" nil)
+                                                              ("~" "\\verb~%s~" t)
+                                                              ("@" "\\alert{%s}" nil)))
+
+                      org-latex-listings 'minted
+                      ;; org-latex-packages-alist '(("" "graphicx" t)
+                      ;;                            ("" "longtable" nil)
+                      ;;                            ("" "minted" nil)
+                      ;;                            ("" "float" nil))
+
+                      ;; we do this above
+                      ;; org-latex-packages-alist '(("" "minted" nil))
+                      org-latex-create-formula-image-program 'imagemagick
+
+                      org-latex-pdf-process
+                      '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+                        "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+                        "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f")
+
+                      ;; capture the search instead of the highlighted message in
+                      ;; headers view
+                      org-mu4e-link-query-in-headers-mode nil
+
+                      ;; XXX investigate this more
+                      ;; org-icalendar-include-todo t
+                      ;; org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
+                      ;; org-icalendar-use-scheduled '(event-if-todo event-if-not-todo todo-start)
+                      ;; org-icalendar-with-timestamps t
+
+                      ;; (setq org-capture-templates
+                      ;; '(
+                      ;;   ("m" "Mail options")
+
+                      ;;   ("mt" "mailtodo"
+                      ;;    entry (file+datetree "~/s/notes/tasks.org")
+                      ;;    "* TODO %^{Task} : %:subject %^G\nSCHEDULED: %t\n- From :: %:from\n- Subject :: %:subject\n- Email :: %a\n\n%?" :kill-buffer t)
+
+                      ;;   ("mn" "mailnote"
+                      ;;    entry (file+headline "~/s/notes/notes.org" "general notes and tasks")
+                      ;;    "* %^{Title} : %:subject %^G\n- From :: %:from\n- Subject :: %:subject\n- Email :: %a\n\n%?\n\n%U")
+                      ;;   ))
+
+                      org-capture-templates
+                      `(
+                        ("t" "Todo" entry (file+headline ,(concat org-directory "/notes.org") "Tasks")
+                         "* TODO %^{Title}%?\nDEADLINE: %^t CREATED: %u\nAnnotation: %a\n\n")
+
+                        ("m" "Mail Todo" entry (file+headline ,(concat org-directory "/notes.org") "Mail")
+                         "* TODO [Mail] %^{Title|%:subject}%? ([%:from])\nDEADLINE: %^t CREATED: %u\nMessage: %a\n\n")
+
+                        ("c" "Code Todo" entry (file+headline ,(concat org-directory "/notes.org") "Code Todo")
+                         "* TODO [Code] %^{Title}\nDEADLINE: %^t\nCREATED: %u\nAnnotation: %a\n%?\n\n")
+
+                        ("n" "Generic Note" entry (file+headline ,(concat org-directory "/notes.org") "Notes")
+                         "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
+
+                        ("L" "Mac Link Note" entry (file+headline ,(concat org-directory "/notes.org") "Notes")
+                         "* NOTE %?\n%u\n%(org-mac-safari-get-frontmost-url)\n")
+
+                        ("s" "Status" item (file+olp+datetree ,(concat org-directory "/work.org") "Working" "Status Items")
+                         "- %^{Status Item} %u\n" :tree-type week :immediate-finish t)
+
+                        ;; ("s" "Status" entry (file+weektree ,(concat org-directory "/status.org"))
+                        ;;  "* NOTE %?\n%u\n")
+
+                        ("x" "Food/Medication")
+                        ("xa" "Augmentin 875-125" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 875-125 amox/clav\nCreated: %U" :immediate-finish t)
+                        ("xc" "Creon 36K" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 36000 creon\nCreated: %U" :immediate-finish t)
+                        ("xC" "Compazine 5mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 5mg Compazine\nCreated: %U" :immediate-finish t)
+                        ("xn" "Nortriptyline 50mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 50mg Nortriptyline 2x25\nCreated: %U" :immediate-finish t)
+                        ("xf" "Food" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE Food\nCreated: %U\nFood:%^{food}" :immediate-finish t)
+                        ("xp" "Prilosec 20mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 20mg Prilosec\nCreated: %U" :immediate-finish t)
+                        ("xt" "Tylenol dose 1g" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 1g Tylenol\nCreated: %U" :immediate-finish t)
+                        ("x1" "Tramadol 100mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 100mg 2x50 Tramadol\nCreated: %U" :immediate-finish t)
+                        ("x/" "Tramadol 75mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 75mg 1.5x50 Tramadol\nCreated: %U" :immediate-finish t)
+                        ("x." "Tramadol 50mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 50mg Tramadol\nCreated: %U" :immediate-finish t)
+                        ("xv" "Vitamin A and D" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 2000-vD/10000-vA\nCreated: %U" :immediate-finish t)
+                        ("xx" "Xifaxan 550mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 50mg xifaxan\nCreated: %U" :immediate-finish t)
+
+                        ("g" "Google Calendars")
+                        ("gh" "Todo" entry (file ,(concat org-directory "/calendar/goog-home.org"))
+                         "* TODO %?\n%T\nAnnotation: %a\n")
+
+                        ("gf" "Todo" entry (file ,(concat org-directory "/calendar/goog-family.org"))
+                         "* TODO %?\n%T\nAnnotation: %a\n")
+
+                        ("gw" "Todo" entry (file ,(concat org-directory "/calendar/goog-work.org"))
+                         "* TODO %?\n%T\nAnnotation: %a\n")
+
+
+                        ("i" "IETF related")
            ;;; XXX these are exact copies of the generic ones different file.
-        ("it" "Todo" entry (file+headline ,(concat org-directory "/ietf.org") "Tasks")
-         "* TODO %?\nCreated: %t\nAnnotation: %a\n")
+                        ("it" "Todo" entry (file+headline ,(concat org-directory "/ietf.org") "Tasks")
+                         "* TODO %?\nCreated: %t\nAnnotation: %a\n")
 
-        ("in" "Generic Note" entry (file+headline ,(concat org-directory "/ietf.org") "Notes")
-         "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
+                        ("in" "Generic Note" entry (file+headline ,(concat org-directory "/ietf.org") "Notes")
+                         "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
 
-        ("w" "Work related")
+                        ("w" "Work related")
            ;;; XXX these are exact copies of the generic ones different file.
-        ("wt" "Todo" entry (file+headline ,(concat org-directory "/work.org") "Tasks")
-         "* TODO %?\nCreated: %t\nAnnotation: %a\n")
+                        ("wt" "Todo" entry (file+headline ,(concat org-directory "/work.org") "Tasks")
+                         "* TODO %?\nCreated: %t\nAnnotation: %a\n")
 
-        ("wc" "Code Todo" entry (file+headline ,(concat org-directory "/work.org") "Code Todo")
-         "* Code TODO %?\nCreated: %t\nAnnotation: %a\n")
+                        ("wc" "Code Todo" entry (file+headline ,(concat org-directory "/work.org") "Code Todo")
+                         "* Code TODO %?\nCreated: %t\nAnnotation: %a\n")
 
-        ("wn" "Generic Note" entry (file+headline ,(concat org-directory "/work.org") "Notes")
-         "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
-        ))
+                        ("wn" "Generic Note" entry (file+headline ,(concat org-directory "/work.org") "Notes")
+                         "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
+                        ))
 
-     (defun org-update-inline-images ()
-       (when org-inline-image-overlays
-         (org-redisplay-inline-images)))
-     (add-hook 'org-babel-after-execute-hook 'org-update-inline-images)
+                     (defun org-update-inline-images ()
+                       (when org-inline-image-overlays
+                         (org-redisplay-inline-images)))
+                     (add-hook 'org-babel-after-execute-hook 'org-update-inline-images)
 
         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     ;; Refile Or Delete Me, from my grpahiv file.
-     (defun _graphviz/post-init-org ()
-       (with-eval-after-load 'org
-         (add-to-list 'org-src-lang-modes  '("dot" . graphviz-dot))))
+                     ;; Refile Or Delete Me, from my grpahiv file.
+                     (defun _graphviz/post-init-org ()
+                       (with-eval-after-load 'org
+                         (add-to-list 'org-src-lang-modes  '("dot" . graphviz-dot))))
          ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-     (defun org-dblock-write:rangereport (params)
-       "Display day-by-day time reports."
-       (let* ((ts (plist-get params :tstart))
-              (te (plist-get params :tend))
-              (start (time-to-seconds
-                      (apply 'encode-time (org-parse-time-string ts))))
-              (end (time-to-seconds
-                    (apply 'encode-time (org-parse-time-string te))))
-              day-numbers)
-         (setq params (plist-put params :tstart nil))
-         (setq params (plist-put params :end nil))
-         (while (<= start end)
-           (save-excursion
-             (insert "\n\n"
-                     (format-time-string (car org-time-stamp-formats)
-                                         (seconds-to-time start))
-                     "----------------\n")
-             (org-dblock-write:clocktable
-              (plist-put
-               (plist-put
-                params
-                :tstart
-                (format-time-string (car org-time-stamp-formats)
-                                    (seconds-to-time start)))
-               :tend
-               (format-time-string (car org-time-stamp-formats)
-                                   (seconds-to-time end))))
-             (setq start (+ 86400 start))))))
+                     (defun org-dblock-write:rangereport (params)
+                       "Display day-by-day time reports."
+                       (let* ((ts (plist-get params :tstart))
+                              (te (plist-get params :tend))
+                              (start (time-to-seconds
+                                      (apply 'encode-time (org-parse-time-string ts))))
+                              (end (time-to-seconds
+                                    (apply 'encode-time (org-parse-time-string te))))
+                              day-numbers)
+                         (setq params (plist-put params :tstart nil))
+                         (setq params (plist-put params :end nil))
+                         (while (<= start end)
+                           (save-excursion
+                             (insert "\n\n"
+                                     (format-time-string (car org-time-stamp-formats)
+                                                         (seconds-to-time start))
+                                     "----------------\n")
+                             (org-dblock-write:clocktable
+                              (plist-put
+                               (plist-put
+                                params
+                                :tstart
+                                (format-time-string (car org-time-stamp-formats)
+                                                    (seconds-to-time start)))
+                               :tend
+                               (format-time-string (car org-time-stamp-formats)
+                                                   (seconds-to-time end))))
+                             (setq start (+ 86400 start))))))
 
-     ;; not defined
-     ;; (org-crypt-use-before-save-magic)
+                     ;; not defined
+                     ;; (org-crypt-use-before-save-magic)
 
-     (debug-init-message "debug-init org-babel-do-load-languges setup")
-     ;; (org-babel-do-load-languages
-     (setq org-babel-load-languages
-           '((emacs-lisp . t)
-             (C . t)
-             (calc . t)
-             (dot . t)
-             (gnuplot . t)
-             (ditaa . t)
-             (latex . t)
-             (pic . t)
-             (plantuml . t)
-             (python . t)
-             (shell . t)
-             ;; Why did this used to work??
-             ;; (yang . t)
+                     (debug-init-message "debug-init org-babel-do-load-languges setup")
+                     ;; (org-babel-do-load-languages
+                     (setq org-babel-load-languages
+                           '((emacs-lisp . t)
+                             (C . t)
+                             (calc . t)
+                             (dot . t)
+                             (gnuplot . t)
+                             (ditaa . t)
+                             (latex . t)
+                             (pic . t)
+                             (plantuml . t)
+                             (python . t)
+                             (shell . t)
+                             ;; Why did this used to work??
+                             ;; (yang . t)
 
-             ;; (sh . t)
-             )
-           )
-     ;;  (dot2tex . t))
-
-
+                             ;; (sh . t)
+                             )
+                           )
+                     ;;  (dot2tex . t))
 
 
-     ;; In mail map todo to mail-todo
-     ;; org-capture-templates-contexts '(("t" "m" ((in-mode . "mu4e-headers-mode")))
-     ;;                                  ("t" "m" ((in-mode . "mu4e-view-mode"))))
-     (debug-init-message "debug-init ox setup")
-     (with-eval-after-load "ox"
-       ;;
-       (defconst chopps/org-latex-packages-alist-pre-hyperref
-         '(
-           ;; This conflicts with Beamer
-           ;; ("letterpaper,margin=1.0in" "geometry")
-
-           ;; Prevent an image from floating to a different location.
-           ;; http://tex.stackexchange.com/a/8633/52678
-           ("" "float")
-           ;; % 0 paragraph indent, adds vertical space between paragraphs
-           ;; http://en.wikibooks.org/wiki/LaTeX/Paragraph_Formatting
-           ("" "parskip"))
-         "Alist of packages that have to be loaded before `hyperref'package is loaded ftp://ftp.ctan.org/tex-archive/macros/latex/contrib/hyperref/README.pdf ")
-
-       ;; Need to only load geometry if not a beamer file
-       ;; ,(not (eq org-latex-create-formula-image-program 'dvipng)))) ; snippet-flag
-
-       (defconst chopps/org-latex-packages-alist-post-hyperref
-         '(
-           ;; Prevent tables/figures from one section to float into another section
-           ;; http://tex.stackexchange.com/a/282/52678
-           ("section" "placeins")
-           ;; Graphics package for more complicated figures
-           ("" "tikz")
-           ("" "caption")
-           ("" "adjustbox")
-           ;;
-           ;; Packages suggested to be added for previewing latex fragments
-           ;; http://orgmode.org/worg/org-tutorials/org-latex-preview.html
-           ("mathscr" "eucal")
-           ("" "latexsym"))
-         "Alist of packages that have to (or can be) loaded after `hyperref' package is loaded.")
-
-       (defvar latex-minted-cachedir (concat temporary-file-directory
-                                             (getenv "USER")
-                                             "/.minted/\\jobname"))
-
-       (add-to-list 'chopps/org-latex-packages-alist-post-hyperref
-                    `(,(concat "cachedir=" ; options
-                               latex-minted-cachedir)
-                      "minted" ; package
-                      ;; If `org-latex-create-formula-image-program'
-                      ;; is set to `dvipng', minted package cannot be
-                      ;; used to show latex previews.
-                      ,(not (eq org-latex-create-formula-image-program 'dvipng)))) ; snippet-flag
-
-       ;; remove hyperref from default package list.
-       (setq org-latex-default-packages-alist
-             (delq (rassoc '("hyperref" nil) org-latex-default-packages-alist)
-                   org-latex-default-packages-alist))
-
-       ;; This is no longer needed
-       (setq org-latex-default-packages-alist
-             (delq (rassoc '("fixltx2e" nil) org-latex-default-packages-alist)
-                   org-latex-default-packages-alist))
-
-       ;; Setup package list with correct placement of hyperref
-       (setq org-latex-packages-alist
-             (append chopps/org-latex-packages-alist-pre-hyperref
-                     '(("" "hyperref" nil))
-                     chopps/org-latex-packages-alist-post-hyperref))
-       )
 
 
-     ;; Languages to interpret (execute) in begin_src blocks
+                     ;; In mail map todo to mail-todo
+                     ;; org-capture-templates-contexts '(("t" "m" ((in-mode . "mu4e-headers-mode")))
+                     ;;                                  ("t" "m" ((in-mode . "mu4e-view-mode"))))
+                     (debug-init-message "debug-init ox setup")
+                     (with-eval-after-load "ox"
+                       ;;
+                       (defconst chopps/org-latex-packages-alist-pre-hyperref
+                         '(
+                           ;; This conflicts with Beamer
+                           ;; ("letterpaper,margin=1.0in" "geometry")
 
-     ;; ;; XXX latex preview highly questionable
-     ;; (add-to-list 'org-latex-packages-alist
-     ;;              '("" "tikz" t))
-     ;; (eval-after-load "preview"
-     ;;   '(add-to-list 'preview-default-preamble "\\PreviewEnvironment{tikzpicture}" t))
+                           ;; Prevent an image from floating to a different location.
+                           ;; http://tex.stackexchange.com/a/8633/52678
+                           ("" "float")
+                           ;; % 0 paragraph indent, adds vertical space between paragraphs
+                           ;; http://en.wikibooks.org/wiki/LaTeX/Paragraph_Formatting
+                           ("" "parskip"))
+                         "Alist of packages that have to be loaded before `hyperref'package is loaded ftp://ftp.ctan.org/tex-archive/macros/latex/contrib/hyperref/README.pdf ")
 
-     ;; spacemacs default
-     ;; Its value is ((shell . t) (python . t) (dot . t) (emacs-lisp . t))
-     ;; Original value was ((emacs-lisp . t))
+                       ;; Need to only load geometry if not a beamer file
+                       ;; ,(not (eq org-latex-create-formula-image-program 'dvipng)))) ; snippet-flag
+
+                       (defconst chopps/org-latex-packages-alist-post-hyperref
+                         '(
+                           ;; Prevent tables/figures from one section to float into another section
+                           ;; http://tex.stackexchange.com/a/282/52678
+                           ("section" "placeins")
+                           ;; Graphics package for more complicated figures
+                           ("" "tikz")
+                           ("" "caption")
+                           ("" "adjustbox")
+                           ;;
+                           ;; Packages suggested to be added for previewing latex fragments
+                           ;; http://orgmode.org/worg/org-tutorials/org-latex-preview.html
+                           ("mathscr" "eucal")
+                           ("" "latexsym"))
+                         "Alist of packages that have to (or can be) loaded after `hyperref' package is loaded.")
+
+                       (defvar latex-minted-cachedir (concat temporary-file-directory
+                                                             (getenv "USER")
+                                                             "/.minted/\\jobname"))
+
+                       (add-to-list 'chopps/org-latex-packages-alist-post-hyperref
+                                    `(,(concat "cachedir=" ; options
+                                               latex-minted-cachedir)
+                                      "minted" ; package
+                                      ;; If `org-latex-create-formula-image-program'
+                                      ;; is set to `dvipng', minted package cannot be
+                                      ;; used to show latex previews.
+                                      ,(not (eq org-latex-create-formula-image-program 'dvipng)))) ; snippet-flag
+
+                       ;; remove hyperref from default package list.
+                       (setq org-latex-default-packages-alist
+                             (delq (rassoc '("hyperref" nil) org-latex-default-packages-alist)
+                                   org-latex-default-packages-alist))
+
+                       ;; This is no longer needed
+                       (setq org-latex-default-packages-alist
+                             (delq (rassoc '("fixltx2e" nil) org-latex-default-packages-alist)
+                                   org-latex-default-packages-alist))
+
+                       ;; Setup package list with correct placement of hyperref
+                       (setq org-latex-packages-alist
+                             (append chopps/org-latex-packages-alist-pre-hyperref
+                                     '(("" "hyperref" nil))
+                                     chopps/org-latex-packages-alist-post-hyperref))
+                       )
 
 
-     ;; (eval-after-load "org"
-     ;;   '(mapc
-     ;;     (lambda (face)
-     ;;       (set-face-attribute
-     ;;        face nil
-     ;;        :inherit
-     ;;        (my-adjoin-to-list-or-symbol
-     ;;         'fixed-pitch
-     ;;         (face-attribute face :inherit))))
-     ;;     (list 'org-code 'org-block 'org-table 'org-block-background)))
+                     ;; Languages to interpret (execute) in begin_src blocks
 
-     ;; (add-to-list 'org-modules 'org-mac-message)
-     ;; (setq org-mac-mail-account "Work")
+                     ;; ;; XXX latex preview highly questionable
+                     ;; (add-to-list 'org-latex-packages-alist
+                     ;;              '("" "tikz" t))
+                     ;; (eval-after-load "preview"
+                     ;;   '(add-to-list 'preview-default-preamble "\\PreviewEnvironment{tikzpicture}" t))
 
-     ;; - Vi friendly bindings replacing cursor movement with meta-{hjkl}
-     ;; (bind-key "C-c w" 'org-refile-to-datetree)
-     ;; (bind-key "M-h" 'org-metaleft org-mode-map)
-     ;; (bind-key "M-l" 'org-metaright org-mode-map)
-     ;; (bind-key "M-k" 'org-metaup org-mode-map)
-     ;; (bind-key "M-j" 'org-metadown org-mode-map)
-     ;; (bind-key "M-H" 'org-shiftmetaleft org-mode-map)
-     ;; (bind-key "M-L" 'org-shiftmetaright org-mode-map)
-     ;; (bind-key "M-K" 'org-shiftmetaup org-mode-map)
-     ;; (bind-key "M-J" 'org-shiftmetadown org-mode-map)
+                     ;; spacemacs default
+                     ;; Its value is ((shell . t) (python . t) (dot . t) (emacs-lisp . t))
+                     ;; Original value was ((emacs-lisp . t))
 
-     ;; XXX latex
-     ;; ;; Originally taken from Bruno Tavernier: http://thread.gmane.org/gmane.emacs.orgmode/31150/focus=31432
-     ;; ;; but adapted to use latexmk 4.20 or higher.
-     ;; (defun my-auto-tex-cmd ()
-     ;;   "When exporting from .org with latex, automatically run latex,
-     ;;  pdflatex, or xelatex as appropriate, using latexmk."
-     ;;   (let ((texcmd)))
-     ;;   ;; default command: oldstyle latex via dvi
-     ;;   (setq texcmd "latexmk -dvi -pdfps -quiet %f")
-     ;;   ;; pdflatex -> .pdf
-     ;;   (if (string-match "LATEX_CMD: pdflatex" (buffer-string))
-     ;;       (setq texcmd "latexmk -pdf -quiet %f"))
-     ;;   ;; xelatex -> .pdf
-     ;;   (if (string-match "LATEX_CMD: xelatex" (buffer-string))
-     ;;       (setq texcmd "latexmk -pdflatex=xelatex -pdf -quiet %f"))
-     ;;   ;; LaTeX compilation command
-     ;;   (setq org-latex-to-pdf-process (list texcmd)))
 
-     ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-cmd)
+                     ;; (eval-after-load "org"
+                     ;;   '(mapc
+                     ;;     (lambda (face)
+                     ;;       (set-face-attribute
+                     ;;        face nil
+                     ;;        :inherit
+                     ;;        (my-adjoin-to-list-or-symbol
+                     ;;         'fixed-pitch
+                     ;;         (face-attribute face :inherit))))
+                     ;;     (list 'org-code 'org-block 'org-table 'org-block-background)))
 
-     (debug-init-message "debug-init org-refile-to-datatree setup")
-     (defun org-refile-to-datetree ()
-       "Refile a subtree to a datetree corresponding to it's timestamp."
-       (interactive)
-       (let* ((datetree-date (org-entry-get nil "TIMESTAMP" t))
-              (date (org-date-to-gregorian datetree-date)))
-         (when date
-           (save-excursion
-             (org-cut-subtree)
-             (org-datetree-find-date-create date)
-             (org-narrow-to-subtree)
-             (show-subtree)
-             (org-end-of-subtree t)
-             (newline)
-             (goto-char (point-max))
-             (org-paste-subtree 4)
-             (widen)
-             )
-           )
-         ))
+                     ;; (add-to-list 'org-modules 'org-mac-message)
+                     ;; (setq org-mac-mail-account "Work")
 
-     ;; Specify default packages to be included in every tex file, whether pdflatex or xelatex
-     ;; XXX latex
-     ;; (defun my-auto-tex-parameters ()
-     ;;   "Automatically select the tex packages to include."
-     ;;   ;; default packages for ordinary latex or pdflatex export
-     ;;   (setq org-latex-default-packages-alist
-     ;;         '(("AUTO" "inputenc" t)
-     ;;           ("T1"   "fontenc"   t)
-     ;;           (""     "fixltx2e"  nil)
-     ;;           (""     "wrapfig"   nil)
-     ;;           (""     "soul"      t)
-     ;;           (""     "textcomp"  t)
-     ;;           (""     "marvosym"  t)
-     ;;           (""     "wasysym"   t)
-     ;;           (""     "latexsym"  t)
-     ;;           (""     "amssymb"   t)
-     ;;           (""     "hyperref"  nil)))
+                     ;; - Vi friendly bindings replacing cursor movement with meta-{hjkl}
+                     ;; (bind-key "C-c w" 'org-refile-to-datetree)
+                     ;; (bind-key "M-h" 'org-metaleft org-mode-map)
+                     ;; (bind-key "M-l" 'org-metaright org-mode-map)
+                     ;; (bind-key "M-k" 'org-metaup org-mode-map)
+                     ;; (bind-key "M-j" 'org-metadown org-mode-map)
+                     ;; (bind-key "M-H" 'org-shiftmetaleft org-mode-map)
+                     ;; (bind-key "M-L" 'org-shiftmetaright org-mode-map)
+                     ;; (bind-key "M-K" 'org-shiftmetaup org-mode-map)
+                     ;; (bind-key "M-J" 'org-shiftmetadown org-mode-map)
 
-     ;;   ;; Packages to include when xelatex is used
-     ;;   (if (string-match "LATEX_CMD: xelatex" (buffer-string))
-     ;;       (setq org-latex-default-packages-alist
-     ;;             '(("" "fontspec" t)
-     ;;               ("" "xunicode" t)
-     ;;               ("" "url" t)
-     ;;               ("" "rotating" t)
-     ;;               ("american" "babel" t)
-     ;;               ("babel" "csquotes" t)
-     ;;               ("" "soul" t)
-     ;;               ("xetex" "hyperref" nil)
-     ;;               )))
+                     ;; XXX latex
+                     ;; ;; Originally taken from Bruno Tavernier: http://thread.gmane.org/gmane.emacs.orgmode/31150/focus=31432
+                     ;; ;; but adapted to use latexmk 4.20 or higher.
+                     ;; (defun my-auto-tex-cmd ()
+                     ;;   "When exporting from .org with latex, automatically run latex,
+                     ;;  pdflatex, or xelatex as appropriate, using latexmk."
+                     ;;   (let ((texcmd)))
+                     ;;   ;; default command: oldstyle latex via dvi
+                     ;;   (setq texcmd "latexmk -dvi -pdfps -quiet %f")
+                     ;;   ;; pdflatex -> .pdf
+                     ;;   (if (string-match "LATEX_CMD: pdflatex" (buffer-string))
+                     ;;       (setq texcmd "latexmk -pdf -quiet %f"))
+                     ;;   ;; xelatex -> .pdf
+                     ;;   (if (string-match "LATEX_CMD: xelatex" (buffer-string))
+                     ;;       (setq texcmd "latexmk -pdflatex=xelatex -pdf -quiet %f"))
+                     ;;   ;; LaTeX compilation command
+                     ;;   (setq org-latex-to-pdf-process (list texcmd)))
 
-     ;;   (if (string-match "LATEX_CMD: xelatex" (buffer-string))
-     ;;       (setq org-latex-classes
-     ;;             (cons '("article"
-     ;;                     "\\documentclass[11pt,article,oneside]{memoir}"
-     ;;                     ("\\section{%s}" . "\\section*{%s}")
-     ;;                     ("\\subsection{%s}" . "\\subsection*{%s}")
-     ;;                     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-     ;;                     ("\\paragraph{%s}" . "\\paragraph*{%s}")
-     ;;                     ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
-     ;;                   org-latex-classes))))
+                     ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-cmd)
 
-     (debug-init-message "debug-init pre-org-caldev")
-     ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
-     (with-eval-after-load "org-caldav"
-       ;;https://calendar.google.com/calendar/ical/j2nmb305oqb7n6428m4pf1rctk%40group.calendar.google.com/private-c46e82d6b4bae1f85fe4415a769d225b/basic.ics
-       ;;https://calendar.google.com/calendar/ical/
-       ;; USERNAME: j2nmb305oqb7n6428m4pf1rctk%40group.calendar.google.com/
-       ;; PRIVATE: private-c46e82d6b4bae1f85fe4415a769d225b/basic.ics
-       ;; ID: j2nmb305oqb7n6428m4pf1rctk@group.calendar.google.com
-       (setq org-icalendar-timezone "US/Eastern"
-             ;; org-caldav-url "https://www.google.com/calendar/dav"
-             ;; org-caldav-calendar-id "naqenfju9vq9tr0r4nnh7eaiic@group.calendar.google.com"
-             ;; org-caldav-inbox "/home/chopps/Dropbox/org-mode/calendar/goog-work.org"
-             ;; org-caldav-files '()
-             org-caldav-calendars
-             '((:calendar-id "naqenfju9vq9tr0r4nnh7eaiic@group.calendar.google.com"
-                             :url "https://www.google.com/calendar/dav"
-                             :files ()
-                             :inbox "/home/chopps/Dropbox/org-mode/calendar/goog-work.org")
-               (:calendar-id "l8cjg3irk2h5a8gk5ch9mtp6ls@group.calendar.google.com"
-                             :url "https://www.google.com/calendar/dav"
-                             :files ()
-                             :inbox "/home/chopps/Dropbox/org-mode/calendar/goog-family.org")
-               ;;(:calendar-id "f1jltqbvdp88o8htcjkbg920sc@group.calendar.google.com"
-               ;;              :files ()
-               ;;              :inbox "~/org/calendar/goog-home.org")
-               ;;(:calendar-id "v8eda33vlrn98c9oj2hefjld7s@group.calendar.google.com"
-               ;;              :files ()
-               ;;              :inbox "~/org/calendar/goog-ietf.org")
-               ;; (:calendar-id "v8eda33vlrn98c9oj2hefjld7s@group.calendar.google.com"
-               ;;               :files ()
-               ;;               :inbox "/home/chopps/Dropbox/org-mode/calendar/goog-ietf.org")
-               )
-             )
-       ;; (setq org-caldav-principal-url "https://p25-caldav.icloud.com/65837734/principal"
-       ;;       org-caldav-url "https://p25-caldav.icloud.com/65837734/calendars"
-       ;;       org-caldav-calendar-id "AF7013C4-D5A4-4885-BF8B-0B11FB3A1488"
-       ;;       org-caldav-inbox "/home/chopps/org/orgmode-caldav.org"
-       ;;       org-caldav-files '()
-       ;;       org-icalendar-timezone "US/Eastern"))
+                     (debug-init-message "debug-init org-refile-to-datatree setup")
+                     (defun org-refile-to-datetree ()
+                       "Refile a subtree to a datetree corresponding to it's timestamp."
+                       (interactive)
+                       (let* ((datetree-date (org-entry-get nil "TIMESTAMP" t))
+                              (date (org-date-to-gregorian datetree-date)))
+                         (when date
+                           (save-excursion
+                             (org-cut-subtree)
+                             (org-datetree-find-date-create date)
+                             (org-narrow-to-subtree)
+                             (show-subtree)
+                             (org-end-of-subtree t)
+                             (newline)
+                             (goto-char (point-max))
+                             (org-paste-subtree 4)
+                             (widen)
+                             )
+                           )
+                         ))
 
-       )
+                     ;; Specify default packages to be included in every tex file, whether pdflatex or xelatex
+                     ;; XXX latex
+                     ;; (defun my-auto-tex-parameters ()
+                     ;;   "Automatically select the tex packages to include."
+                     ;;   ;; default packages for ordinary latex or pdflatex export
+                     ;;   (setq org-latex-default-packages-alist
+                     ;;         '(("AUTO" "inputenc" t)
+                     ;;           ("T1"   "fontenc"   t)
+                     ;;           (""     "fixltx2e"  nil)
+                     ;;           (""     "wrapfig"   nil)
+                     ;;           (""     "soul"      t)
+                     ;;           (""     "textcomp"  t)
+                     ;;           (""     "marvosym"  t)
+                     ;;           (""     "wasysym"   t)
+                     ;;           (""     "latexsym"  t)
+                     ;;           (""     "amssymb"   t)
+                     ;;           (""     "hyperref"  nil)))
 
-     (debug-init-message "debug-init pre-org2blog")
-     (when-layer-used 'org2blog
-      (with-eval-after-load "org2blog"
-        ;; (defadvice org-wp-src-block (after ad-org-wp-src-block activate)
-        ;;   "Always use space as title if none given"
-        ;;   (setq ad-return-value (replace-regexp-in-string "title=\"\"" "title=\" \"" ad-return-value)))
-        ;; (ad-activate 'org-wp-src-block)
+                     ;;   ;; Packages to include when xelatex is used
+                     ;;   (if (string-match "LATEX_CMD: xelatex" (buffer-string))
+                     ;;       (setq org-latex-default-packages-alist
+                     ;;             '(("" "fontspec" t)
+                     ;;               ("" "xunicode" t)
+                     ;;               ("" "url" t)
+                     ;;               ("" "rotating" t)
+                     ;;               ("american" "babel" t)
+                     ;;               ("babel" "csquotes" t)
+                     ;;               ("" "soul" t)
+                     ;;               ("xetex" "hyperref" nil)
+                     ;;               )))
 
-        (setq org2blog/wp-use-sourcecode-shortcode t)
-        )
-      )
+                     ;;   (if (string-match "LATEX_CMD: xelatex" (buffer-string))
+                     ;;       (setq org-latex-classes
+                     ;;             (cons '("article"
+                     ;;                     "\\documentclass[11pt,article,oneside]{memoir}"
+                     ;;                     ("\\section{%s}" . "\\section*{%s}")
+                     ;;                     ("\\subsection{%s}" . "\\subsection*{%s}")
+                     ;;                     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                     ;;                     ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                     ;;                     ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+                     ;;                   org-latex-classes))))
 
-     (debug-init-message "pre-server-running-notificiation-setup")
+                     (debug-init-message "debug-init pre-org-caldev")
+                     ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
+                     (with-eval-after-load "org-caldav"
+                       ;;https://calendar.google.com/calendar/ical/j2nmb305oqb7n6428m4pf1rctk%40group.calendar.google.com/private-c46e82d6b4bae1f85fe4415a769d225b/basic.ics
+                       ;;https://calendar.google.com/calendar/ical/
+                       ;; USERNAME: j2nmb305oqb7n6428m4pf1rctk%40group.calendar.google.com/
+                       ;; PRIVATE: private-c46e82d6b4bae1f85fe4415a769d225b/basic.ics
+                       ;; ID: j2nmb305oqb7n6428m4pf1rctk@group.calendar.google.com
+                       (setq org-icalendar-timezone "US/Eastern"
+                             ;; org-caldav-url "https://www.google.com/calendar/dav"
+                             ;; org-caldav-calendar-id "naqenfju9vq9tr0r4nnh7eaiic@group.calendar.google.com"
+                             ;; org-caldav-inbox "/home/chopps/Dropbox/org-mode/calendar/goog-work.org"
+                             ;; org-caldav-files '()
+                             org-caldav-calendars
+                             '((:calendar-id "naqenfju9vq9tr0r4nnh7eaiic@group.calendar.google.com"
+                                             :url "https://www.google.com/calendar/dav"
+                                             :files ()
+                                             :inbox "/home/chopps/Dropbox/org-mode/calendar/goog-work.org")
+                               (:calendar-id "l8cjg3irk2h5a8gk5ch9mtp6ls@group.calendar.google.com"
+                                             :url "https://www.google.com/calendar/dav"
+                                             :files ()
+                                             :inbox "/home/chopps/Dropbox/org-mode/calendar/goog-family.org")
+                               ;;(:calendar-id "f1jltqbvdp88o8htcjkbg920sc@group.calendar.google.com"
+                               ;;              :files ()
+                               ;;              :inbox "~/org/calendar/goog-home.org")
+                               ;;(:calendar-id "v8eda33vlrn98c9oj2hefjld7s@group.calendar.google.com"
+                               ;;              :files ()
+                               ;;              :inbox "~/org/calendar/goog-ietf.org")
+                               ;; (:calendar-id "v8eda33vlrn98c9oj2hefjld7s@group.calendar.google.com"
+                               ;;               :files ()
+                               ;;               :inbox "/home/chopps/Dropbox/org-mode/calendar/goog-ietf.org")
+                               )
+                             )
+                       ;; (setq org-caldav-principal-url "https://p25-caldav.icloud.com/65837734/principal"
+                       ;;       org-caldav-url "https://p25-caldav.icloud.com/65837734/calendars"
+                       ;;       org-caldav-calendar-id "AF7013C4-D5A4-4885-BF8B-0B11FB3A1488"
+                       ;;       org-caldav-inbox "/home/chopps/org/orgmode-caldav.org"
+                       ;;       org-caldav-files '()
+                       ;;       org-icalendar-timezone "US/Eastern"))
 
-     (when (and (or (daemonp) (and (fboundp 'server-running-p) (server-running-p)))
-                (string-equal system-type "darwin"))
+                       )
 
-       (debug-init-message "before require org notify")
+                     (debug-init-message "debug-init pre-org2blog")
+                     (when-layer-used 'org2blog
+                                      (with-eval-after-load "org2blog"
+                                        ;; (defadvice org-wp-src-block (after ad-org-wp-src-block activate)
+                                        ;;   "Always use space as title if none given"
+                                        ;;   (setq ad-return-value (replace-regexp-in-string "title=\"\"" "title=\" \"" ad-return-value)))
+                                        ;; (ad-activate 'org-wp-src-block)
+
+                                        (setq org2blog/wp-use-sourcecode-shortcode t)
+                                        )
+                                      )
+
+                     (debug-init-message "pre-server-running-notificiation-setup")
+
+                     (when (and (or (daemonp) (and (fboundp 'server-running-p) (server-running-p)))
+                                (string-equal system-type "darwin"))
+
+                       (debug-init-message "before require org notify")
 
        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-       ;; Terminal notifier
-       ;; requires 'brew install terminal-notifier'
-       ;; stolen from erc-notifier
+                       ;; Terminal notifier
+                       ;; requires 'brew install terminal-notifier'
+                       ;; stolen from erc-notifier
 
-       ;; Example use of alerter
-       ;; alerter -sound "Second Glance" -sender org.gnu.Emacs -title Foo -subtitle Bar actions YES -closeLabel Close  -message "This is the message"
-       (defvar terminal-alert-command (executable-find "alerter") "The path to the alerter binary.")
+                       ;; Example use of alerter
+                       ;; alerter -sound "Second Glance" -sender org.gnu.Emacs -title Foo -subtitle Bar actions YES -closeLabel Close  -message "This is the message"
+                       (defvar terminal-alert-command (executable-find "alerter") "The path to the alerter binary.")
 
-       ;; (defvar terminal-notifier-command (executable-find "terminal-notifier") "The path to terminal-notifier.")
-       ;;                                  ; (terminal-notifier-notify "Emacs notification" "Something amusing happened")
+                       ;; (defvar terminal-notifier-command (executable-find "terminal-notifier") "The path to terminal-notifier.")
+                       ;;                                  ; (terminal-notifier-notify "Emacs notification" "Something amusing happened")
 
-       ;; (defun terminal-notifier-notify (title message)
-       ;;   "Show a message with terminal-notifier-command ."
-       ;;   (start-process "terminal-notifier"
-       ;;                  "terminal-notifier"
-       ;;                  terminal-notifier-command
-       ;;                  "-title" title
-       ;;                  ; "-sender" "org.gnu.Emacs"
-       ;;                  "-appIcon" "/Applications/Emacs.app/Contents/Resources/etc/images/icons/hicolor/48x48/apps/emacs.png"
-       ;;                  "-message" message
-       ;;                  "-sound" "Gentle Roll"
-       ;;                  "-activate" "org.gnu.Emacs"))
+                       ;; (defun terminal-notifier-notify (title message)
+                       ;;   "Show a message with terminal-notifier-command ."
+                       ;;   (start-process "terminal-notifier"
+                       ;;                  "terminal-notifier"
+                       ;;                  terminal-notifier-command
+                       ;;                  "-title" title
+                       ;;                  ; "-sender" "org.gnu.Emacs"
+                       ;;                  "-appIcon" "/Applications/Emacs.app/Contents/Resources/etc/images/icons/hicolor/48x48/apps/emacs.png"
+                       ;;                  "-message" message
+                       ;;                  "-sound" "Gentle Roll"
+                       ;;                  "-activate" "org.gnu.Emacs"))
 
-       (defun timed-notification (time msg)
-         (interactive "sNotification when (e.g: 2 minutes, 60 seconds, 3 days): \nsMessage: ")
-         (run-at-time time nil (lambda (msg) (notifications-notify :title "Emacs" :body msg)) msg))
-
-
-       (require 'org-notify)
+                       (defun timed-notification (time msg)
+                         (interactive "sNotification when (e.g: 2 minutes, 60 seconds, 3 days): \nsMessage: ")
+                         (run-at-time time nil (lambda (msg) (notifications-notify :title "Emacs" :body msg)) msg))
 
 
-       (defun my-action-act (plist key)
-         "User wants to see action."
-         (let ((file (plist-get plist :file))
-               (begin (plist-get plist :begin)))
-           (if (string-equal key "show")
-               (progn
-                 (switch-to-buffer (find-file-noselect file))
-                 (org-with-wide-buffer
-                  (goto-char begin)
-                  (outline-show-entry))
-                 (goto-char begin)
-                 (search-forward "DEADLINE: <")
-                 (search-forward ":")
-                 (if (display-graphic-p)
-                     (x-focus-frame nil)))
-             (save-excursion
-               (with-current-buffer (find-file-noselect file)
-                 (org-with-wide-buffer
-                  (goto-char begin)
-                  (search-forward "DEADLINE: <")
-                  (cond
-                   ((string-equal key "done")  (org-todo))
-                   ((string-equal key "hour")  (org-timestamp-change 60 'minute))
-                   ((string-equal key "day")   (org-timestamp-up-day))
-                   ((string-equal key "week")  (org-timestamp-change 7 'day)))))))))
+                       (require 'org-notify)
 
-       (defvar todo-action-hash (make-hash-table :test 'equal)
-         "A hash table for looking up notifications by id")
 
-       (defun my-action (id key)
-         (let ((plist (gethash id todo-action-hash)))
-             (my-action-act plist key)
-             (remhash id todo-action-hash)))
+                       (defun my-action-act (plist key)
+                         "User wants to see action."
+                         (let ((file (plist-get plist :file))
+                               (begin (plist-get plist :begin)))
+                           (if (string-equal key "show")
+                               (progn
+                                 (switch-to-buffer (find-file-noselect file))
+                                 (org-with-wide-buffer
+                                  (goto-char begin)
+                                  (outline-show-entry))
+                                 (goto-char begin)
+                                 (search-forward "DEADLINE: <")
+                                 (search-forward ":")
+                                 (if (display-graphic-p)
+                                     (x-focus-frame nil)))
+                             (save-excursion
+                               (with-current-buffer (find-file-noselect file)
+                                 (org-with-wide-buffer
+                                  (goto-char begin)
+                                  (search-forward "DEADLINE: <")
+                                  (cond
+                                   ((string-equal key "done")  (org-todo))
+                                   ((string-equal key "hour")  (org-timestamp-change 60 'minute))
+                                   ((string-equal key "day")   (org-timestamp-up-day))
+                                   ((string-equal key "week")  (org-timestamp-change 7 'day)))))))))
 
-       (debug-init-message "in-server-running-notificiation-setup")
+                       (defvar todo-action-hash (make-hash-table :test 'equal)
+                         "A hash table for looking up notifications by id")
 
-       (defun org-notify-action-notify-mac (plist)
-         "Pop up a notification window."
-         ;; (require 'notifications)
-         (let* ((duration (plist-get plist :duration))
-                (urgency (plist-get plist :urgency))
-                (id (notifications-notify
-                     :title     (plist-get plist :heading)
-                     :body      (org-notify-body-text plist)
-                     :urgency   (or urgency 'normal)
-                     :timeout   (if duration (* duration 1000))
-                     :actions   org-notify-actions
-                     :on-action 'my-action)))
-           (puthash id plist todo-action-hash)
-           ))
-       (debug-init-message "org notify add")
-       (org-notify-add 'default
-                       '(:time "15m"
-                               :period "15m"
-                               :duration 0
-                               :urgency 'critical
-                               :app-icon (concat (configuration-layer/get-layer-path 'org)
-                                                 "img/org.png")
-                               :actions org-notify-action-notify-mac))
-       (debug-init-message "org notify start")
-       (org-notify-start)
-       (debug-init-message "org notify started")
-       )
+                       (defun my-action (id key)
+                         (let ((plist (gethash id todo-action-hash)))
+                           (my-action-act plist key)
+                           (remhash id todo-action-hash)))
 
-     (debug-init-message "debug-init POST-server-running-notification-setup")
+                       (debug-init-message "in-server-running-notificiation-setup")
 
-     )
+                       (defun org-notify-action-notify-mac (plist)
+                         "Pop up a notification window."
+                         ;; (require 'notifications)
+                         (let* ((duration (plist-get plist :duration))
+                                (urgency (plist-get plist :urgency))
+                                (id (notifications-notify
+                                     :title     (plist-get plist :heading)
+                                     :body      (org-notify-body-text plist)
+                                     :urgency   (or urgency 'normal)
+                                     :timeout   (if duration (* duration 1000))
+                                     :actions   org-notify-actions
+                                     :on-action 'my-action)))
+                           (puthash id plist todo-action-hash)
+                           ))
+                       (debug-init-message "org notify add")
+                       (org-notify-add 'default
+                                       '(:time "15m"
+                                               :period "15m"
+                                               :duration 0
+                                               :urgency 'critical
+                                               :app-icon (concat (configuration-layer/get-layer-path 'org)
+                                                                 "img/org.png")
+                                               :actions org-notify-action-notify-mac))
+                       (debug-init-message "org notify start")
+                       (org-notify-start)
+                       (debug-init-message "org notify started")
+                       )
+
+                     (debug-init-message "debug-init POST-server-running-notification-setup")
+
+                     )
 
     ;; ====
     ;; TMUX
@@ -4354,7 +4354,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                         evil-want-C-i-jump nil
                         evil-disable-insert-state-bindings t)
                   (when (display-graphic-p)
-                      (setq evil-esc-delay 0))
+                    (setq evil-esc-delay 0))
                   ;; Configure some modes to start in different modes.
                   (evil-set-initial-state 'artist-mode 'emacs)
                   (evil-set-initial-state 'mu4e-compose-mode 'insert)
@@ -4600,34 +4600,34 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     ;;                  (with-selected-window window
     ;;                    (split-window-below))))))))
 
-     (debug-init-message "list-timers")
+    (debug-init-message "list-timers")
 
     (require 'list-timers)
     (evil-set-initial-state 'timers-menu-mode 'insert)
 
-  ;; left-arrow, right-arrow
-  ;; Used to indicate truncated lines.
+    ;; left-arrow, right-arrow
+    ;; Used to indicate truncated lines.
 
-  ;; left-curly-arrow, right-curly-arrow
-  ;; Used to indicate continued lines.
+    ;; left-curly-arrow, right-curly-arrow
+    ;; Used to indicate continued lines.
 
-  ;; right-triangle, left-triangle
-  ;; The former is used by overlay arrows. The latter is unused.
+    ;; right-triangle, left-triangle
+    ;; The former is used by overlay arrows. The latter is unused.
 
-  ;; up-arrow, down-arrow, top-left-angle top-right-angle
-  ;; bottom-left-angle, bottom-right-angle
-  ;; top-right-angle, top-left-angle
-  ;; left-bracket, right-bracket, top-right-angle, top-left-angle
-  ;; Used to indicate buffer boundaries.
+    ;; up-arrow, down-arrow, top-left-angle top-right-angle
+    ;; bottom-left-angle, bottom-right-angle
+    ;; top-right-angle, top-left-angle
+    ;; left-bracket, right-bracket, top-right-angle, top-left-angle
+    ;; Used to indicate buffer boundaries.
 
-  ;; filled-rectangle, hollow-rectangle
-  ;; filled-square, hollow-square
-  ;; vertical-bar, horizontal-bar
-  ;; Used for different types of fringe cursors.
+    ;; filled-rectangle, hollow-rectangle
+    ;; filled-square, hollow-square
+    ;; vertical-bar, horizontal-bar
+    ;; Used for different types of fringe cursors.
 
-  ;; UTF-8 left-arrow, right-arrow (for truncated lines), left-curly-arrow, and right-curly-arrow
-  ;; → ←  ↩ ↪ ⬅ ↺ ↻ ↷ ⟲ ⟳ ⤵⤴ ⤷ ⤶
-  ;; custom graphics that works nice with half-width fringes
+    ;; UTF-8 left-arrow, right-arrow (for truncated lines), left-curly-arrow, and right-curly-arrow
+    ;; → ←  ↩ ↪ ⬅ ↺ ↻ ↷ ⟲ ⟳ ⤵⤴ ⤷ ⤶
+    ;; custom graphics that works nice with half-width fringes
 
 
     (with-eval-after-load 'git-gutter+-disabled-foo
@@ -4666,113 +4666,113 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
 
       (fringe-helper-define 'left-curly-arrow nil
-        "........................."
-        "........................."
-        ".................#......."
-        ".................####...."
-        ".................#####..."
-        "..................####..."
-        ".......##..........####.."
-        "......###...........###.."
-        ".....###...........####.."
-        "....###............###..."
-        "...###################..."
-        "..###################...."
-        "..##################....."
-        "...####.................."
-        "....####................."
-        ".....####................"
-        "......###................"
-        ".......#................."
-        "........................."
-        "........................."
-        )
+                            "........................."
+                            "........................."
+                            ".................#......."
+                            ".................####...."
+                            ".................#####..."
+                            "..................####..."
+                            ".......##..........####.."
+                            "......###...........###.."
+                            ".....###...........####.."
+                            "....###............###..."
+                            "...###################..."
+                            "..###################...."
+                            "..##################....."
+                            "...####.................."
+                            "....####................."
+                            ".....####................"
+                            "......###................"
+                            ".......#................."
+                            "........................."
+                            "........................."
+                            )
 
       (fringe-helper-define 'right-curly-arrow nil
-        "........................."
-        ".......#................."
-        "....####................."
-        "...#####................."
-        "...####.................."
-        "..####..........##......."
-        "..###...........###......"
-        "..###............###....."
-        "...###............###...."
-        "...###################..."
-        "....###################.."
-        ".....##################.."
-        "..................####..."
-        ".................####...."
-        "................####....."
-        "................###......"
-        ".................#......."
-        "........................."
-        )
+                            "........................."
+                            ".......#................."
+                            "....####................."
+                            "...#####................."
+                            "...####.................."
+                            "..####..........##......."
+                            "..###...........###......"
+                            "..###............###....."
+                            "...###............###...."
+                            "...###################..."
+                            "....###################.."
+                            ".....##################.."
+                            "..................####..."
+                            ".................####...."
+                            "................####....."
+                            "................###......"
+                            ".................#......."
+                            "........................."
+                            )
 
 
 
 
       (fringe-helper-define 'git-gutter-fr:added nil
-        ".......XXXXX......."
-        ".......XXXXX......."
-        ".......XXXXX......."
-        ".......XXXXX......."
-        ".......XXXXX......."
-        ".......XXXXX......."
-        ".......XXXXX......."
-        "XXXXXXXXXXXXXXXXXXX"
-        "XXXXXXXXXXXXXXXXXXX"
-        "XXXXXXXXXXXXXXXXXXX"
-        "XXXXXXXXXXXXXXXXXXX"
-        "XXXXXXXXXXXXXXXXXXX"
-        ".......XXXXX......."
-        ".......XXXXX......."
-        ".......XXXXX......."
-        ".......XXXXX......."
-        ".......XXXXX......."
-        ".......XXXXX......."
-        ".......XXXXX......."
+                            ".......XXXXX......."
+                            ".......XXXXX......."
+                            ".......XXXXX......."
+                            ".......XXXXX......."
+                            ".......XXXXX......."
+                            ".......XXXXX......."
+                            ".......XXXXX......."
+                            "XXXXXXXXXXXXXXXXXXX"
+                            "XXXXXXXXXXXXXXXXXXX"
+                            "XXXXXXXXXXXXXXXXXXX"
+                            "XXXXXXXXXXXXXXXXXXX"
+                            "XXXXXXXXXXXXXXXXXXX"
+                            ".......XXXXX......."
+                            ".......XXXXX......."
+                            ".......XXXXX......."
+                            ".......XXXXX......."
+                            ".......XXXXX......."
+                            ".......XXXXX......."
+                            ".......XXXXX......."
 
 
-        )
+                            )
       (fringe-helper-define 'git-gutter-fr:deleted nil
-        "......................"
-        "......................"
-        "......................"
-        "......................"
-        "......................"
-        "......................"
-        "XXXXXXXXXXXXXXXXXXXXXX"
-        "XXXXXXXXXXXXXXXXXXXXXX"
-        "XXXXXXXXXXXXXXXXXXXXXX"
-        "XXXXXXXXXXXXXXXXXXXXXX"
-        "......................"
-        "......................"
-        "......................"
-        "......................"
-        "......................"
-        "......................"
-        )
+                            "......................"
+                            "......................"
+                            "......................"
+                            "......................"
+                            "......................"
+                            "......................"
+                            "XXXXXXXXXXXXXXXXXXXXXX"
+                            "XXXXXXXXXXXXXXXXXXXXXX"
+                            "XXXXXXXXXXXXXXXXXXXXXX"
+                            "XXXXXXXXXXXXXXXXXXXXXX"
+                            "......................"
+                            "......................"
+                            "......................"
+                            "......................"
+                            "......................"
+                            "......................"
+                            )
       (fringe-helper-define 'git-gutter-fr:modified nil
-        "........................."
-        "........................."
-        "........................."
-        "..........XXXXX.........."
-        ".........XXXXXXX........."
-        "........XXXXXXXXX........"
-        ".......XXXXXXXXXXX......."
-        ".......XXXXXXXXXXX......."
-        ".......XXXXXXXXXXX......."
-        ".......XXXXXXXXXXX......."
-        ".......XXXXXXXXXXX......."
-        "........XXXXXXXXX........"
-        ".........XXXXXXX........."
-        "..........XXXXX.........."
-        "........................."
-        "........................."
-        "........................."
-        "........................."
-        )
+                            "........................."
+                            "........................."
+                            "........................."
+                            "..........XXXXX.........."
+                            ".........XXXXXXX........."
+                            "........XXXXXXXXX........"
+                            ".......XXXXXXXXXXX......."
+                            ".......XXXXXXXXXXX......."
+                            ".......XXXXXXXXXXX......."
+                            ".......XXXXXXXXXXX......."
+                            ".......XXXXXXXXXXX......."
+                            "........XXXXXXXXX........"
+                            ".........XXXXXXX........."
+                            "..........XXXXX.........."
+                            "........................."
+                            "........................."
+                            "........................."
+                            "........................."
+                            )
       )
 
     (debug-init-message "USER-CONFIG done")
