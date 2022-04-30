@@ -3,8 +3,7 @@
 # key: c-bsd
 # contributor: Christian E. Hopps <chopps@gmail.com>
 # --
-# Copyright (c) ${1}, ${Christian Hopps}
-# All Rights Reserved.
+# Copyright (c) `(format-time-string "%Y" (current-time))`, ${LabN Consulting, L.L.C.}
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions

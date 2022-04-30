@@ -3,8 +3,8 @@
 # key: c-closed
 # contributor: Christian E. Hopps <chopps@gmail.com>
 # --
-#
-# Copyright (c) `(format-time-string "%Y" (current-time))`, ${LabN Consulting, L.L.C.}
-# All Rights Reserved.
-#
+/*
+* Copyright (c) `(format-time-string "%Y" (current-time))`, ${LabN Consulting, L.L.C.}
+* All Rights Reserved.
+*/
 $0
