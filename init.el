@@ -2732,10 +2732,17 @@ given, offer to edit the search query before executing it."
                                      lsp-enable-file-watchers t
                                      lsp-file-watch-threshold 20000
 
+                                     lsp-ui-peek-always-show t
                                      lsp-ui-peek-peek-height 40
                                      lsp-ui-peek-list-width 50
+
+                                     lsp-ui-sideline-show-code-actions t
+                                     lsp-ui-sideline-show-diagnostics t
+                                     lsp-ui-sideline-show-hover t
                                      )
 
+                       (define-key lsp-ui-peek-mode-map "j" 'lsp-ui-peek--select-next-file)
+                       (define-key lsp-ui-peek-mode-map "k" 'lsp-ui-peek--select-prev-file)
                        ))
 
     (when-layer-used 'syntax-checking
