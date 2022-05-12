@@ -71,6 +71,18 @@ This function should only modify configuration layer settings."
      ;; lsp-diagnostics-provider :none
      (lsp :variables
           lsp-lens-enable nil)
+     ;; (lua :variables
+     ;;      lua-default-application "lua5.2"
+     ;;      lua-backend 'lsp
+     ;;      lua-lsp-server 'emmy
+     ;;      lsp-clients-emmy-lua-jar-path "/home/chopps/.emacs.d/.cache/lsp/EmmyLua-LS-all.jar" ; default path
+     ;;      lsp-clients-emmy-lua-java-path "java") ; default path
+     (lua :variables
+          lua-default-application "lua5.2"
+          lua-backend 'lsp
+          lua-lsp-server 'lua-language-server
+          lsp-clients-lua-language-server-bin "/home/chopps/.emacs.d/.cache/lsp/lua-language-server/bin/lua-language-server" ; default path
+          lsp-clients-lua-language-server-main-location "/home/chopps/.emacs.d/.cache/lsp/lua-language-server/main.lua") ; default path
      (python :variables python-backend 'lsp
              python-lsp-server 'pylsp
              python-formatter 'black
@@ -219,7 +231,7 @@ This function should only modify configuration layer settings."
      (latex :variables latex-build-command "latexmk")
      (lsp :variables
           lps-ui-sideline-enable nil)
-     (lua :variables lua-default-application "lua5.1")
+     (lua :variables lua-default-application "lua5.2")
      ;; lux
      ;; primary test runner is pytest use 'spc u' prefix to invoke nose
      (python :variables python-backend 'lsp
@@ -252,7 +264,7 @@ This function should only modify configuration layer settings."
            yang-pyang-rules "lint"
            yang-pyang-extra-args "--max-line-length=79")
      )
-   chopps-dev-lite-systems '("dlk" "flk" "ubb" "uff")
+   chopps-dev-lite-systems '("dlk" "lake" "flk" "ubb" "uff")
    ;; These systems get full development packages -- the slowest load
    chopps-dev-systems '("cmf-xe-1" "morn1" "tops" "hp13" "labnh" "ja.int.chopps.org" "rlk" "dak"))
 
