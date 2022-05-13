@@ -1224,6 +1224,11 @@ i.e. windows tiled side-by-side."
   ;; Global Key Bindings and Registers
   ;; =================================
 
+  (fold-section "Registers"
+                (set-register ?t "target remote /tmp/unet-test/tests.errors.test_errors/r1/s/gdbserver")
+                (set-register ?T "target remote /tmp/unet-test/tests.errors.test_errors/r2/s/gdbserver")
+                )
+
   (fold-section "Keybindings"
                 (define-key isearch-mode-map [remap isearch-delete-char] 'isearch-del-char)
 
@@ -2728,8 +2733,8 @@ given, offer to edit the search query before executing it."
     (when-layer-used 'lsp
                      (with-eval-after-load 'lsp-mode
                        (setq-default lsp-enable-indentation nil
-                                     lsp-file-watch-ignored (append '("/usr/include" ".*/build-root/.*" "/opt/current/include" ) lsp-file-watch-ignored)
                                      lsp-enable-file-watchers t
+                                     lsp-file-watch-ignored (append '("/usr/include" ".*/build-root/.*" "/opt/current/include" ) lsp-file-watch-ignored)
                                      lsp-file-watch-threshold 20000
 
                                      lsp-ui-peek-always-show t
@@ -2741,8 +2746,9 @@ given, offer to edit the search query before executing it."
                                      lsp-ui-sideline-show-hover t
                                      )
 
-                       (define-key lsp-ui-peek-mode-map "j" 'lsp-ui-peek--select-next-file)
-                       (define-key lsp-ui-peek-mode-map "k" 'lsp-ui-peek--select-prev-file)
+                       (with-eval-after-load 'lsp-ui-peek
+                         (define-key lsp-ui-peek-mode-map "j" 'lsp-ui-peek--select-next-file)
+                         (define-key lsp-ui-peek-mode-map "k" 'lsp-ui-peek--select-prev-file))
                        ))
 
     (when-layer-used 'syntax-checking
