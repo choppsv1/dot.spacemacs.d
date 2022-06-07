@@ -3624,6 +3624,8 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                      ;; key desc (cmd1 cmd2 ...) settings-for-whole-set files
 
                      (setq org-html-doctype "html5")
+                     (setq org-use-sub-superscripts nil)
+                     (setq org-export-with-sub-superscripts nil)
 
                      ;; Save running clock and clock history.
                      (setq org-clock-persist t)
