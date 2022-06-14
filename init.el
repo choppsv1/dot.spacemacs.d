@@ -3612,34 +3612,9 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
     (setq image-transform-scale 2.0)
 
     (when-layer-used 'org
-
                      (debug-init-message "debug-init org setup")
-                     ;; Do we want this?
-
-                     ;; Custom Agenda View
-                     (setq org-agenda-custom-commands
-                           '(("c" . "Custom searches") ; describe prefix "h"
-                             ("cc" "Closed in the last week" tags "CLOSED>=\"<-1w>\"")))
-
-                     ;; key desc (cmd1 cmd2 ...) settings-for-whole-set files
-
-                     (setq org-html-doctype "html5")
-                     (setq org-use-sub-superscripts nil)
-                     (setq org-export-with-sub-superscripts nil)
-
-                     ;; Save running clock and clock history.
-                     (setq org-clock-persist t)
-
-                     (if (file-accessible-directory-p "~/Dropbox/org-mode")
-                         (progn
-                           (setq-default org-directory "~/Dropbox/org-mode/")
-                           (setq org-agenda-files '("~/Dropbox/org-mode/")))
-                       (setq-default org-directory "~/org/")
-                       (setq org-agenda-files '("~/org/")))
-
-
-                     ;; This is for using xelatex
                      (with-eval-after-load "org"
+
                        ;; (dolist (estate '(normal visual motion))
                        ;;   (evil-define-key estate evil-org-mode-map "H" nil)
                        ;;   (evil-define-key estate evil-org-mode-map "L" nil)
@@ -3711,8 +3686,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                        (setq org-adapt-indentation 'headline-data))
                      (add-hook 'org-mode-hook 'my-org-mode-hook)
 
-                                        ; (require 'ox-rfc)
-
                      (require 'org-id)
 
                      (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)
@@ -3780,27 +3753,43 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                      ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
 
                      (debug-init-message "debug-init org setq")
+
+                     (if (file-accessible-directory-p "~/Dropbox/org-mode")
+                         (progn
+                           (setq-default org-directory "~/Dropbox/org-mode/")
+                           (setq org-agenda-files '("~/Dropbox/org-mode/")))
+                       (setq-default org-directory "~/org/")
+                       (setq org-agenda-files '("~/org/")))
+
                      (setq
                       ;; Crypt
                       org-tags-exclude-from-inheritance '("crypt")
                       org-crypt-disable-auto-save t
                       org-crypt-key "D7B83025"
-                      org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
-                      org-src-fontify-natively t
-                      org-default-notes-file (concat org-directory "/notes.org")
+
                       ;; Display
                       org-display-inline-images t
 
                       ;; General
                       ;; org-agenda-start-day "-8d"
+
+                      org-agenda-custom-commands '(("c" . "Custom searches") ("cc" "Closed in the last week" tags "CLOSED>=\"<-1w>\""))
                       org-agenda-start-on-weekday 1
+                      org-clock-persist t
+                      org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
+                      org-deadline-warning-days 5
+                      org-default-notes-file (concat org-directory "/notes.org")
+                      org-export-with-sub-superscripts nil
                       org-hide-leading-stars t
+                      org-html-doctype "html5"
                       org-log-done 'time
                       org-outline-path-complete-in-steps t
                       org-plantuml-jar-path "/opt/plantuml/plantuml.jar"
                       org-refile-use-outline-path 'file
+                      org-src-fontify-natively t
                       org-src-tab-acts-natively t
                       org-src-window-setup 'current-window
+                      org-use-sub-superscripts nil
 
                       ;; Exports
                       org-export-latex-emphasis-alist (quote (("*" "\\textbf{%s}" nil)
