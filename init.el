@@ -315,6 +315,10 @@ This function should only modify configuration layer settings."
      borland-blue-theme
      cobalt
      color-theme-modern
+     (copilot :location (recipe
+                         :fetcher github
+                         :repo "zerolfx/copilot.el"
+                         :files ("*.el" "dist")))
      dockerfile-mode
      exec-path-from-shell
      ;; This is very cool but too expensive for large projects
@@ -961,6 +965,7 @@ Return an event vector."
   ;; ---------
   ;; User-init
   ;; ---------
+
   (setq-default gdb-default-window-configuration-file "gdb-window-config")
   (setq-default gdb-window-configuration-directory "~/.spacemacs.d/")
 
@@ -1020,6 +1025,54 @@ Return an event vector."
 
   (setq labn-365-dir (expand-file-name "~/365.labn.net/OneDrive - LabN Consulting, L.L.C/"))
   (setq labn-us-dir (expand-file-name "~/us.labn.net/OneDrive - LabN Consulting LLC/"))
+
+
+  ;; -------
+  ;; Copilot
+  ;; -------
+
+  (unless t
+    ;; accept completion from copilot and fallback to company
+    (defun my-copilot-accept-lines ()
+      (interactive)
+      (or (copilot-accept-completion)
+          (company-indent-or-complete-common nil)))
+
+    (defun my-copilot-accept-word ()
+      (interactive)
+      (or (copilot-accept-completion-by-word 1)
+          (company-indent-or-complete-common nil)))
+
+    (with-eval-after-load 'company
+      ;; disable inline previews
+      ;; (delq 'company-preview-if-just-one-frontend company-frontends)
+      ;; enable tab completion
+      (define-key company-mode-map (kbd "<tab>") 'my-copilot-accept-lines)
+      (define-key company-mode-map (kbd "TAB") 'my-copilot-accept-lines)
+      (define-key company-mode-map (kbd "C-<tab>") 'my-copilot-accept-word)
+      (define-key company-mode-map (kbd "C-TAB") 'my-copilot-accept-word)
+      (define-key company-active-map (kbd "<tab>") 'my-copilot-accept-lines)
+      (define-key company-active-map (kbd "TAB") 'my-copilot-accept-lines)
+      (define-key company-active-map (kbd "C-<tab>") 'my-copilot-accept-word)
+      (define-key company-active-map (kbd "C-TAB") 'my-copilot-accept-word)
+      (define-key company-active-map (kbd "M-n") 'copilot-next-completion)
+      (define-key company-active-map (kbd "M-p") 'copilot-previous-completion)
+      )
+
+    (add-hook 'prog-mode-hook 'copilot-mode)
+
+    (with-eval-after-load 'copilot
+      (evil-define-key 'insert copilot-mode-map
+        (kbd "<tab>") #'my/copilot-tab))
+    ;; (evil-define-key estate evil-org-mode-map "H" nil)
+
+    ;; (define-key evil-insert-state-map (kbd "C-<tab>") 'copilot-accept-completion-by-word)
+    ;; (define-key evil-insert-state-map (kbd "C-TAB") 'copilot-accept-completion-by-word)
+    )
+
+  ;; -----------
+  ;; End-copilot
+  ;; -----------
 
   (setq
    evil-search-wrap nil
@@ -1175,7 +1228,7 @@ Return an event vector."
   (setq split-width-threshold 160)
   (setq split-height-threshold 48)
   (setq window-min-width 80)
-  (setq window-min-height 10)
+  (setq window-min-height 24)
 
   (defun split-window-sensibly-prefer-horizontal (&optional window)
     "Based on split-window-sensibly, but designed to prefer a horizontal split,
@@ -1217,8 +1270,13 @@ i.e. windows tiled side-by-side."
           (with-selected-window window (split-window-sensibly-prefer-horizontal window))
         (with-selected-window window (split-window-sensibly window)))))
 
+  ;; this is being ignored!?
   (setq split-window-preferred-function 'split-window-really-sensibly)
   ;; (setq split-window-preferred-function 'split-window-sensibly-prefer-horizontal)
+
+  (defun split-window-sensibly (&optional window)
+    (split-window-really-sensibly window))
+
 
   ;; =================================
   ;; Global Key Bindings and Registers
