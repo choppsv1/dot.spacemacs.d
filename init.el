@@ -39,10 +39,10 @@ This function should only modify configuration layer settings."
      ;; auto-completion-private-snippets-directory "~/.spacemacs.d/snippets/"
      ;; auto-completion-tab-key-behavior 'complete)
      better-defaults
-     git
+     (git :variables git-enable-magit-delta-plugin nil
+          git-enable-magit-gitflow-plugin nil
+          git-enable-magit-todos-plugin nil)
      theming
-
-     neotree
 
      ;; Languages
      emacs-lisp
@@ -127,11 +127,11 @@ This function should only modify configuration layer settings."
      (git :variables git-enable-magit-delta-plugin t
           git-enable-magit-gitflow-plugin nil
           git-enable-magit-todos-plugin t)
+     multiple-cursors
+     neotree
      rebox
      theming
      themes-megapack
-
-     neotree
 
      ;; Languages
      emacs-lisp
@@ -428,8 +428,8 @@ It should only modify the values of Spacemacs settings."
   ;; this setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
   (setq-default
-   ;; If non-nil then enable support for the portable dumper. You'll need
-   ;; to compile Emacs 27 from source following the instructions in file
+   ;; If non-nil then enable support for the portable dumper. You'll need to
+   ;; compile Emacs 27 from source following the instructions in file
    ;; EXPERIMENTAL.org at to root of the git repository.
    ;;
    ;; WARNING: pdumper does not work with Native Compilation, so it's disabled
@@ -518,6 +518,13 @@ It should only modify the values of Spacemacs settings."
    ;; by your Emacs build.
    ;; If the value is nil then no banner is displayed. (default 'official)
    dotspacemacs-startup-banner 'official
+
+   ;; Scale factor controls the scaling (size) of the startup banner. Default
+   ;; value is `auto' for scaling the logo automatically to fit all buffer
+   ;; contents, to a maximum of the full image height and a minimum of 3 line
+   ;; heights. If set to a number (int or float) it is used as a constant
+   ;; scaling factor for the default logo size.
+   dotspacemacs-startup-banner-scale 'auto
 
    ;; List of items to show in startup buffer or an association list of
    ;; the form `(list-type . list-size)`. If nil then it is disabled.
@@ -761,7 +768,6 @@ It should only modify the values of Spacemacs settings."
 
    ;; Code folding method. Possible values are `evil', `origami' and `vimish'.
    ;; (default 'evil)
-   ;; dotspacemacs-folding-method 'evil
    dotspacemacs-folding-method 'evil
 
    ;; If non-nil and `dotspacemacs-activate-smartparens-mode' is also non-nil,
