@@ -3133,11 +3133,34 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                        (add-hook 'c-mode-hook 'clang-maybe-format-buffer-on-save)
                        (add-hook 'c++-mode-hook 'clang-maybe-format-buffer-on-save)
 
+                       ;; Linux
+                       (defun c-lineup-arglist-tabs-only (ignored)
+                         "Line up argument lists by tabs, not spaces"
+                         (let* ((anchor (c-langelem-pos c-syntactic-element))
+                                (column (c-langelem-2nd-pos c-syntactic-element))
+                                (offset (- (1+ column) anchor))
+                                (steps (floor offset c-basic-offset)))
+                           (* (max steps 1)
+                              c-basic-offset)))
+
+                       (c-add-style "linux-kernel"
+                                    '("linux" (c-offsets-alist
+                                               (arglist-cont-nonempty
+                                                c-lineup-gcc-asm-reg
+                                                c-lineup-arglist-tabs-only))))
+
                        (defun my-c-mode-hook ()
                          ;;(message "my-c-mode-hook")
-                         (if (string= (shell-command-to-string "uname -s") "NetBSD\n")
-                             (c-set-style "KNF")
-                           (c-set-style "linux"))
+                         (c-set-style
+                          (cond ((string-match-p "vpp" (buffer-file-name))
+                                 "gnu")
+                                ((string-match-p "linux" (buffer-file-name))
+                                 (setq indent-tabs-mode t)
+                                 "linux")
+                                ((string-match-p "frr" (buffer-file-name))
+                                 (setq indent-tabs-mode t)
+                                 "linux")
+                                ("KNF")))
                          ;; (c-toggle-auto-hungry-state 1)
                          ;; (setq c-electric-flag nil)
                          ;; (setq fill-column 80)
