@@ -124,7 +124,9 @@ This function should only modify configuration layer settings."
                       auto-completion-tab-key-behavior 'complete)
      better-defaults
      colors
-     git
+     (git :variables git-enable-magit-delta-plugin t
+          git-enable-magit-gitflow-plugin nil
+          git-enable-magit-todos-plugin t)
      rebox
      theming
      themes-megapack
@@ -322,8 +324,6 @@ This function should only modify configuration layer settings."
      dockerfile-mode
      exec-path-from-shell
      ;; This is very cool but too expensive for large projects
-     ;; magit-todos
-     magit-delta
      olivetti
      monky
      nhexl-mode
