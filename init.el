@@ -1059,9 +1059,8 @@ Return an event vector."
       (define-key company-active-map (kbd "M-p") 'copilot-previous-completion)
       )
 
-    (add-hook 'prog-mode-hook 'copilot-mode)
-
     (with-eval-after-load 'copilot
+      (add-hook 'prog-mode-hook 'copilot-mode)
       (evil-define-key 'insert copilot-mode-map
         (kbd "<tab>") #'my/copilot-tab))
     ;; (evil-define-key estate evil-org-mode-map "H" nil)
