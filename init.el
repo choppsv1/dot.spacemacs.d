@@ -39,15 +39,21 @@ This function should only modify configuration layer settings."
      ;; auto-completion-private-snippets-directory "~/.spacemacs.d/snippets/"
      ;; auto-completion-tab-key-behavior 'complete)
      better-defaults
+     ;; colors
      (git :variables git-enable-magit-delta-plugin nil
           git-enable-magit-gitflow-plugin nil
           git-enable-magit-todos-plugin nil)
+     ;; multiple-cursors
+     ;; neotree
+     ;; rebox
      theming
+     ;; themes-megapack
 
      ;; Languages
      emacs-lisp
 
      ;; File Formats
+     ;; csv
      markdown
      (org :variables
           org-clock-idle-time 15
@@ -275,7 +281,7 @@ This function should only modify configuration layer settings."
         ((eq system-type 'gnu/linux)
          (setq chopps-layers (append chopps-layers linux-layers))))
   (when (member system-name chopps-dev-lite-systems)
-    (setq chopps-layers (append chopps-layers dev-lite-layers)))
+    (setq chopps-layers (append chopps-lite-layers dev-lite-layers)))
   (when (member system-name chopps-dev-systems)
     (setq chopps-layers (append chopps-layers dev-layers)))
   (when (member system-name '("tops"))
