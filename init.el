@@ -10,7 +10,7 @@
 ;; It must be stored in your home directory.
 
 
-(setq debug-init-msg nil)
+(setq debug-init-msg t)
 (defun debug-init-message (fmt &rest a)
   (and debug-init-msg
        (let ((ts (format-time-string "%S.%N")))
@@ -133,7 +133,7 @@ This function should only modify configuration layer settings."
                       auto-completion-tab-key-behavior 'complete)
      better-defaults
      colors
-     (git :variables git-enable-magit-delta-plugin t
+     (git :variables git-enable-magit-delta-plugin nil
           git-enable-magit-gitflow-plugin nil
           git-enable-magit-todos-plugin t)
      multiple-cursors
@@ -199,8 +199,8 @@ This function should only modify configuration layer settings."
      ;; pandoc
      ;; pdf
      ;; ranger
-     ;; (rust :variables
-     ;;      rust-format-on-save t)
+     (rust :variables
+          rust-format-on-save t)
      rebox
      ;; nginx
      (spell-checking :variables enable-flyspell-auto-completion nil)
@@ -277,7 +277,7 @@ This function should only modify configuration layer settings."
      )
    chopps-dev-lite-systems '("dlk" "jaja" "lake" "flk" "ubb" "uff")
    ;; These systems get full development packages -- the slowest load
-   chopps-dev-systems '("cmf-xe-1" "morn1" "tops" "hp13" "labnh" "ja.int.chopps.org" "rlk" "dak"))
+   chopps-dev-systems '("cmf-xe-1" "morn1" "tops" "hp13" "labnh" "ja.local" "ja.int.chopps.org" "rlk" "dak"))
 
   (setq jaja-machine-id "949972c901cb4c3f9e7e2c6b484bc1bb")
 
@@ -340,6 +340,7 @@ This function should only modify configuration layer settings."
      nhexl-mode
      nano-theme
      org-caldav
+     org-notify
      package-lint
      persistent-scratch
      polymode
@@ -398,9 +399,9 @@ This function should only modify configuration layer settings."
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
     (setq ch-def-font "Iosevka Light")
-    (if (string-equal system-name "lid.local")
-        (setq ch-def-height 16.0)
-      (setq ch-def-height 18.0))
+    (if (string-prefix-p system-name "ja")
+        (setq ch-def-height 14.0)
+      (setq ch-def-height 14.0))
     (debug-init-message "Setting font to %s:%f" ch-def-font ch-def-height))
    ((string-equal system-type "gnu/linux")
     (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
@@ -1241,57 +1242,59 @@ Return an event vector."
   (setq fci-rule-character-color "#121212")
   ;; (setq fci-rule-color "#222222")
 
-  (setq split-width-threshold 160)
-  (setq split-height-threshold 48)
-  (setq window-min-width 80)
-  (setq window-min-height 24)
+  (unless (string-equal system-type "darwin")
+    (setq split-width-threshold 160)
+    (setq split-height-threshold 48)
+    (setq window-min-width 80)
+    (setq window-min-height 24)
 
-  (defun split-window-sensibly-prefer-horizontal (&optional window)
-    "Based on split-window-sensibly, but designed to prefer a horizontal split,
+    (defun split-window-sensibly-prefer-horizontal (&optional window)
+      "Based on split-window-sensibly, but designed to prefer a horizontal split,
 i.e. windows tiled side-by-side."
-    (let ((window (or window (selected-window))))
-      (or (and (window-splittable-p window t)
-               ;; Split window horizontally
-               (with-selected-window window
-                 (split-window-right)))
-          (and (window-splittable-p window)
-               ;; Split window vertically
-               (with-selected-window window
-                 (split-window-below)))
-          (and
-           ;; If WINDOW is the only usable window on its frame (it is
-           ;; the only one or, not being the only one, all the other
-           ;; ones are dedicated) and is not the minibuffer window, try
-           ;; to split it horizontally disregarding the value of
-           ;; `split-height-threshold'.
-           (let ((frame (window-frame window)))
-             (or
-              (eq window (frame-root-window frame))
-              (catch 'done
-                (walk-window-tree (lambda (w)
-                                    (unless (or (eq w window)
-                                                (window-dedicated-p w))
-                                      (throw 'done nil)))
-                                  frame)
-                t)))
-           (not (window-minibuffer-p window))
-           (let ((split-width-threshold 0))
-             (when (window-splittable-p window t)
-               (with-selected-window window
-                 (split-window-right))))))))
+      (let ((window (or window (selected-window))))
+        (or (and (window-splittable-p window t)
+                 ;; Split window horizontally
+                 (with-selected-window window
+                   (split-window-right)))
+            (and (window-splittable-p window)
+                 ;; Split window vertically
+                 (with-selected-window window
+                   (split-window-below)))
+            (and
+             ;; If WINDOW is the only usable window on its frame (it is
+             ;; the only one or, not being the only one, all the other
+             ;; ones are dedicated) and is not the minibuffer window, try
+             ;; to split it horizontally disregarding the value of
+             ;; `split-height-threshold'.
+             (let ((frame (window-frame window)))
+               (or
+                (eq window (frame-root-window frame))
+                (catch 'done
+                  (walk-window-tree (lambda (w)
+                                      (unless (or (eq w window)
+                                                  (window-dedicated-p w))
+                                        (throw 'done nil)))
+                                    frame)
+                  t)))
+             (not (window-minibuffer-p window))
+             (let ((split-width-threshold 0))
+               (when (window-splittable-p window t)
+                 (with-selected-window window
+                   (split-window-right))))))))
 
-  (defun split-window-really-sensibly (&optional window)
-    (let ((window (or window (selected-window))))
-      (if (> (window-total-width window) (* 2 (window-total-height window)))
-          (with-selected-window window (split-window-sensibly-prefer-horizontal window))
-        (with-selected-window window (split-window-sensibly window)))))
+    (defun split-window-really-sensibly (&optional window)
+      (let ((window (or window (selected-window))))
+        (if (> (window-total-width window) (* 2 (window-total-height window)))
+            (with-selected-window window (split-window-sensibly-prefer-horizontal window))
+          (with-selected-window window (split-window-sensibly window)))))
 
-  ;; this is being ignored!?
-  (setq split-window-preferred-function 'split-window-really-sensibly)
-  ;; (setq split-window-preferred-function 'split-window-sensibly-prefer-horizontal)
+    ;; this is being ignored!?
+    (setq split-window-preferred-function 'split-window-really-sensibly)
+    ;; (setq split-window-preferred-function 'split-window-sensibly-prefer-horizontal)
 
-  (defun split-window-sensibly (&optional window)
-    (split-window-really-sensibly window))
+    ;; (defun split-window-sensibly (&optional window)
+    ;;   (split-window-really-sensibly window))
+    )
 
 
   ;; =================================
@@ -2183,7 +2186,7 @@ layers configuration. You are free to put any user code."
                            ;; -------
                            ;; Viewing
                            ;; -------
-                           mu4e-headers-results-limit 500
+                           mu4e-headers-results-limit 1000
                            mu4e-headers-visible-lines 15
                            mu4e-headers-visible-columns 200
 
@@ -3817,9 +3820,11 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                                (save-buffer)
                                ))
                          (warn "Clock not started (Could not find heading '%s' in '%s')" heading labn-365-dir)))
+                     (defun clock-in-busdev () "Clock-IN BusDev" (interactive) (my/start-heading-clock "BusDev"))
                      (defun clock-in-tfs () "Clock-IN TFS" (interactive) (my/start-heading-clock "TFS DO7.002"))
                      (defun clock-in-caas () "Clock-IN CAS" (interactive) (my/start-heading-clock "CAAS DO9.002"))
                      (defun clock-out-save () "Clock-Out Save" (interactive) (my/stop-clock-save-file-with-heading "TFS DO7.002"))
+                     (spacemacs/set-leader-keys "oib" 'clock-in-busdev)
                      (spacemacs/set-leader-keys "oic" 'clock-in-caas)
                      (spacemacs/set-leader-keys "oim" 'clock-in-tfs)
                      (spacemacs/set-leader-keys "oit" 'clock-in-tfs)
@@ -4365,7 +4370,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
 
 
                        (require 'org-notify)
-
 
                        (defun my-action-act (plist key)
                          "User wants to see action."
