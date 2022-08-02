@@ -101,6 +101,9 @@ This function should only modify configuration layer settings."
              pytest-global-name "python -m pytest --doctest-modules"
              python-sort-imports-on-save nil
              python-enable-yapf-format-on-save nil)
+
+     (rust :variables
+           rust-format-on-save t)
      syntax-checking
      (version-control :variables
                       version-control-diff-tool 'git-gutter+
