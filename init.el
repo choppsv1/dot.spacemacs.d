@@ -76,6 +76,7 @@ This function should only modify configuration layer settings."
      gtags
      ;; lsp-diagnostics-provider :none
      (lsp :variables
+          lsp-rust-server 'rust-analyzer
           lsp-lens-enable nil)
      ;; (lua :variables
      ;;      lua-default-application "lua5.2"
