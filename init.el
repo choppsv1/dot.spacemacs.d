@@ -223,12 +223,19 @@ This function should only modify configuration layer settings."
      ;; Languages
      (c-c++ :variables
             c-c++-default-mode-for-headers 'c-mode
-            c-c++-backend 'lsp-clangd
-            ;; c-c++-adopt-subprojects t
-            ;; c-c++-lsp-sem-highlight-rainbow t
-            ;; c-c++-enable-clang-support nil
-            c-c++-lsp-enable-semantic-highlight nil
             c-c++-enable-clang-format-on-save nil
+            c-c++-lsp-enable-semantic-highlight nil
+
+            c-c++-backend 'lsp-ccls
+            c-c++-adopt-subprojects t
+            c-c++-default-mode-for-headers 'c-mode
+
+            ;; ;; clangd options
+            ;; c-c++-backend 'lsp-clangd
+            ;; ;; c-c++-adopt-subprojects t
+            ;; ;; c-c++-lsp-sem-highlight-rainbow t
+            ;; ;; c-c++-enable-clang-support nil
+
             )
      (cmake :variables cmake-enable-cmake-ide-support nil)
      ;; ess
@@ -1104,7 +1111,7 @@ Return an event vector."
    org-protocol-default-template-key "t"
 
    ;; This really should be a file local variable.
-   rebox-style-loop '(71 72 73)
+   ;; rebox-style-loop '(16 71 72 73)
 
    ;; (with-eval-after-load "evil-evilified-state"
    ;;   (define-key evil-evilified-state-map-original "H" 'evil-window-top)
@@ -1164,11 +1171,10 @@ Return an event vector."
                             (font-lock-string-face :foreground "DarkGrey" :slant italic)
                             (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
           (mandm ;; (default :background "#F0F0E0")
-           (font-lock-doc-face :foreground "#036A07" :slant normal)
+           ;; (font-lock-doc-face :foreground "#036A07" :slant normal)
            (font-lock-comment-face :foreground "#6D6D64" :slant normal)
            (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant normal)
-           (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant normal)
-           (lsp-face-highlight-read :foreground "#036A07" :slant normal)
+           (lsp-face-highlight-read :foreground "#036A08" :slant normal)
            )
 
           (leuven ;; (default :background "#F0F0E0")
@@ -1409,6 +1415,57 @@ i.e. windows tiled side-by-side."
   ;;     )
   ;;   )
 
+  (when-layer-used
+   'python
+
+   (message "XXXXXXXXXX PYTHON ")
+   (when-layer-used 'rebox
+                    (message "XXXXXXXXXX REBOX ")
+                    (defun rebox-python-hook ()
+                      (interactive)
+                      (message "XXXXXXXXXX HOOOKED ")
+                      (bind-key "M-q" 'rebox-dwim python-mode-map)
+                      (set (make-local-variable 'rebox-style-loop) '(401 402 403 413 415)))
+                    (message "XXXXXXXXXX ADDHOOK ")
+                    (add-hook 'python-mode-hook 'rebox-python-hook))
+
+       ;;; XXX restore? XXX
+       (defun my-python-before-save-hook ()
+         (if (bound-and-true-p blacken-mode)
+             (py-isort-before-save)))
+
+       (defun my-python-mode-hook ()
+         (setq comment-column 60)
+         (python-docstring-mode 1)
+         ;; Check to see if there's a pylint in the project directory maybe?
+         (message "XXX checker set")
+         ;; flake8 will chain in pylint
+         (add-hook 'before-save-hook 'my-python-before-save-hook)
+         (flycheck-select-checker 'python-pylint)
+         ;; (flycheck-select-checker 'python-flake8)
+         (semantic-mode -1)
+
+         ;; flycheck-checker-error-threshold 900
+         ;; flycheck-pylintrc "~/.pylintrc")))
+
+         ;;   ;; This gives and error
+         ;;   ;; (message "select checker")
+         ;;   ;; This is required b/c for some reason it's still not loaded at this point.
+         ;;   ;; (require 'flycheck)
+
+         ;;   ;; not needed now that we chain
+         ;;   ;; (flycheck-select-checker 'python-pycheckers)
+         ;;   ;; (message "post select checker")
+
+         ;;   ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
+         ;;   ;; (message "select set exec")
+         ;;   ;; (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
+         )
+
+       (add-hook 'python-mode-hook 'my-python-mode-hook)
+
+   )
+
   (debug-init-message "USER-INIT: End")
 
   )
@@ -1428,6 +1485,8 @@ This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
 
   (debug-init-message "USER-CONFIG: Start")
+
+  (message "python mode hook %s" python-mode-hook)
 
   (unless (string-prefix-p "hp13" (system-name))
     (require 'clipetty)
@@ -2804,6 +2863,49 @@ given, offer to edit the search query before executing it."
     (with-eval-after-load "sh-script"
       (modify-syntax-entry ?_ "w" sh-mode-syntax-table))
 
+    (when-layer-used 'rebox
+                     (with-eval-after-load "rebox2"
+
+                       (message "XXX 70")
+                       (rebox-register-template 70 165 '("?"
+                                                         "? box123456"
+                                                         "?"))
+                       (message "XXX 71")
+                       (rebox-register-template 401 255 '("#"
+                                                          "# box123456"
+                                                          "# *********"))
+                       (message "XXX 72")
+                       (rebox-register-template 402 355 '("# ---------"
+                                                          "# box123456"
+                                                          "# ---------"))
+                       (message "XXX 73")
+                       (rebox-register-template 403 455 '("# =========="
+                                                          "# box123456"
+                                                          "# =========="))
+
+                       ;; (message "XXX 80")
+                       (rebox-register-template 80 175 '("//"
+                                                         "// box123456"
+                                                         "//"))
+                       (rebox-register-template 301 265 '("//"
+                                                         "// box123456"
+                                                         "// *********"))
+                       (rebox-register-template 302 365 '("// ---------"
+                                                         "// box123456"
+                                                         "// ---------"))
+                       (rebox-register-template 303 465 '("// ========="
+                                                         "// box123456"
+                                                         "// ========="))
+                       ))
+                     ;; (spacemacs/set-leader-keys-for-major-mode 'c-mode
+                     ;;   "q" 'rebox-dwim)
+                     ;; (spacemacs/set-leader-keys-for-major-mode 'cc-mode
+                     ;;   "q" 'rebox-dwim)
+                     ;; (spacemacs/set-leader-keys-for-major-mode 'c++-mode
+                     ;;   "q" 'rebox-dwim))
+
+
+
     ;; =================
     ;; Programming Modes
     ;; =================
@@ -3594,11 +3696,6 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
        ;; XXX Hack to get rid of warning, need to fix this differently.
        ;; (setq python-shell-completion-native-enable nil)
 
-       (with-eval-after-load 'python
-         (defun rebox-python-hook ()
-           (set (make-local-variable 'rebox-style-loop) '(71 82 73)))
-         (add-hook 'python-mode-hook 'rebox-python-hook))
-
        ;; (defun python-sort-import-list ()
        ;;   "Split an single import lines with multiple module imports into separate lines sort results"
        ;;   (interactive)
@@ -3657,39 +3754,40 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
        ;;     :delimiter-mode nil)))
        ;; (mmm-add-mode-ext-class 'python-mode nil 'rst-python-docstrings)
 
-       (defun my-python-before-save-hook ()
-         (if (bound-and-true-p blacken-mode)
-             (py-isort-before-save)))
+       ;; ;;; XXX restore? XXX
+       ;; (defun my-python-before-save-hook ()
+       ;;   (if (bound-and-true-p blacken-mode)
+       ;;       (py-isort-before-save)))
 
-       (defun my-python-mode-hook ()
-         (setq comment-column 60)
-         (python-docstring-mode 1)
-         ;; Check to see if there's a pylint in the project directory maybe?
-         (message "XXX checker set")
-         ;; flake8 will chain in pylint
-         (add-hook 'before-save-hook 'my-python-before-save-hook)
-         (flycheck-select-checker 'python-pylint)
-         ;; (flycheck-select-checker 'python-flake8)
-         (semantic-mode -1)
+       ;; (defun my-python-mode-hook ()
+       ;;   (setq comment-column 60)
+       ;;   (python-docstring-mode 1)
+       ;;   ;; Check to see if there's a pylint in the project directory maybe?
+       ;;   (message "XXX checker set")
+       ;;   ;; flake8 will chain in pylint
+       ;;   (add-hook 'before-save-hook 'my-python-before-save-hook)
+       ;;   (flycheck-select-checker 'python-pylint)
+       ;;   ;; (flycheck-select-checker 'python-flake8)
+       ;;   (semantic-mode -1)
 
-         ;; flycheck-checker-error-threshold 900
-         ;; flycheck-pylintrc "~/.pylintrc")))
+       ;;   ;; flycheck-checker-error-threshold 900
+       ;;   ;; flycheck-pylintrc "~/.pylintrc")))
 
-         ;;   ;; This gives and error
-         ;;   ;; (message "select checker")
-         ;;   ;; This is required b/c for some reason it's still not loaded at this point.
-         ;;   ;; (require 'flycheck)
+       ;;   ;;   ;; This gives and error
+       ;;   ;;   ;; (message "select checker")
+       ;;   ;;   ;; This is required b/c for some reason it's still not loaded at this point.
+       ;;   ;;   ;; (require 'flycheck)
 
-         ;;   ;; not needed now that we chain
-         ;;   ;; (flycheck-select-checker 'python-pycheckers)
-         ;;   ;; (message "post select checker")
+       ;;   ;;   ;; not needed now that we chain
+       ;;   ;;   ;; (flycheck-select-checker 'python-pycheckers)
+       ;;   ;;   ;; (message "post select checker")
 
-         ;;   ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
-         ;;   ;; (message "select set exec")
-         ;;   ;; (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
-         )
+       ;;   ;;   ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
+       ;;   ;;   ;; (message "select set exec")
+       ;;   ;;   ;; (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
+       ;;   )
 
-       (add-hook 'python-mode-hook 'my-python-mode-hook)
+       ;; (add-hook 'python-mode-hook 'my-python-mode-hook)
 
        ;; (require 'nadvice)
        (defun my-save-kill-ring (fun &rest _args)
@@ -4555,6 +4653,7 @@ See URL `http://pypi.python.org/pypi/pyflakes'."
                         > "# " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@gmail.com>" \n
                         > "#" \n
                         > "# Copyright (c) " (substring (current-time-string) -4) " by Christian E. Hopps." \n
+
                         > "# All rights reserved." \n
                         > "#" \n
                         > "" \n
