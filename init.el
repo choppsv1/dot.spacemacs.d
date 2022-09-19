@@ -44,8 +44,8 @@ This function should only modify configuration layer settings."
           git-enable-magit-gitflow-plugin nil
           git-enable-magit-todos-plugin nil)
      ;; multiple-cursors
-     ;; neotree
-     ;; rebox
+     neotree
+     rebox
      theming
      ;; themes-megapack
 
