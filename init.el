@@ -284,9 +284,9 @@ This function should only modify configuration layer settings."
            yang-pyang-rules "lint"
            yang-pyang-extra-args "--max-line-length=79")
      )
-   chopps-dev-lite-systems '("dlk" "jaja" "lake" "flk" "ubb" "uff")
+   chopps-dev-lite-systems '("dlk" "jaja" "labnh" "lake" "flk" "ubb" "uff")
    ;; These systems get full development packages -- the slowest load
-   chopps-dev-systems '("cmf-xe-1" "morn1" "tops" "hp13" "labnh" "ja.local" "ja.int.chopps.org" "rlk" "dak"))
+   chopps-dev-systems '("cmf-xe-1" "morn1" "tops" "hp13" "ja.local" "ja.int.chopps.org" "rlk" "dak"))
 
   (setq jaja-machine-id "949972c901cb4c3f9e7e2c6b484bc1bb")
 
