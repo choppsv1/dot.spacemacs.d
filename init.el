@@ -72,6 +72,7 @@ This function should only modify configuration layer settings."
             c-c++-enable-clang-format-on-save nil
             c-c++-lsp-enable-semantic-highlight nil
             )
+     debug
      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
      gtags
      ;; lsp-diagnostics-provider :none
@@ -374,7 +375,7 @@ This function should only modify configuration layer settings."
      ;; mu4e-maildirs-extension
      mu4e-alert
      nameless
-     powerline
+     ;; powerline
      ;; recentf
      ;; savehist
      ;; HATE PURPOSE MODE
@@ -613,7 +614,7 @@ It should only modify the values of Spacemacs settings."
    ;; refer to the DOCUMENTATION.org for more info on how to create your own
    ;; spaceline theme. Value can be a symbol or list with additional properties.
    ;; (default '(spacemacs :separator wave :separator-scale 1.5))
-   dotspacemacs-mode-line-theme '(spacemacs :separator wave :separator-scale 1.5)
+   dotspacemacs-mode-line-theme '(vim-powerline :separator wave :separator-scale 1.5)
 
    ;; If non-nil the cursor color matches the state color in GUI Emacs.
    ;; (default t)
@@ -1252,8 +1253,8 @@ Return an event vector."
   (unless (string-equal system-type "darwin")
     (setq split-width-threshold 160)
     (setq split-height-threshold 48)
-    (setq window-min-width 80)
-    (setq window-min-height 24)
+    (setq window-min-width 60)
+    (setq window-min-height 12)
 
     (defun split-window-sensibly-prefer-horizontal (&optional window)
       "Based on split-window-sensibly, but designed to prefer a horizontal split,
@@ -1676,6 +1677,8 @@ layers configuration. You are free to put any user code."
                   (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u2503))
 
 
+                  ;; This doesn't work if powerline enabled
+
                   ;; The default definition
                   ;; (spaceline-compile
                   ;;                       ; left side
@@ -1719,65 +1722,62 @@ layers configuration. You are free to put any user code."
                   ;;     (buffer-position :priority 99)
                   ;;     (hud :priority 99)))
 
-                  (spaceline-compile
-                                        ; left side
-                    '(((persp-name
-                        workspace-number
-                        window-number)
-                       :fallback evil-state
-                       :face highlight-face
-                       :priority 100)
-                      (anzu :priority 95)
-                      auto-compile
-                      ((buffer-modified buffer-size buffer-id remote-host)
-                       :priority 98)
-                      (major-mode :priority 79)
-                      (process :when active)
-                      ((flycheck-error flycheck-warning flycheck-info)
-                       :when active
-                       :priority 89)
-                      (minor-modes :when active
-                                   :priority 9)
-                      ;; (mu4e-alert-segment :when active)
-                      (erc-track :when active)
-                      (version-control :when active
-                                       :priority 78)
-                      (org-pomodoro :when active)
-                      (org-clock :when active)
-                      nyan-cat)
-                                        ; right side
-                    '(which-function
-                      (python-pyvenv :fallback python-pyenv)
-                      (purpose :priority 94)
-                      (battery :when active)
-                      (selection-info :priority 95)
-                      input-method
-                      ((buffer-encoding-abbrev
-                        point-position
-                        line-column)
-                       :separator " | "
-                       :priority 96)
-                      (global :when active)
-                      (buffer-position :priority 99)
-                      (hud :priority 99)))
+                  ;; (spaceline-compile
+                  ;;                       ; left side
+                  ;;   '(((persp-name
+                  ;;       workspace-number
+                  ;;       window-number)
+                  ;;      :fallback evil-state
+                  ;;      :face highlight-face
+                  ;;      :priority 100)
+                  ;;     (anzu :priority 95)
+                  ;;     auto-compile
+                  ;;     ((buffer-modified buffer-size buffer-id remote-host)
+                  ;;      :priority 98)
+                  ;;     (major-mode :priority 79)
+                  ;;     (process :when active)
+                  ;;     ((flycheck-error flycheck-warning flycheck-info)
+                  ;;      :when active
+                  ;;      :priority 89)
+                  ;;     (minor-modes :when active
+                  ;;                  :priority 9)
+                  ;;     ;; (mu4e-alert-segment :when active)
+                  ;;     (erc-track :when active)
+                  ;;     (version-control :when active
+                  ;;                      :priority 78)
+                  ;;     (org-pomodoro :when active)
+                  ;;     (org-clock :when active)
+                  ;;     nyan-cat)
+                  ;;                       ; right side
+                  ;;   '(which-function
+                  ;;     (python-pyvenv :fallback python-pyenv)
+                  ;;     (purpose :priority 94)
+                  ;;     (battery :when active)
+                  ;;     (selection-info :priority 95)
+                  ;;     input-method
+                  ;;     ((buffer-encoding-abbrev
+                  ;;       point-position
+                  ;;       line-column)
+                  ;;      :separator " | "
+                  ;;      :priority 96)
+                  ;;     (global :when active)
+                  ;;     (buffer-position :priority 99)
+                  ;;     (hud :priority 99)))
+                  ;; (if (display-graphic-p)
+                  ;;     (progn
+                  ;;       (spaceline-toggle-battery-on)
+                  ;;       (spaceline-toggle-org-clock-on))
+                  ;;   (spaceline-toggle-battery-off)
+                  ;;   (spaceline-toggle-org-clock-off))
+                  ;; (spaceline-toggle-minor-modes-off)
+                  ;; (spaceline-toggle-point-position-off)
+                  ;; (spaceline-toggle-buffer-encoding-on)
+                  ;; (spaceline-toggle-buffer-encoding-abbrev-off)
+
+                  ;; (setq spaceline-window-numbers-unicode nil
+                  ;;       spaceline-workspace-numbers-unicode nil)
 
 
-                  (if (display-graphic-p)
-                      (progn
-                        (spaceline-toggle-battery-on)
-                        (spaceline-toggle-org-clock-on))
-                    (spaceline-toggle-battery-off)
-                    (spaceline-toggle-org-clock-off))
-
-
-
-                  (spaceline-toggle-minor-modes-off)
-                  (spaceline-toggle-point-position-off)
-                  (spaceline-toggle-buffer-encoding-on)
-                  (spaceline-toggle-buffer-encoding-abbrev-off)
-
-                  (setq spaceline-window-numbers-unicode nil
-                        spaceline-workspace-numbers-unicode nil)
 
                   ;; ;; We can dump this in a while when spaceline is fixed to not blank the modeline
                   ;; ;; with very long buffer names
@@ -2921,9 +2921,9 @@ given, offer to edit the search query before executing it."
                                      lsp-ui-peek-peek-height 40
                                      lsp-ui-peek-list-width 50
 
-                                     lsp-ui-sideline-show-code-actions t
-                                     lsp-ui-sideline-show-diagnostics t
-                                     lsp-ui-sideline-show-hover t
+                                     ;; lsp-ui-sideline-show-code-actions t
+                                     ;; lsp-ui-sideline-show-diagnostics t
+                                     ;; lsp-ui-sideline-show-hover t
                                      )
 
                        (with-eval-after-load 'lsp-ui-peek
@@ -2938,31 +2938,31 @@ given, offer to edit the search query before executing it."
                        (setq flycheck-highlighting-mode 'sexps)
                        (setq flycheck-temp-prefix ".flycheck")
 
-                       (when-layer-used
-                        'lsp
-                        ;; (progn
-                        ;;   (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-gcc)))
-                        )
+                       ;; (when-layer-used
+                       ;;  'lsp
+                       ;;  ;; (progn
+                       ;;  ;;   (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-gcc)))
+                       ;;  )
 
                        ;; the pos-tip window doesn't seem to work with my awesome setup (anymore)
                        (setq flycheck-display-errors-function #'flycheck-display-error-messages)
-                       (setq-default flycheck-pylint-use-symbolic-id nil)
+                       ;; (setq-default flycheck-pylint-use-symbolic-id nil)
 
                        ;; Chain pylint after flake8 to get benefit of both.
                        ;; (flycheck-add-next-checker 'python-flake8 'python-pylint)
                        ;; (flycheck-add-next-checker 'python-pylint 'python-pycompile)
 
-                       (flycheck-define-checker python-pyflakes
-                         "A Python syntax and style checker using the pyflakes utility.
-To override the path to the pyflakes executable, set
-`flycheck-python-pyflakes-executable'.
-See URL `http://pypi.python.org/pypi/pyflakes'."
-                         :command ("pyflakes" source-inplace)
-                         :error-patterns
-                         ((error line-start (file-name) ":" line ":" (message) line-end))
-                         :modes python-mode)
+;;                        (flycheck-define-checker python-pyflakes
+;;                          "A Python syntax and style checker using the pyflakes utility.
+;; To override the path to the pyflakes executable, set
+;; `flycheck-python-pyflakes-executable'.
+;; See URL `http://pypi.python.org/pypi/pyflakes'."
+;;                          :command ("pyflakes" source-inplace)
+;;                          :error-patterns
+;;                          ((error line-start (file-name) ":" line ":" (message) line-end))
+;;                          :modes python-mode)
 
-                       (add-to-list 'flycheck-checkers 'python-pyflakes)
+;;                        (add-to-list 'flycheck-checkers 'python-pyflakes)
 
                        ;; (setq flycheck-checkers (delq 'python-pycompile flycheck-checkers))
                        ;; (setq flycheck-checkers (cons 'python-pylint (delq 'python-pylint flycheck-checkers)))
