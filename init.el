@@ -408,8 +408,8 @@ This function should only modify configuration layer settings."
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
     (setq ch-def-font "Iosevka Light")
-    (if (string-prefix-p system-name "ja")
-        (setq ch-def-height 14.0)
+    (if (string-prefix-p "ja" system-name)
+        (setq ch-def-height 15.0)
       (setq ch-def-height 14.0))
     (debug-init-message "Setting font to %s:%f" ch-def-font ch-def-height))
    ((string-equal system-type "gnu/linux")
@@ -993,6 +993,7 @@ Return an event vector."
   ;; User-init
   ;; ---------
 
+  (setq-default scroll-margin 5)
   (setq-default gdb-default-window-configuration-file "gdb-window-config")
   (setq-default gdb-window-configuration-directory "~/.spacemacs.d/")
 
@@ -4063,16 +4064,18 @@ given, offer to edit the search query before executing it."
                         ;;  "* NOTE %?\n%u\n")
 
                         ("x" "Food/Medication")
-                        ("xa" "Augmentin 875-125" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE 875-125 amox/clav\nCreated: %U" :immediate-finish t)
-                        ("xc" "Creon 36K" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE 36000 creon\nCreated: %U" :immediate-finish t)
+                        ;; ("xa" "Augmentin 875-125" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                        ;;  "* NOTE 875-125 amox/clav\nCreated: %U" :immediate-finish t)
+                        ;; ("xc" "Creon 36K" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                        ;;  "* NOTE 36000 creon\nCreated: %U" :immediate-finish t)
                         ("xC" "Compazine 5mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 5mg Compazine\nCreated: %U" :immediate-finish t)
-                        ("xn" "Nortriptyline 50mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE 50mg Nortriptyline 2x25\nCreated: %U" :immediate-finish t)
+                        ;; ("xn" "Nortriptyline 50mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                        ;;  "* NOTE 50mg Nortriptyline 2x25\nCreated: %U" :immediate-finish t)
                         ("xf" "Food" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE Food\nCreated: %U\nFood:%^{food}" :immediate-finish t)
+                        ("xm" "Metformin 500mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 500mg Metformin\nCreated: %U" :immediate-finish t)
                         ("xp" "Prilosec 20mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 20mg Prilosec\nCreated: %U" :immediate-finish t)
                         ("xt" "Tylenol dose 1g" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
@@ -4083,10 +4086,10 @@ given, offer to edit the search query before executing it."
                          "* NOTE 75mg 1.5x50 Tramadol\nCreated: %U" :immediate-finish t)
                         ("x." "Tramadol 50mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 50mg Tramadol\nCreated: %U" :immediate-finish t)
-                        ("xv" "Vitamin A and D" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE 2000-vD/10000-vA\nCreated: %U" :immediate-finish t)
-                        ("xx" "Xifaxan 550mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE 50mg xifaxan\nCreated: %U" :immediate-finish t)
+                        ;; ("xv" "Vitamin A and D" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                        ;;  "* NOTE 2000-vD/10000-vA\nCreated: %U" :immediate-finish t)
+                        ;; ("xx" "Xifaxan 550mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                        ;;  "* NOTE 50mg xifaxan\nCreated: %U" :immediate-finish t)
 
                         ("g" "Google Calendars")
                         ("gh" "Todo" entry (file ,(concat org-directory "/calendar/goog-home.org"))
