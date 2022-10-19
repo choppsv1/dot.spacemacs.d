@@ -1417,8 +1417,7 @@ i.e. windows tiled side-by-side."
   ;;     )
   ;;   )
 
-  (when-layer-used
-   'python
+  (when-layer-used 'python
 
    (message "XXXXXXXXXX PYTHON ")
    (when-layer-used 'rebox
@@ -1445,28 +1444,8 @@ i.e. windows tiled side-by-side."
          (add-hook 'before-save-hook 'my-python-before-save-hook)
          (flycheck-select-checker 'python-pylint)
          ;; (flycheck-select-checker 'python-flake8)
-         (semantic-mode -1)
-
-         ;; flycheck-checker-error-threshold 900
-         ;; flycheck-pylintrc "~/.pylintrc")))
-
-         ;;   ;; This gives and error
-         ;;   ;; (message "select checker")
-         ;;   ;; This is required b/c for some reason it's still not loaded at this point.
-         ;;   ;; (require 'flycheck)
-
-         ;;   ;; not needed now that we chain
-         ;;   ;; (flycheck-select-checker 'python-pycheckers)
-         ;;   ;; (message "post select checker")
-
-         ;;   ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
-         ;;   ;; (message "select set exec")
-         ;;   ;; (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
-         )
-
-       (add-hook 'python-mode-hook 'my-python-mode-hook)
-
-   )
+         (semantic-mode -1))
+       (add-hook 'python-mode-hook 'my-python-mode-hook))
 
   (debug-init-message "USER-INIT: End")
 
