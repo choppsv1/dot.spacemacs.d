@@ -1417,7 +1417,28 @@ i.e. windows tiled side-by-side."
   ;;     )
   ;;   )
 
-  (when-layer-used 'python
+  (debug-init-message "USER-INIT: End"))
+
+(defun dotspacemacs/user-load ()
+  "Library to load while dumping.
+This function is called only while dumping Spacemacs configuration. You can
+`require' or `load' the libraries of your choice that will be included in the
+dump."
+  (debug-init-message "USER-LOAD: Start")
+  (debug-init-message "USER-LOAD: End")
+  )
+
+(defun dotspacemacs/user-config ()
+  "Configuration function for user code.
+This function is called at the very end of Spacemacs initialization after
+layers configuration. You are free to put any user code."
+
+  (debug-init-message "USER-CONFIG: Start")
+
+  (message "python mode hook %s" python-mode-hook)
+
+  (when-layer-used
+   'python
 
    (message "XXXXXXXXXX PYTHON ")
    (when-layer-used 'rebox
@@ -1426,7 +1447,9 @@ i.e. windows tiled side-by-side."
                       (interactive)
                       (message "XXXXXXXXXX HOOOKED ")
                       (bind-key "M-q" 'rebox-dwim python-mode-map)
-                      (set (make-local-variable 'rebox-style-loop) '(401 402 403 413 415)))
+                      ;; (set (make-local-variable 'rebox-style-loop) '(401 402 403 413 415))
+                      (set (make-local-variable 'rebox-style-loop) '(71 72 73))
+                      )
                     (message "XXXXXXXXXX ADDHOOK ")
                     (add-hook 'python-mode-hook 'rebox-python-hook))
 
@@ -1447,27 +1470,6 @@ i.e. windows tiled side-by-side."
          (semantic-mode -1))
        (add-hook 'python-mode-hook 'my-python-mode-hook))
 
-  (debug-init-message "USER-INIT: End")
-
-  )
-
-(defun dotspacemacs/user-load ()
-  "Library to load while dumping.
-This function is called only while dumping Spacemacs configuration. You can
-`require' or `load' the libraries of your choice that will be included in the
-dump."
-  (debug-init-message "USER-LOAD: Start")
-  (debug-init-message "USER-LOAD: End")
-  )
-
-(defun dotspacemacs/user-config ()
-  "Configuration function for user code.
-This function is called at the very end of Spacemacs initialization after
-layers configuration. You are free to put any user code."
-
-  (debug-init-message "USER-CONFIG: Start")
-
-  (message "python mode hook %s" python-mode-hook)
 
   (unless (string-prefix-p "hp13" (system-name))
     (require 'clipetty)
