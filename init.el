@@ -337,10 +337,10 @@ This function should only modify configuration layer settings."
      borland-blue-theme
      cobalt
      color-theme-modern
-     (copilot :location (recipe
-                         :fetcher github
-                         :repo "zerolfx/copilot.el"
-                         :files ("*.el" "dist")))
+     ;; (copilot :location (recipe
+     ;;                     :fetcher github
+     ;;                     :repo "zerolfx/copilot.el"
+     ;;                     :files ("*.el" "dist")))
      dockerfile-mode
      exec-path-from-shell
      ;; This is very cool but too expensive for large projects
