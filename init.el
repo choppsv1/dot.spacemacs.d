@@ -993,7 +993,6 @@ Return an event vector."
   ;; User-init
   ;; ---------
 
-  (setq-default scroll-margin 5)
   (setq-default gdb-default-window-configuration-file "gdb-window-config")
   (setq-default gdb-window-configuration-directory "~/.spacemacs.d/")
 
@@ -1573,6 +1572,8 @@ layers configuration. You are free to put any user code."
           (if (not (eq 'lisp-indent-offset (cdr e)))
               (set-default (cdr e) 4))
         (dolist (x (cdr e)) (set-default x 4))))
+
+    (setq-default scroll-margin 5)
 
     ;; (setq-default lisp-indent-offset nil)
     ;; (setq emacs-lisp-mode lisp-mode) . lisp-indent-offset)
