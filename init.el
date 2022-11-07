@@ -72,6 +72,7 @@ This function should only modify configuration layer settings."
             c-c++-enable-clang-format-on-save nil
             c-c++-lsp-enable-semantic-highlight nil
             )
+     dap
      debug
      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
      gtags
@@ -214,6 +215,7 @@ This function should only modify configuration layer settings."
                       version-control-diff-side 'right
                       version-control-global-margin t)
      ;; treemacs
+     dap
 
      ;; File formats
      docker
@@ -349,6 +351,7 @@ This function should only modify configuration layer settings."
      nhexl-mode
      nano-theme
      org-caldav
+     org-journal
      org-notify
      package-lint
      persistent-scratch
@@ -916,7 +919,6 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
 
-
   (add-hook 'grep-mode-hook
             (lambda()
               (kill-local-variable 'compilation-auto-jump-to-next)))
@@ -1468,6 +1470,11 @@ layers configuration. You are free to put any user code."
          ;; (flycheck-select-checker 'python-flake8)
          (semantic-mode -1))
        (add-hook 'python-mode-hook 'my-python-mode-hook))
+
+  (when (eq system-type 'darwin)
+    (when-layer-used 'org
+                     (with-eval-after-load "org"
+                       (require 'journal-lisp))))
 
 
   (unless (string-prefix-p "hp13" (system-name))
@@ -2311,36 +2318,24 @@ layers configuration. You are free to put any user code."
                                                "maildir:/chopps.org/spam")
 
                            mu4e-unread-filter "(flag:unread AND NOT flag:flagged AND NOT flag:trashed)"
-                           mu4e-not-junk-folder-filter (concat " AND NOT (" (string-join mu4e-junk-mailbox " OR " ) ")")
+                           mu4e-not-junk-folder-filter (concat " NOT (" (string-join mu4e-junk-mailbox " OR " ) ")")
                            mu4e-inbox-filter-base (concat "(" (string-join mu4e-inbox-mailbox " OR ") ")")
                            mu4e-imp-filter-base (concat "(" (string-join mu4e-imp-mailbox " OR ") ")")
-                           mu4e-unread-filter "(flag:unread AND NOT flag:flagged AND NOT flag:trashed)"
-                           mu4e-unread-flagged-filter "(flag:unread AND flag:flagged AND NOT flag:trashed)"
+                           mu4e-unread-filter "(flag:unread AND NOT flag:trashed)"
 
                            mu4e-bookmarks
                            (append
-                            (list (list (concat "flag:unread AND NOT flag:trashed AND " mu4e-inbox-filter-base) "Unread [i]NBOX messages" ?i)
-                                  (list (concat mu4e-unread-filter  mu4e-imp-filter-base) "Unread Important messages" ?n)
-                                  (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-lsr") "Unread LSR messages" ?l)
-                                  (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-wg-ipsec") "Unread netmod messages" ?I)
-                                  (list (concat "flag:unread AND NOT flag:trashed" mu4e-not-junk-folder-filter " AND maildir:/chopps.org/ietf-*") "Unread IETF messages" ?e)
-
-                                  ;; (list (concat "flag:flagged AND NOT flag:trashed AND " mu4e-inbox-filter-base) "[f]lagged INBOX messages" ?f)
-                                  ;; (list (concat "flag:flagged AND NOT flag:trashed AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "[F]lagged Non-INBOX messages" ?F)
-
-                                  ;; (list (concat mu4e-unread-flagged-filter mu4e-imp-filter-base) "Unread-Flagged Important messages" ?N)
-
-                                  (list (concat mu4e-unread-filter         " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread [u]nimportant messages" ?u)
-                                  ;; (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged [U]nimportant messages" ?U)
-
-                                  (list (concat mu4e-unread-filter         " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread Non-INBOX messages" ?o)
-                                  ;; (list (concat mu4e-unread-flagged-filter " AND NOT " mu4e-inbox-filter-base mu4e-not-junk-folder-filter) "Unread-Flagged Non-INBOX messages" ?O)
-
-                                  (list (concat mu4e-unread-filter         mu4e-not-junk-folder-filter) "Unread messages" ?a)
-                                  ;; (list (concat mu4e-unread-flagged-filter mu4e-not-junk-folder-filter) "Unread-flagged messages" ?A)
-
+                            (list (list (concat mu4e-unread-filter " AND " mu4e-inbox-filter-base) "Unread [i]NBOX messages" ?i)
+                                  (list (concat mu4e-unread-filter " AND " "maildir:/chopps.org/INBOX") "Unread [c]hopps INBOX messages" ?c)
+                                  (list (concat mu4e-unread-filter " AND " mu4e-imp-filter-base) "Unread Important messages" ?n)
+                                  (list (concat mu4e-unread-filter " AND " mu4e-not-junk-folder-filter " AND " "maildir:/chopps.org/ietf-wg-lsr") "Unread LSR messages" ?l)
+                                  (list (concat mu4e-unread-filter " AND " mu4e-not-junk-folder-filter " AND " "maildir:/chopps.org/ietf-wg-ipsec") "Unread netmod messages" ?I)
+                                  (list (concat mu4e-unread-filter " AND " mu4e-not-junk-folder-filter " AND " "maildir:/chopps.org/ietf-*") "Unread IETF messages" ?e)
+                                  (list (concat mu4e-unread-filter " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base " AND " mu4e-not-junk-folder-filter) "Unread [u]nimportant messages" ?u)
+                                  (list (concat mu4e-unread-filter " AND NOT " mu4e-inbox-filter-base " AND " mu4e-not-junk-folder-filter) "Unread Non-INBOX messages" ?o)
+                                  (list (concat mu4e-unread-filter " AND " mu4e-not-junk-folder-filter) "Unread messages" ?a)
                                   (list "(maildir:/chopps.org/spam-probable                                              )" "Probable spam messages" ?s))
-                            (mapcar (lambda (x) (cons (concat (car x) mu4e-not-junk-folder-filter) (cdr x)))
+                            (mapcar (lambda (x) (cons (concat (car x) " AND " mu4e-not-junk-folder-filter) (cdr x)))
                                     '(("flag:unread AND NOT flag:trashed" "Unread messages" ?u)
                                       ("date:1h..now" "Last hours messages" ?h)
                                       ("date:24h..now" "Today's messages" ?d)
@@ -4030,8 +4025,14 @@ given, offer to edit the search query before executing it."
                         ("m" "Mail Todo" entry (file+headline ,(concat org-directory "/notes.org") "Mail")
                          "* TODO [Mail] %^{Title|%:subject}%? ([%:from])\nDEADLINE: %^t CREATED: %u\nMessage: %a\n\n")
 
+                        ("M" "Memory" entry (file+headline ,(concat org-directory "/notes.org") "Memories")
+                         "* NOTE %?\nCREATED: %u\n\n")
+
                         ("c" "Code Todo" entry (file+headline ,(concat org-directory "/notes.org") "Code Todo")
                          "* TODO [Code] %^{Title}\nDEADLINE: %^t\nCREATED: %u\nAnnotation: %a\n%?\n\n")
+
+                        ("j" "Journal Note" entry (file ,(get-journal-file-today))
+                         "* Event: %?\n\n  %i\n\n  From: %a" :empty-lines 1)
 
                         ("n" "Generic Note" entry (file+headline ,(concat org-directory "/notes.org") "Notes")
                          "* NOTE %?\n%u\nannotation:%a\nx:%x\n")

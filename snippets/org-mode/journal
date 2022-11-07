@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: Journal Template
+# key: journal
+# --
+#+TITLE: Journal Entry- `(format-time-string "%Y-%m-%d (%A)")`
+
+$0
