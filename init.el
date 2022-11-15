@@ -1471,10 +1471,9 @@ layers configuration. You are free to put any user code."
          (semantic-mode -1))
        (add-hook 'python-mode-hook 'my-python-mode-hook))
 
-  (when (eq system-type 'darwin)
-    (when-layer-used 'org
-                     (with-eval-after-load "org"
-                       (require 'journal-lisp))))
+  (when-layer-used 'org
+                   (with-eval-after-load "org"
+                     (require 'journal-lisp)))
 
 
   (unless (string-prefix-p "hp13" (system-name))
