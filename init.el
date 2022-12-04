@@ -3665,6 +3665,18 @@ given, offer to edit the search query before executing it."
        ;; Consider _ a part of words for python
        (modify-syntax-entry ?_ "w" python-mode-syntax-table)
 
+       (defun python-google-docstring ()
+         "Generate google-style docstring for python."
+         (interactive)
+         (if (region-active-p)
+             (progn
+               (call-process-region (region-beginning) (region-end) "python3" nil t t (concat dotspacemacs-directory "format-g-docs.py"))
+               (message "Docs are generated")
+               (deactivate-mark))
+           (message "No region active; can't generate docs!"))
+         )
+       (spacemacs/set-leader-keys-for-major-mode 'python-mode "oo" 'python-google-docstring)
+
        ;; (define-key global-map (kbd "C-c o") 'iedit-mode)
 
        ;; (if (file-exists-p "/usr/local/bin/python"  )
@@ -4052,12 +4064,12 @@ given, offer to edit the search query before executing it."
                         ;;  "* NOTE 36000 creon\nCreated: %U" :immediate-finish t)
                         ("xC" "Compazine 5mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 5mg Compazine\nCreated: %U" :immediate-finish t)
-                        ;; ("xn" "Nortriptyline 50mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                        ;;  "* NOTE 50mg Nortriptyline 2x25\nCreated: %U" :immediate-finish t)
+                        ("xn" "Nortriptyline 25mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 50mg Nortriptyline 1x25\nCreated: %U" :immediate-finish t)
                         ("xf" "Food" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE Food\nCreated: %U\nFood:%^{food}" :immediate-finish t)
-                        ("xm" "Metformin 500mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE 500mg Metformin\nCreated: %U" :immediate-finish t)
+                        ("xm" "Metformin 1000mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 1000mg Metformin\nCreated: %U" :immediate-finish t)
                         ("xp" "Prilosec 20mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 20mg Prilosec\nCreated: %U" :immediate-finish t)
                         ("xt" "Tylenol dose 1g" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
