@@ -11,6 +11,7 @@
 
 
 (setq debug-init-msg t)
+; (setq debug-on-error t)
 (defun debug-init-message (fmt &rest a)
   (and debug-init-msg
        (let ((ts (format-time-string "%S.%N")))
@@ -365,7 +366,7 @@ This function should only modify configuration layer settings."
    ((string-equal system-type "darwin") ; Mac OS X
     (setq ch-def-font "Iosevka Light")
     (if (string-prefix-p "ja" system-name)
-        (setq ch-def-height 15.0)
+        (setq ch-def-height 17.0)
       (setq ch-def-height 14.0))
     (debug-init-message "Setting font to %s:%f" ch-def-font ch-def-height))
    ((string-equal system-type "gnu/linux")
@@ -1432,11 +1433,6 @@ layers configuration. You are free to put any user code."
    (add-hook 'python-mode-hook 'my-early-config-python-mode-hook)
    (message "config stage: current python mode hook %s" python-mode-hook)
    )
-
-  (when-layer-used 'org
-                   (with-eval-after-load "org"
-                     (require 'journal-lisp)))
-
 
   (unless (string-prefix-p "hp13" (system-name))
     (require 'clipetty)
@@ -2804,25 +2800,18 @@ given, offer to edit the search query before executing it."
 
     (when-layer-used 'rebox
                      (with-eval-after-load "rebox2"
-
-                       (message "XXX 70")
                        (rebox-register-template 70 165 '("?"
                                                          "? box123456"
                                                          "?"))
-                       (message "XXX 71")
                        (rebox-register-template 401 255 '("#"
                                                           "# box123456"
                                                           "# *********"))
-                       (message "XXX 72")
                        (rebox-register-template 402 355 '("# ---------"
                                                           "# box123456"
                                                           "# ---------"))
-                       (message "XXX 73")
                        (rebox-register-template 403 455 '("# =========="
                                                           "# box123456"
                                                           "# =========="))
-
-                       ;; (message "XXX 80")
                        (rebox-register-template 80 175 '("//"
                                                          "// box123456"
                                                          "//"))
@@ -3781,7 +3770,7 @@ given, offer to edit the search query before executing it."
 
     (when-layer-used 'org
                      (debug-init-message "debug-init org setup")
-                     (with-eval-after-load "org"
+                     (with-eval-after-load 'org
 
                        ;; (dolist (estate '(normal visual motion))
                        ;;   (evil-define-key estate evil-org-mode-map "H" nil)
@@ -3854,13 +3843,19 @@ given, offer to edit the search query before executing it."
                        (setq org-adapt-indentation 'headline-data))
                      (add-hook 'org-mode-hook 'my-org-mode-hook)
 
-                     (require 'org-id)
+                     (require 'journal-lisp)
 
-                     (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)
-                     (define-key org-mode-map (kbd "C-c e e") 'org-encrypt-entries)
-                     (define-key org-mode-map (kbd "C-c e E") 'org-encrypt-entry)
-                     (define-key org-mode-map (kbd "C-c e d") 'org-decrypt-entries)
-                     (define-key org-mode-map (kbd "C-c e D") 'org-decrypt-entry)
+                     (debug-init-message "debug-init org-id")
+
+                     ;; (require 'org-id)
+
+                     ;; (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)
+                     ;; (define-key org-mode-map (kbd "C-c e e") 'org-encrypt-entries)
+                     ;; (define-key org-mode-map (kbd "C-c e E") 'org-encrypt-entry)
+                     ;; (define-key org-mode-map (kbd "C-c e d") 'org-decrypt-entries)
+                     ;; (define-key org-mode-map (kbd "C-c e D") 'org-decrypt-entry)
+
+                     (debug-init-message "debug-init org clock stuff")
 
                      ;;
                      ;; Global org mode clock in/out keys
@@ -4042,13 +4037,21 @@ given, offer to edit the search query before executing it."
                         ;;  "* NOTE 875-125 amox/clav\nCreated: %U" :immediate-finish t)
                         ;; ("xc" "Creon 36K" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                         ;;  "* NOTE 36000 creon\nCreated: %U" :immediate-finish t)
+                        ("xc" "Compazine 2.5mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 2.5mg Compazine\nCreated: %U" :immediate-finish t)
                         ("xC" "Compazine 5mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 5mg Compazine\nCreated: %U" :immediate-finish t)
                         ("xn" "Nortriptyline 25mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 25mg Nortriptyline 1x25\nCreated: %U" :immediate-finish t)
+                        ("xN" "Nortriptyline 50mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 50mg Nortriptyline 1x25\nCreated: %U" :immediate-finish t)
                         ("xf" "Food" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE Food\nCreated: %U\nFood:%^{food}" :immediate-finish t)
-                        ("xm" "Metformin 1000mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                        ("xi" "Invokana 300mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 300mg Invokana\nCreated: %U" :immediate-finish t)
+                        ("xm" "Metformin 500mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 1000mg Metformin\nCreated: %U" :immediate-finish t)
+                        ("xM" "Metformin 1000mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 1000mg Metformin\nCreated: %U" :immediate-finish t)
                         ("xp" "Prilosec 20mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 20mg Prilosec\nCreated: %U" :immediate-finish t)
@@ -4414,8 +4417,6 @@ given, offer to edit the search query before executing it."
                      (when (and (or (daemonp) (and (fboundp 'server-running-p) (server-running-p)))
                                 (string-equal system-type "darwin"))
 
-                       (debug-init-message "before require org notify")
-
        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
                        ;; Terminal notifier
                        ;; requires 'brew install terminal-notifier'
@@ -4445,7 +4446,9 @@ given, offer to edit the search query before executing it."
                          (run-at-time time nil (lambda (msg) (notifications-notify :title "Emacs" :body msg)) msg))
 
 
+                       (debug-init-message "before require org notify")
                        (require 'org-notify)
+                       (debug-init-message "after require org notify")
 
                        (defun my-action-act (plist key)
                          "User wants to see action."
@@ -4981,6 +4984,6 @@ given, offer to edit the search query before executing it."
         ))
   )
 
-;; Local Variables:
-;; eval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when-layer-used\\|(when (configuration-layer\\)")
+;; ;; Local Variables:
+;; noteval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when-layer-used\\|(when (configuration-layer\\)")"
 ;; End:
