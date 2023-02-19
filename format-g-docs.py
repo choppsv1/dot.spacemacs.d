@@ -33,7 +33,9 @@ def main() -> None:
     raw_string = ""
     indent = ""
     for line in sys.stdin.readlines():
-        if (pos := line.find("def ")) != -1 :
+        if (pos := line.find("async def")) != -1:
+            indent = line[0:pos]
+        elif (pos := line.find("def ")) != -1 :
             indent = line[0:pos]
         raw_string += line.strip()
 
@@ -46,7 +48,7 @@ def main() -> None:
     result = ""
 
     for fun in ast_data.body:
-        if isinstance(fun, ast.FunctionDef):
+        if isinstance(fun, ast.FunctionDef) or isinstance(fun, ast.AsyncFunctionDef):
             if fun.name == "__init__":
                 result += f"{indent}\"\"\"Initialize object\n\n"
             else:
@@ -58,17 +60,11 @@ def main() -> None:
             if len(args) != 0:
                 result += f"{indent}Args:\n"
                 for arg in args:
-                    type_decr = "t.Any"
-                    if arg.annotation is not None:
-                        type_decr = astunparse.unparse(arg.annotation).strip()
-                    result += f"{indent}{TAB}{arg.arg.strip()} ({type_decr}):"
-                    if hasattr(arg, "__local_default"):
-                        result += f" (default: {arg.__local_default})"
-                    result += "\n"
+                    result += f"{indent}{TAB}{arg.arg.strip()}:\n"
             if fun.args.vararg:
-                result += f"{indent}{TAB}*args (t.List[t.Any]):\n"
+                result += f"{indent}{TAB}*args:\n"
             if fun.args.kwarg:
-                result += f"{indent}{TAB}**kwargs (t.Dict[t.Any, t.Any]):\n"
+                result += f"{indent}{TAB}**kwargs:\n"
             result += f"{indent}Returns:\n"
             if ((fun.returns is None or getattr(fun.returns, "value", None) is None)
                 and not getattr(fun.returns, "id", None)):
