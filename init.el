@@ -297,6 +297,9 @@ This function should only modify configuration layer settings."
      ;;                     :fetcher github
      ;;                     :repo "zerolfx/copilot.el"
      ;;                     :files ("*.el" "dist")))
+     (cov :location (recipe :fetcher github
+                            :branch "chopps/add-bg-overlay-tint"
+                            :repo "choppsv1/cov"))
      dockerfile-mode
      exec-path-from-shell
      ;; This is very cool but too expensive for large projects
@@ -957,6 +960,7 @@ Return an event vector."
   ;; ---------
   (setq-default git-magit-status-fullscreen t)
 
+  ;; (setq-default cov-coverage-mode t)
   (setq-default gdb-default-window-configuration-file "gdb-window-config")
   (setq-default gdb-window-configuration-directory "~/.spacemacs.d/")
 
@@ -2856,7 +2860,8 @@ given, offer to edit the search query before executing it."
                                      lsp-ui-peek-always-show t
                                      lsp-ui-peek-peek-height 40
                                      lsp-ui-peek-list-width 50
-
+                                     lsp-diagnostics-attributes '((unnecessary :background "gray20" :foreground "gray70")
+                                                                  (deprecated :strike-through t))
                                      ;; lsp-ui-sideline-show-code-actions t
                                      ;; lsp-ui-sideline-show-diagnostics t
                                      ;; lsp-ui-sideline-show-hover t
