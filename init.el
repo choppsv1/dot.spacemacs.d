@@ -24,126 +24,25 @@ This function should only modify configuration layer settings."
 
   (setq load-prefer-newer t)
 
+  ;;
+  ;; Base Layers
+  ;;
   (setq
-
-   chopps-lite-layers
-   '(
-     ;; Choose either ivy or helm as completion framework
-     ;; ivy
-     helm
-     ;; (auto-completion :disabled-for org
-     ;; :variables
-     ;; auto-completion-enable-snippets-in-popup t
-     ;; auto-completion-enable-help-tooltip nil
-     ;; auto-completion-complete-with-key-sequence nil
-     ;; auto-completion-private-snippets-directory "~/.spacemacs.d/snippets/"
-     ;; auto-completion-tab-key-behavior 'complete)
-     better-defaults
-     ;; colors
-     (git :variables git-enable-magit-delta-plugin nil
-          git-enable-magit-gitflow-plugin nil
-          git-enable-magit-todos-plugin nil)
-     ;; multiple-cursors
-     neotree
-     rebox
-     theming
-     ;; themes-megapack
-
-     ;; Languages
-     emacs-lisp
-
-     ;; File Formats
-     ;; csv
-     markdown
-     (org :variables
-          org-clock-idle-time 15
-          org-enable-rfc-support nil)
-     shell-scripts
-     yaml
-     )
-
-   dev-lite-layers
-   '(
-     ;; (syntax-checking :variables syntax-checking-enable-tooltips t)
-     (c-c++ :variables
-            c-c++-backend 'lsp-ccls
-            c-c++-adopt-subprojects t
-            c-c++-default-mode-for-headers 'c-mode
-            c-c++-enable-clang-format-on-save nil
-            c-c++-lsp-enable-semantic-highlight nil
-            )
-     dap
-     debug
-     (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
-     gtags
-     ;; lsp-diagnostics-provider :none
-     (lsp :variables
-          lsp-rust-server 'rust-analyzer
-          lsp-lens-enable nil)
-     ;; (lua :variables
-     ;;      lua-default-application "lua5.2"
-     ;;      lua-backend 'lsp
-     ;;      lua-lsp-server 'emmy
-     ;;      lsp-clients-emmy-lua-jar-path "/home/chopps/.emacs.d/.cache/lsp/EmmyLua-LS-all.jar" ; default path
-     ;;      lsp-clients-emmy-lua-java-path "java") ; default path
-     (lua :variables
-          lua-default-application "lua5.2"
-          lua-backend 'lsp
-          lua-lsp-server 'lua-language-server
-          lsp-clients-lua-language-server-bin "/home/chopps/.emacs.d/.cache/lsp/lua-language-server/bin/lua-language-server" ; default path
-          lsp-clients-lua-language-server-main-location "/home/chopps/.emacs.d/.cache/lsp/lua-language-server/main.lua") ; default path
-     (python :variables python-backend 'lsp
-             python-lsp-server 'pylsp
-             python-formatter 'black
-             python-fill-column 88
-             python-tab-width 8
-             python-pipenv-activate t
-             python-poetry-activate t
-             python-fill-docstring-style 'pep-257-nn
-             python-test-runner '(pytest nose)
-             pytest-global-name "python -m pytest --doctest-modules"
-             python-sort-imports-on-save nil
-             python-enable-yapf-format-on-save nil)
-
-     (rust :variables
-           rust-format-on-save t)
-     syntax-checking
-     (version-control :variables
-                      version-control-diff-tool 'git-gutter+
-                      ;; version-control-diff-tool 'git-gutter
-                      ;; version-control-diff-tool 'diff-hl
-                      version-control-diff-side 'right
-                      version-control-global-margin t)
-     (yang :variables
-           yang-pyang-rules "lint"
-           yang-pyang-extra-args "--max-line-length=79")
-     )
-
-   ;;
-   ;; All systems get these layers -- keep it small!
-   ;;
    chopps-layers
    '(
      ;; Choose either ivy or helm as completion framework
      ;; ivy
      helm
-     (auto-completion :disabled-for org
-                      :variables
-                      auto-completion-enable-snippets-in-popup t
-                      auto-completion-enable-help-tooltip nil
-                      auto-completion-complete-with-key-sequence nil
-                      auto-completion-private-snippets-directory "~/.spacemacs.d/snippets/"
-                      auto-completion-tab-key-behavior 'complete)
+
      better-defaults
-     colors
      (git :variables git-enable-magit-delta-plugin nil
+          magit-diff-refine-hunk 'all
           git-enable-magit-gitflow-plugin nil
-          git-enable-magit-todos-plugin t)
-     multiple-cursors
+          git-enable-magit-todos-plugin nil)
+
      neotree
      rebox
      theming
-     themes-megapack
 
      ;; Languages
      emacs-lisp
@@ -151,19 +50,28 @@ This function should only modify configuration layer settings."
      ;; File Formats
      csv
      markdown
-     (org :variables
-          org-clock-idle-time 15
-          org-enable-rfc-support t)
+     multiple-cursors
      shell-scripts
      yaml
      )
-   ;; tops-layers
-   ;; '(
-   ;;   (mu4e :variables
-   ;;         ;; mu4e-enable-async-operations t
-   ;;         mu4e-enable-notifications nil
-   ;;         mu4e-use-maildirs-extension nil)
-   ;;   )
+
+   chopps-extra-layers
+   '(
+     (auto-completion :disabled-for org
+                      :variables
+                      auto-completion-enable-snippets-in-popup t
+                      auto-completion-enable-help-tooltip nil
+                      auto-completion-complete-with-key-sequence nil
+                      auto-completion-private-snippets-directory "~/.spacemacs.d/snippets/"
+                      auto-completion-tab-key-behavior 'complete)
+     colors
+     themes-megapack
+     )
+
+   ;;
+   ;; OS Specific Layers
+   ;;
+
    linux-layers
    '(
      systemd
@@ -171,6 +79,8 @@ This function should only modify configuration layer settings."
 
    osx-layers
    '(
+     ;; May repeate in development b/c we don't normally include osx in devel machiens
+     html
      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
      (mu4e :variables
            ;; mu4e-enable-async-operations t
@@ -181,31 +91,48 @@ This function should only modify configuration layer settings."
      (osx :variables
           osx-use-option-as-meta t)
      (spell-checking :variables enable-flyspell-auto-completion nil)
+     )
 
-     ;; File formats
+   ;;
+   ;; Development Specific Layers
+   ;;
+
+   dev-common-layers
+   '(
+     (cmake :variables cmake-enable-cmake-ide-support nil)
+     dap
+     debug
      docker
      gtags
      html
-
-     shell-scripts
-     (yang :variables
-           yang-pyang-rules "lint"
-           yang-pyang-extra-args "--max-line-length=79")
-     )
-
-   dev-layers
-   '(
-     ;; ditaa
-     debug
-     gtags
      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
-     ;; pandoc
-     ;; pdf
-     ;; ranger
+     (python :variables python-backend 'lsp
+             ;; python-lsp-server 'pyright
+             python-lsp-server 'pylsp
+             python-formatter 'black
+             python-fill-column 88
+             python-tab-width 8
+             python-pipenv-activate nil
+             python-poetry-activate t
+             python-fill-docstring-style 'pep-257-nn
+             ;; primary test runner is pytest use 'spc u' prefix to invoke nose
+             python-test-runner '(pytest nose)
+             pytest-global-name "python -m pytest --doctest-modules"
+             python-sort-imports-on-save nil
+             python-enable-yapf-format-on-save nil
+             ;;
+             python-auto-set-local-pyvenv-virtualenv nil
+             python-auto-set-local-pyenv-virtualenv nil
+             ;;
+             ;; lsp-pylsp-plugins-flake8-enabled t ;; was nil by spacemacs but t before
+             ;; lsp-pylsp-plugins-pylint-enabled nil ;; was t by spacemacs but nil before
+             ;; lsp-pylsp-plugins-pyflakes-enabled nil ;; was t by spacemacs but nil before
+             ;; lsp-pylsp-plugins-autopep8-enabled nil ;; was nil is nil
+             ;; lsp-pylsp-plugins-pycodestyle-enabled nil ;; was t by spacemacs but nil before
+             ;; lsp-pylsp-plugins-mccabe-enabled nil ;; was nil by spacemacs but t before
+             )
      (rust :variables
-          rust-format-on-save t)
-     rebox
-     ;; nginx
+           rust-format-on-save t)
      (spell-checking :variables enable-flyspell-auto-completion nil)
      (syntax-checking :variables syntax-checking-enable-tooltips t)
      (version-control :variables
@@ -214,14 +141,51 @@ This function should only modify configuration layer settings."
                       ;; version-control-diff-tool 'diff-hl
                       version-control-diff-side 'right
                       version-control-global-margin t)
+     (yang :variables
+           yang-pyang-rules "lint"
+           yang-pyang-extra-args "--max-line-length=79")
+     )
+
+   dev-lite-layers
+   '(
+     ;; Language Meta-Layers
+     (lsp :variables
+          ;; lsp-diagnostics-provider :none
+          lsp-rust-server 'rust-analyzer
+          lsp-lens-enable nil)
+
+     ;; Languages
+     (c-c++ :variables
+            c-c++-backend 'lsp-ccls
+            c-c++-adopt-subprojects t
+            c-c++-default-mode-for-headers 'c-mode
+            c-c++-enable-clang-format-on-save nil
+            c-c++-lsp-enable-semantic-highlight nil)
+     )
+
+   dev-layers
+   '(
+     ;; ditaa
+     ;; ess
+     ;; nginx
+     ;; pandoc
+     ;; pdf
+     ;; ranger
      ;; treemacs
-     dap
+     sphinx
 
      ;; File formats
      docker
      graphviz
      groovy
-     html
+     restructuredtext
+
+     ;; Language Meta-Layers
+     (lsp :variables
+          ;; lsp-diagnostics-provider :none
+          lps-ui-sideline-enable nil)
+
+     (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
 
      ;; Languages
      (c-c++ :variables
@@ -240,8 +204,7 @@ This function should only modify configuration layer settings."
             ;; ;; c-c++-enable-clang-support nil
 
             )
-     (cmake :variables cmake-enable-cmake-ide-support nil)
-     ;; ess
+
      (go :variables
          go-format-before-save t
          go-use-golangci-lint t
@@ -249,59 +212,49 @@ This function should only modify configuration layer settings."
          ;; godoc-at-point-function 'godoc-gogetdoc
          go-backend 'lsp
          )
+
      ;; javascript
      (latex :variables latex-build-command "latexmk")
-     (lsp :variables
-          lps-ui-sideline-enable nil)
-     (lua :variables lua-default-application "lua5.2")
-     ;; lux
-     ;; primary test runner is pytest use 'spc u' prefix to invoke nose
-     (python :variables python-backend 'lsp
-             ;; python-lsp-server 'pyright
-             python-lsp-server 'pylsp
-             python-formatter 'black
-             python-fill-column 88
-             python-tab-width 8
-             python-pipenv-activate t
-             python-poetry-activate t
-             python-fill-docstring-style 'pep-257-nn
-             python-test-runner '(pytest nose)
-             pytest-global-name "python -m pytest --doctest-modules"
-             python-sort-imports-on-save nil
-             python-enable-yapf-format-on-save nil
-             ;; lsp-pylsp-plugins-pylint-enabled t ;; was t by spacemacs but nil before
-             ;; lsp-pylsp-plugins-pyflakes-enabled nil ;; was t by spacemacs but nil before
-             ;; lsp-pylsp-plugins-autopep8-enabled nil ;; was nil is nil
-             ;; lsp-pylsp-plugins-flake8-enabled nil ;; was nil by spacemacs but t before
-             ;; lsp-pylsp-plugins-pycodestyle-enabled nil ;; was t by spacemacs but nil before
-             ;; lsp-pylsp-plugins-mccabe-enabled nil ;; was nil by spacemacs but t before
-             ;; python-auto-set-local-pyvenv-virtualenv on-visit
-             ;; python-auto-set-local-pyenv-virtualenv nil
-             )
-     restructuredtext
-     (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
-     sphinx
 
-     (yang :variables
-           yang-pyang-rules "lint"
-           yang-pyang-extra-args "--max-line-length=79")
+     (lua :variables
+          lua-default-application "lua5.2"
+          lua-backend 'lsp
+          lua-lsp-server 'lua-language-server
+          ;;      lua-lsp-server 'emmy
+          ;;      lsp-clients-emmy-lua-jar-path "/home/chopps/.emacs.d/.cache/lsp/EmmyLua-LS-all.jar" ; default path
+          lsp-clients-lua-language-server-bin
+          "/home/chopps/.emacs.d/.cache/lsp/lua-language-server/bin/lua-language-server" ; default path
+          lsp-clients-lua-language-server-main-location
+          "/home/chopps/.emacs.d/.cache/lsp/lua-language-server/main.lua") ; default path
      )
+
+   ;; Normally we do note configure any OSX as a dev system, and only change
+   ;; this when we are doing development on the mac.
+
+   ;; all dev-lite are linux
    chopps-dev-lite-systems '("dlk" "jaja" "labnh" "lake" "flk" "ubb" "uff")
+
    ;; These systems get full development packages -- the slowest load
-   chopps-dev-systems '("cmf-xe-1" "morn1" "tops" "hp13" "ja.local" "ja.int.chopps.org" "rlk" "dak"))
+   chopps-dev-systems '("cmf-xe-1" "morn1" "tops" "hp13" "rlk" "dak"))
 
   (setq jaja-machine-id "949972c901cb4c3f9e7e2c6b484bc1bb")
 
-  (cond ((eq system-type 'darwin)
-         (setq chopps-layers (append chopps-layers osx-layers)))
-        ((eq system-type 'gnu/linux)
-         (setq chopps-layers (append chopps-layers linux-layers))))
   (when (member system-name chopps-dev-lite-systems)
-    (setq chopps-layers (append chopps-lite-layers dev-lite-layers)))
+    (setq chopps-layers (append chopps-layers dev-common-layers dev-lite-layers)))
+
   (when (member system-name chopps-dev-systems)
-    (setq chopps-layers (append chopps-layers dev-layers)))
+    (setq chopps-layers (append chopps-layers chopps-extra-layers dev-common-layers dev-layers)))
+
   (when (member system-name '("tops"))
     (setq chopps-layers (append chopps-layers tops-layers)))
+
+  ;; OS specific
+  (cond ((eq system-type 'darwin)
+         ;; add chopps-extra-layers maybe again b/c osx may not be development
+         (setq chopps-layers (append chopps-layers chopps-extra-layers osx-layers)))
+        ((eq system-type 'gnu/linux)
+         (setq chopps-layers (append chopps-layers linux-layers))
+         ))
 
   (setq-default
    load-prefer-newer t
@@ -994,6 +947,7 @@ Return an event vector."
   ;; ---------
   ;; User-init
   ;; ---------
+  (setq-default git-magit-status-fullscreen t)
 
   (setq-default gdb-default-window-configuration-file "gdb-window-config")
   (setq-default gdb-window-configuration-directory "~/.spacemacs.d/")
@@ -1128,7 +1082,6 @@ Return an event vector."
    ;;                              )
    )
 
-  1
   (setq-default debug-mac-notifications nil)
   (setq-default flycheck-standard-error-navigation nil)
   (setq flycheck-standard-error-navigation nil)
@@ -1306,6 +1259,13 @@ i.e. windows tiled side-by-side."
     ;;   (split-window-really-sensibly window))
     )
 
+  (defun my-early-python-mode-hook ()
+    (message "XXX checker set in early init hook")
+    ;; flake8 will chain in pylint
+    ;; (flycheck-select-checker 'python-flake8)
+    )
+  (add-hook 'python-mode-hook 'my-early-python-mode-hook)
+  (message "init stage current python mode hook %s" python-mode-hook)
 
   ;; =================================
   ;; Global Key Bindings and Registers
@@ -1436,40 +1396,42 @@ layers configuration. You are free to put any user code."
 
   (debug-init-message "USER-CONFIG: Start")
 
-  (message "python mode hook %s" python-mode-hook)
+  (let ((repo (concat dotspacemacs-directory "repos/py-snippets/snippets/")))
+    (message repo)
+    (if (file-directory-p repo)
+        (setq yas-snippet-dirs (append yas-snippet-dirs `(,repo)))))
+
 
   (when-layer-used
    'python
-
-   (message "XXXXXXXXXX PYTHON ")
+   (message "config stage: current python mode hook %s" python-mode-hook)
    (when-layer-used 'rebox
-                    (message "XXXXXXXXXX REBOX ")
                     (defun rebox-python-hook ()
                       (interactive)
-                      (message "XXXXXXXXXX HOOOKED ")
+                      (message "running rebox-python-hook")
                       (bind-key "M-q" 'rebox-dwim python-mode-map)
                       ;; (set (make-local-variable 'rebox-style-loop) '(401 402 403 413 415))
                       (set (make-local-variable 'rebox-style-loop) '(71 72 73))
                       )
-                    (message "XXXXXXXXXX ADDHOOK ")
                     (add-hook 'python-mode-hook 'rebox-python-hook))
 
-       ;;; XXX restore? XXX
-       (defun my-python-before-save-hook ()
-         (if (bound-and-true-p blacken-mode)
-             (py-isort-before-save)))
+   (defun my-python-before-save-hook ()
+     (if (bound-and-true-p blacken-mode)
+         (py-isort-before-save)))
 
-       (defun my-python-mode-hook ()
-         (setq comment-column 60)
-         (python-docstring-mode 1)
-         ;; Check to see if there's a pylint in the project directory maybe?
-         (message "XXX checker set")
-         ;; flake8 will chain in pylint
-         (add-hook 'before-save-hook 'my-python-before-save-hook)
-         (flycheck-select-checker 'python-pylint)
-         ;; (flycheck-select-checker 'python-flake8)
-         (semantic-mode -1))
-       (add-hook 'python-mode-hook 'my-python-mode-hook))
+   (defun my-early-config-python-mode-hook ()
+     (setq comment-column 60)
+     (python-docstring-mode 1)
+     ;; Check to see if there's a pylint in the project directory maybe?
+     (add-hook 'before-save-hook 'my-python-before-save-hook)
+     (message "XXX checker set in early config hook")
+     ;; flake8 will chain in pylint
+     ;; (flycheck-select-checker 'python-flake8)
+     ;; (flycheck-select-checker 'python-pylint)
+     (semantic-mode -1))
+   (add-hook 'python-mode-hook 'my-early-config-python-mode-hook)
+   (message "config stage: current python mode hook %s" python-mode-hook)
+   )
 
   (when-layer-used 'org
                    (with-eval-after-load "org"
@@ -3612,10 +3574,19 @@ given, offer to edit the search query before executing it."
      (when-layer-used
       'lsp
       (setq-default
-       lsp-pylsp-plugins-autopep8-enabled nil
+
+       lsp-pylsp-plugins-pylint-enabled t
+       ;; Use .dir-locals.el
+       ;; lsp-pylsp-plugins-pylint-args ["--rcfile=/home/chopps/w/munet/pyproject.toml"]
+       ;; ((python-mode . ((lsp-pylsp-plugins-pylint-args . ["--rcfile=~/w/munet/pyproject.toml"]))))
+       lsp-pylsp-plugins-pydocstyle-enabled t
+       lsp-pylsp-plugins-pydocstyle-convention 'google
+       lsp-pylsp-plugins-pydocstyle-add-ignore []
+
        lsp-pylsp-plugins-flake8-enabled t
        lsp-pylsp-plugins-flake8-ignore ["E203"]
        lsp-pylsp-plugins-flake8-max-line-length 88
+
        lsp-pylsp-plugins-jedi-completion-enabled t
        lsp-pylsp-plugins-jedi-definition-enabled nil
        lsp-pylsp-plugins-jedi-hover-enabled nil
@@ -3624,17 +3595,26 @@ given, offer to edit the search query before executing it."
        lsp-pylsp-plugins-jedi-symbols-enabled t
        lsp-pylsp-plugins-mccabe-enabled nil
        lsp-pylsp-plugins-preload-enabled nil
-       lsp-pylsp-plugins-pycodestyle-enabled t
-       lsp-pylsp-plugins-pycodestyle-ignore ["E203"]
-       lsp-pylsp-plugins-pycodestyle-max-line-length 88
-       lsp-pylsp-plugins-pydocstyle-enabled nil
+
+       lsp-pylsp-plugins-autopep8-enabled nil
+       lsp-pylsp-plugins-pycodestyle-enabled nil
+       ;; lsp-pylsp-plugins-pycodestyle-enabled t
+       ;; lsp-pylsp-plugins-pycodestyle-ignore ["E203"]
+       ;; lsp-pylsp-plugins-pycodestyle-max-line-length 88
        lsp-pylsp-plugins-pyflakes-enabled nil
-       lsp-pylsp-plugins-pylint-enabled t
        lsp-pylsp-plugins-rope-completion-enabled nil
        lsp-pylsp-plugins-yapf-enabled nil
        ))
+
      (with-eval-after-load 'python
        (autoload 'pycoverage-mode "pycoverage" "python coverage mode" t)
+
+       ;; This actually sits right ahead of the hook we set in config, pre-python-eval
+       ;; (defun my-post-eval-python-mode-hook ()
+       ;;   (message "XXX after eval python mode hook"))
+       ;; (add-hook 'python-mode-hook 'my-post-eval-python-mode-hook)
+       ;; (message "post eval python mode stage: current python mode hook %s" python-mode-hook)
+
 
        ;; (setq python-fill-docstring-style 'symmetric
        ;;       python-fill-string-function 'my-python-fill-string-function)
