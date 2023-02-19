@@ -1260,13 +1260,15 @@ i.e. windows tiled side-by-side."
     ;;   (split-window-really-sensibly window))
     )
 
-  (defun my-early-python-mode-hook ()
-    (message "XXX checker set in early init hook")
-    ;; flake8 will chain in pylint
-    ;; (flycheck-select-checker 'python-flake8)
-    )
-  (add-hook 'python-mode-hook 'my-early-python-mode-hook)
-  (message "init stage current python mode hook %s" python-mode-hook)
+  ;; If we actually need to do anything early uncomment this
+  ;; (when-layer-used 'python
+  ;;                  (defun my-init-python-mode-hook ()
+  ;;                    ;; flake8 will chain in pylint
+  ;;                    ;; (flycheck-select-checker 'python-flake8)
+  ;;                    )
+  ;;                  (add-hook 'python-mode-hook 'my-init-python-mode-hook)
+  ;;                  ;; (message "init stage current python mode hook %s" python-mode-hook)
+  ;;                  )
 
   ;; =================================
   ;; Global Key Bindings and Registers
@@ -1403,36 +1405,35 @@ layers configuration. You are free to put any user code."
         (setq yas-snippet-dirs (append yas-snippet-dirs `(,repo)))))
 
 
-  (when-layer-used
-   'python
-   (message "config stage: current python mode hook %s" python-mode-hook)
-   (when-layer-used 'rebox
-                    (defun rebox-python-hook ()
-                      (interactive)
-                      (message "running rebox-python-hook")
-                      (bind-key "M-q" 'rebox-dwim python-mode-map)
-                      ;; (set (make-local-variable 'rebox-style-loop) '(401 402 403 413 415))
-                      (set (make-local-variable 'rebox-style-loop) '(71 72 73))
-                      )
-                    (add-hook 'python-mode-hook 'rebox-python-hook))
+  (when-layer-used 'python
+                   ;; Get our hooks into python mode early
+                   ;; (message "config stage: current python mode hook %s" python-mode-hook)
+                   (when-layer-used 'rebox
+                                    (defun rebox-python-hook ()
+                                      (interactive)
+                                      (message "running rebox-python-hook")
+                                      (bind-key "M-q" 'rebox-dwim python-mode-map)
+                                      ;; (set (make-local-variable 'rebox-style-loop) '(401 402 403 413 415))
+                                      (set (make-local-variable 'rebox-style-loop) '(71 72 73)))
+                                    (add-hook 'python-mode-hook 'rebox-python-hook))
 
-   (defun my-python-before-save-hook ()
-     (if (bound-and-true-p blacken-mode)
-         (py-isort-before-save)))
+                   (defun my-python-before-save-hook ()
+                     (if (bound-and-true-p blacken-mode)
+                         (py-isort-before-save)))
 
-   (defun my-early-config-python-mode-hook ()
-     (setq comment-column 60)
-     (python-docstring-mode 1)
-     ;; Check to see if there's a pylint in the project directory maybe?
-     (add-hook 'before-save-hook 'my-python-before-save-hook)
-     (message "XXX checker set in early config hook")
-     ;; flake8 will chain in pylint
-     ;; (flycheck-select-checker 'python-flake8)
-     ;; (flycheck-select-checker 'python-pylint)
-     (semantic-mode -1))
-   (add-hook 'python-mode-hook 'my-early-config-python-mode-hook)
-   (message "config stage: current python mode hook %s" python-mode-hook)
-   )
+                   (defun my-config-python-mode-hook ()
+                     (setq comment-column 60)
+                     (python-docstring-mode 1)
+                     ;; Check to see if there's a pylint in the project directory maybe?
+                     (add-hook 'before-save-hook 'my-python-before-save-hook)
+                     (message "XXX checker set in early config hook")
+                     ;; flake8 will chain in pylint
+                     ;; (flycheck-select-checker 'python-flake8)
+                     ;; (flycheck-select-checker 'python-pylint)
+                     (semantic-mode -1))
+                   (add-hook 'python-mode-hook 'my-config-python-mode-hook)
+                   ;; (message "config stage: current python mode hook %s" python-mode-hook)
+                   )
 
   (unless (string-prefix-p "hp13" (system-name))
     (require 'clipetty)
