@@ -704,6 +704,11 @@ It should only modify the values of Spacemacs settings."
    ;; Transparency can be toggled through `toggle-transparency'. (default 90)
    dotspacemacs-inactive-transparency 90
 
+   ;; A value from the range (0..100), in increasing opacity, which describes the
+   ;; transparency level of a frame background when it's active or selected. Transparency
+   ;; can be toggled through `toggle-background-transparency'. (default 90)
+   dotspacemacs-background-transparency 90
+
    ;; If non-nil show the titles of transient states. (default t)
    dotspacemacs-show-transient-state-title t
 
@@ -813,7 +818,9 @@ It should only modify the values of Spacemacs settings."
    ;; (default nil - same as frame-title-format)
    dotspacemacs-icon-title-format nil
 
-   ;; Show trailing whitespace (default t)
+   ;; Color highlight trailing whitespace in all prog-mode and text-mode derived
+   ;; modes such as c++-mode, python-mode, emacs-lisp, html-mode, rst-mode etc.
+   ;; (default t)
    dotspacemacs-show-trailing-whitespace t
 
    ;; Delete whitespace while saving buffer. Possible values are `all'
@@ -2924,7 +2931,8 @@ given, offer to edit the search query before executing it."
                                                            (setq c-basic-offset 2)))))
 
     (with-eval-after-load "transient"
-      (setq transient-values-file "~/.transient-values.el"))
+      (if (file-exists-p (expand-file-name "~/.transient-values.el"))
+        (setq transient-values-file "~/.transient-values.el")))
 
     ;; (with-eval-after-load "yang-mode"
     ;;   ;; (autoload 'yang-mode "yang-mode")
@@ -3551,7 +3559,7 @@ given, offer to edit the search query before executing it."
                        ;; (require 'magit-gerrit)
                        (magit-wip-mode 1)
 
-                       (transient-insert-suffix 'magit-pull "-r" '("-f" "Overwrite local branch" "--force"))
+                       ;; (transient-insert-suffix 'magit-pull "-r" '("-f" "Overwrite local branch" "--force"))
 
                        (bind-key (kbd "M-RET") 'magit-diff-visit-worktree-file-other-window 'magit-diff-mode-map)
                        (bind-key (kbd "C-j") 'magit-diff-visit-worktree-file 'magit-diff-mode-map)
@@ -4988,3 +4996,6 @@ given, offer to edit the search query before executing it."
 ;; ;; Local Variables:
 ;; noteval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when-layer-used\\|(when (configuration-layer\\)")"
 ;; End:
+
+;; Do not write anything past this comment. This is where Emacs will
+;; auto-generate custom variable definitions.
