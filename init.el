@@ -66,6 +66,9 @@ This function should only modify configuration layer settings."
                       auto-completion-private-snippets-directory "~/.spacemacs.d/snippets/"
                       auto-completion-tab-key-behavior 'complete)
      colors
+     (org :variables
+          org-clock-idle-time 15
+          org-enable-rfc-support nil)
      themes-megapack
      )
 
@@ -319,7 +322,13 @@ This function should only modify configuration layer settings."
      ;; colorsarenice-light
      )
    ;; A list of packages that cannot be updated.
-   dotspacemacs-frozen-packages '()
+   ;; dotspacemacs-frozen-packages '()
+   dotspacemacs-frozen-packages
+   '(
+     magit
+     magit-section
+     forge
+     )
 
    ;; A list of packages that will not be installed and loaded.
    dotspacemacs-excluded-packages
