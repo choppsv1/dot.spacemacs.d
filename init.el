@@ -37,6 +37,10 @@ This function should only modify configuration layer settings."
 
      better-defaults
      (git :variables git-enable-magit-delta-plugin nil
+          magit-display-buffer-function ;; 'magit-display-buffer-traditional
+          'magit-display-buffer-fullcolumn-most-v1
+          magit-bury-buffer-function 'magit-restore-window-configuration
+          git-magit-status-fullscreen nil
           magit-diff-refine-hunk 'all
           git-enable-magit-gitflow-plugin nil
           git-enable-magit-todos-plugin nil)
@@ -347,13 +351,13 @@ This function should only modify configuration layer settings."
      ;; powerline
      ;; recentf
      ;; savehist
-     ;; HATE PURPOSE MODE
 
-     ;; eyebrowse
-     ;; helm-purpose
-     ;; ivy-purpose
-     ;; spacemacs-purpose-popwin
-     ;; window-purpose
+     ;; HATE PURPOSE MODE
+     eyebrowse
+     helm-purpose
+     ivy-purpose
+     window-purpose
+     spacemacs-purpose-popwin
 
      ) ; evil-org
    ;; Defines the behaviour of Spacemacs when installing packages.
@@ -942,7 +946,10 @@ Return an event vector."
                                         ;  (enable-CSI-u))
 
   (setq exec-path-from-shell-check-startup-files nil)
-  (setq epa-pinentry-mode 'loopback)
+  ;; literally wrong to use loopback here
+  ;; (setf epa-pinentry-mode nil)
+  ;; (setq epg-pinentry-mode 'loopback)
+  (setq epg-pinentry-mode nil)
 
   (debug-init-message "USER-INIT: Start")
 
@@ -974,7 +981,9 @@ Return an event vector."
   (setq-default gdb-window-configuration-directory "~/.spacemacs.d/")
 
   (cond ((string-equal system-type "darwin")
-         (setq epg-gpg-program "/usr/local/MacGPG2/bin/gpg2")))
+         (setq epg-gpg-program "/usr/local/MacGPG2/bin/gpg2"))
+        (t
+         (setq epg-gpg-program "/usr/bin/gpg")))
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   ;; (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu-mac/mu4e/")
@@ -1232,52 +1241,71 @@ Return an event vector."
     (setq window-min-width 60)
     (setq window-min-height 12)
 
-    (defun split-window-sensibly-prefer-horizontal (&optional window)
-      "Based on split-window-sensibly, but designed to prefer a horizontal split,
-i.e. windows tiled side-by-side."
-      (let ((window (or window (selected-window))))
-        (or (and (window-splittable-p window t)
-                 ;; Split window horizontally
-                 (with-selected-window window
-                   (split-window-right)))
-            (and (window-splittable-p window)
-                 ;; Split window vertically
-                 (with-selected-window window
-                   (split-window-below)))
-            (and
-             ;; If WINDOW is the only usable window on its frame (it is
-             ;; the only one or, not being the only one, all the other
-             ;; ones are dedicated) and is not the minibuffer window, try
-             ;; to split it horizontally disregarding the value of
-             ;; `split-height-threshold'.
-             (let ((frame (window-frame window)))
-               (or
-                (eq window (frame-root-window frame))
-                (catch 'done
-                  (walk-window-tree (lambda (w)
-                                      (unless (or (eq w window)
-                                                  (window-dedicated-p w))
-                                        (throw 'done nil)))
-                                    frame)
-                  t)))
-             (not (window-minibuffer-p window))
-             (let ((split-width-threshold 0))
-               (when (window-splittable-p window t)
-                 (with-selected-window window
-                   (split-window-right))))))))
+    ;; (defun split-horizontally-for-temp-buffers ()
+    ;;   "Split the window horizontally for temp buffers."
+    ;;   (when (and (one-window-p t)
+    ;;  	         (not (active-minibuffer-window)))
+    ;;     (split-window-horizontally)))
 
-    (defun split-window-really-sensibly (&optional window)
-      (let ((window (or window (selected-window))))
-        (if (> (window-total-width window) (* 2 (window-total-height window)))
-            (with-selected-window window (split-window-sensibly-prefer-horizontal window))
-          (with-selected-window window (split-window-sensibly window)))))
+    ;; (add-hook 'temp-buffer-setup-hook 'split-horizontally-for-temp-buffers)
 
-    ;; this is being ignored!?
-    (setq split-window-preferred-function 'split-window-really-sensibly)
-    ;; (setq split-window-preferred-function 'split-window-sensibly-prefer-horizontal)
+    (defun split-window-prefer-horizonally (window)
+      "If there's only one window (excluding any possibly active
+         minibuffer), then split the current window horizontally."
+      (if (and (one-window-p t)
+               (not (active-minibuffer-window)))
+          (let ((split-height-threshold nil))
+            (split-window-sensibly window))
+        (split-window-sensibly window)))
 
-    ;; (defun split-window-sensibly (&optional window)
-    ;;   (split-window-really-sensibly window))
+    (setq split-window-preferred-function 'split-window-prefer-horizonally)
+
+;;     (defun split-window-sensibly-prefer-horizontal (&optional window)
+;;       "Based on split-window-sensibly, but designed to prefer a horizontal split,
+;; i.e. windows tiled side-by-side."
+;;       (let ((window (or window (selected-window))))
+;;         (or (and (window-splittable-p window t)
+;;                  ;; Split window horizontally
+;;                  (with-selected-window window
+;;                    (split-window-right)))
+;;             (and (window-splittable-p window)
+;;                  ;; Split window vertically
+;;                  (with-selected-window window
+;;                    (split-window-below)))
+;;             (and
+;;              ;; If WINDOW is the only usable window on its frame (it is
+;;              ;; the only one or, not being the only one, all the other
+;;              ;; ones are dedicated) and is not the minibuffer window, try
+;;              ;; to split it horizontally disregarding the value of
+;;              ;; `split-height-threshold'.
+;;              (let ((frame (window-frame window)))
+;;                (or
+;;                 (eq window (frame-root-window frame))
+;;                 (catch 'done
+;;                   (walk-window-tree (lambda (w)
+;;                                       (unless (or (eq w window)
+;;                                                   (window-dedicated-p w))
+;;                                         (throw 'done nil)))
+;;                                     frame)
+;;                   t)))
+;;              (not (window-minibuffer-p window))
+;;              (let ((split-width-threshold 0))
+;;                (when (window-splittable-p window t)
+;;                  (with-selected-window window
+;;                    (split-window-right))))))))
+
+    ;; (defun split-window-really-sensibly (&optional window)
+    ;;   (let ((window (or window (selected-window))))
+    ;;     (if (> (window-total-width window) (* 2 (window-total-height window)))
+    ;;         (with-selected-window window (split-window-sensibly-prefer-horizontal window))
+    ;;       (with-selected-window window (split-window-sensibly window)))))
+
+    ;; ;; this is being ignored!?
+    ;; (setq split-window-preferred-function 'split-window-really-sensibly)
+    ;; ;; (setq split-window-preferred-function 'split-window-sensibly-prefer-horizontal)
+
+    ;; ;; (defun split-window-sensibly (&optional window)
+    ;; ;;   (split-window-really-sensibly window))
     )
 
   ;; If we actually need to do anything early uncomment this
