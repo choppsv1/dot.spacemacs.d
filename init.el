@@ -114,9 +114,9 @@ This function should only modify configuration layer settings."
      gtags
      html
      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
-     (python :variables python-backend 'lsp
+     (python :variables python-backend 'anaconda
              ;; python-lsp-server 'pyright
-             python-lsp-server 'pylsp
+             ;; python-lsp-server 'pylsp
              python-formatter 'black
              python-fill-column 88
              python-tab-width 8
@@ -3264,6 +3264,7 @@ given, offer to edit the search query before executing it."
                        ;;(clang-format-buffer)))
 
                        (setq-default clang-maybe-format-buffer-enabled t)
+                       (require 'clang-format)
 
                        (spacemacs|add-toggle format-buffer
                          :status clang-maybe-format-buffer-enabled
@@ -3283,7 +3284,8 @@ given, offer to edit the search query before executing it."
                                        ;; ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
                                        ((string= "INDENT" (match-string 1)) (vpp-format-buffer) t)
                                        ;; We need to avoid doing this for files with changes in DEFUN/DEFPY
-                                       ((f-exists? (concat (projectile-project-root) ".clang-format")) (message "found .clang-format") (clang-format-vc-diff) t))))))
+                                       ((f-exists? (concat (projectile-project-root) ".clang-format")) (message "found .clang-format") (clang-format-vc-diff) t)
+                                       (t (message "didn't find .clang-format in %s" (concat (projectile-project-root) ".clang-format"))))))))
 
                        (defun clang-maybe-format-buffer-on-save ()
                          (add-hook 'before-save-hook 'clang-maybe-format-buffer 90 t))
