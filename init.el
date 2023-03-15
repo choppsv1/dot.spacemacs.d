@@ -382,8 +382,11 @@ This function should only modify configuration layer settings."
    ((string-equal system-type "darwin") ; Mac OS X
     (setq ch-def-font "Iosevka Light")
     (if (string-prefix-p "ja" system-name)
-        (setq ch-def-height 17.0)
-      (setq ch-def-height 14.0))
+        (progn
+          (setq ch-def-font "Iosevka Light")
+          (setq ch-def-height 15.0))
+      (setq ch-def-font "Iosevka Thin")
+      (setq ch-def-height 16.0))
     (debug-init-message "Setting font to %s:%f" ch-def-font ch-def-height))
    ((string-equal system-type "gnu/linux")
     (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
@@ -980,10 +983,10 @@ Return an event vector."
   (setq-default gdb-default-window-configuration-file "gdb-window-config")
   (setq-default gdb-window-configuration-directory "~/.spacemacs.d/")
 
-  (cond ((string-equal system-type "darwin")
-         (setq epg-gpg-program "/usr/local/MacGPG2/bin/gpg2"))
-        (t
-         (setq epg-gpg-program "/usr/bin/gpg")))
+;;  (cond ((string-equal system-type "darwin")
+;;         (setq epg-gpg-program "/usr/local/MacGPG2/bin/gpg2"))
+;;        (t
+;;         (setq epg-gpg-program "/usr/bin/gpg")))
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   ;; (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu-mac/mu4e/")
@@ -1544,7 +1547,9 @@ layers configuration. You are free to put any user code."
       (setq recentf-exclude (delete (recentf-expand-file-name package-user-dir) recentf-exclude)))
 
     (cond ((string-equal system-type "darwin") (progn (exec-path-from-shell-copy-env "PATH")
-                                                      (setq insert-directory-program "/opt/homebrew/bin/gls")
+                                                      (if (string-prefix-p "ja" system-name)
+                                                          (setq insert-directory-program "/opt/homebrew/bin/gls")
+                                                        (setq insert-directory-program "/usr/local/bin/gls"))
                                                       ;; (setq insert-directory-program "/bin/ls")
                                                       (setq dired-listing-switchecs "-al --dired")
                                                       ;; (setq dired-listing-switches "-aBhl")
@@ -2370,8 +2375,13 @@ layers configuration. You are free to put any user code."
                            )
 
                      (with-eval-after-load 'mu4e
+
                        (progn
                          (debug-init-message "debug-init MU4E setq")
+
+                         (if (string-prefix-p "ja" system-name)
+                             (setq my-msmtp "/opt/homebrew/bin/msmtp")
+                           (setq my-msmtp "/usr/local/bin/msmtp"))
 
                          (setq mu4e-contexts `(
                                                ,(make-mu4e-context
@@ -2447,7 +2457,8 @@ layers configuration. You are free to put any user code."
                                                          (mu4e-sent-messages-behavior   . sent)
                                                          ;; smtp
                                                          (message-send-mail-function . message-send-mail-with-sendmail)
-                                                         (sendmail-program . "/opt/homebrew/bin/msmtp")
+
+                                                         (sendmail-program . 'my-msmtp)
                                                          (send-mail-function . 'smtpmail-send-it)
                                                          (message-sendmail-extra-arguments . ("--read-envelope-from"))
 
