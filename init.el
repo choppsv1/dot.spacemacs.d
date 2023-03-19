@@ -261,7 +261,7 @@ This function should only modify configuration layer settings."
 
    ;; all dev-lite are linux
    chopps-dev-lite-systems '("dlk" "jaja" "labnh" "lake" "flk" "ubb" "uff")
-
+   chopps-dev-lite-systems '("dlk" "jaja" "labnh" "lake" "flk" "ubb" "uff" "sal")
    ;; These systems get full development packages -- the slowest load
    chopps-dev-systems '("cmf-xe-1" "morn1" "tops" "hp13" "rlk" "dak"))
 
@@ -3030,7 +3030,9 @@ given, offer to edit the search query before executing it."
 
     (when-layer-used 'c-c++
                      (let ((binpath))
-                       (dolist (suffix '("-11" "-10" "-9" "-8" "-7" ""))
+                       ;; version 10 is default in ubuntu 20.04 so don't search
+                       ;; any lower
+                       (dolist (suffix '("-17" "-16" "-15" "-14" "-13" "-12" "-11" ""))
                          (unless binpath
                            (setq binpath (executable-find (concat "clang-format" suffix)))))
                        (when binpath
@@ -3316,8 +3318,20 @@ given, offer to edit the search query before executing it."
                                        ;; ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
                                        ((string= "INDENT" (match-string 1)) (vpp-format-buffer) t)
                                        ;; We need to avoid doing this for files with changes in DEFUN/DEFPY
-                                       ((f-exists? (concat (projectile-project-root) ".clang-format")) (message "found .clang-format") (clang-format-vc-diff) t)
+                                       ((f-exists? (concat (projectile-project-root) ".clang-format")) (clang-format-vc-diff) t)
                                        (t (message "didn't find .clang-format in %s" (concat (projectile-project-root) ".clang-format"))))))))
+
+;;                                       (if (f-exists? (concat (projectile-project-root) ".clang-format"))
+;;                                           (progn
+;;                                             (message "found .clang-format")
+;;                                             (clang-format-vc-diff))
+;;                                         (goto-char (point-min))
+;;                                         (re-search-forward "coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t)
+;;                                         (cond
+;;                                          ((string= "CLANG" (match-string 1)) (vpp-format-buffer t) t)
+;;                                          ;; ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
+;;                                          ((string= "INDENT" (match-string 1)) (vpp-format-buffer) t)))))))
+;;
 
                        (defun clang-maybe-format-buffer-on-save ()
                          (add-hook 'before-save-hook 'clang-maybe-format-buffer 90 t))
