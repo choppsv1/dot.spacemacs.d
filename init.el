@@ -114,9 +114,10 @@ This function should only modify configuration layer settings."
      gtags
      html
      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
-     (python :variables python-backend 'anaconda
+     (python :variables 
+             ;; python-backend 'anaconda
              ;; python-lsp-server 'pyright
-             ;; python-lsp-server 'pylsp
+             python-lsp-server 'pylsp
              python-formatter 'black
              python-fill-column 88
              python-tab-width 8
@@ -132,12 +133,31 @@ This function should only modify configuration layer settings."
              python-auto-set-local-pyvenv-virtualenv nil
              python-auto-set-local-pyenv-virtualenv nil
              ;;
-             ;; lsp-pylsp-plugins-flake8-enabled t ;; was nil by spacemacs but t before
-             ;; lsp-pylsp-plugins-pylint-enabled nil ;; was t by spacemacs but nil before
-             ;; lsp-pylsp-plugins-pyflakes-enabled nil ;; was t by spacemacs but nil before
-             ;; lsp-pylsp-plugins-autopep8-enabled nil ;; was nil is nil
-             ;; lsp-pylsp-plugins-pycodestyle-enabled nil ;; was t by spacemacs but nil before
-             ;; lsp-pylsp-plugins-mccabe-enabled nil ;; was nil by spacemacs but t before
+             ;; Use .dir-locals.el
+             ;; ((python-mode . ((lsp-pylsp-plugins-pylint-args . ["--rcfile=~/w/munet/pyproject.toml"]))))
+             ;; lsp-pylsp-plugins-pylint-args ["--rcfile=/home/chopps/w/munet/pyproject.toml"]
+
+             lsp-pylsp-plugins-autopep8-enabled nil
+             lsp-pylsp-plugins-black-enabled t
+             lsp-pylsp-plugins-flake8-enabled t
+             lsp-pylsp-plugins-flake8-ignore ["E203"]
+             lsp-pylsp-plugins-flake8-max-line-length 88
+             lsp-pylsp-plugins-jedi-completion-enabled t
+             lsp-pylsp-plugins-jedi-definition-enabled nil
+             lsp-pylsp-plugins-jedi-hover-enabled nil
+             lsp-pylsp-plugins-jedi-references-enabled t
+             lsp-pylsp-plugins-jedi-signature-help-enabled t
+             lsp-pylsp-plugins-jedi-symbols-enabled t
+             lsp-pylsp-plugins-mccabe-enabled nil
+             lsp-pylsp-plugins-preload-enabled nil
+             lsp-pylsp-plugins-pycodestyle-enabled nil
+             lsp-pylsp-plugins-pydocstyle-add-ignore []
+             lsp-pylsp-plugins-pydocstyle-convention 'google
+             lsp-pylsp-plugins-pydocstyle-enabled t
+             lsp-pylsp-plugins-pyflakes-enabled nil
+             lsp-pylsp-plugins-pylint-enabled t
+             lsp-pylsp-plugins-rope-completion-enabled nil
+             lsp-pylsp-plugins-yapf-enabled nil
              )
      (rust :variables
            rust-format-on-save t)
@@ -425,6 +445,7 @@ It should only modify the values of Spacemacs settings."
   ;; this setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
   (setq-default
+   blink-matching-paren 'jump
    ;; If non-nil then enable support for the portable dumper. You'll need to
    ;; compile Emacs 27 from source following the instructions in file
    ;; EXPERIMENTAL.org at to root of the git repository.
@@ -789,7 +810,7 @@ It should only modify the values of Spacemacs settings."
    ;; Select a scope to highlight delimiters. Possible values are `any',
    ;; `current', `all' or `nil'. Default is `all' (highlight any scope and
    ;; emphasis the current one). (default 'all)
-   dotspacemacs-highlight-delimiters 'all
+   dotspacemacs-highlight-delimiters nil
 
    ;; If non-nil, start an Emacs server if one is not already running.
    ;; (default nil)
@@ -1159,12 +1180,12 @@ Return an event vector."
           (quasi-monochrome (default :height ,(* ch-def-height 10))
                             (font-lock-string-face :foreground "DarkGrey" :slant italic)
                             (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
-          (mandm ;; (default :background "#F0F0E0")
-           ;; (font-lock-doc-face :foreground "#036A07" :slant normal)
-           (font-lock-comment-face :foreground "#6D6D64" :slant normal)
-           (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant normal)
-           (lsp-face-highlight-read :foreground "#036A08" :slant normal)
-           )
+          ;; (mandm ;; (default :background "#F0F0E0")
+          ;;  ;; (font-lock-doc-face :foreground "#036A07" :slant normal)
+          ;;  (font-lock-comment-face :foreground "#6D6D64" :slant normal)
+          ;;  (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant normal)
+          ;;  (lsp-face-highlight-read :foreground "#036A08" :slant normal)
+          ;;  )
 
           (leuven ;; (default :background "#F0F0E0")
            (default :background "#ede8da")
@@ -3624,41 +3645,10 @@ given, offer to edit the search query before executing it."
     ;; python
     (when-layer-used
      'python
-     (when-layer-used
-      'lsp
-      (setq-default
-
-       lsp-pylsp-plugins-pylint-enabled t
-       ;; Use .dir-locals.el
-       ;; lsp-pylsp-plugins-pylint-args ["--rcfile=/home/chopps/w/munet/pyproject.toml"]
-       ;; ((python-mode . ((lsp-pylsp-plugins-pylint-args . ["--rcfile=~/w/munet/pyproject.toml"]))))
-       lsp-pylsp-plugins-pydocstyle-enabled t
-       lsp-pylsp-plugins-pydocstyle-convention 'google
-       lsp-pylsp-plugins-pydocstyle-add-ignore []
-
-       lsp-pylsp-plugins-flake8-enabled t
-       lsp-pylsp-plugins-flake8-ignore ["E203"]
-       lsp-pylsp-plugins-flake8-max-line-length 88
-
-       lsp-pylsp-plugins-jedi-completion-enabled t
-       lsp-pylsp-plugins-jedi-definition-enabled nil
-       lsp-pylsp-plugins-jedi-hover-enabled nil
-       lsp-pylsp-plugins-jedi-references-enabled t
-       lsp-pylsp-plugins-jedi-signature-help-enabled t
-       lsp-pylsp-plugins-jedi-symbols-enabled t
-       lsp-pylsp-plugins-mccabe-enabled nil
-       lsp-pylsp-plugins-preload-enabled nil
-
-       lsp-pylsp-plugins-autopep8-enabled nil
-       lsp-pylsp-plugins-pycodestyle-enabled nil
-       ;; lsp-pylsp-plugins-pycodestyle-enabled t
-       ;; lsp-pylsp-plugins-pycodestyle-ignore ["E203"]
-       ;; lsp-pylsp-plugins-pycodestyle-max-line-length 88
-       lsp-pylsp-plugins-pyflakes-enabled nil
-       lsp-pylsp-plugins-rope-completion-enabled nil
-       lsp-pylsp-plugins-yapf-enabled nil
-       ))
-
+     ;; (when-layer-used
+     ;;  'lsp
+     ;;  ;; (setq-default)
+     ;;  )
      (with-eval-after-load 'python
        (autoload 'pycoverage-mode "pycoverage" "python coverage mode" t)
 
