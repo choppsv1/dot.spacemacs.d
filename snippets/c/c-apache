@@ -4,7 +4,7 @@
 # contributor: Christian E. Hopps <chopps@gmail.com>
 # --
 /*
-* Copyright (c) `(format-time-string "%Y" (current-time))`, ${`user-full-name`}
+* Copyright (C) `(format-time-string "%Y" (current-time))` ${`user-full-name`}
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.

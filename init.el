@@ -115,9 +115,9 @@ This function should only modify configuration layer settings."
      html
      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
      (python :variables 
-             ;; python-backend 'anaconda
+             python-backend 'anaconda
              ;; python-lsp-server 'pyright
-             python-lsp-server 'pylsp
+             ;; python-lsp-server 'pylsp
              python-formatter 'black
              python-fill-column 88
              python-tab-width 8
@@ -213,7 +213,8 @@ This function should only modify configuration layer settings."
           ;; lsp-diagnostics-provider :none
           lps-ui-sideline-enable nil)
 
-     (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
+     ;; (semantic :disabled-for '(emacs-lisp cc-mode c-mode c++-mode))
+     (semantic :disabled-for '(emacs-lisp cc-mode c++-mode))
 
      ;; Languages
      (c-c++ :variables
@@ -927,6 +928,15 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;; Do not pop an annoying window up constantly to tell us about async
   ;; compilation warnings
   (setq-default native-comp-async-report-warnings-errors 'silent)
+
+
+  ;; (setq-default transient-values-file (expand-file-name "transient/values.el"
+  ;;                                                       dotspacemacs-directory))
+
+  ;; (spacemacs|use-package-add-hook transient
+  ;;   :init
+  ;;   (setq transient-values-file (expand-file-name "transient/values.el"
+  ;;                                                 dotspacemacs-directory)))
 
   (defun enable-CSI-u ()
     ;; Take advantage of iterm2's CSI u support (https://gitlab.com/gnachman/iterm2/-/issues/8382).
@@ -2946,7 +2956,9 @@ given, offer to edit the search query before executing it."
                        ;; (setq flycheck-highlighting-mode 'lines)
                        (add-hook 'flycheck-mode-hook (lambda () (setq next-error-function nil)))
                        (setq flycheck-highlighting-mode 'sexps)
-                       (setq flycheck-temp-prefix ".flycheck")
+                       ;; DO NOT USE A "." prefix as it screws up pylint
+                       ;; relative import checks!!
+                       ;; (setq flycheck-temp-prefix "flycheck")
 
                        ;; (when-layer-used
                        ;;  'lsp
@@ -3004,9 +3016,9 @@ given, offer to edit the search query before executing it."
                                                            (setq indent-tabs-mode nil)
                                                            (setq c-basic-offset 2)))))
 
-    (with-eval-after-load "transient"
-      (if (file-exists-p (expand-file-name "~/.transient-values.el"))
-        (setq transient-values-file "~/.transient-values.el")))
+    ;; (with-eval-after-load "transient"
+    ;;   (if (file-exists-p (expand-file-name "~/.transient-values.el"))
+    ;;     (setq transient-values-file "~/.transient-values.el")))
 
     ;; (with-eval-after-load "yang-mode"
     ;;   ;; (autoload 'yang-mode "yang-mode")
@@ -3647,12 +3659,15 @@ given, offer to edit the search query before executing it."
                      (with-eval-after-load 'magit
                        ;; (magit-todos-mode 1)
                        ;; (require 'magit-gerrit)
-                       (magit-wip-mode 1)
-
-                       ;; (transient-insert-suffix 'magit-pull "-r" '("-f" "Overwrite local branch" "--force"))
-
                        (bind-key (kbd "M-RET") 'magit-diff-visit-worktree-file-other-window 'magit-diff-mode-map)
                        (bind-key (kbd "C-j") 'magit-diff-visit-worktree-file 'magit-diff-mode-map)
+                       (magit-wip-mode 1)
+                       ;; this doesn't work
+                       ;; (defun git/pre-init-transient ()
+                       ;;   ;; (transient-insert-suffix 'magit-pull "-r" '("-f" "Overwrite local branch" "--force"))
+                       ;;   (setq transient-values-file (expand-file-name "transient/values.el"
+                       ;;                                                 dotspacemacs-directory))
+                      ;;   )
                        )
                      )
 
