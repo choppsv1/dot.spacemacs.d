@@ -58,6 +58,7 @@ This function should only modify configuration layer settings."
      multiple-cursors
      shell-scripts
      yaml
+     themes-megapack
      )
 
    chopps-extra-layers
@@ -73,7 +74,6 @@ This function should only modify configuration layer settings."
      (org :variables
           org-clock-idle-time 15
           org-enable-rfc-support nil)
-     themes-megapack
      )
 
    ;;
@@ -332,6 +332,7 @@ This function should only modify configuration layer settings."
      exec-path-from-shell
      ;; This is very cool but too expensive for large projects
      olivetti
+     jsc-light-theme
      monky
      nhexl-mode
      nano-theme
@@ -596,14 +597,19 @@ It should only modify the values of Spacemacs settings."
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(
-                         ;; sanityinc-tomorrow-blue
-                         ;; borland-blue
-                         ;; sanityinc-solarized-dark
-                         ;; misterioso
+                         doom-acario-light
+                         doom-material
+                         cobalt
+                         sanityinc-tomorrow-blue
+                         sanityinc-solarized-dark
+                         sanityinc-solarized-light
+                         borland-blue
+                         misterioso
                          mandm
-                         ;; gruvbox-light-hard
-                         ;; molokai
-                         ;; leuven
+                         gruvbox-light-hard
+                         molokai
+                         leuven
+                         jsc-light
                          )
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
    ;; `all-the-icons', `custom', `doom', `vim-powerline' and `vanilla'. The
