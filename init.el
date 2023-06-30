@@ -1197,10 +1197,9 @@ Return an event vector."
           (quasi-monochrome (default :height ,(* ch-def-height 10))
                             (font-lock-string-face :foreground "DarkGrey" :slant italic)
                             (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
-          ;; (mandm ;; (default :background "#F0F0E0")
-          ;;  ;; (font-lock-doc-face :foreground "#036A07" :slant normal)
-          ;;  (font-lock-comment-face :foreground "#6D6D64" :slant normal)
-          ;;  (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant normal)
+          (mandm ;; (font-lock-doc-face :foreground "#036A07" :slant normal)
+           (font-lock-comment-face :foreground "grey60" :slant italic)
+           (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant italice))
           ;;  (lsp-face-highlight-read :foreground "#036A08" :slant normal)
           ;;  )
 
@@ -4249,7 +4248,6 @@ given, offer to edit the search query before executing it."
                              (shell . t)
                              ;; Why did this used to work??
                              ;; (yang . t)
-
                              ;; (sh . t)
                              )
                            )
