@@ -1199,7 +1199,7 @@ Return an event vector."
                             (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
           (mandm ;; (font-lock-doc-face :foreground "#036A07" :slant normal)
            (font-lock-comment-face :foreground "grey60" :slant italic)
-           (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant italice))
+           (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant italic))
           ;;  (lsp-face-highlight-read :foreground "#036A08" :slant normal)
           ;;  )
 
