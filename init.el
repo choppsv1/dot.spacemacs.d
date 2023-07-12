@@ -1,3 +1,7 @@
+;; -*- mode: emacs-lisp; lexical-binding: t -*-
+;; This file is loaded by Spacemacs at startup.
+;; It must be stored in your home directory.
+
 ;;
 ;; April 2 2022, Christian Hopps <chopps@gmail.com>
 ;;
@@ -5,13 +9,8 @@
 ;; All rights reserved.
 ;;
 
-;; -*- mode: emacs-lisp; lexical-binding: t -*-
-;; This file is loaded by Spacemacs at startup.
-;; It must be stored in your home directory.
-
-
 (setq debug-init-msg t)
-; (setq debug-on-error t)
+                                        ; (setq debug-on-error t)
 (defun debug-init-message (fmt &rest a)
   (and debug-init-msg
        (let ((ts (format-time-string "%S.%N")))
@@ -19,12 +18,8 @@
                 (append (list (concat ts ": DEBUG-INIT: " fmt))
                         a)))))
 
-(defun dotspacemacs/layers ()
-  "Layer configuration:
-This function should only modify configuration layer settings."
-
-  (setq load-prefer-newer t)
-
+(defun my-layer-setup ()
+  "My layer setup"
   ;;
   ;; Base Layers
   ;;
@@ -36,14 +31,17 @@ This function should only modify configuration layer settings."
      helm
 
      better-defaults
-     (git :variables git-enable-magit-delta-plugin nil
-          magit-display-buffer-function ;; 'magit-display-buffer-traditional
-          'magit-display-buffer-fullcolumn-most-v1
-          magit-bury-buffer-function 'magit-restore-window-configuration
-          git-magit-status-fullscreen nil
-          magit-diff-refine-hunk 'all
-          git-enable-magit-gitflow-plugin nil
-          git-enable-magit-todos-plugin nil)
+     ;; (git :variables
+     ;;      ;; magit-diff-refine-hunk 'all
+     ;;      magit-bury-buffer-function 'magit-restore-window-configuration
+     ;;      ;; magit-display-buffer-function 'magit-display-buffer-traditional
+     ;;      ;; magit-display-buffer-function 'magit-display-buffer-fullcolumn-most-v1
+     ;;      ;; git-enable-magit-delta-plugin nil
+     ;;      ;; git-magit-status-fullscreen nil
+     ;;      ;; git-enable-magit-gitflow-plugin nil
+     ;;      ;; git-enable-magit-todos-plugin nil
+     ;;      )
+     git
 
      neotree
      rebox
@@ -114,7 +112,7 @@ This function should only modify configuration layer settings."
      gtags
      html
      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
-     (python :variables 
+     (python :variables
              python-backend 'anaconda
              ;; python-lsp-server 'pyright
              ;; python-lsp-server 'pylsp
@@ -284,7 +282,13 @@ This function should only modify configuration layer settings."
         ((eq system-type 'gnu/linux)
          (setq chopps-layers (append chopps-layers linux-layers))
          ))
+  )
 
+(my-layer-setup)
+
+(defun dotspacemacs/layers ()
+  "Layer configuration:
+This function should only modify configuration layer settings."
   (setq-default
    load-prefer-newer t
 
@@ -314,7 +318,14 @@ This function should only modify configuration layer settings."
 
    dotspacemacs-configuration-layers chopps-layers
 
-   ;; List of configuration layers to load.
+   ;; List of additional packages that will be installed without being wrapped
+   ;; in a layer (generally the packages are installed only and should still be
+   ;; loaded using load/require/use-package in the user-config section below in
+   ;; this file). If you need some configuration for these packages, then
+   ;; consider creating a layer. You can also put the configuration in
+   ;; `dotspacemacs/user-config'. To use a local version of a package, use the
+   ;; `:location' property: '(your-package :location "~/path/to/your-package/")
+   ;; Also include the dependencies as they will not be resolved automatically.
    dotspacemacs-additional-packages
    '(
      base16-theme
@@ -343,17 +354,19 @@ This function should only modify configuration layer settings."
      polymode
      python-docstring
      protobuf-mode
+     sqlite3
      ;; rfcview
      ;; colorsarenice-light
      )
-   ;; A list of packages that cannot be updated.
-   ;; dotspacemacs-frozen-packages '()
-   dotspacemacs-frozen-packages
-   '(
-     magit
-     magit-section
-     forge
-     )
+
+   ;; ;; A list of packages that cannot be updated.
+   ;; ;; dotspacemacs-frozen-packages '()
+   ;; dotspacemacs-frozen-packages
+   ;; '(
+   ;;   magit
+   ;;   magit-section
+   ;;   forge
+   ;;   )
 
    ;; A list of packages that will not be installed and loaded.
    dotspacemacs-excluded-packages
@@ -734,12 +747,12 @@ It should only modify the values of Spacemacs settings."
 
    ;; If non-nil the frame is maximized when Emacs starts up.
    ;; Takes effect only if `dotspacemacs-fullscreen-at-startup' is nil.
-   ;; (default nil) (Emacs 24.4+ only)
+   ;; (default t) (Emacs 24.4+ only)
    dotspacemacs-maximized-at-startup nil
 
    ;; If non-nil the frame is undecorated when Emacs starts up. Combine this
-   ;; variable with `dotspacemacs-maximized-at-startup' in OSX to obtain
-   ;; borderless fullscreen. (default nil)
+   ;; variable with `dotspacemacs-maximized-at-startup' to obtain fullscreen
+   ;; without external boxes. Also disables the internal border. (default nil)
    dotspacemacs-undecorated-at-startup nil
 
    ;; A value from the range (0..100), in increasing opacity, which describes
@@ -921,13 +934,11 @@ See the header of this file for more information."
   )
 
 (defun dotspacemacs/user-init ()
-  "Initialization function for user code.
-It is called immediately after `dotspacemacs/init', before layer configuration
-executes.
- This function is mostly useful for variables that need to be set
-before packages are loaded. If you are unsure, you should try in setting them in
-`dotspacemacs/user-config' first."
-
+  "Initialization for user code:
+This function is called immediately after `dotspacemacs/init', before layer
+configuration.
+It is mostly for variables that should be set before packages are loaded.
+If you are unsure, try setting them in `dotspacemacs/user-config' first."
   (add-hook 'grep-mode-hook
             (lambda()
               (kill-local-variable 'compilation-auto-jump-to-next)))
@@ -1028,7 +1039,7 @@ Return an event vector."
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   ;; (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu-mac/mu4e/")
-  ;; (add-to-list 'load-path "/opt/homebrew/share/emacs/site-lisp/mu-mac/mu4e/")
+  (add-to-list 'load-path "/opt/homebrew/share/emacs/site-lisp/mu-mac/mu4e/")
   (add-to-list 'custom-theme-load-path "~/p/emacs-mandm-theme/")
 
 
@@ -1471,6 +1482,7 @@ Return an event vector."
 
   (debug-init-message "USER-INIT: End"))
 
+
 (defun dotspacemacs/user-load ()
   "Library to load while dumping.
 This function is called only while dumping Spacemacs configuration. You can
@@ -1480,11 +1492,13 @@ dump."
   (debug-init-message "USER-LOAD: End")
   )
 
-(defun dotspacemacs/user-config ()
-  "Configuration function for user code.
-This function is called at the very end of Spacemacs initialization after
-layers configuration. You are free to put any user code."
 
+(defun dotspacemacs/user-config ()
+  "Configuration for user code:
+This function is called at the very end of Spacemacs startup, after layer
+configuration.
+Put your configuration code here, except for variables that should be set
+before packages are loaded."
   (debug-init-message "USER-CONFIG: Start")
 
   (let ((repo (concat dotspacemacs-directory "repos/py-snippets/snippets/")))
@@ -3437,24 +3451,26 @@ given, offer to edit the search query before executing it."
                                         (add-hook 'c-mode-hook 'rebox-c-hook)
 
                                         (with-eval-after-load "rebox2"
-                                          (rebox-register-template 252 286 '("/* ---------"
-                                                                             " * box123456"
-                                                                             " * ---------*/"))
-                                          (rebox-register-template 253 386 '("/* ========="
-                                                                             " * box123456"
-                                                                             " * =========*/"))
-                                          (rebox-register-template 254 486 '("/* *********"
-                                                                             " * box123456"
-                                                                             " * **********/"))
-                                          (rebox-register-template 281 186 '("//"
-                                                                             "// box123456"
-                                                                             "//"))
-                                          (rebox-register-template 282 286 '("// ---------"
-                                                                             "// box123456"
-                                                                             "// ---------"))
-                                          (rebox-register-template 283 486 '("// ========="
-                                                                             "// box123456"
-                                                                             "// =========")))
+                                          ;; XXX why are these saying defined twice?
+                                          ;; (rebox-register-template 252 286 '("/* ---------"
+                                          ;;                                    " * box123456"
+                                          ;;                                    " * ---------*/"))
+                                          ;; (rebox-register-template 253 386 '("/* ========="
+                                          ;;                                    " * box123456"
+                                          ;;                                    " * =========*/"))
+                                          ;; (rebox-register-template 254 486 '("/* *********"
+                                          ;;                                    " * box123456"
+                                          ;;                                    " * **********/"))
+                                          ;; (rebox-register-template 281 186 '("//"
+                                          ;;                                    "// box123456"
+                                          ;;                                    "//"))
+                                          ;; (rebox-register-template 282 286 '("// ---------"
+                                          ;;                                    "// box123456"
+                                          ;;                                    "// ---------"))
+                                          ;; (rebox-register-template 283 486 '("// ========="
+                                          ;;                                    "// box123456"
+                                          ;;                                    "// ========="))
+                                          )
 
                                         (spacemacs/set-leader-keys-for-major-mode 'c-mode
                                           "q" 'rebox-dwim)
