@@ -332,10 +332,12 @@ This function should only modify configuration layer settings."
      borland-blue-theme
      cobalt
      color-theme-modern
-     ;; (copilot :location (recipe
-     ;;                     :fetcher github
-     ;;                     :repo "zerolfx/copilot.el"
-     ;;                     :files ("*.el" "dist")))
+
+     (copilot :location (recipe
+                         :fetcher github
+                         :repo "zerolfx/copilot.el"
+                         :files ("*.el" "dist")))
+
      (cov :location (recipe :fetcher github
                             :branch "chopps/add-bg-overlay-tint"
                             :repo "choppsv1/cov"))
@@ -1096,7 +1098,7 @@ Return an event vector."
   ;; Copilot
   ;; -------
 
-  (unless t
+  (unless nil
     ;; accept completion from copilot and fallback to company
     (defun my-copilot-accept-lines ()
       (interactive)
@@ -1112,22 +1114,28 @@ Return an event vector."
       ;; disable inline previews
       ;; (delq 'company-preview-if-just-one-frontend company-frontends)
       ;; enable tab completion
-      (define-key company-mode-map (kbd "<tab>") 'my-copilot-accept-lines)
-      (define-key company-mode-map (kbd "TAB") 'my-copilot-accept-lines)
+
+      ;; (define-key company-mode-map (kbd "<tab>") 'my-copilot-accept-lines)
+      ;; (define-key company-mode-map (kbd "TAB") 'my-copilot-accept-lines)
       (define-key company-mode-map (kbd "C-<tab>") 'my-copilot-accept-word)
       (define-key company-mode-map (kbd "C-TAB") 'my-copilot-accept-word)
-      (define-key company-active-map (kbd "<tab>") 'my-copilot-accept-lines)
-      (define-key company-active-map (kbd "TAB") 'my-copilot-accept-lines)
+
+      ;; (define-key company-active-map (kbd "<tab>") 'my-copilot-accept-lines)
+      ;; (define-key company-active-map (kbd "TAB") 'my-copilot-accept-lines)
+
       (define-key company-active-map (kbd "C-<tab>") 'my-copilot-accept-word)
       (define-key company-active-map (kbd "C-TAB") 'my-copilot-accept-word)
+
       (define-key company-active-map (kbd "M-n") 'copilot-next-completion)
       (define-key company-active-map (kbd "M-p") 'copilot-previous-completion)
       )
 
     (with-eval-after-load 'copilot
       (add-hook 'prog-mode-hook 'copilot-mode)
-      (evil-define-key 'insert copilot-mode-map
-        (kbd "<tab>") #'my/copilot-tab))
+      ;; (evil-define-key 'insert copilot-mode-map
+      ;;   (kbd "<tab>") #'my/copilot-tab)
+      )
+
     ;; (evil-define-key estate evil-org-mode-map "H" nil)
 
     ;; (define-key evil-insert-state-map (kbd "C-<tab>") 'copilot-accept-completion-by-word)
