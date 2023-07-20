@@ -1114,7 +1114,6 @@ Return an event vector."
       ;; disable inline previews
       ;; (delq 'company-preview-if-just-one-frontend company-frontends)
       ;; enable tab completion
-
       ;; (define-key company-mode-map (kbd "<tab>") 'my-copilot-accept-lines)
       ;; (define-key company-mode-map (kbd "TAB") 'my-copilot-accept-lines)
       (define-key company-mode-map (kbd "C-<tab>") 'my-copilot-accept-word)
@@ -1217,8 +1216,9 @@ Return an event vector."
                             (font-lock-string-face :foreground "DarkGrey" :slant italic)
                             (font-lock-comment-delimiter-face :foreground ,comment-delim-color))
           (mandm ;; (font-lock-doc-face :foreground "#036A07" :slant normal)
-           (font-lock-comment-face :foreground "grey60" :slant italic)
-           (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant italic))
+           (font-lock-comment-face :foreground "darkcyan" :slant normal)
+           (font-lock-comment-delimiter-face :foreground "darkcyan" :slant normal))
+           ;; (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant normal))
           ;;  (lsp-face-highlight-read :foreground "#036A08" :slant normal)
           ;;  )
 
