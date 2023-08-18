@@ -113,9 +113,9 @@
      html
      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
      (python :variables
-             python-backend 'anaconda
+             ;; python-backend 'anaconda
              ;; python-lsp-server 'pyright
-             ;; python-lsp-server 'pylsp
+              python-lsp-server 'pylsp
              python-formatter 'black
              python-fill-column 88
              python-tab-width 8
@@ -313,7 +313,7 @@ This function should only modify configuration layer settings."
    dotspacemacs-ask-for-lazy-installation t
 
    ;; List of additional paths where to look for configuration layers.
-   ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
+   ;; Paths must have a trailing slash (i.e. "~/.mycontribs/")
    dotspacemacs-configuration-layer-path '()
 
    dotspacemacs-configuration-layers chopps-layers
@@ -458,7 +458,7 @@ It should only modify the values of Spacemacs settings."
   (set-fontsize)
   (debug-init-message "def height %s" ch-def-height)
 
-  ;; this setq-default sexp is an exhaustive list of all the supported
+  ;; This setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
   (setq-default
    blink-matching-paren 'jump
@@ -610,8 +610,7 @@ It should only modify the values of Spacemacs settings."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(
-                         mandm
+   dotspacemacs-themes '(mandm
                          misterioso
                          borland-blue
                          molokai
@@ -3684,6 +3683,10 @@ given, offer to edit the search query before executing it."
                        ;; (add-hook 'rst-mode-hook 'my-rst-hook)
 
                        ))
+
+    (with-eval-after-load 'paradox
+      (setq paradox-github-token
+            (cadr(auth-source-user-and-password "api.github.com" "a-schaefers^paradox"))))
 
     (when-layer-used 'git
                      (with-eval-after-load 'magit
