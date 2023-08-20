@@ -4274,7 +4274,11 @@ given, offer to edit the search query before executing it."
                              (latex . t)
                              (pic . t)
                              (plantuml . t)
-                             (python . t)
+                             ;; This loads python mode when org mode loads I dont want that.
+                             ;; spacemacs is supposed to add this when python mode loads
+                             ;; but does this work if all we have is python babel blocks
+                             ;; b/c why would it know to load python-mode then?
+                             ;; (python . t)
                              (shell . t)
                              ;; Why did this used to work??
                              ;; (yang . t)
