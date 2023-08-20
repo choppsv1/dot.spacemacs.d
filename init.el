@@ -420,7 +420,8 @@ This function should only modify configuration layer settings."
     (if (string-prefix-p "ja" system-name)
         (progn
           (setq ch-def-font "Iosevka Light")
-          (setq ch-def-height 15.0))
+          ;; (setq ch-def-font "UbuntuMono Nerd Font")
+          (setq ch-def-height 18.0))
       (setq ch-def-font "Iosevka Thin")
       (setq ch-def-height 16.0))
     (debug-init-message "Setting font to %s:%f" ch-def-font ch-def-height))
@@ -4163,6 +4164,8 @@ given, offer to edit the search query before executing it."
                          "* NOTE 50mg Nortriptyline 1x25\nCreated: %U" :immediate-finish t)
                         ("xf" "Food" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE Food\nCreated: %U\nFood:%^{food}" :immediate-finish t)
+                        ("xg" "Glimepiride 1mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 1mg Glimepiride\nCreated: %U" :immediate-finish t)
                         ("xi" "Invokana 300mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 300mg Invokana\nCreated: %U" :immediate-finish t)
                         ("xm" "Metformin 500mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
