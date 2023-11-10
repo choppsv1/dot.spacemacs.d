@@ -2363,7 +2363,7 @@ before packages are loaded."
                                                        ("^\\(Disposition-Notification-To\\|Return-Receipt-To\\):" . message-expand-name))
 
                            ;; -----------
-                           ;; [b]ookmarks
+                           ;; [b]ookmark
                            ;; -----------
 
                            mu4e-inbox-mailbox '("maildir:/labn.net/INBOX"
@@ -2378,7 +2378,9 @@ before packages are loaded."
                                               "maildir:/chopps.org/ietf-wg-ipsec"
                                               "maildir:/chopps.org/ietf-wg-lsr"
                                               "maildir:/chopps.org/ietf-wg-netmod"
-                                              "maildir:/chopps.org/ietf-wg-rtg")
+                                              "maildir:/chopps.org/ietf-wg-rtg"
+                                              "maildir:/chopps.org/linux-ipsec"
+                                              )
 
                            mu4e-junk-mailbox '("maildir:/gmail.com/[Gmail]/Spam"
                                                "maildir:/labn.net/Junk Email"
