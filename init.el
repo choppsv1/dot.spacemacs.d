@@ -1028,7 +1028,11 @@ Return an event vector."
   ;; ---------
   ;; User-init
   ;; ---------
-  (setq-default git-magit-status-fullscreen t)
+  (setq-default git-magit-status-fullscreen t
+                magit-repository-directories '(("/home/chopps/w" . 1)
+                                               ("/home/chopps/w-share" . 1)
+                                               ("/home/chopps/p" . 1)
+                ))
 
   ;; (setq-default cov-coverage-mode t)
   (setq-default gdb-default-window-configuration-file "gdb-window-config")
@@ -3695,6 +3699,12 @@ given, offer to edit the search query before executing it."
                      (with-eval-after-load 'magit
                        ;; (magit-todos-mode 1)
                        ;; (require 'magit-gerrit)
+                       (magit-wip-mode 1)
+
+                       ;; (transient-insert-suffix 'magit-pull "-r" '("-f" "Overwrite local branch" "--force"))
+
+                       (spacemacs/set-leader-keys "gT" 'magit-toggle-buffer-lock)
+
                        (bind-key (kbd "M-RET") 'magit-diff-visit-worktree-file-other-window 'magit-diff-mode-map)
                        (bind-key (kbd "C-j") 'magit-diff-visit-worktree-file 'magit-diff-mode-map)
                        (magit-wip-mode 1)
