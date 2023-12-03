@@ -416,14 +416,8 @@ This function should only modify configuration layer settings."
   (setq ch-def-font "DejaVu Sans Mono")
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
-    (setq ch-def-font "Iosevka Light")
-    (if (string-prefix-p "ja" system-name)
-        (progn
-          (setq ch-def-font "Iosevka Light")
-          ;; (setq ch-def-font "UbuntuMono Nerd Font")
-          (setq ch-def-height 18.0))
-      (setq ch-def-font "Iosevka Thin")
-      (setq ch-def-height 16.0))
+    (setq ch-def-font "Iosevka Thin")
+    (setq ch-def-height 17.0)
     (debug-init-message "Setting font to %s:%f" ch-def-font ch-def-height))
    ((string-equal system-type "gnu/linux")
     (let ((xres (shell-command-to-string "xdpyinfo | sed -e '/dimensions/!d;s/.* \\([0-9]*\\)x[0-9]* .*/\\1/'"))
@@ -1046,7 +1040,6 @@ Return an event vector."
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   ;; (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu-mac/mu4e/")
   (add-to-list 'load-path "/opt/homebrew/share/emacs/site-lisp/mu-mac/mu4e/")
-  (add-to-list 'custom-theme-load-path "~/p/emacs-mandm-theme/")
 
 
   ;; add all non-theme named subdirs of repos to load path
@@ -1610,7 +1603,7 @@ before packages are loaded."
       (setq recentf-exclude (delete (recentf-expand-file-name package-user-dir) recentf-exclude)))
 
     (cond ((string-equal system-type "darwin") (progn (exec-path-from-shell-copy-env "PATH")
-                                                      (if (string-prefix-p "ja" system-name)
+                                                      (if (string-prefix-p "aarch64" system-configuration)
                                                           (setq insert-directory-program "/opt/homebrew/bin/gls")
                                                         (setq insert-directory-program "/usr/local/bin/gls"))
                                                       ;; (setq insert-directory-program "/bin/ls")
@@ -2444,7 +2437,8 @@ before packages are loaded."
                        (progn
                          (debug-init-message "debug-init MU4E setq")
 
-                         (if (string-prefix-p "ja" system-name)
+
+                         (if (string-prefix-p "aarch64" system-configuration)
                              (setq my-msmtp "/opt/homebrew/bin/msmtp")
                            (setq my-msmtp "/usr/local/bin/msmtp"))
 
@@ -4170,12 +4164,6 @@ given, offer to edit the search query before executing it."
                          "* NOTE 2.5mg Compazine\nCreated: %U" :immediate-finish t)
                         ("xC" "Compazine 5mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 5mg Compazine\nCreated: %U" :immediate-finish t)
-                        ("xn" "Nortriptyline 25mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE 25mg Nortriptyline 1x25\nCreated: %U" :immediate-finish t)
-                        ("xN" "Nortriptyline 50mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE 50mg Nortriptyline 1x25\nCreated: %U" :immediate-finish t)
-                        ("xf" "Food" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE Food\nCreated: %U\nFood:%^{food}" :immediate-finish t)
                         ("xg" "Glimepiride 1mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 1mg Glimepiride\nCreated: %U" :immediate-finish t)
                         ("xi" "Invokana 300mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
@@ -4184,6 +4172,8 @@ given, offer to edit the search query before executing it."
                          "* NOTE 1000mg Metformin\nCreated: %U" :immediate-finish t)
                         ("xM" "Metformin 1000mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 1000mg Metformin\nCreated: %U" :immediate-finish t)
+                        ("xo" "Oxycodone 5mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 5mg Oxycodone\nCreated: %U" :immediate-finish t)
                         ("xp" "Prilosec 20mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 20mg Prilosec\nCreated: %U" :immediate-finish t)
                         ("xt" "Tylenol dose 1g" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
