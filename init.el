@@ -359,6 +359,7 @@ This function should only modify configuration layer settings."
      sqlite3
      ;; rfcview
      ;; colorsarenice-light
+     w3m
      )
 
    ;; ;; A list of packages that cannot be updated.
@@ -2380,6 +2381,7 @@ before packages are loaded."
                                               )
 
                            mu4e-junk-mailbox '("maildir:/gmail.com/[Gmail]/Spam"
+                                               "maildir:/gmail.com/[Gmail]/Trash"
                                                "maildir:/labn.net/Junk Email"
                                                "maildir:/us.labn.net/Junk Email"
                                                "maildir:/chopps.org/spam-probable"
@@ -2507,7 +2509,7 @@ before packages are loaded."
                                                  :name "nrl.navy.mil"
                                                  :match-func (lambda (msg)
                                                                (and msg (string-match "/nrl.navy.mil/.*" (mu4e-message-field msg :maildir))))
-                                                 :vars '((user-mail-address  . "christian.hopps.ctr@nrl.navy.mil")
+                                                 :vars `((user-mail-address  . "christian.hopps.ctr@nrl.navy.mil")
                                                          (user-full-name . "Christian Hopps")
                                                          ;; mu4e
                                                          (mu4e-drafts-folder . "/nrl.navy.mil/Drafts")
@@ -2517,7 +2519,7 @@ before packages are loaded."
                                                          ;; smtp
                                                          (message-send-mail-function . message-send-mail-with-sendmail)
 
-                                                         (sendmail-program . 'my-msmtp)
+                                                         (sendmail-program . ,my-msmtp)
                                                          (send-mail-function . 'smtpmail-send-it)
                                                          (message-sendmail-extra-arguments . ("--read-envelope-from"))
 
@@ -3736,38 +3738,44 @@ given, offer to edit the search query before executing it."
        ;;     (python-fill-comment justify)))
 
        (require 'pyfixers)
-       (spacemacs/declare-prefix-for-mode 'python-mode "e" "errors-prefix")
-       ;; (define-key python-mode-map (kbd "C-c M-\\") 'pyfixer:ignore-current-line)
-       ;; SPC m e i[gnore]
-       (spacemacs/set-leader-keys-for-major-mode 'python-mode "ei" 'pyfixer:ignore-current-line)
-       ;; (define-key python-mode-map (kbd "C-c C-\\") 'pyfixer:fix-current-line)
-       ;; SPC m e f[ix]
-       (spacemacs/set-leader-keys-for-major-mode 'python-mode "ef" 'pyfixer:fix-current-line)
-       ;; (define-key python-mode-map (kbd "C-c C-M-\\") 'pyfixer:fix-all-errors)
-       ;; (define-key python-mode-map (kbd "C-c 8") 'pyfixer:fix-all-errors)
-       (spacemacs/set-leader-keys-for-major-mode 'python-mode "eF" 'pyfixer:fix-all-errors)
-       ;; (bind-key "C-c C-h" 'pylookup-lookup python-mode-map)
 
-       (spacemacs/set-leader-keys-for-major-mode 'python-mode "en" 'flycheck-next-error)
-       (spacemacs/set-leader-keys-for-major-mode 'python-mode "ep" 'flycheck-prev-error)
+       ;; START VCOMMENT OUT
 
-       ;;
-       (add-to-list 'python-shell-extra-pythonpaths "/opt/Acton/modules")
+       ;; (spacemacs/declare-prefix-for-mode 'python-mode "e" "errors-prefix")
+       ;; ;; (define-key python-mode-map (kbd "C-c M-\\") 'pyfixer:ignore-current-line)
+       ;; ;; SPC m e i[gnore]
+       ;; (spacemacs/set-leader-keys-for-major-mode 'python-mode "ei" 'pyfixer:ignore-current-line)
+       ;; ;; (define-key python-mode-map (kbd "C-c C-\\") 'pyfixer:fix-current-line)
+       ;; ;; SPC m e f[ix]
+       ;; (spacemacs/set-leader-keys-for-major-mode 'python-mode "ef" 'pyfixer:fix-current-line)
+       ;; ;; (define-key python-mode-map (kbd "C-c C-M-\\") 'pyfixer:fix-all-errors)
+       ;; ;; (define-key python-mode-map (kbd "C-c 8") 'pyfixer:fix-all-errors)
+       ;; (spacemacs/set-leader-keys-for-major-mode 'python-mode "eF" 'pyfixer:fix-all-errors)
+       ;; ;; (bind-key "C-c C-h" 'pylookup-lookup python-mode-map)
 
-       ;; Consider _ a part of words for python
-       (modify-syntax-entry ?_ "w" python-mode-syntax-table)
+       ;; (spacemacs/set-leader-keys-for-major-mode 'python-mode "en" 'flycheck-next-error)
+       ;; (spacemacs/set-leader-keys-for-major-mode 'python-mode "ep" 'flycheck-prev-error)
 
-       (defun python-google-docstring ()
-         "Generate google-style docstring for python."
-         (interactive)
-         (if (region-active-p)
-             (progn
-               (call-process-region (region-beginning) (region-end) "python3" nil t t (concat dotspacemacs-directory "format-g-docs.py"))
-               (message "Docs are generated")
-               (deactivate-mark))
-           (message "No region active; can't generate docs!"))
-         )
-       (spacemacs/set-leader-keys-for-major-mode 'python-mode "oo" 'python-google-docstring)
+       ;; ;;
+       ;; (add-to-list 'python-shell-extra-pythonpaths "/opt/Acton/modules")
+
+       ;; ;; Consider _ a part of words for python
+       ;; (modify-syntax-entry ?_ "w" python-mode-syntax-table)
+
+       ;; (defun python-google-docstring ()
+       ;;   "Generate google-style docstring for python."
+       ;;   (interactive)
+       ;;   (if (region-active-p)
+       ;;       (progn
+       ;;         (call-process-region (region-beginning) (region-end) "python3" nil t t (concat dotspacemacs-directory "format-g-docs.py"))
+       ;;         (message "Docs are generated")
+       ;;         (deactivate-mark))
+       ;;     (message "No region active; can't generate docs!"))
+       ;;   )
+       ;; (spacemacs/set-leader-keys-for-major-mode 'python-mode "oo" 'python-google-docstring)
+       ;; END COMMENT OUT
+
+
 
        ;; (define-key global-map (kbd "C-c o") 'iedit-mode)
 
@@ -4156,10 +4164,10 @@ given, offer to edit the search query before executing it."
                         ;;  "* NOTE %?\n%u\n")
 
                         ("x" "Food/Medication")
-                        ;; ("xa" "Augmentin 875-125" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                        ;;  "* NOTE 875-125 amox/clav\nCreated: %U" :immediate-finish t)
-                        ;; ("xc" "Creon 36K" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                        ;;  "* NOTE 36000 creon\nCreated: %U" :immediate-finish t)
+                        ("xa" "Albuteral 180mcg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 1/2 Sum\nCreated: %U" :immediate-finish t)
+                        ("xA" "Sum" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE Sum\nCreated: %U" :immediate-finish t)
                         ("xc" "Compazine 2.5mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 2.5mg Compazine\nCreated: %U" :immediate-finish t)
                         ("xC" "Compazine 5mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
@@ -4168,8 +4176,8 @@ given, offer to edit the search query before executing it."
                          "* NOTE 1mg Glimepiride\nCreated: %U" :immediate-finish t)
                         ("xi" "Invokana 300mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 300mg Invokana\nCreated: %U" :immediate-finish t)
-                        ("xm" "Metformin 500mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE 1000mg Metformin\nCreated: %U" :immediate-finish t)
+                        ("xm" "Mucinex 600mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 500mg Metformin\nCreated: %U" :immediate-finish t)
                         ("xM" "Metformin 1000mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 1000mg Metformin\nCreated: %U" :immediate-finish t)
                         ("xo" "Oxycodone 5mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
@@ -4184,10 +4192,6 @@ given, offer to edit the search query before executing it."
                          "* NOTE 75mg 1.5x50 Tramadol\nCreated: %U" :immediate-finish t)
                         ("x." "Tramadol 50mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 50mg Tramadol\nCreated: %U" :immediate-finish t)
-                        ;; ("xv" "Vitamin A and D" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                        ;;  "* NOTE 2000-vD/10000-vA\nCreated: %U" :immediate-finish t)
-                        ;; ("xx" "Xifaxan 550mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                        ;;  "* NOTE 50mg xifaxan\nCreated: %U" :immediate-finish t)
 
                         ("g" "Google Calendars")
                         ("gh" "Todo" entry (file ,(concat org-directory "/calendar/goog-home.org"))
