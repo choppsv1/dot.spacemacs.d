@@ -366,17 +366,21 @@
     (insert-file-contents fPath)
     (split-string (buffer-string) "\n" t)))
 
-(eval-after-load "elisp-mode"
-  '(progn
-     (modify-syntax-entry ?_ "w" emacs-lisp-mode-syntax-table)
-     (modify-syntax-entry ?- "w" emacs-lisp-mode-syntax-table)
-     ))
+(defun wrap-region-with-cond (start end condition)
+  "Wrap the selected region with a specified preprocessor conditional."
+  (interactive "r\nsEnter conditional: ")
+  (save-excursion
+    (goto-char end)
+    (end-of-line)
+    (insert "\n#endif\n")
+    (goto-char start)
+    (beginning-of-line)
+    (insert "#if " condition "\n")))
 
-(eval-after-load "lisp-mode"
-  '(progn
-     (modify-syntax-entry ?_ "w" lisp-mode-syntax-table)
-     (modify-syntax-entry ?- "w" lisp-mode-syntax-table)
-     ))
+(defun wrap-region-with-cond-0 (start end)
+  "Wrap the selected region with a specified preprocessor conditional."
+  (interactive "r")
+  (wrap-region-with-cond start end "0"))
 
 (defun _url-open-with-buffer (url)
   "Open a URL into a file buffer"

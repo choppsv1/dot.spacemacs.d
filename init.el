@@ -345,6 +345,7 @@ This function should only modify configuration layer settings."
      exec-path-from-shell
      ;; This is very cool but too expensive for large projects
      olivetti
+     modus-themes
      monky
      nhexl-mode
      nano-theme
@@ -356,6 +357,7 @@ This function should only modify configuration layer settings."
      polymode
      python-docstring
      protobuf-mode
+     rainbow-mode
      sqlite3
      ;; rfcview
      ;; colorsarenice-light
@@ -1557,26 +1559,27 @@ before packages are loaded."
   ;; leuven
 
   ;; Put this back
-  ;; (cond
-  ;;  ((string-equal system-type "darwin") ; Mac OS X
-  ;;   (spacemacs/load-theme 'spacemacs-dark))
-  ;;  ((or (string-prefix-p "dlk" (system-name))
-  ;;       (string-prefix-p "flk" (system-name))
-  ;;       (string-prefix-p "ubb" (system-name))
-  ;;       (string-prefix-p "uff" (system-name))
-  ;;       )
-  ;;   (spacemacs/load-theme 'mandm)
-  ;;   )
-  ;;  ((or (string-prefix-p "cmf-" (system-name))
-  ;;       (string-prefix-p "labnh" (system-name))
-  ;;       (string-prefix-p "rlk" (system-name))
-  ;;       (string-prefix-p "builder" (system-name))
-  ;;       (string-prefix-p "hp13" (system-name))
-  ;;       )
-  ;;   (spacemacs/load-theme 'afternoon))
-  ;;  ((string-equal system-type "gnu/linux")
-  ;;   (spacemacs/load-theme 'sanityinc-tomorrow-blue))
-  ;;  (t (spacemacs/load-theme 'sanityinc-tomorrow-blue)))
+  (cond
+   ((string-equal system-type "darwin") ; Mac OS X
+    (spacemacs/load-theme 'mandm))
+   ((or (string-prefix-p "dlk" (system-name))
+        (string-prefix-p "flk" (system-name))
+        (string-prefix-p "ubb" (system-name))
+        (string-prefix-p "uff" (system-name))
+        )
+    (spacemacs/load-theme 'sanityinc-tomorrow-blue)
+    ;; (spacemacs/load-theme 'mandm)
+    )
+   ((or (string-prefix-p "cmf-" (system-name))
+        (string-prefix-p "labnh" (system-name))
+        (string-prefix-p "rlk" (system-name))
+        (string-prefix-p "builder" (system-name))
+        (string-prefix-p "hp13" (system-name))
+        )
+    (spacemacs/load-theme 'afternoon))
+   ((string-equal system-type "gnu/linux")
+    (spacemacs/load-theme 'sanityinc-tomorrow-blue))
+   (t (spacemacs/load-theme 'sanityinc-tomorrow-blue)))
 
   ;; XXX is this going to make everything fail?
   (defun et/semantic-remove-hooks ()
@@ -3026,7 +3029,9 @@ given, offer to edit the search query before executing it."
                      (with-eval-after-load "lisp-mode"
                        ;; hyphens are words in emacs lisp
                        (modify-syntax-entry ?- "w" lisp-mode-syntax-table)
+                       (modify-syntax-entry ?_ "w" lisp-mode-syntax-table)
                        (modify-syntax-entry ?- "w" emacs-lisp-mode-syntax-table)
+                       (modify-syntax-entry ?_ "w" emacs-lisp-mode-syntax-table)
                        (when-layer-used 'rebox
                                         (defun rebox-lisp-hook ()
                                           (set (make-local-variable 'rebox-style-loop) '(81 82 83)))
@@ -3400,6 +3405,12 @@ given, offer to edit the search query before executing it."
 
                        (defun my-c-mode-hook ()
                          ;;(message "my-c-mode-hook")
+
+                         (spacemacs/set-leader-keys-for-major-mode 'c-mode
+                           "w" 'wrap-region-with-cond-0)
+                         (spacemacs/set-leader-keys-for-major-mode 'c++-mode
+                           "w" 'wrap-region-with-cond-0)
+
                          (c-set-style
                           (cond ((string-match-p "vpp" (buffer-file-name))
                                  "gnu")
