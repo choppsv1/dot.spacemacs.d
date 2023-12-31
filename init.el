@@ -609,20 +609,55 @@ It should only modify the values of Spacemacs settings."
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(mandm
-                         misterioso
-                         borland-blue
+
+                         ;; Dark modes
+                         ef-autumn ;; dark -- good -- warmer
+                         ef-bio ;; dark -- good -- cooler
+                         ef-cherie ;; dark
+                         ef-dark ;; dark -- good
+                         ef-duo-dark
+                         ef-deuteranopia-dark ;; good
+                         ef-elea-dark ;; good
+                         ef-maris-dark
+                         ef-melissa-dark
+                         ef-night
+                         ef-symbiosis
+                         ef-trio-dark
+                         ef-tritanopia-dark
                          molokai
+
+                         ;; Medium modes
+                         borland-blue
+                         doom-material
+                         misterioso
+                         obalt
+                         sanityinc-tomorrow-blue
+
+                         ;; Light modes
+                         ef-cyprus ;; light -- good -- cooler
+                         ef-day ;; light
+                         ef-deuteranopia-light ;; light -- good -- cooler greyish
+                         ef-duo-light ;; light -- good -- warmer with blue
+                         ef-elea-light ;; light -- nah -- cooloer with green bg tint
+                         ef-frost ;; light -- good -- medium blues and purples and greens
+                         ef-light ;; light --
+                         ef-maris-light ;; light --
+                         ef-melissa-light ;; light --
+                         ef-kassio ;; light --
+                         ef-spring ;; light --
+                         ef-summer ;; light --
+                         ef-trio-light ;; light --
+                         ef-tritanopia-light ;; light --
+                         ef-winter ;; light --
+
+                         ;; Light modes
+                         ;; sanityinc-solarized-light
                          doom-acario-light
+                         gruvbox-light-hard
+                         leuven
                          ;; this is nice but unavailable when starting
                          ;; up for some reason
                          ;; jsc-light
-                         ;; cobalt
-                         doom-material
-                         sanityinc-tomorrow-blue
-                         sanityinc-solarized-dark
-                         sanityinc-solarized-light
-                         gruvbox-light-hard
-                         leuven
                          )
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
    ;; `all-the-icons', `custom', `doom', `vim-powerline' and `vanilla'. The
