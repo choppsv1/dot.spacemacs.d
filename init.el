@@ -2652,7 +2652,7 @@ given, offer to edit the search query before executing it."
                          (bind-key (kbd "f") 'mu4e-view-go-to-url 'mu4e-view-mode-map)
 
                          (defun my-mu4e-contact-filter (addr)
-                           (let ((re "\\(no[t]?[-\\.]?repl\\(y\\|ies\\)\\|@dev.terastream.net\\|@nrl.nav.mil\\|@cmf.nrl.navy.mil\\|phoebe.johnson\\|christian.phoebe.hopps\\|phoebe.hopps@helloinnovation.com\\|lberger@fore.com\\)"))
+                           (let ((re "\\(no[t]?[-\\.]?repl\\(y\\|ies\\)\\|@nrl.navy.mill\\|@dev.terastream.net\\|@nrl.nav.mil\\|@cmf.nrl.navy.mil\\|phoebe.johnson\\|christian.phoebe.hopps\\|phoebe.hopps@helloinnovation.com\\|lberger@fore.com\\)"))
                              (unless (string-match-p re addr) addr)))
                          (setq mu4e-contact-process-function 'my-mu4e-contact-filter)
 
@@ -4212,7 +4212,7 @@ given, offer to edit the search query before executing it."
 
                         ("x" "Food/Medication")
                         ("xa" "Albuteral 180mcg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE 1/2 Sum\nCreated: %U" :immediate-finish t)
+                         "* NOTE Albuteral 180mcg\nCreated: %U" :immediate-finish t)
                         ("xA" "Sum" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE Sum\nCreated: %U" :immediate-finish t)
                         ("xc" "Compazine 2.5mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
@@ -4233,8 +4233,8 @@ given, offer to edit the search query before executing it."
                          "* NOTE 5mg Oxycodone\nCreated: %U" :immediate-finish t)
                         ("xp" "Prilosec 20mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 20mg Prilosec\nCreated: %U" :immediate-finish t)
-                        ("xt" "Tylenol dose 1g" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE 1g Tylenol\nCreated: %U" :immediate-finish t)
+                        ("xt" "Tylenol dose 650mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 650mg Tylenol\nCreated: %U" :immediate-finish t)
                         ("x1" "Tramadol 100mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 100mg 2x50 Tramadol\nCreated: %U" :immediate-finish t)
                         ("x/" "Tramadol 75mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
