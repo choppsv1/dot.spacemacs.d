@@ -28,7 +28,8 @@
    '(
      ;; Choose either ivy or helm as completion framework
      ;; ivy
-     helm
+     (helm :variables
+           helm-move-to-line-cycle-in-source nil)
 
      better-defaults
      ;; (git :variables
@@ -1136,9 +1137,9 @@ Return an event vector."
 
   (unless nil
     ;; accept completion from copilot and fallback to company
-    (defun my-copilot-accept-lines ()
+    (defun my-copilot-accept-line ()
       (interactive)
-      (or (copilot-accept-completion)
+      (or (copilot-accept-completion-by-line 1)
           (company-indent-or-complete-common nil)))
 
     (defun my-copilot-accept-word ()
@@ -1152,14 +1153,14 @@ Return an event vector."
       ;; enable tab completion
       ;; (define-key company-mode-map (kbd "<tab>") 'my-copilot-accept-lines)
       ;; (define-key company-mode-map (kbd "TAB") 'my-copilot-accept-lines)
-      (define-key company-mode-map (kbd "C-<tab>") 'my-copilot-accept-word)
-      (define-key company-mode-map (kbd "C-TAB") 'my-copilot-accept-word)
+      (define-key company-mode-map (kbd "C-<tab>") 'my-copilot-accept-line)
+      (define-key company-mode-map (kbd "C-TAB") 'my-copilot-accept-line)
 
       ;; (define-key company-active-map (kbd "<tab>") 'my-copilot-accept-lines)
       ;; (define-key company-active-map (kbd "TAB") 'my-copilot-accept-lines)
 
-      (define-key company-active-map (kbd "C-<tab>") 'my-copilot-accept-word)
-      (define-key company-active-map (kbd "C-TAB") 'my-copilot-accept-word)
+      (define-key company-active-map (kbd "C-M-<tab>") 'my-copilot-accept-word)
+      (define-key company-active-map (kbd "C-M-TAB") 'my-copilot-accept-word)
 
       (define-key company-active-map (kbd "M-n") 'copilot-next-completion)
       (define-key company-active-map (kbd "M-p") 'copilot-previous-completion)
@@ -1451,24 +1452,6 @@ Return an event vector."
                 ;;   ;; (setq-default interprogram-paste-function #'remote-gui-selection-value)
                 ;;   )
 
-                ;; (defun yank-from-ssh ()
-                ;;   (interactive)
-                ;;   (let ((interprogram-paste-function #'remote-gui-selection-value))
-                ;;     (if (bound-and-true-p rebox-mode)
-                ;;         (rebox-yank)
-                ;;       (yank))))
-                ;; ;; Note used anymore
-                ;; ;; (defun yank-from-ssh ()
-                ;; ;;   (interactive)
-                ;; ;;   (kill-new (remote-gui-selection-value))
-                ;; ;;   (yank))
-                ;; ;; (evil-global-set-key 'insert (kbd "C-y") 'yank-from-ssh)
-                ;; (global-set-key (kbd "C-S-y") 'yank-from-ssh)
-
-
-                ;; Commented out a while ago
-                ;; (global-set-key (kbd "M-Y") 'yank-from-ssh)
-                ;; (global-set-key (kbd "M-Q") 'rebox-dwim)
                 (defun activate-iterm ()
                   (interactive)
                   (do-applescript "tell application \"iTerm\" to activate"))
@@ -1513,16 +1496,15 @@ Return an event vector."
   ;;            (configuration-layer/layer-usedp 'gtags))
   ;;            (configuration-layer/layer-usedp 'gtags))
 
-  ;; (spacemacs|use-package-add-hook rebox2
-  ;;   :post-init
-  ;;   (progn
-  ;;     (setq rebox-style-loop '(81 82 83))
-  ;;     ;; (setq rebox-style-loop '(71 72 73 74 75 76 77 81 82 83 84 85 86 87))
-  ;;     ;; C-mode comments
-  ;;     ;; (setq-default '(241 235 245))
-  ;;     (add-hook 'all-prog-mode-hook 'rebox-mode)
-  ;;     )
-  ;;   )
+  (spacemacs|use-package-add-hook rebox2
+    :post-init
+    (progn
+      (setq rebox-style-loop '(81 82 83))
+      ;; (setq rebox-style-loop '(71 72 73 74 75 76 77 81 82 83 84 85 86 87))
+      ;; C-mode comments
+      ;; (setq-default '(241 235 245))
+      )
+    )
 
   (debug-init-message "USER-INIT: End"))
 
@@ -1751,6 +1733,8 @@ before packages are loaded."
     (setq
      spacemacs--hjkl-completion-navigation-functions nil
      browse-url-new-window-flag nil
+     browse-url-browser-function #'browse-url-generic
+     browse-url-generic-program "openurl.sh"
      tab-always-indent t
      case-fold-search nil
      )
@@ -3106,10 +3090,8 @@ given, offer to edit the search query before executing it."
 
 
     (when-layer-used 'yaml
-                     (add-hook 'yaml-mode-hook (function (lambda ()
-                                                           (when-layer-used 'rebox
-                                                                            (rebox-mode))
-                                                           (flyspell-prog-mode)))))
+                     (add-hook 'yaml-mode-hook
+                               (function (lambda () (flyspell-prog-mode)))))
 
     (when-layer-used 'c-c++
                      (let ((binpath))
@@ -3763,103 +3745,31 @@ given, offer to edit the search query before executing it."
     ;; python
     (when-layer-used
      'python
-     ;; (when-layer-used
-     ;;  'lsp
-     ;;  ;; (setq-default)
-     ;;  )
+
      (with-eval-after-load 'python
        (autoload 'pycoverage-mode "pycoverage" "python coverage mode" t)
-
-       ;; This actually sits right ahead of the hook we set in config, pre-python-eval
-       ;; (defun my-post-eval-python-mode-hook ()
-       ;;   (message "XXX after eval python mode hook"))
-       ;; (add-hook 'python-mode-hook 'my-post-eval-python-mode-hook)
-       ;; (message "post eval python mode stage: current python mode hook %s" python-mode-hook)
-
-
-       ;; (setq python-fill-docstring-style 'symmetric
-       ;;       python-fill-string-function 'my-python-fill-string-function)
-
-       ;; (defun my-python-fill-comment-function (&optional justify)
-       ;;   (let ((fill-column 80))
-       ;;     (python-fill-comment justify)))
-
        (require 'pyfixers)
 
-       ;; START VCOMMENT OUT
+       (spacemacs/declare-prefix-for-mode 'python-mode "e" "errors-prefix")
+       ;; (define-key python-mode-map (kbd "C-c M-\\") 'pyfixer:ignore-current-line)
+       ;; SPC m e i[gnore]
+       (spacemacs/set-leader-keys-for-major-mode 'python-mode "ei" 'pyfixer:ignore-current-line)
+       ;; (define-key python-mode-map (kbd "C-c C-\\") 'pyfixer:fix-current-line)
+       ;; SPC m e f[ix]
+       (spacemacs/set-leader-keys-for-major-mode 'python-mode "ef" 'pyfixer:fix-current-line)
+       ;; (define-key python-mode-map (kbd "C-c C-M-\\") 'pyfixer:fix-all-errors)
+       ;; (define-key python-mode-map (kbd "C-c 8") 'pyfixer:fix-all-errors)
+       (spacemacs/set-leader-keys-for-major-mode 'python-mode "eF" 'pyfixer:fix-all-errors)
+       ;; (bind-key "C-c C-h" 'pylookup-lookup python-mode-map)
 
-       ;; (spacemacs/declare-prefix-for-mode 'python-mode "e" "errors-prefix")
-       ;; ;; (define-key python-mode-map (kbd "C-c M-\\") 'pyfixer:ignore-current-line)
-       ;; ;; SPC m e i[gnore]
-       ;; (spacemacs/set-leader-keys-for-major-mode 'python-mode "ei" 'pyfixer:ignore-current-line)
-       ;; ;; (define-key python-mode-map (kbd "C-c C-\\") 'pyfixer:fix-current-line)
-       ;; ;; SPC m e f[ix]
-       ;; (spacemacs/set-leader-keys-for-major-mode 'python-mode "ef" 'pyfixer:fix-current-line)
-       ;; ;; (define-key python-mode-map (kbd "C-c C-M-\\") 'pyfixer:fix-all-errors)
-       ;; ;; (define-key python-mode-map (kbd "C-c 8") 'pyfixer:fix-all-errors)
-       ;; (spacemacs/set-leader-keys-for-major-mode 'python-mode "eF" 'pyfixer:fix-all-errors)
-       ;; ;; (bind-key "C-c C-h" 'pylookup-lookup python-mode-map)
-
-       ;; (spacemacs/set-leader-keys-for-major-mode 'python-mode "en" 'flycheck-next-error)
-       ;; (spacemacs/set-leader-keys-for-major-mode 'python-mode "ep" 'flycheck-prev-error)
-
-       ;; ;;
        ;; (add-to-list 'python-shell-extra-pythonpaths "/opt/Acton/modules")
 
-       ;; ;; Consider _ a part of words for python
-       ;; (modify-syntax-entry ?_ "w" python-mode-syntax-table)
+       ;; Consider _ a part of words for python
+       (modify-syntax-entry ?_ "w" python-mode-syntax-table)
 
-       ;; (defun python-google-docstring ()
-       ;;   "Generate google-style docstring for python."
-       ;;   (interactive)
-       ;;   (if (region-active-p)
-       ;;       (progn
-       ;;         (call-process-region (region-beginning) (region-end) "python3" nil t t (concat dotspacemacs-directory "format-g-docs.py"))
-       ;;         (message "Docs are generated")
-       ;;         (deactivate-mark))
-       ;;     (message "No region active; can't generate docs!"))
-       ;;   )
-       ;; (spacemacs/set-leader-keys-for-major-mode 'python-mode "oo" 'python-google-docstring)
-       ;; END COMMENT OUT
-
-
-
-       ;; (define-key global-map (kbd "C-c o") 'iedit-mode)
 
        ;; (if (file-exists-p "/usr/local/bin/python"  )
        ;; (setenv "PYMACS_PYTHON" "/usr/local/bin/python"))
-
-       ;; XXX Hack to get rid of warning, need to fix this differently.
-       ;; (setq python-shell-completion-native-enable nil)
-
-       ;; (defun python-sort-import-list ()
-       ;;   "Split an single import lines with multiple module imports into separate lines sort results"
-       ;;   (interactive)
-       ;;   (if (not (use-region-p))
-       ;;       (error "No region defined"))
-       ;;   (let* ((start (region-beginning))
-       ;;          (end (region-end))
-       ;;          (value 0)
-       ;;          found)
-       ;;     (save-excursion
-       ;;       (let* (modlist impstart impend bigstr)
-       ;;         (setq modlist '())
-       ;;         (goto-char start)
-       ;;         (when (re-search-forward "^import \\([[:alnum:]_,\\. ]+\\)$" end t)
-       ;;           (setq impstart (match-beginning 0))
-       ;;           (setq impend (match-end 0))
-       ;;           (setq modlist (append modlist (mapcar 's-trim (s-split "," (match-string 1)))))
-       ;;           (while (setq found (re-search-forward "^import \\([[:alnum:]_,\\. ]+\\)$" end t))
-       ;;             (setq impend (match-end 0))
-       ;;             (setq modlist (append modlist (mapcar 's-trim (s-split "," (match-string 1))))))
-       ;;           (setq modlist (sort modlist 's-less?))
-       ;;           (setq modlist (mapcar (lambda (x) (concat "import " x)) modlist))
-       ;;           (setq bigstr (s-join "\n" modlist))
-       ;;           (save-restriction
-       ;;             (narrow-to-region impstart impend)
-       ;;             (delete-region impstart impend)
-       ;;             (goto-char impstart)
-       ;;             (insert bigstr)))))))
 
        (defun rst-python-statement-is-docstring (begin)
          "Return true if beginning of statiment is :begin"
@@ -3890,41 +3800,6 @@ given, offer to edit the search query before executing it."
        ;;     :delimiter-mode nil)))
        ;; (mmm-add-mode-ext-class 'python-mode nil 'rst-python-docstrings)
 
-       ;; ;;; XXX restore? XXX
-       ;; (defun my-python-before-save-hook ()
-       ;;   (if (bound-and-true-p blacken-mode)
-       ;;       (py-isort-before-save)))
-
-       ;; (defun my-python-mode-hook ()
-       ;;   (setq comment-column 60)
-       ;;   (python-docstring-mode 1)
-       ;;   ;; Check to see if there's a pylint in the project directory maybe?
-       ;;   (message "XXX checker set")
-       ;;   ;; flake8 will chain in pylint
-       ;;   (add-hook 'before-save-hook 'my-python-before-save-hook)
-       ;;   (flycheck-select-checker 'python-pylint)
-       ;;   ;; (flycheck-select-checker 'python-flake8)
-       ;;   (semantic-mode -1)
-
-       ;;   ;; flycheck-checker-error-threshold 900
-       ;;   ;; flycheck-pylintrc "~/.pylintrc")))
-
-       ;;   ;;   ;; This gives and error
-       ;;   ;;   ;; (message "select checker")
-       ;;   ;;   ;; This is required b/c for some reason it's still not loaded at this point.
-       ;;   ;;   ;; (require 'flycheck)
-
-       ;;   ;;   ;; not needed now that we chain
-       ;;   ;;   ;; (flycheck-select-checker 'python-pycheckers)
-       ;;   ;;   ;; (message "post select checker")
-
-       ;;   ;;   ;; (flycheck-set-checker-executable 'python-flake8 "~/bin/pycheckers.sh")
-       ;;   ;;   ;; (message "select set exec")
-       ;;   ;;   ;; (add-to-list 'compilation-error-regexp-alist '("\\(.*\\):[CEFRW][0-9]+: ?\\([0-9]+\\),[0-9]+: .*" 1 2))
-       ;;   )
-
-       ;; (add-hook 'python-mode-hook 'my-python-mode-hook)
-
        ;; (require 'nadvice)
        (defun my-save-kill-ring (fun &rest _args)
          (let ((kill-ring nil))
@@ -3932,7 +3807,6 @@ given, offer to edit the search query before executing it."
        (advice-add 'yapffy-region :around 'my-save-kill-ring)
 
        )
-
      )
 
     ;; remove when added to spacemacs--indent-variable-alist
