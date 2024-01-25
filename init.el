@@ -1029,9 +1029,9 @@ Return an event vector."
                   ("\e\[%d;8u" control meta shift)))
           (setq c (1+ c))))))
 
-                                        ; (unless (display-graphic-p)
-                                        ;  (add-hook 'after-make-frame-functions 'enable-CSI-u)
-                                        ;  (enable-CSI-u))
+  (unless (display-graphic-p)
+    (add-hook 'after-make-frame-functions 'enable-CSI-u)
+    (enable-CSI-u))
 
   (setq exec-path-from-shell-check-startup-files nil)
   ;; literally wrong to use loopback here
@@ -4102,7 +4102,7 @@ given, offer to edit the search query before executing it."
                         ("xm" "Mucinex 600mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 500mg Metformin\nCreated: %U" :immediate-finish t)
                         ("xM" "Morning Pills" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE Invokana,Glimepiride,Mucinex,Prilosec,Tylenol,Florastor,V-Multi,V-D,Zinc\nCreated: %U" :immediate-finish t)
+                         "* NOTE Invokana,Glimepiride,Prilosec,Florastor,V-Multi,V-D,Zinc\nCreated: %U" :immediate-finish t)
                         ("xn" "Nicoderm" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE Nicoderm\nCreated: %U" :immediate-finish t)
                         ("xN" "Night Pills" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
