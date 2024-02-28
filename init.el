@@ -1265,6 +1265,8 @@ Return an event vector."
            (font-lock-doc-face :foreground "#036A07" :slant italic)
            (font-lock-comment-face :foreground "#6D6D64" :slant italic)
            (font-lock-comment-delimiter-face :foreground "#BDBDA4"))
+          (sanityinc-tomorrow-blue
+           (highlight :background "#00346e"))
           (solarized-light
            (font-lock-doc-face :foreground "#036A07" :slant italic)
            (font-lock-comment-face :foreground "#6D6D64" :slant italic)
@@ -3415,11 +3417,11 @@ given, offer to edit the search query before executing it."
                            (* (max steps 1)
                               c-basic-offset)))
 
-                       (c-add-style "linux-kernel"
-                                    '("linux" (c-offsets-alist
-                                               (arglist-cont-nonempty
-                                                c-lineup-gcc-asm-reg
-                                                c-lineup-arglist-tabs-only))))
+                       (c-add-style
+                        "linux-kernel"
+                        '("linux"
+                          (c-offsets-alist . ((inextern-lang . 0)))))
+                                                                                 ;; (arglist-cont-nonempty c-lineup-gcc-asm-reg c-lineup-arglist-tabs-only))))
 
                        (defun my-c-mode-hook ()
                          ;;(message "my-c-mode-hook")
@@ -3434,10 +3436,10 @@ given, offer to edit the search query before executing it."
                                  "gnu")
                                 ((string-match-p "linux" (buffer-file-name))
                                  (setq indent-tabs-mode t)
-                                 "linux")
+                                 "linux-kernel")
                                 ((string-match-p "frr" (buffer-file-name))
                                  (setq indent-tabs-mode t)
-                                 "linux")
+                                 "linux-kernel")
                                 ("KNF")))
                          ;; (c-toggle-auto-hungry-state 1)
                          ;; (setq c-electric-flag nil)
@@ -3560,6 +3562,7 @@ given, offer to edit the search query before executing it."
                                         ; above is ansi        (func-decl-cont        . 0)
                                               (knr-argdecl-intro     . 0)
                                               (knr-argdecl           . 0)
+                                              (inextern-lang         . 0)
                                               (topmost-intro         . 0)
                                               (topmost-intro-cont    . 0)
                                               (block-open            . 0)
@@ -3626,6 +3629,7 @@ given, offer to edit the search query before executing it."
                                               (brace-list-close      . 0)
                                               (brace-list-intro      . +)
                                               (brace-list-entry      . 0)
+                                              (inextern-lang         . 0)
                                               (statement             . 0)
                                               (statement-cont        . c-lineup-math)
                                               (statement-block-intro . +)
