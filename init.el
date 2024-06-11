@@ -68,6 +68,7 @@
                       auto-completion-enable-help-tooltip nil
                       auto-completion-complete-with-key-sequence nil
                       auto-completion-private-snippets-directory "~/.spacemacs.d/snippets/"
+                      auto-completion-return-key-behavior nil
                       auto-completion-tab-key-behavior 'complete)
      colors
      (org :variables
@@ -178,8 +179,12 @@
      ;; Language Meta-Layers
      (lsp :variables
           ;; lsp-diagnostics-provider :none
+          lsp-lens-enable nil
+          lsp-rust-analyzer-server-display-inlay-hints t
           lsp-rust-server 'rust-analyzer
-          lsp-lens-enable nil)
+          lsp-ui-doc-enable nil
+          lsp-ui-sideline-code-actions-prefix " "
+          lsp-ui-sideline-show-hover nil)
 
      ;; Languages
      (c-c++ :variables
