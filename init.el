@@ -265,8 +265,8 @@
    ;; this when we are doing development on the mac.
 
    ;; all dev-lite are linux
-   chopps-dev-lite-systems '("dlk" "jaja" "labnh" "lake" "flk" "ubb" "uff")
-   chopps-dev-lite-systems '("dlk" "jaja" "labnh" "lake" "flk" "ubb" "uff" "sal")
+   ;; chopps-dev-lite-systems '("dlk" "jaja" "labnh" "lake" "flk" "ubb" "uff")
+   chopps-dev-lite-systems '("dlk" "ja.int.chopps.org" "jaja" "labnh" "lake" "flk" "ubb" "uff" "sal")
    ;; These systems get full development packages -- the slowest load
    chopps-dev-systems '("cmf-xe-1" "morn1" "tops" "hp13" "rlk" "dak"))
 
@@ -1741,7 +1741,7 @@ before packages are loaded."
      spacemacs--hjkl-completion-navigation-functions nil
      browse-url-new-window-flag nil
      browse-url-browser-function #'browse-url-generic
-     browse-url-generic-program "openurl.sh"
+     browse-url-generic-program "openurl-chrome.sh"
      tab-always-indent t
      case-fold-search nil
      )
@@ -3945,9 +3945,9 @@ given, offer to edit the search query before executing it."
                                ))
                          (warn "Clock not started (Could not find heading '%s' in '%s')" heading labn-365-dir)))
                      (defun clock-in-busdev () "Clock-IN BusDev" (interactive) (my/start-heading-clock "BusDev"))
-                     (defun clock-in-tfs () "Clock-IN TFS" (interactive) (my/start-heading-clock "TFS DO7.002"))
-                     (defun clock-in-caas () "Clock-IN CAS" (interactive) (my/start-heading-clock "CAAS DO9.002"))
-                     (defun clock-out-save () "Clock-Out Save" (interactive) (my/stop-clock-save-file-with-heading "TFS DO7.002"))
+                     (defun clock-in-tfs () "Clock-IN TFS" (interactive) (my/start-heading-clock "TFS DO7.012"))
+                     (defun clock-in-caas () "Clock-IN CAS" (interactive) (my/start-heading-clock "CAAS DO7.016"))
+                     (defun clock-out-save () "Clock-Out Save" (interactive) (my/stop-clock-save-file-with-heading "TFS DO7.012"))
                      (spacemacs/set-leader-keys "oib" 'clock-in-busdev)
                      (spacemacs/set-leader-keys "oic" 'clock-in-caas)
                      (spacemacs/set-leader-keys "oim" 'clock-in-tfs)
@@ -4098,32 +4098,34 @@ given, offer to edit the search query before executing it."
                          "* NOTE Albuteral 180mcg\nCreated: %U" :immediate-finish t)
                         ("xA" "Sum" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE Sum\nCreated: %U" :immediate-finish t)
+                        ("xb" "Vitamin B12" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 2500mcg Vitamin B12\nCreated: %U" :immediate-finish t)
                         ("xc" "Compazine 2.5mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 2.5mg Compazine\nCreated: %U" :immediate-finish t)
                         ("xC" "Compazine 5mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 5mg Compazine\nCreated: %U" :immediate-finish t)
-                        ("xf" "Florastor" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE Florastor\nCreated: %U" :immediate-finish t)
-                        ("xg" "Glimepiride 1mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE 1mg Glimepiride\nCreated: %U" :immediate-finish t)
+                        ("xd" "Vitamin D 50k" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 50ku Vitamin D\nCreated: %U" :immediate-finish t)
+                        ("xD" "Vitamin D 50k" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 50ku Vitamin D\nCreated: %U" :immediate-finish t)
+                        ("xg" "Glimepiride 4mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 4mg Glimepiride\nCreated: %U" :immediate-finish t)
                         ("xi" "Invokana 300mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 300mg Invokana\nCreated: %U" :immediate-finish t)
-                        ("xm" "Mucinex 600mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE 500mg Metformin\nCreated: %U" :immediate-finish t)
+                        ("xm" "Metformin 1500mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 1500mg Metformin\nCreated: %U" :immediate-finish t)
                         ("xM" "Morning Pills" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE Invokana,Glimepiride,Prilosec\nCreated: %U" :immediate-finish t)
+                         "* NOTE 300mg Invokana,4mg Glimepiride,40mg Protonix\nCreated: %U" :immediate-finish t)
                         ("xn" "Nicoderm" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE Nicoderm\nCreated: %U" :immediate-finish t)
-                        ("xN" "Night Pills" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE Mucinex,Tylenol\nCreated: %U" :immediate-finish t)
-                        ("xo" "Oxycodone 5mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE 5mg Oxycodone\nCreated: %U" :immediate-finish t)
-                        ("xp" "Prilosec 20mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE 20mg Prilosec\nCreated: %U" :immediate-finish t)
-                        ("xt" "Tylenol dose 650mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                        ("xo" "Oxycodone 2.5mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 2.5mg Oxycodone\nCreated: %U" :immediate-finish t)
+                        ("xp" "Protonix 40mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 40mg Protonix\nCreated: %U" :immediate-finish t)
+                        ("xt" "Tylenol dose 325" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 325mg Tylenol\nCreated: %U" :immediate-finish t)
+                        ("xT" "Tylenol dose 650" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 650mg Tylenol\nCreated: %U" :immediate-finish t)
-                        ("xv" "Vitamins" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE V-Multi,V-D,Zinc\nCreated: %U" :immediate-finish t)
                         ("x1" "Tramadol 100mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 100mg 2x50 Tramadol\nCreated: %U" :immediate-finish t)
                         ("x/" "Tramadol 75mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
