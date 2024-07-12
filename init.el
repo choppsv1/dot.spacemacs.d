@@ -266,7 +266,7 @@
 
    ;; all dev-lite are linux
    ;; chopps-dev-lite-systems '("dlk" "jaja" "labnh" "lake" "flk" "ubb" "uff")
-   chopps-dev-lite-systems '("dlk" "ja.int.chopps.org" "jaja" "labnh" "lake" "flk" "ubb" "uff" "sal")
+   chopps-dev-lite-systems '("dlk" "ja.int.chopps.org" "jaja" "labnh" "lake" "flk" "ubb" "uff" "sal" "varm")
    ;; These systems get full development packages -- the slowest load
    chopps-dev-systems '("cmf-xe-1" "morn1" "tops" "hp13" "rlk" "dak"))
 
@@ -1000,7 +1000,9 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
   (defun enable-CSI-u ()
     ;; Take advantage of iterm2's CSI u support (https://gitlab.com/gnachman/iterm2/-/issues/8382).
 
-    (xterm--init-modify-other-keys)
+    
+    (if (boundp 'xterm--init-modify-other-keys)
+     (xterm--init-modify-other-keys))
 
     ;; Courtesy https://emacs.stackexchange.com/a/13957, modified per
     ;; https://gitlab.com/gnachman/iterm2/-/issues/8382#note_365264207
