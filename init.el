@@ -4124,6 +4124,8 @@ given, offer to edit the search query before executing it."
                          "* NOTE 2.5mg Oxycodone\nCreated: %U" :immediate-finish t)
                         ("xp" "Protonix 40mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 40mg Protonix\nCreated: %U" :immediate-finish t)
+                        ("xs" "Sucralfate 500mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 500mg Sucralfate\nCreated: %U" :immediate-finish t)
                         ("xt" "Tylenol dose 325" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 325mg Tylenol\nCreated: %U" :immediate-finish t)
                         ("xT" "Tylenol dose 650" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
