@@ -117,7 +117,7 @@
      (python :variables
              ;; python-backend 'anaconda
              ;; python-lsp-server 'pyright
-              python-lsp-server 'pylsp
+             python-lsp-server 'pylsp
              python-formatter 'black
              python-fill-column 88
              python-tab-width 8
@@ -160,7 +160,22 @@
              lsp-pylsp-plugins-yapf-enabled nil
              )
      (rust :variables
-           rust-format-on-save t)
+           rust-format-on-save t
+
+           lsp-rust-server 'rust-analyzer
+           lsp-rust-analyzer-server-display-inlay-hints nil
+           lsp-rust-analyzer-cargo-watch-command "clippy"
+
+           ;; ;; enable / disable the hints as you prefer:
+           ;; ;; These are optional configurations. See https://emacs-lsp.github.io/lsp-mode/page/lsp-rust-analyzer/#lsp-rust-analyzer-display-chaining-hints for a full list
+           ;; lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial"
+           ;; lsp-rust-analyzer-display-chaining-hints t
+           ;; lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names nil
+           ;; lsp-rust-analyzer-display-closure-return-type-hints t
+           ;; lsp-rust-analyzer-display-parameter-hints nil
+           ;; lsp-rust-analyzer-display-reborrow-hints nil
+
+           )
      (spell-checking :variables enable-flyspell-auto-completion nil)
      (syntax-checking :variables syntax-checking-enable-tooltips t)
      (version-control :variables
@@ -179,12 +194,28 @@
      ;; Language Meta-Layers
      (lsp :variables
           ;; lsp-diagnostics-provider :none
+
           lsp-lens-enable nil
-          lsp-rust-analyzer-server-display-inlay-hints t
-          lsp-rust-server 'rust-analyzer
+          ;; lsp-signature-auto-activate
+
+          lsp-eldoc-render-all t
+          lsp-idle-delay 0.6
+
+          lsp-inlay-hint-enable nil
+
+          lsp-enable-indentation nil
+          lsp-enable-file-watchers t
+          lsp-file-watch-threshold 20000
+
           lsp-ui-doc-enable nil
+          lsp-ui-peek-always-show t
+          lsp-ui-peek-list-width 50
+          lsp-ui-peek-peek-height 40
           lsp-ui-sideline-code-actions-prefix " "
-          lsp-ui-sideline-show-hover nil)
+          lsp-ui-sideline-show-hover nil
+          ;; lsp-ui-sideline-show-code-actions t
+          ;; lsp-ui-sideline-show-diagnostics t
+          )
 
      ;; Languages
      (c-c++ :variables
@@ -398,11 +429,11 @@ This function should only modify configuration layer settings."
      ;; savehist
 
      ;; HATE PURPOSE MODE
-     eyebrowse
-     helm-purpose
-     ivy-purpose
-     window-purpose
-     spacemacs-purpose-popwin
+     ;; eyebrowse
+     ;; helm-purpose
+     ;; ivy-purpose
+     ;; window-purpose
+     ;; spacemacs-purpose-popwin
 
      ) ; evil-org
    ;; Defines the behaviour of Spacemacs when installing packages.
@@ -673,7 +704,7 @@ It should only modify the values of Spacemacs settings."
    ;; refer to the DOCUMENTATION.org for more info on how to create your own
    ;; spaceline theme. Value can be a symbol or list with additional properties.
    ;; (default '(spacemacs :separator wave :separator-scale 1.5))
-   dotspacemacs-mode-line-theme '(vim-powerline :separator wave :separator-scale 1.5)
+   dotspacemacs-mode-line-theme '(spacemacs :separator wave :separator-scale 1.5)
 
    ;; If non-nil the cursor color matches the state color in GUI Emacs.
    ;; (default t)
@@ -763,6 +794,10 @@ It should only modify the values of Spacemacs settings."
    ;; Which-key frame position. Possible values are `right', `bottom' and
    ;; `right-then-bottom'. right-then-bottom tries to display the frame to the
    ;; right; if there is insufficient space it displays it at the bottom.
+   ;; It is also possible to use a posframe with the following cons cell
+   ;; `(posframe . position)' where position can be one of `center',
+   ;; `top-center', `bottom-center', `top-left-corner', `top-right-corner',
+   ;; `top-right-corner', `bottom-left-corner' or `bottom-right-corner'
    ;; (default 'bottom)
    dotspacemacs-which-key-position 'bottom
 
@@ -872,7 +907,7 @@ It should only modify the values of Spacemacs settings."
    ;; Select a scope to highlight delimiters. Possible values are `any',
    ;; `current', `all' or `nil'. Default is `all' (highlight any scope and
    ;; emphasis the current one). (default 'all)
-   dotspacemacs-highlight-delimiters nil
+   dotspacemacs-highlight-delimiters 'all
 
    ;; If non-nil, start an Emacs server if one is not already running.
    ;; (default nil)
@@ -1000,9 +1035,9 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
   (defun enable-CSI-u ()
     ;; Take advantage of iterm2's CSI u support (https://gitlab.com/gnachman/iterm2/-/issues/8382).
 
-    
+
     (if (boundp 'xterm--init-modify-other-keys)
-     (xterm--init-modify-other-keys))
+        (xterm--init-modify-other-keys))
 
     ;; Courtesy https://emacs.stackexchange.com/a/13957, modified per
     ;; https://gitlab.com/gnachman/iterm2/-/issues/8382#note_365264207
@@ -1035,10 +1070,6 @@ Return an event vector."
                   ("\e\[%d;7u" control meta)
                   ("\e\[%d;8u" control meta shift)))
           (setq c (1+ c))))))
-
-  (unless (display-graphic-p)
-    (add-hook 'after-make-frame-functions 'enable-CSI-u)
-    (enable-CSI-u))
 
   (setq exec-path-from-shell-check-startup-files nil)
   ;; literally wrong to use loopback here
@@ -1073,16 +1104,16 @@ Return an event vector."
                 magit-repository-directories '(("/home/chopps/w" . 1)
                                                ("/home/chopps/w-share" . 1)
                                                ("/home/chopps/p" . 1)
-                ))
+                                               ))
 
   ;; (setq-default cov-coverage-mode t)
   (setq-default gdb-default-window-configuration-file "gdb-window-config")
   (setq-default gdb-window-configuration-directory "~/.spacemacs.d/")
 
-;;  (cond ((string-equal system-type "darwin")
-;;         (setq epg-gpg-program "/usr/local/MacGPG2/bin/gpg2"))
-;;        (t
-;;         (setq epg-gpg-program "/usr/bin/gpg")))
+  ;;  (cond ((string-equal system-type "darwin")
+  ;;         (setq epg-gpg-program "/usr/local/MacGPG2/bin/gpg2"))
+  ;;        (t
+  ;;         (setq epg-gpg-program "/usr/bin/gpg")))
 
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   ;; (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu-mac/mu4e/")
@@ -1262,7 +1293,7 @@ Return an event vector."
           (mandm ;; (font-lock-doc-face :foreground "#036A07" :slant normal)
            (font-lock-comment-face :foreground "darkcyan" :slant normal)
            (font-lock-comment-delimiter-face :foreground "darkcyan" :slant normal))
-           ;; (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant normal))
+          ;; (font-lock-comment-delimiter-face :foreground "#BDBDA4" :slant normal))
           ;;  (lsp-face-highlight-read :foreground "#036A08" :slant normal)
           ;;  )
 
@@ -1273,7 +1304,13 @@ Return an event vector."
            (font-lock-comment-face :foreground "#6D6D64" :slant italic)
            (font-lock-comment-delimiter-face :foreground "#BDBDA4"))
           (sanityinc-tomorrow-blue
-           (highlight :background "#00346e"))
+           (highlight :background "#00346e")
+           (font-lock-doc-face :foreground "lightgreen" :slant italic)
+           (font-lock-keyword-face :foreground "peachpuff")
+           (font-lock-function-name-face :foreground "snow" :weight bold)
+           (font-lock-variable-name-face :foreground "snow" :weight bold)
+           (font-lock-type-face :foreground "lightsteelblue1" :slant italic)
+           )
           (solarized-light
            (font-lock-doc-face :foreground "#036A07" :slant italic)
            (font-lock-comment-face :foreground "#6D6D64" :slant italic)
@@ -1349,7 +1386,7 @@ Return an event vector."
     ;; (defun split-horizontally-for-temp-buffers ()
     ;;   "Split the window horizontally for temp buffers."
     ;;   (when (and (one-window-p t)
-    ;;  	         (not (active-minibuffer-window)))
+    ;;                   (not (active-minibuffer-window)))
     ;;     (split-window-horizontally)))
 
     ;; (add-hook 'temp-buffer-setup-hook 'split-horizontally-for-temp-buffers)
@@ -1365,39 +1402,39 @@ Return an event vector."
 
     (setq split-window-preferred-function 'split-window-prefer-horizonally)
 
-;;     (defun split-window-sensibly-prefer-horizontal (&optional window)
-;;       "Based on split-window-sensibly, but designed to prefer a horizontal split,
-;; i.e. windows tiled side-by-side."
-;;       (let ((window (or window (selected-window))))
-;;         (or (and (window-splittable-p window t)
-;;                  ;; Split window horizontally
-;;                  (with-selected-window window
-;;                    (split-window-right)))
-;;             (and (window-splittable-p window)
-;;                  ;; Split window vertically
-;;                  (with-selected-window window
-;;                    (split-window-below)))
-;;             (and
-;;              ;; If WINDOW is the only usable window on its frame (it is
-;;              ;; the only one or, not being the only one, all the other
-;;              ;; ones are dedicated) and is not the minibuffer window, try
-;;              ;; to split it horizontally disregarding the value of
-;;              ;; `split-height-threshold'.
-;;              (let ((frame (window-frame window)))
-;;                (or
-;;                 (eq window (frame-root-window frame))
-;;                 (catch 'done
-;;                   (walk-window-tree (lambda (w)
-;;                                       (unless (or (eq w window)
-;;                                                   (window-dedicated-p w))
-;;                                         (throw 'done nil)))
-;;                                     frame)
-;;                   t)))
-;;              (not (window-minibuffer-p window))
-;;              (let ((split-width-threshold 0))
-;;                (when (window-splittable-p window t)
-;;                  (with-selected-window window
-;;                    (split-window-right))))))))
+    ;;     (defun split-window-sensibly-prefer-horizontal (&optional window)
+    ;;       "Based on split-window-sensibly, but designed to prefer a horizontal split,
+    ;; i.e. windows tiled side-by-side."
+    ;;       (let ((window (or window (selected-window))))
+    ;;         (or (and (window-splittable-p window t)
+    ;;                  ;; Split window horizontally
+    ;;                  (with-selected-window window
+    ;;                    (split-window-right)))
+    ;;             (and (window-splittable-p window)
+    ;;                  ;; Split window vertically
+    ;;                  (with-selected-window window
+    ;;                    (split-window-below)))
+    ;;             (and
+    ;;              ;; If WINDOW is the only usable window on its frame (it is
+    ;;              ;; the only one or, not being the only one, all the other
+    ;;              ;; ones are dedicated) and is not the minibuffer window, try
+    ;;              ;; to split it horizontally disregarding the value of
+    ;;              ;; `split-height-threshold'.
+    ;;              (let ((frame (window-frame window)))
+    ;;                (or
+    ;;                 (eq window (frame-root-window frame))
+    ;;                 (catch 'done
+    ;;                   (walk-window-tree (lambda (w)
+    ;;                                       (unless (or (eq w window)
+    ;;                                                   (window-dedicated-p w))
+    ;;                                         (throw 'done nil)))
+    ;;                                     frame)
+    ;;                   t)))
+    ;;              (not (window-minibuffer-p window))
+    ;;              (let ((split-width-threshold 0))
+    ;;                (when (window-splittable-p window t)
+    ;;                  (with-selected-window window
+    ;;                    (split-window-right))))))))
 
     ;; (defun split-window-really-sensibly (&optional window)
     ;;   (let ((window (or window (selected-window))))
@@ -1536,6 +1573,10 @@ Put your configuration code here, except for variables that should be set
 before packages are loaded."
   (debug-init-message "USER-CONFIG: Start")
 
+  ;; (unless (display-graphic-p)
+  ;;   (add-hook 'after-make-frame-functions 'enable-CSI-u)
+  ;;   (enable-CSI-u))
+
   (let ((repo (concat dotspacemacs-directory "repos/py-snippets/snippets/")))
     (message repo)
     (if (file-directory-p repo)
@@ -1605,7 +1646,7 @@ before packages are loaded."
         )
     (spacemacs/load-theme 'afternoon))
    ((string-equal system-type "gnu/linux")
-    (spacemacs/load-theme 'sanityinc-tomorrow-blue))
+    (spacemacs/load-theme 'mandm))
    (t (spacemacs/load-theme 'sanityinc-tomorrow-blue)))
 
   ;; XXX is this going to make everything fail?
@@ -1759,13 +1800,18 @@ before packages are loaded."
     (fold-section "display"
                   (global-hl-line-mode -1)            ; Disable hihglighting of current line.
 
+                  (spaceline-toggle-minor-modes-off)
+                  (spaceline-toggle-major-mode-off)
+                  (spaceline-toggle-point-position-off)
+                  (spaceline-toggle-buffer-encoding-on)
+                  (spaceline-toggle-buffer-encoding-abbrev-off)
+
                   ;; fill-column-mode character doesn't work
                   (set-face-inverse-video-p 'vertical-border nil)
                   (set-face-background 'vertical-border (face-background 'default))
                   (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u2999))
                   (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u299A))
                   (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u2503))
-
 
                   ;; This doesn't work if powerline enabled
 
@@ -2951,39 +2997,41 @@ given, offer to edit the search query before executing it."
     (with-eval-after-load "sh-script"
       (modify-syntax-entry ?_ "w" sh-mode-syntax-table))
 
-    (when-layer-used 'rebox
-                     (with-eval-after-load "rebox2"
-                       (rebox-register-template 70 165 '("?"
-                                                         "? box123456"
-                                                         "?"))
-                       (rebox-register-template 401 255 '("#"
-                                                          "# box123456"
-                                                          "# *********"))
-                       (rebox-register-template 402 355 '("# ---------"
-                                                          "# box123456"
-                                                          "# ---------"))
-                       (rebox-register-template 403 455 '("# =========="
-                                                          "# box123456"
-                                                          "# =========="))
-                       (rebox-register-template 80 175 '("//"
-                                                         "// box123456"
-                                                         "//"))
-                       (rebox-register-template 301 265 '("//"
-                                                         "// box123456"
-                                                         "// *********"))
-                       (rebox-register-template 302 365 '("// ---------"
-                                                         "// box123456"
-                                                         "// ---------"))
-                       (rebox-register-template 303 465 '("// ========="
-                                                         "// box123456"
-                                                         "// ========="))
-                       ))
-                     ;; (spacemacs/set-leader-keys-for-major-mode 'c-mode
-                     ;;   "q" 'rebox-dwim)
-                     ;; (spacemacs/set-leader-keys-for-major-mode 'cc-mode
-                     ;;   "q" 'rebox-dwim)
-                     ;; (spacemacs/set-leader-keys-for-major-mode 'c++-mode
-                     ;;   "q" 'rebox-dwim))
+    ;; How to do this right what is 70 then 401 or 80 then 301?
+    ;; (when-layer-used 'rebox
+    ;;                  (with-eval-after-load "rebox2"
+    ;;                    (rebox-register-template 70 165 '("?"
+    ;;                                                      "? box123456"
+    ;;                                                      "?"))
+    ;;                    (rebox-register-template 401 255 '("#"
+    ;;                                                       "# box123456"
+    ;;                                                       "# *********"))
+    ;;                    (rebox-register-template 402 355 '("# ---------"
+    ;;                                                       "# box123456"
+    ;;                                                       "# ---------"))
+    ;;                    (rebox-register-template 403 455 '("# =========="
+    ;;                                                       "# box123456"
+    ;;                                                       "# =========="))
+    ;;                    (rebox-register-template 80 175 '("//"
+    ;;                                                      "// box123456"
+    ;;                                                      "//"))
+    ;;                    (rebox-register-template 301 265 '("//"
+    ;;                                                       "// box123456"
+    ;;                                                       "// *********"))
+    ;;                    (rebox-register-template 302 365 '("// ---------"
+    ;;                                                       "// box123456"
+    ;;                                                       "// ---------"))
+    ;;                    (rebox-register-template 303 465 '("// ========="
+    ;;                                                       "// box123456"
+    ;;                                                       "// ========="))
+    ;;                    ))
+
+    ;; (spacemacs/set-leader-keys-for-major-mode 'c-mode
+    ;;   "q" 'rebox-dwim)
+    ;; (spacemacs/set-leader-keys-for-major-mode 'cc-mode
+    ;;   "q" 'rebox-dwim)
+    ;; (spacemacs/set-leader-keys-for-major-mode 'c++-mode
+    ;;   "q" 'rebox-dwim))
 
 
 
@@ -2993,20 +3041,22 @@ given, offer to edit the search query before executing it."
 
     (when-layer-used 'lsp
                      (with-eval-after-load 'lsp-mode
-                       (setq-default lsp-enable-indentation nil
-                                     lsp-enable-file-watchers t
-                                     lsp-file-watch-ignored (append '("/usr/include" ".*/build-root/.*" "/opt/current/include" ) lsp-file-watch-ignored)
-                                     lsp-file-watch-threshold 20000
+                       (setq-default
+                        lsp-file-watch-ignored (append '("/usr/include" ".*/build-root/.*" "/opt/current/include" ) lsp-file-watch-ignored)
+                        lsp-enable-indentation nil
+                        lsp-enable-file-watchers t
+                        lsp-file-watch-threshold 20000
 
-                                     lsp-ui-peek-always-show t
-                                     lsp-ui-peek-peek-height 40
-                                     lsp-ui-peek-list-width 50
-                                     lsp-diagnostics-attributes '((unnecessary :background "gray20" :foreground "gray70")
-                                                                  (deprecated :strike-through t))
-                                     ;; lsp-ui-sideline-show-code-actions t
-                                     ;; lsp-ui-sideline-show-diagnostics t
-                                     ;; lsp-ui-sideline-show-hover t
-                                     )
+                        lsp-ui-peek-always-show t
+                        lsp-ui-peek-list-width 50
+                        lsp-ui-peek-peek-height 40
+                        lsp-ui-sideline-show-hover t
+                        ;; lsp-ui-sideline-show-code-actions t
+                        ;; lsp-ui-sideline-show-diagnostics t
+
+                        lsp-diagnostics-attributes '((unnecessary :background "gray20" :foreground "gray70")
+                                                     (deprecated :strike-through t))
+                        )
 
                        (with-eval-after-load 'lsp-ui-peek
                          (define-key lsp-ui-peek-mode-map "j" 'lsp-ui-peek--select-next-file)
@@ -3036,17 +3086,17 @@ given, offer to edit the search query before executing it."
                        ;; (flycheck-add-next-checker 'python-flake8 'python-pylint)
                        ;; (flycheck-add-next-checker 'python-pylint 'python-pycompile)
 
-;;                        (flycheck-define-checker python-pyflakes
-;;                          "A Python syntax and style checker using the pyflakes utility.
-;; To override the path to the pyflakes executable, set
-;; `flycheck-python-pyflakes-executable'.
-;; See URL `http://pypi.python.org/pypi/pyflakes'."
-;;                          :command ("pyflakes" source-inplace)
-;;                          :error-patterns
-;;                          ((error line-start (file-name) ":" line ":" (message) line-end))
-;;                          :modes python-mode)
+                       ;;                        (flycheck-define-checker python-pyflakes
+                       ;;                          "A Python syntax and style checker using the pyflakes utility.
+                       ;; To override the path to the pyflakes executable, set
+                       ;; `flycheck-python-pyflakes-executable'.
+                       ;; See URL `http://pypi.python.org/pypi/pyflakes'."
+                       ;;                          :command ("pyflakes" source-inplace)
+                       ;;                          :error-patterns
+                       ;;                          ((error line-start (file-name) ":" line ":" (message) line-end))
+                       ;;                          :modes python-mode)
 
-;;                        (add-to-list 'flycheck-checkers 'python-pyflakes)
+                       ;;                        (add-to-list 'flycheck-checkers 'python-pyflakes)
 
                        ;; (setq flycheck-checkers (delq 'python-pycompile flycheck-checkers))
                        ;; (setq flycheck-checkers (cons 'python-pylint (delq 'python-pylint flycheck-checkers)))
@@ -3395,17 +3445,17 @@ given, offer to edit the search query before executing it."
                                        ((f-exists? (concat (projectile-project-root) ".clang-format")) (clang-format-vc-diff) t)
                                        (t (message "didn't find .clang-format in %s" (concat (projectile-project-root) ".clang-format"))))))))
 
-;;                                       (if (f-exists? (concat (projectile-project-root) ".clang-format"))
-;;                                           (progn
-;;                                             (message "found .clang-format")
-;;                                             (clang-format-vc-diff))
-;;                                         (goto-char (point-min))
-;;                                         (re-search-forward "coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t)
-;;                                         (cond
-;;                                          ((string= "CLANG" (match-string 1)) (vpp-format-buffer t) t)
-;;                                          ;; ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
-;;                                          ((string= "INDENT" (match-string 1)) (vpp-format-buffer) t)))))))
-;;
+                       ;;                                       (if (f-exists? (concat (projectile-project-root) ".clang-format"))
+                       ;;                                           (progn
+                       ;;                                             (message "found .clang-format")
+                       ;;                                             (clang-format-vc-diff))
+                       ;;                                         (goto-char (point-min))
+                       ;;                                         (re-search-forward "coding-style-patch-verification: \\(ON\\|INDENT\\|CLANG\\)" nil t)
+                       ;;                                         (cond
+                       ;;                                          ((string= "CLANG" (match-string 1)) (vpp-format-buffer t) t)
+                       ;;                                          ;; ((string= "ON" (match-string 1)) (vpp-format-buffer) t)
+                       ;;                                          ((string= "INDENT" (match-string 1)) (vpp-format-buffer) t)))))))
+                       ;;
 
                        (defun clang-maybe-format-buffer-on-save ()
                          (add-hook 'before-save-hook 'clang-maybe-format-buffer 90 t))
@@ -3428,7 +3478,7 @@ given, offer to edit the search query before executing it."
                         "linux-kernel"
                         '("linux"
                           (c-offsets-alist . ((inextern-lang . 0)))))
-                                                                                 ;; (arglist-cont-nonempty c-lineup-gcc-asm-reg c-lineup-arglist-tabs-only))))
+                       ;; (arglist-cont-nonempty c-lineup-gcc-asm-reg c-lineup-arglist-tabs-only))))
 
                        (defun my-c-mode-hook ()
                          ;;(message "my-c-mode-hook")
@@ -3749,9 +3799,23 @@ given, offer to edit the search query before executing it."
                        ;;   ;; (transient-insert-suffix 'magit-pull "-r" '("-f" "Overwrite local branch" "--force"))
                        ;;   (setq transient-values-file (expand-file-name "transient/values.el"
                        ;;                                                 dotspacemacs-directory))
-                      ;;   )
+                       ;;   )
                        )
                      )
+
+    ;; python
+    (when-layer-used
+     'rust
+     ;; (with-eval-after-load 'rust-mode
+     ;;   ;; Consider _ a part of words for python
+     ;;   (modify-syntax-entry ?_ "w" rust-mode-syntax-table))
+     (with-eval-after-load 'rustic
+       ;; Consider _ a part of words for python
+       (modify-syntax-entry ?_ "w" rust-mode-syntax-table)
+       (when-layer-used 'rebox
+                        (defun rebox-rust-hook ()
+                          (set (make-local-variable 'rebox-style-loop) '(81 82 83)))
+                        (add-hook 'rust-mode-hook 'rebox-rust-hook))))
 
     ;; python
     (when-layer-used
@@ -4742,7 +4806,7 @@ given, offer to edit the search query before executing it."
                         > ".." \n
                         > _ ))
                     (define-auto-insert
-                      '("\\.go\\'" . "Home Go skeleton")
+                      '("\\.\\(go\\|rs\\)\\'" . "Home Go skeleton")
                       '("Short description: "
                         "//" \n
                         > "// -*- coding: utf-8 -*-" \n
@@ -4808,7 +4872,6 @@ given, offer to edit the search query before executing it."
                         > "#" \n
                         > "# Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
                         > "#" \n
-                        > "#" \n
                         > _ ))
                     (define-auto-insert
                       (cons (concat work-ai-prefix "\\.\\(pl\\|tcl\\)\\'") "# Work comment skeleton")
@@ -4818,18 +4881,27 @@ given, offer to edit the search query before executing it."
                         > "#" \n
                         > "# Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
                         > "#" \n
-                        > "#" \n
                         > _ ))
                     (define-auto-insert
                       (cons (concat work-ai-prefix "\\.rst\\'") "Work ReST skeleton")
                       '("Short description: "
-                        ".." \n
+                        ".. -*- coding: utf-8 -*-" \n
+                        > ".." \n
                         > ".. " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
                         > ".." \n
                         > ".. Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
                         > ".." \n
-                        > ".." \n
                         > _ ))
+                    (define-auto-insert
+                      '("\\.\\(go\\|rs\\)\\'" . "Work Go/Rust skeleton")
+                      '("Short description: "
+                        "// -*- coding: utf-8 -*-" \n
+                        > "//" \n
+                        > "// " (new-file-header-date) ", " (user-full-name) " <" (user-login-name) "@labn.net>" \n
+                        > "//" \n
+                        > "// Copyright (c) " (substring (current-time-string) -4) ", " labn-copyright-name \n
+                        > "//" \n
+                        > "/// Module implementing " _))
                     (define-auto-insert
                       (cons (concat work-ai-prefix "\\.\\(h\\|c\\|CC?\\|cc\\|cxx\\|cpp\\|c++\\|m\\)\\'") "Work C-style skeleton")
                       '("Short description: "
