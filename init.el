@@ -1036,6 +1036,7 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
     ;; Take advantage of iterm2's CSI u support (https://gitlab.com/gnachman/iterm2/-/issues/8382).
 
 
+    (require 'term/xterm)
     (if (boundp 'xterm--init-modify-other-keys)
         (xterm--init-modify-other-keys))
 
