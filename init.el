@@ -648,7 +648,7 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-themes '(mandm
                          ;; Preferred modes
                          sanityinc-tomorrow-blue
-                         misterioso
+                         ;; misterioso
                          ;; cobalt
                          doom-material
 
@@ -663,7 +663,7 @@ It should only modify the values of Spacemacs settings."
                          ;; ef-elea-dark ;; good
                          ;; ef-maris-dark
                          ;; ef-melissa-dark
-                         ;; ef-night
+                         ef-night
                          ;; ef-symbiosis
                          ;; ef-trio-dark
                          ;; ef-tritanopia-dark
@@ -1634,21 +1634,24 @@ before packages are loaded."
   (cond
    ((string-equal system-type "darwin") ; Mac OS X
     (spacemacs/load-theme 'mandm))
-   ((or (string-prefix-p "dlk" (system-name))
-        (string-prefix-p "flk" (system-name))
-        (string-prefix-p "ubb" (system-name))
-        (string-prefix-p "uff" (system-name))
-        )
+   ((or
+     (string-prefix-p "flk" (system-name))
+     (string-prefix-p "labnh" (system-name))
+     (string-prefix-p "lake" (system-name))
+     )
     (spacemacs/load-theme 'sanityinc-tomorrow-blue)
     ;; (spacemacs/load-theme 'mandm)
     )
-   ((or (string-prefix-p "cmf-" (system-name))
-        (string-prefix-p "labnh" (system-name))
-        (string-prefix-p "rlk" (system-name))
-        (string-prefix-p "builder" (system-name))
-        (string-prefix-p "hp13" (system-name))
-        )
-    (spacemacs/load-theme 'afternoon))
+   ((or
+     (string-prefix-p "builder" (system-name))
+     (string-prefix-p "cmf-" (system-name))
+     (string-prefix-p "dlk" (system-name))
+     (string-prefix-p "hp13" (system-name))
+     (string-prefix-p "rlk" (system-name))
+     (string-prefix-p "ubb" (system-name))
+     (string-prefix-p "uff" (system-name))
+     )
+    (spacemacs/load-theme 'cobalt))
    ((string-equal system-type "gnu/linux")
     (spacemacs/load-theme 'mandm))
    (t (spacemacs/load-theme 'sanityinc-tomorrow-blue)))
