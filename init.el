@@ -73,7 +73,8 @@
      colors
      (org :variables
           org-clock-idle-time 15
-          org-enable-rfc-support nil)
+          org-enable-rfc-support nil
+          )
      )
 
    ;;
@@ -370,14 +371,15 @@ This function should only modify configuration layer settings."
      cobalt
      color-theme-modern
 
-     (copilot :location (recipe
-                         :fetcher github
-                         :repo "zerolfx/copilot.el"
-                         :files ("*.el" "dist")))
+     ;; (copilot :location (recipe
+     ;;                     :fetcher github
+     ;;                     :repo "zerolfx/copilot.el"
+     ;;                     :files ("*.el" "dist")))
 
      (cov :location (recipe :fetcher github
                             :branch "chopps/add-bg-overlay-tint"
                             :repo "choppsv1/cov"))
+
      dockerfile-mode
      exec-path-from-shell
      ;; This is very cool but too expensive for large projects
@@ -387,7 +389,7 @@ This function should only modify configuration layer settings."
      nhexl-mode
      nano-theme
      org-caldav
-     org-journal
+     ;; org-journal
      org-notify
      package-lint
      persistent-scratch
@@ -1023,23 +1025,11 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
   ;; compilation warnings
   (setq-default native-comp-async-report-warnings-errors 'silent)
 
-
-  ;; (setq-default transient-values-file (expand-file-name "transient/values.el"
-  ;;                                                       dotspacemacs-directory))
-
-  ;; (spacemacs|use-package-add-hook transient
-  ;;   :init
-  ;;   (setq transient-values-file (expand-file-name "transient/values.el"
-  ;;                                                 dotspacemacs-directory)))
-
   (defun enable-CSI-u ()
     ;; Take advantage of iterm2's CSI u support (https://gitlab.com/gnachman/iterm2/-/issues/8382).
-
-
     (require 'term/xterm)
     (if (boundp 'xterm--init-modify-other-keys)
         (xterm--init-modify-other-keys))
-
     ;; Courtesy https://emacs.stackexchange.com/a/13957, modified per
     ;; https://gitlab.com/gnachman/iterm2/-/issues/8382#note_365264207
     (defun character-apply-modifiers (c &rest modifiers)
@@ -1057,7 +1047,7 @@ Return an event vector."
         (while (<= c 126)
           (mapc (lambda (x)
                   (define-key xterm-function-map (format (car x) c)
-                              (apply 'character-apply-modifiers c (cdr x))))
+                    (apply 'character-apply-modifiers c (cdr x))))
                 '(;; with ?.VT100.formatOtherKeys: 0
                   ("\e\[27;3;%d~" meta)
                   ("\e\[27;5;%d~" control)
@@ -1111,15 +1101,9 @@ Return an event vector."
   (setq-default gdb-default-window-configuration-file "gdb-window-config")
   (setq-default gdb-window-configuration-directory "~/.spacemacs.d/")
 
-  ;;  (cond ((string-equal system-type "darwin")
-  ;;         (setq epg-gpg-program "/usr/local/MacGPG2/bin/gpg2"))
-  ;;        (t
-  ;;         (setq epg-gpg-program "/usr/bin/gpg")))
-
   (add-to-list 'load-path (concat dotspacemacs-directory "local-lisp/"))
   ;; (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu-mac/mu4e/")
   (add-to-list 'load-path "/opt/homebrew/share/emacs/site-lisp/mu-mac/mu4e/")
-
 
   ;; add all non-theme named subdirs of repos to load path
   (setq load-path
@@ -1140,9 +1124,6 @@ Return an event vector."
       (load-theme (intern theme) t nil)))
 
   (add-to-list 'load-path (concat "~/p/ietf-docs"))
-  ;;(require 'iterm-custom-keys)
-
-  ;; (require 'explain-pause-mode)
 
   (require 'iterm-xterm-extra)
 
@@ -1152,9 +1133,6 @@ Return an event vector."
 
   (require 'generic-lisp)
   (require 'generic-mode-hooks)
-
-  ;; (when (display-graphic-p)
-  ;;   (fringe-mode '(20 . nil)))
 
   (auto-insert-mode)
 
@@ -1212,7 +1190,6 @@ Return an event vector."
       )
 
     ;; (evil-define-key estate evil-org-mode-map "H" nil)
-
     ;; (define-key evil-insert-state-map (kbd "C-<tab>") 'copilot-accept-completion-by-word)
     ;; (define-key evil-insert-state-map (kbd "C-TAB") 'copilot-accept-completion-by-word)
     )
@@ -1240,17 +1217,13 @@ Return an event vector."
    ;;   (define-key evil-evilified-state-map-original "L" 'evil-window-bottom)
    ;;   (define-key evil-evilified-state-map-original "M" 'evil-window-middle))
    projectile-globally-unignored-files '(".gitlab-ci.yml" ".pylintrc" ".travis.yml")
-
-   ;; This should be set below automatically from hitting ! when queried.
-   ;; safe-local-variable-values '(
-   ;;                              (evil-shift-width . 2)
-   ;;                              )
    )
 
   (setq-default debug-mac-notifications nil)
   (setq-default flycheck-standard-error-navigation nil)
   (setq flycheck-standard-error-navigation nil)
   (setq-default spaceline-buffer-id-max-length 120)
+
 
   (with-eval-after-load 'tramp
     (push "/home/chopps/local/bin" tramp-remote-path))
@@ -1406,63 +1379,7 @@ Return an event vector."
 
     (setq split-window-preferred-function 'split-window-prefer-horizonally)
 
-    ;;     (defun split-window-sensibly-prefer-horizontal (&optional window)
-    ;;       "Based on split-window-sensibly, but designed to prefer a horizontal split,
-    ;; i.e. windows tiled side-by-side."
-    ;;       (let ((window (or window (selected-window))))
-    ;;         (or (and (window-splittable-p window t)
-    ;;                  ;; Split window horizontally
-    ;;                  (with-selected-window window
-    ;;                    (split-window-right)))
-    ;;             (and (window-splittable-p window)
-    ;;                  ;; Split window vertically
-    ;;                  (with-selected-window window
-    ;;                    (split-window-below)))
-    ;;             (and
-    ;;              ;; If WINDOW is the only usable window on its frame (it is
-    ;;              ;; the only one or, not being the only one, all the other
-    ;;              ;; ones are dedicated) and is not the minibuffer window, try
-    ;;              ;; to split it horizontally disregarding the value of
-    ;;              ;; `split-height-threshold'.
-    ;;              (let ((frame (window-frame window)))
-    ;;                (or
-    ;;                 (eq window (frame-root-window frame))
-    ;;                 (catch 'done
-    ;;                   (walk-window-tree (lambda (w)
-    ;;                                       (unless (or (eq w window)
-    ;;                                                   (window-dedicated-p w))
-    ;;                                         (throw 'done nil)))
-    ;;                                     frame)
-    ;;                   t)))
-    ;;              (not (window-minibuffer-p window))
-    ;;              (let ((split-width-threshold 0))
-    ;;                (when (window-splittable-p window t)
-    ;;                  (with-selected-window window
-    ;;                    (split-window-right))))))))
-
-    ;; (defun split-window-really-sensibly (&optional window)
-    ;;   (let ((window (or window (selected-window))))
-    ;;     (if (> (window-total-width window) (* 2 (window-total-height window)))
-    ;;         (with-selected-window window (split-window-sensibly-prefer-horizontal window))
-    ;;       (with-selected-window window (split-window-sensibly window)))))
-
-    ;; ;; this is being ignored!?
-    ;; (setq split-window-preferred-function 'split-window-really-sensibly)
-    ;; ;; (setq split-window-preferred-function 'split-window-sensibly-prefer-horizontal)
-
-    ;; ;; (defun split-window-sensibly (&optional window)
-    ;; ;;   (split-window-really-sensibly window))
     )
-
-  ;; If we actually need to do anything early uncomment this
-  ;; (when-layer-used 'python
-  ;;                  (defun my-init-python-mode-hook ()
-  ;;                    ;; flake8 will chain in pylint
-  ;;                    ;; (flycheck-select-checker 'python-flake8)
-  ;;                    )
-  ;;                  (add-hook 'python-mode-hook 'my-init-python-mode-hook)
-  ;;                  ;; (message "init stage current python mode hook %s" python-mode-hook)
-  ;;                  )
 
   ;; =================================
   ;; Global Key Bindings and Registers
@@ -1475,32 +1392,6 @@ Return an event vector."
 
   (fold-section "Keybindings"
                 (define-key isearch-mode-map [remap isearch-delete-char] 'isearch-del-char)
-
-                ;; (defun remote-gui-select-text (data)
-                ;;   "gui-select-test version to use ssh to copy the current kill to the local systems clipboard"
-                ;;   ;; (let ((cmd "ssh -q ${SSH_CONNECTION%% *} bash -c 'xsel -ibp --display :0 >& /dev/null || pbcopy'"))
-                ;;   (let ((cmd "copytoclipem.sh"))
-                ;;     (save-excursion
-                ;;       (let* ((process-connection-type nil)  ; use a pipe as it cleans itself up
-                ;;              (proc (start-process-shell-command "cut-to-remote" nil cmd)))
-                ;;         (message "invoking remote select text cmd: %s with data: %s" cmd data)
-                ;;         (process-send-string proc data)
-                ;;         (process-send-eof proc)))
-                ;;     data))
-
-                ;; (defun remote-gui-selection-value ()
-                ;;   "Use ssh to obtain the current clibboard on the local system"
-                ;;   (interactive)
-                ;;   (save-excursion
-                ;;     (shell-command-to-string "ssh -q ${SSH_CONNECTION%% *} -- bash -c 'xsel -ob 2> /dev/null || pbpaste -Prefer txt'")))
-
-                ;; See if OSC-52 works now.
-                ;; (when (and (not (display-graphic-p))
-                ;;            (getenv "SSH_CONNECTION"))
-                ;;   (setq-default interprogram-cut-function #'remote-gui-select-text)
-                ;;   ;; This is very slow, all yanks cause synchronous ssh connection..
-                ;;   ;; (setq-default interprogram-paste-function #'remote-gui-selection-value)
-                ;;   )
 
                 (defun activate-iterm ()
                   (interactive)
@@ -1541,10 +1432,6 @@ Return an event vector."
   ;; =================
   ;; Programming Modes
   ;; =================
-
-  ;; (when (and (configuration-layer/layer-usedp 'python)
-  ;;            (configuration-layer/layer-usedp 'gtags))
-  ;;            (configuration-layer/layer-usedp 'gtags))
 
   (spacemacs|use-package-add-hook rebox2
     :post-init
@@ -1784,8 +1671,6 @@ before packages are loaded."
       (defadvice browse-url-can-use-xdg-open (after ad-browse-url-can-use-xdg-open activate)
         "Always use xdg-open"
         (setq ad-return-value t)))
-    ;;(setq ad-return-value (executable-find "xdg-open"))))
-    ;; (ad-activate 'browse-url-can-use-xdg-open)
 
     (setq
      spacemacs--hjkl-completion-navigation-functions nil
@@ -1803,142 +1688,20 @@ before packages are loaded."
     ;; Display
     ;; =======
 
-
     (fold-section "display"
                   (global-hl-line-mode -1)            ; Disable hihglighting of current line.
-
                   (spaceline-toggle-minor-modes-off)
                   (spaceline-toggle-major-mode-off)
                   (spaceline-toggle-point-position-off)
                   (spaceline-toggle-buffer-encoding-on)
                   (spaceline-toggle-buffer-encoding-abbrev-off)
-
+                  (spaceline-toggle-org-clock-on)
                   ;; fill-column-mode character doesn't work
                   (set-face-inverse-video-p 'vertical-border nil)
                   (set-face-background 'vertical-border (face-background 'default))
                   (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u2999))
                   (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u299A))
                   (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u2503))
-
-                  ;; This doesn't work if powerline enabled
-
-                  ;; The default definition
-                  ;; (spaceline-compile
-                  ;;                       ; left side
-                  ;;   '(((persp-name
-                  ;;       workspace-number
-                  ;;       window-number)
-                  ;;      :fallback evil-state
-                  ;;      :face highlight-face
-                  ;;      :priority 100)
-                  ;;     (anzu :priority 95)
-                  ;;     auto-compile
-                  ;;     ((buffer-modified buffer-size buffer-id) remote-host)
-                  ;;      :priority 98)
-                  ;;     (major-mode :priority 79)
-                  ;;     (process :when active)
-                  ;;     ((flycheck-error flycheck-warning flycheck-info)
-                  ;;      :when active
-                  ;;      :priority 89)
-                  ;;     (minor-modes :when active
-                  ;;                  :priority 9)
-                  ;;     (mu4e-alert-segment :when active)
-                  ;;     (erc-track :when active)
-                  ;;     (version-control :when active
-                  ;;                      :priority 78)
-                  ;;     (org-pomodoro :when active)
-                  ;;     (org-clock :when active)
-                  ;;     nyan-cat)
-                  ;;                       ; right side
-                  ;;   '(which-function
-                  ;;     (python-pyvenv :fallback python-pyenv)
-                  ;;     (purpose :priority 94)
-                  ;;     (battery :when active)
-                  ;;     (selection-info :priority 95)
-                  ;;     input-method
-                  ;;     ((buffer-encoding-abbrev
-                  ;;       point-position
-                  ;;       line-column)
-                  ;;      :separator " | "
-                  ;;      :priority 96)
-                  ;;     (global :when active)
-                  ;;     (buffer-position :priority 99)
-                  ;;     (hud :priority 99)))
-
-                  ;; (spaceline-compile
-                  ;;                       ; left side
-                  ;;   '(((persp-name
-                  ;;       workspace-number
-                  ;;       window-number)
-                  ;;      :fallback evil-state
-                  ;;      :face highlight-face
-                  ;;      :priority 100)
-                  ;;     (anzu :priority 95)
-                  ;;     auto-compile
-                  ;;     ((buffer-modified buffer-size buffer-id remote-host)
-                  ;;      :priority 98)
-                  ;;     (major-mode :priority 79)
-                  ;;     (process :when active)
-                  ;;     ((flycheck-error flycheck-warning flycheck-info)
-                  ;;      :when active
-                  ;;      :priority 89)
-                  ;;     (minor-modes :when active
-                  ;;                  :priority 9)
-                  ;;     ;; (mu4e-alert-segment :when active)
-                  ;;     (erc-track :when active)
-                  ;;     (version-control :when active
-                  ;;                      :priority 78)
-                  ;;     (org-pomodoro :when active)
-                  ;;     (org-clock :when active)
-                  ;;     nyan-cat)
-                  ;;                       ; right side
-                  ;;   '(which-function
-                  ;;     (python-pyvenv :fallback python-pyenv)
-                  ;;     (purpose :priority 94)
-                  ;;     (battery :when active)
-                  ;;     (selection-info :priority 95)
-                  ;;     input-method
-                  ;;     ((buffer-encoding-abbrev
-                  ;;       point-position
-                  ;;       line-column)
-                  ;;      :separator " | "
-                  ;;      :priority 96)
-                  ;;     (global :when active)
-                  ;;     (buffer-position :priority 99)
-                  ;;     (hud :priority 99)))
-                  ;; (if (display-graphic-p)
-                  ;;     (progn
-                  ;;       (spaceline-toggle-battery-on)
-                  ;;       (spaceline-toggle-org-clock-on))
-                  ;;   (spaceline-toggle-battery-off)
-                  ;;   (spaceline-toggle-org-clock-off))
-                  ;; (spaceline-toggle-minor-modes-off)
-                  ;; (spaceline-toggle-point-position-off)
-                  ;; (spaceline-toggle-buffer-encoding-on)
-                  ;; (spaceline-toggle-buffer-encoding-abbrev-off)
-
-                  ;; (setq spaceline-window-numbers-unicode nil
-                  ;;       spaceline-workspace-numbers-unicode nil)
-
-
-
-                  ;; ;; We can dump this in a while when spaceline is fixed to not blank the modeline
-                  ;; ;; with very long buffer names
-                  ;; (defun spaceline-spacemacs-theme (&rest additional-segments)
-                  ;;   "Install the modeline used by Spacemacs.
-                  ;;    ADDITIONAL-SEGMENTS are inserted on the right, between `global' and
-                  ;;    `buffer-position'."
-                  ;;   (apply 'spaceline--theme
-                  ;;          '((persp-name
-                  ;;             workspace-number
-                  ;;             window-number)
-                  ;;            :fallback evil-state
-                  ;;            :face highlight-face
-                  ;;            :priority 0)
-                  ;;          '((buffer-modified buffer-size buffer-id remote-host)
-                  ;;            :priority 5)
-                  ;;          additional-segments))
-
                   )
 
     ;; =======
@@ -2681,7 +2444,7 @@ given, offer to edit the search query before executing it."
                              map))
 
                          (define-key mu4e-minibuffer-search-query-map (kbd "C-u")
-                                     ch/mu4e-minibuffer-quick-insert-map)
+                           ch/mu4e-minibuffer-quick-insert-map)
 
 
                          ;; Work around a bug with too long names in the spaceline/modeline
@@ -3906,13 +3669,6 @@ given, offer to edit the search query before executing it."
                      (debug-init-message "debug-init org setup")
                      (with-eval-after-load 'org
 
-                       ;; (dolist (estate '(normal visual motion))
-                       ;;   (evil-define-key estate evil-org-mode-map "H" nil)
-                       ;;   (evil-define-key estate evil-org-mode-map "L" nil)
-                       ;;   (evil-define-key estate org-mode-map "H" nil)
-                       ;;   (evil-define-key estate org-mode-map "M" nil)
-                       ;;   (evil-define-key estate org-mode-map "L" nil))
-
                        ;; Consider _s parts of words
                        (modify-syntax-entry ?_ "w" org-mode-syntax-table)
 
@@ -3922,12 +3678,9 @@ given, offer to edit the search query before executing it."
                        (set-register ?S `(file . ,(concat org-directory "/status.org")))
                        (set-register ?P `(file . ,(concat dropbox-directory "/ts-pass.gpg")))
 
-                       ;;
-                       ;; XXX add back
-                       ;; (add-to-list 'org-file-apps '("\\.pdf\\'" . emacs))
+                       (add-to-list 'org-file-apps '("\\.pdf\\'" . emacs))
 
                        (setq-default org-use-sub-superscripts '{})
-                       ;; (setq-default org-export-with-sub-superscripts nil)
                        (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
 
                        (setq org-taskjuggler-default-global-properties
@@ -3944,51 +3697,23 @@ given, offer to edit the search query before executing it."
                              )
                        (org-duration-set-regexps)
 
-                       (require 'ox-latex)
-
-                       ;; ;; lualatex preview
-                       ;; (setq org-latex-pdf-process
-                       ;;       '("lualatex -shell-escape -interaction nonstopmode %f"
-                       ;;         "lualatex -shell-escape -interaction nonstopmode %f"))
-
-                       ;; (setq luamagick '(luamagick :programs ("lualatex" "convert")
-                       ;;                             :description "pdf > png"
-                       ;;                             :message "you need to install lualatex and imagemagick."
-                       ;;                             :use-xcolor t
-                       ;;                             :image-input-type "pdf"
-                       ;;                             :image-output-type "png"
-                       ;;                             :image-size-adjust (1.0 . 1.0)
-                       ;;                             :latex-compiler ("lualatex -interaction nonstopmode -output-directory %o %f")
-                       ;;                             :image-converter ("convert -density %D -trim -antialias %f -quality 100 %O")))
-
-                       ;; (add-to-list 'org-preview-latex-process-alist luamagick)
-
-                       ;; (setq org-preview-latex-default-process 'luamagick)
+                       ;; bad load
+                       ;;                        (require 'ox-latex)
                        )
 
 
-                     ;; (with-eval-after-load "org-agenda"
-                     ;;   (define-key org-agenda-mode-map (kbd "RET") 'org-agenda-switch-to))
-
                      (debug-init-message "debug-init org my-org-mode-hook")
+
                      (defun my-org-mode-hook ()
                        (yas-minor-mode 1)
                        (electric-indent-mode 0)
                        (setq org-adapt-indentation 'headline-data))
+
                      (add-hook 'org-mode-hook 'my-org-mode-hook)
 
-                     (require 'journal-lisp)
+                     ;; (require 'journal-lisp)
 
                      (debug-init-message "debug-init org-id")
-
-                     ;; (require 'org-id)
-
-                     ;; (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)
-                     ;; (define-key org-mode-map (kbd "C-c e e") 'org-encrypt-entries)
-                     ;; (define-key org-mode-map (kbd "C-c e E") 'org-encrypt-entry)
-                     ;; (define-key org-mode-map (kbd "C-c e d") 'org-decrypt-entries)
-                     ;; (define-key org-mode-map (kbd "C-c e D") 'org-decrypt-entry)
-
                      (debug-init-message "debug-init org clock stuff")
 
                      ;;
@@ -4006,9 +3731,9 @@ given, offer to edit the search query before executing it."
                                (save-buffer)
                                ))
                          (warn "Clock not started (Could not find heading '%s' in '%s')" heading labn-365-dir)))
+
                      (defun my/stop-clock-save-file-with-heading (heading)
                        "Stop clock and save file"
-                       ;; (if-let (marker (org-find-exact-heading-in-directory heading org-directory))
                        (if-let (marker (org-find-exact-heading-in-directory heading labn-365-dir))
                            (save-current-buffer
                              (save-excursion
@@ -4016,7 +3741,8 @@ given, offer to edit the search query before executing it."
                                (org-clock-out)
                                (save-buffer)
                                ))
-                         (warn "Clock not started (Could not find heading '%s' in '%s')" heading labn-365-dir)))
+                         (warn "Clock not started (Could not find heading '%s' in '%s')" heading labn-365-dir))
+                       )
                      (defun clock-in-busdev () "Clock-IN BusDev" (interactive) (my/start-heading-clock "BusDev"))
                      (defun clock-in-tfs () "Clock-IN TFS" (interactive) (my/start-heading-clock "TFS DO7.012"))
                      (defun clock-in-caas () "Clock-IN CAS" (interactive) (my/start-heading-clock "CAAS DO7.016"))
@@ -4027,29 +3753,14 @@ given, offer to edit the search query before executing it."
                      (spacemacs/set-leader-keys "oit" 'clock-in-tfs)
                      (spacemacs/set-leader-keys "oo" 'clock-out-save)
 
-                     ;; (setq TeX-view-program-selection
-                     ;;       (append
-                     ;;        (delq (assoc 'output-pdf TeX-view-program-selection) TeX-view-program-selection)
-                     ;;        '((output-pdf "PDF Tools"))))
-
-                     ;; (defun th/pdf-view-revert-buffer-maybe (file)
-                     ;;   (when-let ((buf (find-buffer-visiting file)))
-                     ;;             (with-current-buffer buf
-                     ;;               (when (derived-mode-p 'pdf-view-mode)
-                     ;;                 (pdf-view-revert-buffer nil t)))))
-
-                     ;; (add-hook 'TeX-after-TeX-LaTeX-command-finished-hook
-                     ;;           #'th/pdf-view-revert-buffer-maybe)
-
-                     (defun my-org-confirm-babel-evaluate (lang body)
-                       (not (or (string= lang "ditaa")
-                                (string= lang "dot2tex")
-                                (string= lang "dot")
-                                (string= lang "gnuplot")
-                                (string= lang "plantuml")
-                                ;; (string= lang "yang")
-                                )))
-                     ;; (add-to-list 'org-babel-load-languages '(dot2tex . t))
+                     ;; (defun my-org-confirm-babel-evaluate (lang body)
+                     ;;   (not (or (string= lang "ditaa")
+                     ;;            (string= lang "dot2tex")
+                     ;;            (string= lang "dot")
+                     ;;            (string= lang "gnuplot")
+                     ;;            (string= lang "plantuml")
+                     ;;            ;; (string= lang "yang")
+                     ;;            )))
 
                      (debug-init-message "debug-init org setq")
 
@@ -4070,7 +3781,6 @@ given, offer to edit the search query before executing it."
                       org-display-inline-images t
 
                       ;; General
-                      ;; org-agenda-start-day "-8d"
 
                       org-agenda-custom-commands '(("c" . "Custom searches") ("cc" "Closed in the last week" tags "CLOSED>=\"<-1w>\""))
                       org-agenda-start-on-weekday 1
@@ -4118,24 +3828,6 @@ given, offer to edit the search query before executing it."
                       ;; headers view
                       org-mu4e-link-query-in-headers-mode nil
 
-                      ;; XXX investigate this more
-                      ;; org-icalendar-include-todo t
-                      ;; org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
-                      ;; org-icalendar-use-scheduled '(event-if-todo event-if-not-todo todo-start)
-                      ;; org-icalendar-with-timestamps t
-
-                      ;; (setq org-capture-templates
-                      ;; '(
-                      ;;   ("m" "Mail options")
-
-                      ;;   ("mt" "mailtodo"
-                      ;;    entry (file+datetree "~/s/notes/tasks.org")
-                      ;;    "* TODO %^{Task} : %:subject %^G\nSCHEDULED: %t\n- From :: %:from\n- Subject :: %:subject\n- Email :: %a\n\n%?" :kill-buffer t)
-
-                      ;;   ("mn" "mailnote"
-                      ;;    entry (file+headline "~/s/notes/notes.org" "general notes and tasks")
-                      ;;    "* %^{Title} : %:subject %^G\n- From :: %:from\n- Subject :: %:subject\n- Email :: %a\n\n%?\n\n%U")
-                      ;;   ))
 
                       org-capture-templates
                       `(
@@ -4151,8 +3843,8 @@ given, offer to edit the search query before executing it."
                         ("c" "Code Todo" entry (file+headline ,(concat org-directory "/notes.org") "Code Todo")
                          "* TODO [Code] %^{Title}\nDEADLINE: %^t\nCREATED: %u\nAnnotation: %a\n%?\n\n")
 
-                        ("j" "Journal Note" entry (file ,(get-journal-file-today))
-                         "* Event: %?\n\n  %i\n\n  From: %a" :empty-lines 1)
+                        ;; ("j" "Journal Note" entry (file ,(get-journal-file-today))
+                        ;;  "* Event: %?\n\n  %i\n\n  From: %a" :empty-lines 1)
 
                         ("n" "Generic Note" entry (file+headline ,(concat org-directory "/notes.org") "Notes")
                          "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
@@ -4237,20 +3929,24 @@ given, offer to edit the search query before executing it."
 
                         ("wn" "Generic Note" entry (file+headline ,(concat org-directory "/work.org") "Notes")
                          "* NOTE %?\n%u\nannotation:%a\nx:%x\n")
-                        ))
+                        )
+                      )
 
+                     ;; XXX bad load
                      (defun org-update-inline-images ()
                        (when org-inline-image-overlays
                          (org-redisplay-inline-images)))
                      (add-hook 'org-babel-after-execute-hook 'org-update-inline-images)
-
+                     ;;
         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
                      ;; Refile Or Delete Me, from my grpahiv file.
+                     ;; XXX bad load
                      (defun _graphviz/post-init-org ()
                        (with-eval-after-load 'org
                          (add-to-list 'org-src-lang-modes  '("dot" . graphviz-dot))))
          ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+                     ;; XXX bad load
                      (defun org-dblock-write:rangereport (params)
                        "Display day-by-day time reports."
                        (let* ((ts (plist-get params :tstart))
@@ -4280,19 +3976,20 @@ given, offer to edit the search query before executing it."
                                                    (seconds-to-time end))))
                              (setq start (+ 86400 start))))))
 
-                     ;; not defined
-                     ;; (org-crypt-use-before-save-magic)
-
+                     ;; XXX bad load
                      (debug-init-message "debug-init org-babel-do-load-languges setup")
-                     ;; (org-babel-do-load-languages
                      (setq org-babel-load-languages
                            '((emacs-lisp . t)
                              (C . t)
                              (calc . t)
+                             ;;
                              (dot . t)
-                             (gnuplot . t)
+                             ;; gnuplot fails with recursive redefine org stuff
+                             ;; (gnuplot . t)
+
                              (ditaa . t)
-                             (latex . t)
+                             ;; XXX latex fails with void variable
+                             ;; (latex . t)
                              (pic . t)
                              (plantuml . t)
                              ;; This loads python mode when org mode loads I dont want that.
@@ -4306,360 +4003,110 @@ given, offer to edit the search query before executing it."
                              ;; (sh . t)
                              )
                            )
-                     ;;  (dot2tex . t))
+                     ;;
+
+                     ;; XXX bad load
+                     ;;                     (debug-init-message "debug-init ox setup")
+
+                     ;;                     (with-eval-after-load "ox"
+                     ;;                       ;;
+                     ;;                       (defconst chopps/org-latex-packages-alist-pre-hyperref
+                     ;;                         '(
+                     ;;                           ;; This conflicts with Beamer
+                     ;;                           ;; ("letterpaper,margin=1.0in" "geometry")
+                     ;;
+                     ;;                           ;; Prevent an image from floating to a different location.
+                     ;;                           ;; http://tex.stackexchange.com/a/8633/52678
+                     ;;                           ("" "float")
+                     ;;                           ;; % 0 paragraph indent, adds vertical space between paragraphs
+                     ;;                           ;; http://en.wikibooks.org/wiki/LaTeX/Paragraph_Formatting
+                     ;;                           ("" "parskip"))
+                     ;;                         "Alist of packages that have to be loaded before `hyperref'package is loaded ftp://ftp.ctan.org/tex-archive/macros/latex/contrib/hyperref/README.pdf "))
 
 
 
-
-                     ;; In mail map todo to mail-todo
-                     ;; org-capture-templates-contexts '(("t" "m" ((in-mode . "mu4e-headers-mode")))
-                     ;;                                  ("t" "m" ((in-mode . "mu4e-view-mode"))))
-                     (debug-init-message "debug-init ox setup")
-                     (with-eval-after-load "ox"
-                       ;;
-                       (defconst chopps/org-latex-packages-alist-pre-hyperref
-                         '(
-                           ;; This conflicts with Beamer
-                           ;; ("letterpaper,margin=1.0in" "geometry")
-
-                           ;; Prevent an image from floating to a different location.
-                           ;; http://tex.stackexchange.com/a/8633/52678
-                           ("" "float")
-                           ;; % 0 paragraph indent, adds vertical space between paragraphs
-                           ;; http://en.wikibooks.org/wiki/LaTeX/Paragraph_Formatting
-                           ("" "parskip"))
-                         "Alist of packages that have to be loaded before `hyperref'package is loaded ftp://ftp.ctan.org/tex-archive/macros/latex/contrib/hyperref/README.pdf ")
-
-                       ;; Need to only load geometry if not a beamer file
-                       ;; ,(not (eq org-latex-create-formula-image-program 'dvipng)))) ; snippet-flag
-
-                       (defconst chopps/org-latex-packages-alist-post-hyperref
-                         '(
-                           ;; Prevent tables/figures from one section to float into another section
-                           ;; http://tex.stackexchange.com/a/282/52678
-                           ("section" "placeins")
-                           ;; Graphics package for more complicated figures
-                           ("" "tikz")
-                           ("" "caption")
-                           ("" "adjustbox")
-                           ;;
-                           ;; Packages suggested to be added for previewing latex fragments
-                           ;; http://orgmode.org/worg/org-tutorials/org-latex-preview.html
-                           ("mathscr" "eucal")
-                           ("" "latexsym"))
-                         "Alist of packages that have to (or can be) loaded after `hyperref' package is loaded.")
-
-                       (defvar latex-minted-cachedir (concat temporary-file-directory
-                                                             (getenv "USER")
-                                                             "/.minted/\\jobname"))
-
-                       (add-to-list 'chopps/org-latex-packages-alist-post-hyperref
-                                    `(,(concat "cachedir=" ; options
-                                               latex-minted-cachedir)
-                                      "minted" ; package
-                                      ;; If `org-latex-create-formula-image-program'
-                                      ;; is set to `dvipng', minted package cannot be
-                                      ;; used to show latex previews.
-                                      ,(not (eq org-latex-create-formula-image-program 'dvipng)))) ; snippet-flag
-
-                       ;; remove hyperref from default package list.
-                       (setq org-latex-default-packages-alist
-                             (delq (rassoc '("hyperref" nil) org-latex-default-packages-alist)
-                                   org-latex-default-packages-alist))
-
-                       ;; This is no longer needed
-                       (setq org-latex-default-packages-alist
-                             (delq (rassoc '("fixltx2e" nil) org-latex-default-packages-alist)
-                                   org-latex-default-packages-alist))
-
-                       ;; Setup package list with correct placement of hyperref
-                       (setq org-latex-packages-alist
-                             (append chopps/org-latex-packages-alist-pre-hyperref
-                                     '(("" "hyperref" nil))
-                                     chopps/org-latex-packages-alist-post-hyperref))
-                       )
+                     ;; XXX bad load
+                     ;;                       (defconst chopps/org-latex-packages-alist-post-hyperref
+                     ;;                         '(
+                     ;;                           ;; Prevent tables/figures from one section to float into another section
+                     ;;                           ;; http://tex.stackexchange.com/a/282/52678
+                     ;;                           ("section" "placeins")
+                     ;;                           ;; Graphics package for more complicated figures
+                     ;;                           ("" "tikz")
+                     ;;                           ("" "caption")
+                     ;;                           ("" "adjustbox")
+                     ;;                           ;;
+                     ;;                           ;; Packages suggested to be added for previewing latex fragments
+                     ;;                           ;; http://orgmode.org/worg/org-tutorials/org-latex-preview.html
+                     ;;                           ("mathscr" "eucal")
+                     ;;                           ("" "latexsym"))
+                     ;;                         "Alist of packages that have to (or can be) loaded after `hyperref' package is loaded.")
+                     ;;
+                     ;;                       (defvar latex-minted-cachedir (concat temporary-file-directory
+                     ;;                                                             (getenv "USER")
+                     ;;                                                             "/.minted/\\jobname"))
+                     ;;
+                     ;;                       (add-to-list 'chopps/org-latex-packages-alist-post-hyperref
+                     ;;                                    `(,(concat "cachedir=" ; options
+                     ;;                                               latex-minted-cachedir)
+                     ;;                                      "minted" ; package
+                     ;;                                      ;; If `org-latex-create-formula-image-program'
+                     ;;                                      ;; is set to `dvipng', minted package cannot be
+                     ;;                                      ;; used to show latex previews.
+                     ;;                                      ,(not (eq org-latex-create-formula-image-program 'dvipng)))) ; snippet-flag
+                     ;;
+                     ;;                       ;; remove hyperref from default package list.
+                     ;;                       (setq org-latex-default-packages-alist
+                     ;;                             (delq (rassoc '("hyperref" nil) org-latex-default-packages-alist)
+                     ;;                                   org-latex-default-packages-alist))
+                     ;;
+                     ;;                       ;; This is no longer needed
+                     ;;                       (setq org-latex-default-packages-alist
+                     ;;                             (delq (rassoc '("fixltx2e" nil) org-latex-default-packages-alist)
+                     ;;                                   org-latex-default-packages-alist))
+                     ;;
+                     ;;                       ;; Setup package list with correct placement of hyperref
+                     ;;                       (setq org-latex-packages-alist
+                     ;;                             (append chopps/org-latex-packages-alist-pre-hyperref
+                     ;;                                     '(("" "hyperref" nil))
+                     ;;                                     chopps/org-latex-packages-alist-post-hyperref))
+                     ;;                       )
+                     ;;
 
 
-                     ;; Languages to interpret (execute) in begin_src blocks
+                     ;; XXX bad load
+                     ;;                     (debug-init-message "debug-init org-refile-to-datatree setup")
+                     ;;                     (defun org-refile-to-datetree ()
+                     ;;                       "Refile a subtree to a datetree corresponding to it's timestamp."
+                     ;;                       (interactive)
+                     ;;                       (let* ((datetree-date (org-entry-get nil "TIMESTAMP" t))
+                     ;;                              (date (org-date-to-gregorian datetree-date)))
+                     ;;                         (when date
+                     ;;                           (save-excursion
+                     ;;                             (org-cut-subtree)
+                     ;;                             (org-datetree-find-date-create date)
+                     ;;                             (org-narrow-to-subtree)
+                     ;;                             (show-subtree)
+                     ;;                             (org-end-of-subtree t)
+                     ;;                             (newline)
+                     ;;                             (goto-char (point-max))
+                     ;;                             (org-paste-subtree 4)
+                     ;;                             (widen)
+                     ;;                             )
+                     ;;                           )
+                     ;;                         ))
+                     ;;
 
-                     ;; ;; XXX latex preview highly questionable
-                     ;; (add-to-list 'org-latex-packages-alist
-                     ;;              '("" "tikz" t))
-                     ;; (eval-after-load "preview"
-                     ;;   '(add-to-list 'preview-default-preamble "\\PreviewEnvironment{tikzpicture}" t))
-
-                     ;; spacemacs default
-                     ;; Its value is ((shell . t) (python . t) (dot . t) (emacs-lisp . t))
-                     ;; Original value was ((emacs-lisp . t))
-
-
-                     ;; (eval-after-load "org"
-                     ;;   '(mapc
-                     ;;     (lambda (face)
-                     ;;       (set-face-attribute
-                     ;;        face nil
-                     ;;        :inherit
-                     ;;        (my-adjoin-to-list-or-symbol
-                     ;;         'fixed-pitch
-                     ;;         (face-attribute face :inherit))))
-                     ;;     (list 'org-code 'org-block 'org-table 'org-block-background)))
-
-                     ;; (add-to-list 'org-modules 'org-mac-message)
-                     ;; (setq org-mac-mail-account "Work")
-
-                     ;; - Vi friendly bindings replacing cursor movement with meta-{hjkl}
-                     ;; (bind-key "C-c w" 'org-refile-to-datetree)
-                     ;; (bind-key "M-h" 'org-metaleft org-mode-map)
-                     ;; (bind-key "M-l" 'org-metaright org-mode-map)
-                     ;; (bind-key "M-k" 'org-metaup org-mode-map)
-                     ;; (bind-key "M-j" 'org-metadown org-mode-map)
-                     ;; (bind-key "M-H" 'org-shiftmetaleft org-mode-map)
-                     ;; (bind-key "M-L" 'org-shiftmetaright org-mode-map)
-                     ;; (bind-key "M-K" 'org-shiftmetaup org-mode-map)
-                     ;; (bind-key "M-J" 'org-shiftmetadown org-mode-map)
-
-                     ;; XXX latex
-                     ;; ;; Originally taken from Bruno Tavernier: http://thread.gmane.org/gmane.emacs.orgmode/31150/focus=31432
-                     ;; ;; but adapted to use latexmk 4.20 or higher.
-                     ;; (defun my-auto-tex-cmd ()
-                     ;;   "When exporting from .org with latex, automatically run latex,
-                     ;;  pdflatex, or xelatex as appropriate, using latexmk."
-                     ;;   (let ((texcmd)))
-                     ;;   ;; default command: oldstyle latex via dvi
-                     ;;   (setq texcmd "latexmk -dvi -pdfps -quiet %f")
-                     ;;   ;; pdflatex -> .pdf
-                     ;;   (if (string-match "LATEX_CMD: pdflatex" (buffer-string))
-                     ;;       (setq texcmd "latexmk -pdf -quiet %f"))
-                     ;;   ;; xelatex -> .pdf
-                     ;;   (if (string-match "LATEX_CMD: xelatex" (buffer-string))
-                     ;;       (setq texcmd "latexmk -pdflatex=xelatex -pdf -quiet %f"))
-                     ;;   ;; LaTeX compilation command
-                     ;;   (setq org-latex-to-pdf-process (list texcmd)))
-
-                     ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-cmd)
-
-                     (debug-init-message "debug-init org-refile-to-datatree setup")
-                     (defun org-refile-to-datetree ()
-                       "Refile a subtree to a datetree corresponding to it's timestamp."
-                       (interactive)
-                       (let* ((datetree-date (org-entry-get nil "TIMESTAMP" t))
-                              (date (org-date-to-gregorian datetree-date)))
-                         (when date
-                           (save-excursion
-                             (org-cut-subtree)
-                             (org-datetree-find-date-create date)
-                             (org-narrow-to-subtree)
-                             (show-subtree)
-                             (org-end-of-subtree t)
-                             (newline)
-                             (goto-char (point-max))
-                             (org-paste-subtree 4)
-                             (widen)
-                             )
-                           )
-                         ))
-
-                     ;; Specify default packages to be included in every tex file, whether pdflatex or xelatex
-                     ;; XXX latex
-                     ;; (defun my-auto-tex-parameters ()
-                     ;;   "Automatically select the tex packages to include."
-                     ;;   ;; default packages for ordinary latex or pdflatex export
-                     ;;   (setq org-latex-default-packages-alist
-                     ;;         '(("AUTO" "inputenc" t)
-                     ;;           ("T1"   "fontenc"   t)
-                     ;;           (""     "fixltx2e"  nil)
-                     ;;           (""     "wrapfig"   nil)
-                     ;;           (""     "soul"      t)
-                     ;;           (""     "textcomp"  t)
-                     ;;           (""     "marvosym"  t)
-                     ;;           (""     "wasysym"   t)
-                     ;;           (""     "latexsym"  t)
-                     ;;           (""     "amssymb"   t)
-                     ;;           (""     "hyperref"  nil)))
-
-                     ;;   ;; Packages to include when xelatex is used
-                     ;;   (if (string-match "LATEX_CMD: xelatex" (buffer-string))
-                     ;;       (setq org-latex-default-packages-alist
-                     ;;             '(("" "fontspec" t)
-                     ;;               ("" "xunicode" t)
-                     ;;               ("" "url" t)
-                     ;;               ("" "rotating" t)
-                     ;;               ("american" "babel" t)
-                     ;;               ("babel" "csquotes" t)
-                     ;;               ("" "soul" t)
-                     ;;               ("xetex" "hyperref" nil)
-                     ;;               )))
-
-                     ;;   (if (string-match "LATEX_CMD: xelatex" (buffer-string))
-                     ;;       (setq org-latex-classes
-                     ;;             (cons '("article"
-                     ;;                     "\\documentclass[11pt,article,oneside]{memoir}"
-                     ;;                     ("\\section{%s}" . "\\section*{%s}")
-                     ;;                     ("\\subsection{%s}" . "\\subsection*{%s}")
-                     ;;                     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                     ;;                     ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                     ;;                     ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
-                     ;;                   org-latex-classes))))
-
-                     (debug-init-message "debug-init pre-org-caldev")
-                     ;; (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
-                     (with-eval-after-load "org-caldav"
-                       ;;https://calendar.google.com/calendar/ical/j2nmb305oqb7n6428m4pf1rctk%40group.calendar.google.com/private-c46e82d6b4bae1f85fe4415a769d225b/basic.ics
-                       ;;https://calendar.google.com/calendar/ical/
-                       ;; USERNAME: j2nmb305oqb7n6428m4pf1rctk%40group.calendar.google.com/
-                       ;; PRIVATE: private-c46e82d6b4bae1f85fe4415a769d225b/basic.ics
-                       ;; ID: j2nmb305oqb7n6428m4pf1rctk@group.calendar.google.com
-                       (setq org-icalendar-timezone "US/Eastern"
-                             ;; org-caldav-url "https://www.google.com/calendar/dav"
-                             ;; org-caldav-calendar-id "naqenfju9vq9tr0r4nnh7eaiic@group.calendar.google.com"
-                             ;; org-caldav-inbox "/home/chopps/Dropbox/org-mode/calendar/goog-work.org"
-                             ;; org-caldav-files '()
-                             org-caldav-calendars
-                             '((:calendar-id "naqenfju9vq9tr0r4nnh7eaiic@group.calendar.google.com"
-                                             :url "https://www.google.com/calendar/dav"
-                                             :files ()
-                                             :inbox "/home/chopps/Dropbox/org-mode/calendar/goog-work.org")
-                               (:calendar-id "l8cjg3irk2h5a8gk5ch9mtp6ls@group.calendar.google.com"
-                                             :url "https://www.google.com/calendar/dav"
-                                             :files ()
-                                             :inbox "/home/chopps/Dropbox/org-mode/calendar/goog-family.org")
-                               ;;(:calendar-id "f1jltqbvdp88o8htcjkbg920sc@group.calendar.google.com"
-                               ;;              :files ()
-                               ;;              :inbox "~/org/calendar/goog-home.org")
-                               ;;(:calendar-id "v8eda33vlrn98c9oj2hefjld7s@group.calendar.google.com"
-                               ;;              :files ()
-                               ;;              :inbox "~/org/calendar/goog-ietf.org")
-                               ;; (:calendar-id "v8eda33vlrn98c9oj2hefjld7s@group.calendar.google.com"
-                               ;;               :files ()
-                               ;;               :inbox "/home/chopps/Dropbox/org-mode/calendar/goog-ietf.org")
-                               )
-                             )
-                       ;; (setq org-caldav-principal-url "https://p25-caldav.icloud.com/65837734/principal"
-                       ;;       org-caldav-url "https://p25-caldav.icloud.com/65837734/calendars"
-                       ;;       org-caldav-calendar-id "AF7013C4-D5A4-4885-BF8B-0B11FB3A1488"
-                       ;;       org-caldav-inbox "/home/chopps/org/orgmode-caldav.org"
-                       ;;       org-caldav-files '()
-                       ;;       org-icalendar-timezone "US/Eastern"))
-
-                       )
-
-                     (debug-init-message "debug-init pre-org2blog")
-                     (when-layer-used 'org2blog
-                                      (with-eval-after-load "org2blog"
-                                        ;; (defadvice org-wp-src-block (after ad-org-wp-src-block activate)
-                                        ;;   "Always use space as title if none given"
-                                        ;;   (setq ad-return-value (replace-regexp-in-string "title=\"\"" "title=\" \"" ad-return-value)))
-                                        ;; (ad-activate 'org-wp-src-block)
-
-                                        (setq org2blog/wp-use-sourcecode-shortcode t)
-                                        )
-                                      )
-
-                     (debug-init-message "pre-server-running-notificiation-setup")
-
-                     (when (and (or (daemonp) (and (fboundp 'server-running-p) (server-running-p)))
-                                (string-equal system-type "darwin"))
-
-       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-                       ;; Terminal notifier
-                       ;; requires 'brew install terminal-notifier'
-                       ;; stolen from erc-notifier
-
-                       ;; Example use of alerter
-                       ;; alerter -sound "Second Glance" -sender org.gnu.Emacs -title Foo -subtitle Bar actions YES -closeLabel Close  -message "This is the message"
-                       (defvar terminal-alert-command (executable-find "alerter") "The path to the alerter binary.")
-
-                       ;; (defvar terminal-notifier-command (executable-find "terminal-notifier") "The path to terminal-notifier.")
-                       ;;                                  ; (terminal-notifier-notify "Emacs notification" "Something amusing happened")
-
-                       ;; (defun terminal-notifier-notify (title message)
-                       ;;   "Show a message with terminal-notifier-command ."
-                       ;;   (start-process "terminal-notifier"
-                       ;;                  "terminal-notifier"
-                       ;;                  terminal-notifier-command
-                       ;;                  "-title" title
-                       ;;                  ; "-sender" "org.gnu.Emacs"
-                       ;;                  "-appIcon" "/Applications/Emacs.app/Contents/Resources/etc/images/icons/hicolor/48x48/apps/emacs.png"
-                       ;;                  "-message" message
-                       ;;                  "-sound" "Gentle Roll"
-                       ;;                  "-activate" "org.gnu.Emacs"))
-
-                       (defun timed-notification (time msg)
-                         (interactive "sNotification when (e.g: 2 minutes, 60 seconds, 3 days): \nsMessage: ")
-                         (run-at-time time nil (lambda (msg) (notifications-notify :title "Emacs" :body msg)) msg))
-
-
-                       (debug-init-message "before require org notify")
-                       (require 'org-notify)
-                       (debug-init-message "after require org notify")
-
-                       (defun my-action-act (plist key)
-                         "User wants to see action."
-                         (let ((file (plist-get plist :file))
-                               (begin (plist-get plist :begin)))
-                           (if (string-equal key "show")
-                               (progn
-                                 (switch-to-buffer (find-file-noselect file))
-                                 (org-with-wide-buffer
-                                  (goto-char begin)
-                                  (outline-show-entry))
-                                 (goto-char begin)
-                                 (search-forward "DEADLINE: <")
-                                 (search-forward ":")
-                                 (if (display-graphic-p)
-                                     (x-focus-frame nil)))
-                             (save-excursion
-                               (with-current-buffer (find-file-noselect file)
-                                 (org-with-wide-buffer
-                                  (goto-char begin)
-                                  (search-forward "DEADLINE: <")
-                                  (cond
-                                   ((string-equal key "done")  (org-todo))
-                                   ((string-equal key "hour")  (org-timestamp-change 60 'minute))
-                                   ((string-equal key "day")   (org-timestamp-up-day))
-                                   ((string-equal key "week")  (org-timestamp-change 7 'day)))))))))
-
-                       (defvar todo-action-hash (make-hash-table :test 'equal)
-                         "A hash table for looking up notifications by id")
-
-                       (defun my-action (id key)
-                         (let ((plist (gethash id todo-action-hash)))
-                           (my-action-act plist key)
-                           (remhash id todo-action-hash)))
-
-                       (debug-init-message "in-server-running-notificiation-setup")
-
-                       (defun org-notify-action-notify-mac (plist)
-                         "Pop up a notification window."
-                         ;; (require 'notifications)
-                         (let* ((duration (plist-get plist :duration))
-                                (urgency (plist-get plist :urgency))
-                                (id (notifications-notify
-                                     :title     (plist-get plist :heading)
-                                     :body      (org-notify-body-text plist)
-                                     :urgency   (or urgency 'normal)
-                                     :timeout   (if duration (* duration 1000))
-                                     :actions   org-notify-actions
-                                     :on-action 'my-action)))
-                           (puthash id plist todo-action-hash)
-                           ))
-                       (debug-init-message "org notify add")
-                       (org-notify-add 'default
-                                       '(:time "15m"
-                                               :period "15m"
-                                               :duration 0
-                                               :urgency 'critical
-                                               :app-icon (concat (configuration-layer/get-layer-path 'org)
-                                                                 "img/org.png")
-                                               :actions org-notify-action-notify-mac))
-                       (debug-init-message "org notify start")
-                       (org-notify-start)
-                       (debug-init-message "org notify started")
-                       )
-
-                     (debug-init-message "debug-init POST-server-running-notification-setup")
+                     ;; XXX bad load
+                     ;;                     (debug-init-message "debug-init pre-org2blog")
+                     ;;                     (when-layer-used 'org2blog
+                     ;;                                      (with-eval-after-load "org2blog"
+                     ;;                                        (setq org2blog/wp-use-sourcecode-shortcode t)
+                     ;;                                        )
+                     ;;                                      )
 
                      )
+
 
     ;; ====
     ;; TMUX
@@ -4979,7 +4426,6 @@ given, offer to edit the search query before executing it."
 
 
     (with-eval-after-load 'git-gutter+-disabled-foo
-
       (debug-init-message "gutter")
 
       ;; .....................
@@ -5123,18 +4569,120 @@ given, offer to edit the search query before executing it."
                             )
       )
 
-    (debug-init-message "USER-CONFIG done")
-    )
 
   ;;; To save the clock history across Emacs sessions, use
-  (if (display-graphic-p)
-      (progn
-        (if (not (file-exists-p org-clock-persist-file))
-            (shell-command (concat "touch " org-clock-persist-file)))
-        (org-clock-persistence-insinuate)
-        ))
-  )
+    (if (display-graphic-p)
+        (progn
+          (if (not (file-exists-p org-clock-persist-file))
+              (shell-command (concat "touch " org-clock-persist-file)))
+          (org-clock-persistence-insinuate)
+          ))
 
+    (when (and (or (daemonp)
+                   (and (fboundp 'server-running-p) (server-running-p)))
+               (string-equal system-type "darwin"))
+
+       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+      ;; Terminal notifier
+      ;; requires 'brew install terminal-notifier'
+      ;; stolen from erc-notifier
+
+      ;; Example use of alerter
+      ;; alerter -sound "Second Glance" -sender org.gnu.Emacs -title Foo -subtitle Bar actions YES -closeLabel Close  -message "This is the message"
+      (defvar terminal-alert-command (executable-find "alerter") "The path to the alerter binary.")
+
+      ;; (defvar terminal-notifier-command (executable-find "terminal-notifier") "The path to terminal-notifier.")
+      ;;                                  ; (terminal-notifier-notify "Emacs notification" "Something amusing happened")
+
+      ;; (defun terminal-notifier-notify (title message)
+      ;;   "Show a message with terminal-notifier-command ."
+      ;;   (start-process "terminal-notifier"
+      ;;                  "terminal-notifier"
+      ;;                  terminal-notifier-command
+      ;;                  "-title" title
+      ;;                  ; "-sender" "org.gnu.Emacs"
+      ;;                  "-appIcon" "/Applications/Emacs.app/Contents/Resources/etc/images/icons/hicolor/48x48/apps/emacs.png"
+      ;;                  "-message" message
+      ;;                  "-sound" "Gentle Roll"
+      ;;                  "-activate" "org.gnu.Emacs"))
+
+
+
+      (defun timed-notification (time msg)
+        (interactive "sNotification when (e.g: 2 minutes, 60 seconds, 3 days): \nsMessage: ")
+        (run-at-time time nil (lambda (msg) (notifications-notify :title "Emacs" :body msg)) msg))
+
+
+      (debug-init-message "before require org notify")
+      (require 'org-notify)
+      (debug-init-message "after require org notify")
+
+      (defun my-action-act (plist key)
+        "User wants to see action."
+        (let ((file (plist-get plist :file))
+              (begin (plist-get plist :begin)))
+          (if (string-equal key "show")
+              (progn
+                (switch-to-buffer (find-file-noselect file))
+                (org-with-wide-buffer
+                 (goto-char begin)
+                 (outline-show-entry))
+                (goto-char begin)
+                (search-forward "DEADLINE: <")
+                (search-forward ":")
+                (if (display-graphic-p)
+                    (x-focus-frame nil)))
+            (save-excursion
+              (with-current-buffer (find-file-noselect file)
+                (org-with-wide-buffer
+                 (goto-char begin)
+                 (search-forward "DEADLINE: <")
+                 (cond
+                  ((string-equal key "done")  (org-todo))
+                  ((string-equal key "hour")  (org-timestamp-change 60 'minute))
+                  ((string-equal key "day")   (org-timestamp-up-day))
+                  ((string-equal key "week")  (org-timestamp-change 7 'day)))))))))
+
+      (defvar todo-action-hash (make-hash-table :test 'equal)
+        "A hash table for looking up notifications by id")
+
+      (defun my-action (id key)
+        (let ((plist (gethash id todo-action-hash)))
+          (my-action-act plist key)
+          (remhash id todo-action-hash)))
+
+      (debug-init-message "in-server-running-notificiation-setup")
+
+      (defun org-notify-action-notify-mac (plist)
+        "Pop up a notification window."
+        ;; (require 'notifications)
+        (let* ((duration (plist-get plist :duration))
+               (urgency (plist-get plist :urgency))
+               (id (notifications-notify
+                    :title     (plist-get plist :heading)
+                    :body      (org-notify-body-text plist)
+                    :urgency   (or urgency 'normal)
+                    :timeout   (if duration (* duration 1000))
+                    :actions   org-notify-actions
+                    :on-action 'my-action)))
+          (puthash id plist todo-action-hash)
+          ))
+      (debug-init-message "org notify add")
+      (org-notify-add 'default
+                      '(:time "15m"
+                              :period "15m"
+                              :duration 0
+                              :urgency 'critical
+                              :app-icon (concat (configuration-layer/get-layer-path 'org)
+                                                "img/org.png")
+                              :actions org-notify-action-notify-mac))
+      (debug-init-message "org notify start")
+      (org-notify-start)
+      (debug-init-message "org notify started")
+      )
+    (debug-init-message "USER-CONFIG done")
+    )
+  )
 ;; ;; Local Variables:
 ;; noteval: (find-and-close-fold "\\((fold-section \\|(spacemacs|use\\|(when-layer-used\\|(when (configuration-layer\\)")"
 ;; End:
