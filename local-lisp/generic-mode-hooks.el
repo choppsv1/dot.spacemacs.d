@@ -22,7 +22,7 @@
     (before run-unfocus-hooks-other-advice activate)
   (run-unfocus-hooks))
 
-  ;; Should return the buffer
+;; Should return the buffer
 (defadvice pop-to-buffer
     (before run-unfocus-hooks-pop-advice activate)
   (run-unfocus-hooks))

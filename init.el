@@ -153,7 +153,7 @@
              lsp-pylsp-plugins-preload-enabled nil
              lsp-pylsp-plugins-pycodestyle-enabled nil
              lsp-pylsp-plugins-pydocstyle-add-ignore []
-             lsp-pylsp-plugins-pydocstyle-convention 'google
+             ;; lsp-pylsp-plugins-pydocstyle-convention "google"
              lsp-pylsp-plugins-pydocstyle-enabled t
              lsp-pylsp-plugins-pyflakes-enabled nil
              lsp-pylsp-plugins-pylint-enabled t
