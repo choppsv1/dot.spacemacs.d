@@ -26,12 +26,14 @@
   (setq
    chopps-layers
    '(
+     colors
      ;; Choose either ivy or helm as completion framework
      ;; ivy
      (helm :variables
            helm-move-to-line-cycle-in-source nil)
 
      better-defaults
+
      ;; (git :variables
      ;;      ;; magit-diff-refine-hunk 'all
      ;;      magit-bury-buffer-function 'magit-restore-window-configuration
@@ -44,6 +46,7 @@
      ;;      )
      git
 
+     multiple-cursors
      neotree
      rebox
      theming
@@ -54,12 +57,13 @@
      ;; File Formats
      csv
      markdown
-     multiple-cursors
+     restructuredtext
      shell-scripts
      yaml
      themes-megapack
      )
 
+   ;; On Darwin and dev (non-lite which are very few) systems
    chopps-extra-layers
    '(
      (auto-completion :disabled-for org
@@ -70,11 +74,6 @@
                       auto-completion-private-snippets-directory "~/.spacemacs.d/snippets/"
                       auto-completion-return-key-behavior nil
                       auto-completion-tab-key-behavior 'complete)
-     colors
-     (org :variables
-          org-clock-idle-time 15
-          org-enable-rfc-support nil
-          )
      )
 
    ;;
@@ -91,12 +90,18 @@
      ;; May repeate in development b/c we don't normally include osx in devel machiens
      html
      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
-     (mu4e :variables
-           ;; mu4e-enable-async-operations t
-           mu4e-enable-notifications t
-           ;; mu4e-enable-mode-line nil
-           mu4e-use-maildirs-extension nil)
+     mu4e
+     ;; (mu4e :variables
+     ;;       ;; mu4e-enable-async-operations t
+     ;;       mu4e-enable-notifications t
+     ;;       ;; mu4e-enable-mode-line nil
+     ;;       mu4e-use-maildirs-extension nil
+     ;;       )
      ;; (org2blog :variables org2blog-name "hoppsjots.org")
+     (org :variables
+          org-clock-idle-time 15
+          org-enable-rfc-support nil
+          )
      (osx :variables
           osx-use-option-as-meta t)
      (spell-checking :variables enable-flyspell-auto-completion nil)
@@ -112,6 +117,7 @@
      dap
      debug
      docker
+     graphviz
      gtags
      html
      (ietf :variables ietf-docs-cache "~/ietf-docs-cache")
@@ -239,10 +245,7 @@
      sphinx
 
      ;; File formats
-     docker
-     graphviz
      groovy
-     restructuredtext
 
      ;; Language Meta-Layers
      (lsp :variables
@@ -299,6 +302,7 @@
    ;; all dev-lite are linux
    ;; chopps-dev-lite-systems '("dlk" "jaja" "labnh" "lake" "flk" "ubb" "uff")
    chopps-dev-lite-systems '("dlk" "ja.int.chopps.org" "jaja" "labnh" "lake" "flk" "ubb" "uff" "sal" "varm")
+
    ;; These systems get full development packages -- the slowest load
    chopps-dev-systems '("cmf-xe-1" "morn1" "tops" "hp13" "rlk" "dak"))
 
@@ -383,24 +387,26 @@ This function should only modify configuration layer settings."
      dockerfile-mode
      exec-path-from-shell
      ;; This is very cool but too expensive for large projects
-     olivetti
+     ;; olivetti ;; for writing keeping text in center
      modus-themes
-     monky
+     monky ;; hg
      nhexl-mode
      nano-theme
-     org-caldav
+     ;; org-caldav
      ;; org-journal
      org-notify
      package-lint
-     persistent-scratch
-     polymode
+     ;; persistent-scratch
+     ;; polymode ;; this sort of works but maybe not worth the hassle
      python-docstring
      protobuf-mode
      rainbow-mode
      sqlite3
      ;; rfcview
      ;; colorsarenice-light
-     w3m
+
+     ;; not sure if this is messing up mu4e
+     ;; w3m
      )
 
    ;; ;; A list of packages that cannot be updated.
@@ -423,9 +429,10 @@ This function should only modify configuration layer settings."
      evil-mc
      helm-gtags
      irfc
-     ;; mu4e-maildirs-extension
-     mu4e-alert
-     nameless
+     ;; mu4e-alert
+
+     ;; nameless
+
      ;; powerline
      ;; recentf
      ;; savehist
@@ -498,7 +505,9 @@ It should only modify the values of Spacemacs settings."
   ;; This setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
   (setq-default
+
    blink-matching-paren 'jump
+
    ;; If non-nil then enable support for the portable dumper. You'll need to
    ;; compile Emacs 27 from source following the instructions in file
    ;; EXPERIMENTAL.org at to root of the git repository.
@@ -712,7 +721,9 @@ It should only modify the values of Spacemacs settings."
    ;; (default t)
    dotspacemacs-colorize-cursor-according-to-state nil
 
-   ;; Default font or prioritized list of fonts. The `:size' can be specified as
+   ;; Default font or prioritized list of fonts. This setting has no effect when
+   ;; running Emacs in terminal. The font set here will be used for default and
+   ;; fixed-pitch faces. The `:size' can be specified as
    ;; a non-negative integer (pixel size), or a floating-point (point size).
    ;; Point size is recommended, because it's device independent. (default 10.0)
    ;; dotspacemacs-default-font `("Office Code Pro D" :size ,ch-def-height :weight normal :width normal :powerline-scale 1.4)
@@ -931,7 +942,15 @@ It should only modify the values of Spacemacs settings."
    ;; (default '("rg" "ag" "pt" "ack" "grep"))
    dotspacemacs-search-tools '("rg" "ag" "pt" "ack" "grep")
 
-   ;; Format specification for setting the frame title.
+   ;; The backend used for undo/redo functionality. Possible values are
+   ;; `undo-tree', `undo-fu' and `undo-redo', see also `evil-undo-system'.
+   ;; Note that saved undo history does not get transferred when changing
+   ;; from undo-tree to undo-fu or undo-redo.
+   ;; The default is currently 'undo-tree, but it will likely be changed
+   ;; and at some point removed because undo-tree is not maintained anymore.
+   dotspacemacs-undo-system 'undo-tree
+
+   ;;Format specification for setting the frame title.
    ;; %a - the `abbreviated-file-name', or `buffer-name'
    ;; %t - `projectile-project-name'
    ;; %I - `invocation-name'
@@ -1365,7 +1384,6 @@ Return an event vector."
     ;;   (when (and (one-window-p t)
     ;;                   (not (active-minibuffer-window)))
     ;;     (split-window-horizontally)))
-
     ;; (add-hook 'temp-buffer-setup-hook 'split-horizontally-for-temp-buffers)
 
     (defun split-window-prefer-horizonally (window)
@@ -1376,9 +1394,7 @@ Return an event vector."
           (let ((split-height-threshold nil))
             (split-window-sensibly window))
         (split-window-sensibly window)))
-
     (setq split-window-preferred-function 'split-window-prefer-horizonally)
-
     )
 
   ;; =================================
@@ -1690,18 +1706,22 @@ before packages are loaded."
 
     (fold-section "display"
                   (global-hl-line-mode -1)            ; Disable hihglighting of current line.
+
                   (spaceline-toggle-minor-modes-off)
                   (spaceline-toggle-major-mode-off)
                   (spaceline-toggle-point-position-off)
                   (spaceline-toggle-buffer-encoding-on)
                   (spaceline-toggle-buffer-encoding-abbrev-off)
                   (spaceline-toggle-org-clock-on)
+
                   ;; fill-column-mode character doesn't work
                   (set-face-inverse-video-p 'vertical-border nil)
                   (set-face-background 'vertical-border (face-background 'default))
+
                   (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u2999))
                   (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u299A))
                   (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?\u2503))
+
                   )
 
     ;; =======
@@ -2130,83 +2150,90 @@ before packages are loaded."
     ;; ======
 
     (when-layer-used 'mu4e
-                     (defcustom mu4e-spam-folder "/chopps.org/spam-train"
-                       "Folder for spam email"
-                       :type '(string :tag "Folder name")
-                       :group 'mu4e-folders)
+
+                     ;; removed: <2024-11-21 Thu>
+                     ;; (defcustom mu4e-spam-folder "/chopps.org/spam-train"
+                     ;;   "Folder for spam email"
+                     ;;   :type '(string :tag "Folder name")
+                     ;;   :group 'mu4e-folders)
 
                      (setq mu4e-attachment-dir "~/Downloads"
-                           mu4e-debug t
-                           mu4e-mu-debug nil
 
-                           ;;
-                           ;; Indexing
-                           ;;
-                           mu4e-index-cleanup nil
-                           mu4e-index-lazy-check t
-                           mu4e-change-filenames-when-moving t
-                           mu4e-update-interval nil
+                           ;; All settings to bookmark commented out: <2024-11-21 Thu>
+                           ;; mu4e-debug nil
+                           ;; mu4e-mu-debug nil
 
-                           ;; mu4e-hide-index-messages t
+                           ;; ;;
+                           ;; ;; Indexing
+                           ;; ;;
+                           ;; mu4e-index-cleanup nil
+                           ;; mu4e-index-lazy-check t
+                           ;; mu4e-change-filenames-when-moving t
+                           ;; mu4e-update-interval nil
 
-                           ;; -------
-                           ;; Viewing
-                           ;; -------
-                           mu4e-headers-results-limit 1000
-                           mu4e-headers-visible-lines 15
-                           mu4e-headers-visible-columns 200
+                           ;; ;; mu4e-hide-index-messages t
 
-                           ;; For searches useful as t to find replies to threads?
-                           mu4e-headers-include-related nil
-                           mu4e-view-show-addresses t
-                           mu4e-view-use-gnus t
+                           ;; ;; -------
+                           ;; ;; Viewing
+                           ;; ;; -------
+                           ;; mu4e-headers-results-limit 1000
+                           ;; mu4e-headers-visible-lines 15
+                           ;; mu4e-headers-visible-columns 200
 
-                           ;; mm-text-html-renderer 'shr
-                           mm-text-html-renderer 'gnus-w3m
-                           ;; mm-text-html-renderer 'lynx
-                           ;; HTML
-                           ;; mu4e-html2text-command 'my-mu4e-shr2text
-                           shr-color-visible-luminance-min 80
-                           shr-use-fonts nil
+                           ;; ;; For searches useful as t to find replies to threads?
+                           ;; mu4e-headers-include-related nil
+                           ;; mu4e-view-show-addresses t
+                           ;; mu4e-view-use-gnus t
 
-                           mu4e-use-fancy-chars t
+                           ;; ;; mm-text-html-renderer 'shr
+                           ;; mm-text-html-renderer 'gnus-w3m
 
-                           ;; -----------
-                           ;; Composition
-                           ;; -----------
-                           send-mail-function 'smtpmail-send-it
-                           message-send-mail-function 'smtpmail-send-it
-                           message-cite-reply-position 'below
+                           ;; ;; mm-text-html-renderer 'lynx
+                           ;; ;; HTML
+                           ;; ;; mu4e-html2text-command 'my-mu4e-shr2text
+                           ;; shr-color-visible-luminance-min 80
+                           ;; shr-use-fonts nil
 
-                           ;; don't keep message buffers around
-                           message-kill-buffer-on-exit t
-                           mu4e-compose-complete-addresses t
-                           ;; mu4e-compose-complete-only-personal t
-                           ;; mu4e-compose-complete-only-after "2019-01-01"
-                           mu4e-compose-context-policy 'ask-if-none
-                           mu4e-compose-format-flowed t
-                           ;; This is an interesting value.. it's where soft-newlines will be
-                           ;; inserted for wrapping. The suggestion is 66, but that's based on
-                           ;; the ancient assumption of very small dumb-terminals with old
-                           ;; clients. In fact smart phones (the target now) will support
-                           ;; format=flowed. So the affect; viewing on clients that do not
-                           ;; support format=flowed (e.g. mu4e emacs!) line-wrapping even if
-                           ;; the window is quite large. This sucks so we choose a huge value.
-                           fill-flowed-encode-column 100000
-                           mu4e-compose-in-new-frame t
-                           mu4e-compose-keep-self-cc t
-                           mu4e-compose-signature-auto-include nil
-                           mu4e-context-policy 'pick-first
-                           mm-verify-option 'known
+                           ;; mu4e-use-fancy-chars nil
 
-                           ;; ------------------
-                           ;; Address Completion
-                           ;; ------------------
+                           ;; ;; -----------
+                           ;; ;; Composition
+                           ;; ;; -----------
+                           ;; send-mail-function 'smtpmail-send-it
+                           ;; message-send-mail-function 'smtpmail-send-it
+                           ;; message-cite-reply-position 'below
 
-                           message-completion-alistp '(("^\\(Newsgroups\\|Followup-To\\|Posted-To\\|Gcc\\):" . message-expand-group)
-                                                       ("^\\(Resent-\\)?\\(To\\|B?Cc\\):" . message-expand-name)
-                                                       ("^\\(Reply-To\\|From\\|Mail-Followup-To\\|Mail-Copies-To\\):" . message-expand-name)
-                                                       ("^\\(Disposition-Notification-To\\|Return-Receipt-To\\):" . message-expand-name))
+                           ;; ;; don't keep message buffers around
+                           ;; message-kill-buffer-on-exit t
+
+                           ;; mu4e-compose-complete-addresses t
+                           ;; ;; mu4e-compose-complete-only-personal t
+                           ;; ;; mu4e-compose-complete-only-after "2019-01-01"
+                           ;; mu4e-compose-context-policy 'ask-if-none
+                           ;; mu4e-compose-format-flowed t
+                           ;; ;; This is an interesting value.. it's where soft-newlines will be
+                           ;; ;; inserted for wrapping. The suggestion is 66, but that's based on
+                           ;; ;; the ancient assumption of very small dumb-terminals with old
+                           ;; ;; clients. In fact smart phones (the target now) will support
+                           ;; ;; format=flowed. So the affect; viewing on clients that do not
+                           ;; ;; support format=flowed (e.g. mu4e emacs!) line-wrapping even if
+                           ;; ;; the window is quite large. This sucks so we choose a huge value.
+                           ;; fill-flowed-encode-column 100000
+                           ;; mu4e-compose-in-new-frame t
+                           ;; mu4e-compose-keep-self-cc t
+                           ;; mu4e-compose-signature-auto-include nil
+                           ;; mu4e-context-policy 'pick-first
+                           ;; mm-verify-option 'known
+
+                           ;; ;; ------------------
+                           ;; ;; Address Completion
+                           ;; ;; ------------------
+
+                           ;; ;; removed: <2024-11-21 Thu>
+                           ;; ;; message-completion-alistp '(("^\\(Newsgroups\\|Followup-To\\|Posted-To\\|Gcc\\):" . message-expand-group)
+                           ;; ;;                             ("^\\(Resent-\\)?\\(To\\|B?Cc\\):" . message-expand-name)
+                           ;; ;;                             ("^\\(Reply-To\\|From\\|Mail-Followup-To\\|Mail-Copies-To\\):" . message-expand-name)
+                           ;; ;;                             ("^\\(Disposition-Notification-To\\|Return-Receipt-To\\):" . message-expand-name))
 
                            ;; -----------
                            ;; [b]ookmark
@@ -2243,30 +2270,71 @@ before packages are loaded."
                            mu4e-unread-filter "(flag:unread AND NOT flag:trashed)"
 
                            mu4e-bookmarks
-                           (append
-                            (list (list (concat mu4e-unread-filter " AND " mu4e-inbox-filter-base) "Unread [i]NBOX messages" ?i)
-                                  (list (concat mu4e-unread-filter " AND " "maildir:/chopps.org/INBOX") "Unread [c]hopps INBOX messages" ?c)
-                                  (list (concat mu4e-unread-filter " AND " mu4e-imp-filter-base) "Unread Important messages" ?n)
-                                  (list (concat mu4e-unread-filter " AND " mu4e-not-junk-folder-filter " AND " "maildir:/chopps.org/ietf-wg-lsr") "Unread LSR messages" ?l)
-                                  (list (concat mu4e-unread-filter " AND " mu4e-not-junk-folder-filter " AND " "maildir:/chopps.org/ietf-wg-ipsec") "Unread netmod messages" ?I)
-                                  (list (concat mu4e-unread-filter " AND " mu4e-not-junk-folder-filter " AND " "maildir:/chopps.org/ietf-*") "Unread IETF messages" ?e)
-                                  (list (concat mu4e-unread-filter " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base " AND " mu4e-not-junk-folder-filter) "Unread [u]nimportant messages" ?u)
-                                  (list (concat mu4e-unread-filter " AND NOT " mu4e-inbox-filter-base " AND " mu4e-not-junk-folder-filter) "Unread Non-INBOX messages" ?o)
-                                  (list (concat mu4e-unread-filter " AND " mu4e-not-junk-folder-filter) "Unread messages" ?a)
-                                  (list "(maildir:/chopps.org/spam-probable                                              )" "Probable spam messages" ?s))
-                            (mapcar (lambda (x) (cons (concat (car x) " AND " mu4e-not-junk-folder-filter) (cdr x)))
-                                    '(("flag:unread AND NOT flag:trashed" "Unread messages" ?u)
-                                      ("date:1h..now" "Last hours messages" ?h)
-                                      ("date:24h..now" "Today's messages" ?d)
-                                      ("date:today..now" "Today's messages" ?t)
-                                      ("date:7d..now" "Last 7 days" ?w)
-                                      ("date:7d..now AND (from:chopps@chopps.org OR from:chopps@gmail.com OR from:chopps@us.labn.net OR from:chopps@labn.net OR from:christian.hopps.ctr@nrl.navy.mil)" "Last 7 days sent" ?W)
-                                      ("date:14d..now AND (from:chopps@chopps.org OR  OR from:chopps@gmail.com OR from:chopps@us.labn.net OR from:chopps@labn.net OR from:christian.hopps.ctr@nrl.navy.mil)" "Last 14 days sent" ?F)
-                                      ("mime:application/zip" "Messages with ZIP" ?z)
-                                      ("mime:application/pdf" "Messages with PDF" ?p)
-                                      ("mime:text/calendar" "Messages with calendar" ?q)
-                                      ("mime:*cs" "Messages with VCS" ?Q)
-                                      ))
+                           (list
+                            (list :name "Unread [i]NBOX messages"
+                                  :query (concat mu4e-unread-filter " AND " mu4e-inbox-filter-base)
+                                  :key ?i)
+
+                            (list :name "Unread [c]hopps INBOX messages"
+                                  :query (concat mu4e-unread-filter " AND " "maildir:/chopps.org/INBOX")
+                                  :key ?c)
+
+                            (list :name "Unread [g]mail INBOX messages"
+                                  :query (concat mu4e-unread-filter " AND " "maildir:/gmail.com/INBOX")
+                                  :key ?g)
+
+                            (list :name "Unread Important messages"
+                                  :query (concat mu4e-unread-filter " AND " mu4e-imp-filter-base)
+                                  :key ?n)
+
+                            ;; (list (concat mu4e-unread-filter " AND " mu4e-not-junk-folder-filter " AND " "maildir:/chopps.org/ietf-wg-lsr") "Unread LSR messages" ?l)
+                            ;; (list (concat mu4e-unread-filter " AND " mu4e-not-junk-folder-filter " AND " "maildir:/chopps.org/ietf-wg-ipsec") "Unread netmod messages" ?I)
+                            ;; (list (concat mu4e-unread-filter " AND " mu4e-not-junk-folder-filter " AND " "maildir:/chopps.org/ietf-*") "Unread IETF messages" ?e)
+
+                            ;; (list :name "Unread [u]nimportant messages"
+                            ;;       :query (concat mu4e-unread-filter " AND NOT " mu4e-imp-filter-base " AND NOT " mu4e-inbox-filter-base " AND " mu4e-not-junk-folder-filter)
+                            ;;       :key ?u)
+
+                            ;; (list :name "Unread Non-INBOX messages"
+                            ;;       :query (concat mu4e-unread-filter " AND NOT " mu4e-inbox-filter-base " AND " mu4e-not-junk-folder-filter)
+                            ;;       :key ?o)
+
+                            ;; (list :name "Unread messages"
+                            ;;       :query (concat mu4e-unread-filter " AND " mu4e-not-junk-folder-filter)
+                            ;;       :key ?a)
+
+                            ;; (list :name "Probable spam messages"
+                            ;;       :query "(maildir:/chopps.org/spam-probable                                              )"
+                            ;;       :key ?s)
+
+                            ;; (list :name "Last hours messages"
+                            ;;       :query "date:1h..now"
+                            ;;       :key ?h)
+
+                            ;; (list :name "Last 24 hours messages"
+                            ;;       :query "date:24h..now"
+                            ;;       :key ?d)
+
+                            ;; (list :name "Today's messages"
+                            ;;       :query "date:today..now"
+                            ;;       :key ?t)
+
+                            ;; (list :name "Last 7 days"
+                            ;;       :query "date:7d..now"
+                            ;;       ?w)
+
+                            ;; (list :name "Last 7 days FROM ME"
+                            ;;       :query "date:7d..now AND (from:chopps@chopps.org OR from:chopps@gmail.com OR from:chopps@us.labn.net OR from:chopps@labn.net OR from:christian.hopps.ctr@nrl.navy.mil)"
+                            ;;       :key ?W)
+
+                            ;; (list :name "Last 14 days FROM ME"
+                            ;;       :query "date:14d..now AND (from:chopps@chopps.org OR  OR from:chopps@gmail.com OR from:chopps@us.labn.net OR from:chopps@labn.net OR from:christian.hopps.ctr@nrl.navy.mil)"
+                            ;;       :key ?F)
+                            ;; ;; AND " mu4e-not-junk-folder-filter
+                            ;; ;;           ("mime:application/zip" "Messages with ZIP" ?z)
+                            ;; ;;           ("mime:application/pdf" "Messages with PDF" ?p)
+                            ;; ;;           ("mime:text/calendar" "Messages with calendar" ?q)
+                            ;; ;;           ("mime:*cs" "Messages with VCS" ?Q)
                             )
 
 
@@ -2287,7 +2355,6 @@ before packages are loaded."
                        (progn
                          (debug-init-message "debug-init MU4E setq")
 
-
                          (if (string-prefix-p "aarch64" system-configuration)
                              (setq my-msmtp "/opt/homebrew/bin/msmtp")
                            (setq my-msmtp "/usr/local/bin/msmtp"))
@@ -2297,6 +2364,7 @@ before packages are loaded."
                                                  :name "chopps.org"
                                                  :match-func (lambda (msg)
                                                                (and msg (string-match "/chopps.org/.*" (mu4e-message-field msg :maildir))))
+
                                                  :vars '((user-mail-address  . "chopps@chopps.org")
                                                          (user-full-name . "Christian Hopps")
                                                          ;; mu4e
@@ -2315,6 +2383,7 @@ before packages are loaded."
                                                          (smtpmail-local-domain         .      "chopps.org")
                                                          (smtpmail-stream-type          . starttls)
                                                          (smtpmail-smtp-service         . 587)))
+
                                                ,(make-mu4e-context
                                                  :name "labn.net"
                                                  :match-func (lambda (msg)
@@ -2334,6 +2403,7 @@ before packages are loaded."
                                                          (smtpmail-local-domain         . "labn.net")
                                                          (smtpmail-stream-type          . starttls)
                                                          (smtpmail-smtp-service         . 587)))
+
                                                ,(make-mu4e-context
                                                  :name "us.labn.net"
                                                  :match-func (lambda (msg)
@@ -2353,6 +2423,7 @@ before packages are loaded."
                                                          (smtpmail-local-domain         . "us.labn.net")
                                                          (smtpmail-stream-type          . starttls)
                                                          (smtpmail-smtp-service         . 587)))
+
                                                ,(make-mu4e-context
                                                  :name "nrl.navy.mil"
                                                  :match-func (lambda (msg)
@@ -2377,6 +2448,7 @@ before packages are loaded."
                                                          ;; (smtpmail-smtp-service         . 587)
 
                                                          (message-sendmail-f-is-evil . t)))
+
                                                ,(make-mu4e-context
                                                  :name "gmail.com"
                                                  :match-func (lambda (msg)
@@ -2401,175 +2473,133 @@ before packages are loaded."
 
                          (debug-init-message "debug-init MU4E defuns")
 
-                         (defun mu4e~headers-jump-to-maildir-unread (maildir)
-                           "Show the unread messages in maildir.
-The user is prompted to ask what maildir.  If prefix arg EDIT is
-given, offer to edit the search query before executing it."
-                           (interactive
-                            (let ((maildir (mu4e-ask-maildir "Jump to maildir: ")))))
-                           (when maildir
-                             (let* ((query (format "maildir:\"%s\" AND flag:unread" maildir)))
-                               (mu4e-mark-handle-when-leaving)
-                               (mu4e-headers-search query))))
-
+                         ;; removed: <2024-11-21 Thu>
+                         ;;                          (defun mu4e~headers-jump-to-maildir-unread (maildir)
+                         ;;                            "Show the unread messages in maildir.
+                         ;; The user is prompted to ask what maildir.  If prefix arg EDIT is
+                         ;; given, offer to edit the search query before executing it."
+                         ;;                            (interactive
+                         ;;                             (let ((maildir (mu4e-ask-maildir "Jump to maildir: ")))))
+                         ;;                            (when maildir
+                         ;;                              (let* ((query (format "maildir:\"%s\" AND flag:unread" maildir)))
+                         ;;                                (mu4e-mark-handle-when-leaving)
+                         ;;                                (mu4e-headers-search query))))
+                         ;;                          (bind-key (kbd "J") 'mu4e~headers-jump-to-maildir-unread 'mu4e-main-mode-map)
                          ;; (define-key mu4e-main-mode-map (kbd "J") 'mu4e~headers-jump-to-maildir-unread)
                          ;; (define-key evilified-state--normal-state-map (kbd "J") 'mu4e~headers-jump-to-maildir-unread)
                          ;; (define-key evilified-state--visual-state-map (kbd "J") 'mu4e~headers-jump-to-maildir-unread)
 
-                         (defun ch/mu4e--query-insert-something (something)
-                           (interactive)
-                           (unless (looking-back "\\(:\\|and\\|or\\|not\\)[ \t]*")
-                             (insert " and "))
-                           (unless (looking-back "[ \t]")
-                             (insert " "))
-                           (insert something))
 
-                         (defun ch/mu4e-query-insert-flag:unread ()
-                           (interactive)
-                           (ch/mu4e--query-insert-something "flag:unread"))
-
-                         (defun ch/mu4e-query-insert-flag:flagged ()
-                           (interactive)
-                           (ch/mu4e--query-insert-something "flag:flagged"))
-
-                         (defun ch/mu4e-query-insert-flag:attach ()
-                           (interactive)
-                           (ch/mu4e--query-insert-something "flag:attach"))
-
-                         (defvar ch/mu4e-minibuffer-quick-insert-map
-                           (let ((map (make-sparse-keymap)))
-                             (define-key map (kbd "u") #'ch/mu4e-query-insert-flag:unread)
-                             (define-key map (kbd "f") #'ch/mu4e-query-insert-flag:flagged)
-                             (define-key map (kbd "a") #'ch/mu4e-query-insert-flag:attach)
-                             map))
-
-                         (define-key mu4e-minibuffer-search-query-map (kbd "C-u")
-                                     ch/mu4e-minibuffer-quick-insert-map)
+                         ;; removed: <2024-11-21 Thu>
+                         ;; (defun ch/mu4e--query-insert-something (something)
+                         ;;   (interactive)
+                         ;;   (unless (looking-back "\\(:\\|and\\|or\\|not\\)[ \t]*")
+                         ;;     (insert " and "))
+                         ;;   (unless (looking-back "[ \t]")
+                         ;;     (insert " "))
+                         ;;   (insert something))
+                         ;; (defun ch/mu4e-query-insert-flag:unread ()
+                         ;;   (interactive)
+                         ;;   (ch/mu4e--query-insert-something "flag:unread"))
+                         ;; (defun ch/mu4e-query-insert-flag:flagged ()
+                         ;;   (interactive)
+                         ;;   (ch/mu4e--query-insert-something "flag:flagged"))
+                         ;; (defun ch/mu4e-query-insert-flag:attach ()
+                         ;;   (interactive)
+                         ;;   (ch/mu4e--query-insert-something "flag:attach"))
+                         ;; (defvar ch/mu4e-minibuffer-quick-insert-map
+                         ;;   (let ((map (make-sparse-keymap)))
+                         ;;     (define-key map (kbd "u") #'ch/mu4e-query-insert-flag:unread)
+                         ;;     (define-key map (kbd "f") #'ch/mu4e-query-insert-flag:flagged)
+                         ;;     (define-key map (kbd "a") #'ch/mu4e-query-insert-flag:attach)
+                         ;;     map))
+                         ;; (define-key mu4e-minibuffer-search-query-map (kbd "C-u")
+                         ;;   ch/mu4e-minibuffer-quick-insert-map)
 
 
-                         ;; Work around a bug with too long names in the spaceline/modeline
-                         ;; This is causing an error now in emacs 27.2
-                         ;; (defun trim-modeline-string-chopps (str)
-                         ;;   (substring str 0 39))
-                         ;; (add-function :filter-return (symbol-function 'mu4e~quote-for-modeline) 'trim-modeline-string-chopps)
+                         ;; removed: <2024-11-21 Thu>
+                         ;; (defun my-mu4e-contact-filter (addr)
+                         ;;   (let ((re "\\(no[t]?[-\\.]?repl\\(y\\|ies\\)\\|@nrl.navy.mill\\|@dev.terastream.net\\|@nrl.nav.mil\\|@cmf.nrl.navy.mil\\|phoebe.johnson\\|christian.phoebe.hopps\\|phoebe.hopps@helloinnovation.com\\|lberger@fore.com\\)"))
+                         ;;     (unless (string-match-p re addr) addr)))
+                         ;; (setq mu4e-contact-process-function 'my-mu4e-contact-filter)
 
-                         ;; Mu4E Keyboard extras
-                         (bind-key (kbd "'") 'mu4e-headers-next 'mu4e-headers-mode-map)
-                         ;; XXXerror with vimification
-                         ;; (bind-key (kbd "\"") 'mu4e-headers-prev 'mu4e-headers-mode-map)
-                         ;; (bind-key (kbd "\"") 'mu4e-view-headers-prev 'mu4e-view-mode-map)
-                         (bind-key (kbd "f") 'mu4e-view-go-to-url 'mu4e-view-mode-map)
 
-                         (defun my-mu4e-contact-filter (addr)
-                           (let ((re "\\(no[t]?[-\\.]?repl\\(y\\|ies\\)\\|@nrl.navy.mill\\|@dev.terastream.net\\|@nrl.nav.mil\\|@cmf.nrl.navy.mil\\|phoebe.johnson\\|christian.phoebe.hopps\\|phoebe.hopps@helloinnovation.com\\|lberger@fore.com\\)"))
-                             (unless (string-match-p re addr) addr)))
-                         (setq mu4e-contact-process-function 'my-mu4e-contact-filter)
+                         ;; removed: <2024-11-21 Thu>
+                         ;; (defun my-mu4e-index-udpated ()
+                         ;;   (let ((ts (format-time-string "%H:%M:%S.%N")))
+                         ;;     (message "%s mu4e: full updated complete." ts)))
+                         ;; (add-hook 'mu4e-index-updated-hook 'my-mu4e-index-udpated)
 
-                         (defun my-mu4e-index-udpated ()
-                           (let ((ts (format-time-string "%H:%M:%S.%N")))
-                             (message "%s mu4e: full updated complete." ts)))
-
-                         (add-hook 'mu4e-index-updated-hook 'my-mu4e-index-udpated)
-
-                         (defun mu4e-update-index-deep ()
-                           "Reindex mu4e with cleanup"
-                           (interactive)
-                           (let ((mu4e-index-cleanup t)
-                                 (mu4e-index-lazy-check t))
-                             (let ((ts (format-time-string "%H:%M:%S.%N")))
-                               (message "%s mu4e: full index update starting..." ts)
-                               (mu4e-update-index))))
-
-                         (bind-key (kbd "U") 'mu4e-update-index-deep 'mu4e-main-mode-map)
-                         (bind-key (kbd "u") 'mu4e-update-index 'mu4e-main-mode-map)
+                         ;; removed: <2024-11-21 Thu>
+                         ;; (defun mu4e-update-index-deep ()
+                         ;;   "Reindex mu4e with cleanup"
+                         ;;   (interactive)
+                         ;;   (let ((mu4e-index-cleanup t)
+                         ;;         (mu4e-index-lazy-check t))
+                         ;;     (let ((ts (format-time-string "%H:%M:%S.%N")))
+                         ;;       (message "%s mu4e: full index update starting..." ts)
+                         ;;       (mu4e-update-index))))
+                         ;; (bind-key (kbd "U") 'mu4e-update-index-deep 'mu4e-main-mode-map)
+                         ;; (bind-key (kbd "u") 'mu4e-update-index 'mu4e-main-mode-map)
                          ;; (bind-key (kbd "U") 'mu4e-update-mail-and-index  'mu4e-main-mode-map)
 
-                         (defun mu4e-deal-with-moved-message ()
-                           (if (equal major-mode 'mu4e-loading-mode)
-                               (progn
-                                 (delete-window)
-                                 (mu4e-update-index)
-                                 (message "correct!"))))
+                         ;; removed: <2024-11-21 Thu>
+                         ;; (defun mu4e-deal-with-moved-message ()
+                         ;;   (if (equal major-mode 'mu4e-loading-mode)
+                         ;;       (progn
+                         ;;         (delete-window)
+                         ;;         (mu4e-update-index)
+                         ;;         (message "correct!"))))
+                         ;; (defun mu4e-error-handler (errcode errmsg)
+                         ;;   "Handler function for showing an error."
+                         ;;   ;; don't use mu4e-error here; it's running in the process filter context
+                         ;;   (cl-case errcode
+                         ;;     ((102 111) (progn
+                         ;;                  (mu4e-deal-with-moved-message)
+                         ;;                  (error "Updating Index: Error %d: %s" errcode errmsg)))
+                         ;;     (4 (user-error "No matches for this search query."))
+                         ;;     (t (error "Error %d: %s" errcode errmsg))))
 
-                         (defun mu4e-error-handler (errcode errmsg)
-                           "Handler function for showing an error."
-                           ;; don't use mu4e-error here; it's running in the process filter context
-                           (cl-case errcode
-                             ((102 111) (progn
-                                          (mu4e-deal-with-moved-message)
-                                          (error "Updating Index: Error %d: %s" errcode errmsg)))
-                             (4 (user-error "No matches for this search query."))
-                             (t (error "Error %d: %s" errcode errmsg))))
+
+                         ;; removed: <2024-11-21 Thu>
+                         ;; (defun my-mu4e-compose-hook ()
+                         ;;   "Setup outgoing messages"
+                         ;;   ;; Add chopps@<account-sending-from> to CC
+                         ;;   ;; Add chopps@chopps.org to Bcc if not sending from @chopps.org
+                         ;;   (let ((buffer-modified (buffer-modified-p)))
+                         ;;     (save-excursion
+                         ;;       (message-add-header (concat "Cc: " user-mail-address))
+                         ;;       (if (not (string= user-mail-address "chopps@chopps.org"))
+                         ;;           (message-add-header "Bcc: chopps@chopps.org")
+                         ;;         ))
+                         ;;     (set-buffer-modified-p buffer-modified))
+                         ;;   ;; Outgoing mails get format=flowed.
+                         ;;   (use-hard-newlines t 'guess)
+                         ;;   (mml-secure-message-sign-pgpmime)
+                         ;;   )
+                         ;; (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
 
 
-                         ;; (debug-init-message "debug-init MU4E helm")
-                         ;; (defun ch:ct (clist)
-                         ;;   "Transform candidate into (display . real)"
-                         ;;   (mapcar (lambda (candidate)
-                         ;;             (let* ((name (plist-get candidate :name))
-                         ;;                     email (plist-get candidate :mail))
-                         ;;               (or (and name (format "%s <%s>" name email))
-                         ;;                 email))) clist))
-                         ;; (when (configuration-layer/package-usedp 'helm)
-                         ;;   (defun my-message-expand-name (&optional start)
-                         ;;     ((interactive "P"))
-                         ;;     ;; (message "my-message-expand-name called")
-                         ;;     (helm :prompt "; contact:" :sources
-                         ;;           (helm-build-sync-source "mu4e contacts"
-                         ;;                                   :candidates mu4e~contact-list :candidate-transformer 'ch:ct))))
-
-                         (defun my-mu4e-compose-hook ()
-                           "Setup outgoing messages"
-                           ;; Add chopps@<account-sending-from> to CC
-                           ;; Add chopps@chopps.org to Bcc if not sending from @chopps.org
-                           (let ((buffer-modified (buffer-modified-p)))
-                             (save-excursion
-                               (message-add-header (concat "Cc: " user-mail-address))
-                               (if (not (string= user-mail-address "chopps@chopps.org"))
-                                   (message-add-header "Bcc: chopps@chopps.org")
-                                 ))
-                             (set-buffer-modified-p buffer-modified))
-
-                           ;; This should go elsewhere
-                           ;; Actually don't like this.
-                           ;; (require 'visual-fill-column)
-                           ;; (visual-fill-column-mode)
-
-                           ;; Outgoing mails get format=flowed.
-                           (use-hard-newlines t 'guess)
-                           (mml-secure-message-sign-pgpmime)
-                           )
-                         (add-hook 'mu4e-compose-mode-hook 'my-mu4e-compose-hook)
-
-                         ;; Mark to move to spam folder from headers view.
-                         (defun mu4e-headers-mark-move-to-spam ()
-                           (interactive)
-                           (let ((maildir (mu4e-message-field (mu4e-message-at-point) :maildir)))
-                             (if (string-match-p (regexp-quote "gmail.com") maildir)
-                                 (mu4e-mark-set 'move "/gmail.com/[Gmail]/Spam")
-                               (mu4e-mark-set 'move mu4e-spam-folder))
-                             (mu4e-headers-next)))
-
-                         ;; Mark to move to spam folder from message view.
-                         (defun mu4e-view-mark-move-to-spam ()
-                           (interactive)
-                           (mu4e~view-in-headers-context
-                            (mu4e-headers-mark-move-to-spam)))
-                         (debug-init-message "post-init end mu4e eval after load")
-
-                         ;; XXX these aren't defined
-                         ;; (define-key mu4e-headers-mode-map (kbd "C-c c") 'org-mu4e-store-and-capture)
-                         ;; (define-key mu4e-view-mode-map    (kbd "C-c c") 'org-mu4e-store-and-capture)
-
-                         ;; removed 20200426
-                         ;; (require 'mu4e-contrib)
-
-                         ;; XXX also add this back
+                         ;; removed: <2024-11-21 Thu>
+                         ;; ;; Mark to move to spam folder from headers view.
+                         ;; (defun mu4e-headers-mark-move-to-spam ()
+                         ;;   (interactive)
+                         ;;   (let ((maildir (mu4e-message-field (mu4e-message-at-point) :maildir)))
+                         ;;     (if (string-match-p (regexp-quote "gmail.com") maildir)
+                         ;;         (mu4e-mark-set 'move "/gmail.com/[Gmail]/Spam")
+                         ;;       (mu4e-mark-set 'move mu4e-spam-folder))
+                         ;;     (mu4e-headers-next)))
+                         ;; ;; Mark to move to spam folder from message view.
+                         ;; (defun mu4e-view-mark-move-to-spam ()
+                         ;;   (interactive)
+                         ;;   (mu4e~view-in-headers-context
+                         ;;    (mu4e-headers-mark-move-to-spam)))
+                         ;; (debug-init-message "post-init end mu4e eval after load")
                          ;;
-                         ;; error in process sentinel: mu4e-alert--parse-mails: End of file during parsing
-                         ;; error in process sentinel: End of file during parsing
-                         ;; (mu4e-alert-enable-mode-line-display)
-                         ;; (mu4e-alert-enable-notifications)
+                         ;; (define-key mu4e-headers-mode-map "@" 'mu4e-headers-mark-move-to-spam)
+                         ;; (define-key mu4e-view-mode-map "@" 'mu4e-view-mark-move-to-spam)
+
+
 
                          ;; removed 20200426
                          ;; ;; ;; XXX disabled trying to find hang XXX THIS CAUSED IT
@@ -2589,171 +2619,119 @@ given, offer to edit the search query before executing it."
                          ;;           (lambda () (setq show-trailing-whitespace nil)))
                          ;; ;; Need exit hook from headers mode to do an immediate index update.
                          ;; (add-hook 'mu4e-main-mode-hook (lambda () (mu4e-update-index)))
-
                          ;; ;; XXX causes hangs
                          ;; (add-hook 'mu4e-headers-mode-hook (lambda () (progn (setq scroll-up-aggressively .8))))
 
                          (debug-init-message "debug-init MU4E add notify actions")
 
-                         (defun open-message-id-in-new-frame (msgid)
-                           (interactive "s")
-                           (let ((mailp (persp-get-by-name "@Mu4e"))
-                                 (nframe (make-frame)))
-                             (select-frame nframe)
-                             (and (persp-p mailp) (persp-switch "@Mu4e" nframe))
-                             (mu4e-view-message-with-message-id msgid)
-                             (delete-other-windows)))
-
-                         (defun message-file-to-sexp (path)
-                           "Retrieve a mu4e s-expression for the e-mail message at PATH."
-                           (car-safe
-                            (read-from-string
-                             (shell-command-to-string
-                              (format "mu view -o sexp %s"
-                                      (shell-quote-argument (expand-file-name path)))))))
-
-                         (defun mu4e-mac-notify-action (id action content)
-                           (let* ((msgid (plist-get content :msgid)))
-                             (when msgid
-                               (open-message-id-in-new-frame msgid))))
-
-                         (defun mu4e-notify-new-message (path)
-                           (let* ((msg (message-file-to-sexp path))
-                                  (msgid (plist-get msg :message-id))
-                                  (subject (plist-get msg :subject))
-                                  (title (format "%s" (car (plist-get msg :from)))))
-                             (mac-notification-send title subject
-                                                    :msgid msgid
-                                                    :sound-name "Looking Up"
-                                                    :on-action 'mu4e-mac-notify-action)))
-
-                         ;; Update the index only if non-destructive, otherwise try later
-                         (setq mu4e-careful-update-timer nil)
-                         (defun mu4e-careful-update-index ()
-                           (if (and
-                                (not (get-buffer-window "*Article*"))
-                                (fboundp 'mu4e-update-index))
-                               (progn
-                                 (if mu4e-careful-update-timer
-                                     (cancel-timer mu4e-careful-update-retry))
-                                 (message "updating-mail-index")
-                                 (mu4e-update-index))
-                             (unless mu4e-careful-update-timer
-                               (message "setting timer to update mail index")
-                               (setq mu4e-careful-update-timer
-                                     (run-at-time "10 sec" nil
-                                                  (lambda ()
-                                                    (setq mu4e-careful-update-timer nil)
-                                                    (mu4e-careful-update-index)))))))
-
-                         (debug-init-message "debug-init MU4E mode add to gcal")
-                         (defun mu4e-action-add-to-gcal (msg)
-                           "Add to a calendar"
-                           (interactive)
-                           (let* ((calendar "Work")    ; fix this to query user or have default I guess
-                                  (count (hash-table-count mu4e~view-attach-map))
-                                  (attachnums (mu4e-split-ranges-to-numbers "a" count)))
-                             (dolist (num attachnums)
-                               (let* ((att (mu4e~view-get-attach msg num))
-                                      (name (plist-get att :name))
-                                      (index (plist-get att :index)))
-                                 (if (or (s-suffix? ".vcs" name) (s-suffix? ".ics" name))
-                                     (progn
-                                       (message "%s %s%s%s" "mu4e-view-pipe-attachment " num " (concat \"gcalcli import --calendar=\"" calendar)
-                                       (mu4e-view-pipe-attachment msg num (concat "gcalcli import --calendar=" calendar)))
-                                   (message "No .[iv]cs attachment"))))))
-
-                         ;; (let* ((save-info (mu4e~view-temp-action
-                         ;;                    (mu4e-message-field msg :docid) index))
-                         ;;        (path (plist-get save-info :path))
-                         ;;        (calendar "Work"))
-                         ;;   (message (concat "gcalcli import --calendar=" calendar " " path))
-                         ;;   (message (shell-command-to-string (concat "gcalcli import --calendar=" calendar " " path)))))))))
-
-                         (add-to-list 'mu4e-view-actions
-                                      '("GoogleCalendar" . mu4e-action-add-to-gcal))
-
-                         ;; (let ((calendar "Work"))
-                         ;;   (shell-command-to-string (concat "gcalcli import --calendar=" calendar " " file))
-
-                         ;;   (let* ((html (mu4e-message-field msg :body-html))
-                         ;;          (txt (mu4e-message-field msg :body-txt))
-                         ;;          (tmpfile (format "%s%x.html" temporary-file-directory (random t))))
-                         ;;     (unless (or html txt)
-                         ;;       (mu4e-error "No body part for this message"))
-                         ;;     (with-temp-buffer
-                         ;;       ;; simplistic -- but note that it's only an example...
-                         ;;       (insert (or html (concat "<pre>" txt "</pre>")))
-                         ;;       (write-file tmpfile)
-                         ;;       (browse-url (concat "file://" tmpfile)))))))
+                         ;; removed: <2024-11-21 Thu>
+                         ;; (defun open-message-id-in-new-frame (msgid)
+                         ;;   (interactive "s")
+                         ;;   (let ((mailp (persp-get-by-name "@Mu4e"))
+                         ;;         (nframe (make-frame)))
+                         ;;     (select-frame nframe)
+                         ;;     (and (persp-p mailp) (persp-switch "@Mu4e" nframe))
+                         ;;     (mu4e-view-message-with-message-id msgid)
+                         ;;     (delete-other-windows)))
+                         ;; (defun message-file-to-sexp (path)
+                         ;;   "Retrieve a mu4e s-expression for the e-mail message at PATH."
+                         ;;   (car-safe
+                         ;;    (read-from-string
+                         ;;     (shell-command-to-string
+                         ;;      (format "mu view -o sexp %s"
+                         ;;              (shell-quote-argument (expand-file-name path)))))))
+                         ;; (defun mu4e-mac-notify-action (id action content)
+                         ;;   (let* ((msgid (plist-get content :msgid)))
+                         ;;     (when msgid
+                         ;;       (open-message-id-in-new-frame msgid))))
+                         ;; (defun mu4e-notify-new-message (path)
+                         ;;   (let* ((msg (message-file-to-sexp path))
+                         ;;          (msgid (plist-get msg :message-id))
+                         ;;          (subject (plist-get msg :subject))
+                         ;;          (title (format "%s" (car (plist-get msg :from)))))
+                         ;;     (mac-notification-send title subject
+                         ;;                            :msgid msgid
+                         ;;                            :sound-name "Looking Up"
+                         ;;                            :on-action 'mu4e-mac-notify-action)))
+                         ;; ;; Update the index only if non-destructive, otherwise try later
+                         ;; (setq mu4e-careful-update-timer nil)
+                         ;; (defun mu4e-careful-update-index ()
+                         ;;   (if (and
+                         ;;        (not (get-buffer-window "*Article*"))
+                         ;;        (fboundp 'mu4e-update-index))
+                         ;;       (progn
+                         ;;         (if mu4e-careful-update-timer
+                         ;;             (cancel-timer mu4e-careful-update-retry))
+                         ;;         (message "updating-mail-index")
+                         ;;         (mu4e-update-index))
+                         ;;     (unless mu4e-careful-update-timer
+                         ;;       (message "setting timer to update mail index")
+                         ;;       (setq mu4e-careful-update-timer
+                         ;;             (run-at-time "10 sec" nil
+                         ;;                          (lambda ()
+                         ;;                            (setq mu4e-careful-update-timer nil)
+                         ;;                            (mu4e-careful-update-index)))))))
 
 
-                         (define-key mu4e-headers-mode-map "d" 'mu4e-headers-mark-for-read)
-                         (define-key mu4e-view-mode-map "d" 'mu4e-view-mark-for-read)
-                         (define-key mu4e-headers-mode-map "@" 'mu4e-headers-mark-move-to-spam)
-                         (define-key mu4e-view-mode-map "@" 'mu4e-view-mark-move-to-spam)
+                         ;; removed: <2024-11-21 Thu>
+                         ;; ;; Mu4E Keyboard extras
+                         ;; (bind-key (kbd "'") 'mu4e-headers-next 'mu4e-headers-mode-map)
+                         ;; ;; XXXerror with vimification
+                         ;; ;; (bind-key (kbd "\"") 'mu4e-headers-prev 'mu4e-headers-mode-map)
+                         ;; ;; (bind-key (kbd "\"") 'mu4e-view-headers-prev 'mu4e-view-mode-map)
+                         ;; (define-key mu4e-headers-mode-map (kbd "C-c c") 'org-mu4e-store-and-capture)
+                         ;; (define-key mu4e-view-mode-map    (kbd "C-c c") 'org-mu4e-store-and-capture)
+                         ;; (define-key mu4e-headers-mode-map "d" 'mu4e-headers-mark-for-read)
+                         ;; (define-key mu4e-view-mode-map "d" 'mu4e-view-mark-for-read)
+                         ;; (bind-key (kbd "f") 'mu4e-view-go-to-url 'mu4e-view-mode-map)
 
-                         ;; XXXerror with auto vimification
-                         ;; (define-key mu4e-headers-mode-map "\\" 'mu4e-headers-mark-move-to-spam)
-                         ;; (define-key mu4e-view-mode-map "\\" 'mu4e-view-mark-move-to-spam)
+                         ;; (debug-init-message "debug-init MU4E leader keys")
+                         ;; (spacemacs/set-leader-keys-for-major-mode 'mu4e-view-mode
+                         ;;   "g" 'mu4e-view-go-to-url
+                         ;;   "h" 'mu4e-view-toggle-html
+                         ;;   "j" 'mu4e-view-headers-next
+                         ;;   "k" 'mu4e-view-headers-prev
+                         ;;   "K" 'mu4e-view-save-url
+                         ;;   "n" 'mu4e-view-headers-next
+                         ;;   "p" 'mu4e-view-headers-prev
+                         ;;   "v" 'mu4e-view-verify-msg-popup
+                         ;;   "\\" 'mu4e-view-verify-msg-popup
+                         ;;   ;; "y" 'mu4e- selejjj
+                         ;;   "s" 'mu4e-view-search-narrow
+                         ;;   "e" 'mu4e-view-search-edit
+                         ;;   ;; "b" 'mu4e-view-bookmark-make-record
+                         ;;   )
 
 
-                         (debug-init-message "debug-init MU4E leader keys")
-                         (spacemacs/set-leader-keys-for-major-mode 'mu4e-view-mode
-                           "g" 'mu4e-view-go-to-url
-                           "h" 'mu4e-view-toggle-html
-                           "j" 'mu4e-view-headers-next
-                           "k" 'mu4e-view-headers-prev
-                           "K" 'mu4e-view-save-url
-                           "n" 'mu4e-view-headers-next
-                           "p" 'mu4e-view-headers-prev
-                           "v" 'mu4e-view-verify-msg-popup
-                           "\\" 'mu4e-view-verify-msg-popup
-                           ;; "y" 'mu4e- selejjj
-                           "s" 'mu4e-view-search-narrow
-                           "e" 'mu4e-view-search-edit
-                           ;; "b" 'mu4e-view-bookmark-make-record
-                           )
-
-                         ;; ;; XXXSLOW
-                         ;; (add-to-list 'mu4e-header-info-custom
-                         ;;   '(:list-or-dir .
-                         ;;      (:name "ML or maildir" ;; long name, as seen in message view
-                         ;;        :shortname "ML-D"     ;; short name, as seen in the headers view
-                         ;;        :help "Mailing list or maildir if not set"
-                         ;;        :function
-                         ;;        (lambda (msg)
-                         ;;          (or (mu4e-message-field msg :mailing-list)
-                         ;;            (mu4e-message-field msg :maildir))))))
-
-                         (setq
-                          ;; "Date         Flgs   List       From                   Subject
-                          mu4e-headers-fields (quote (
-                                                      (:flags          .  4)
-                                                      (:human-date     . 12)
-                                                      (:from           . 24)
-                                                      (:maildir        . 30)
-                                                      ;;(:thread-subject . nil)
-                                                      (:subject . nil)
-                                                      )))
-                         ;; XXXSLOW
-
-                         ;; (require 'mu4e-special)
+                         ;; removed: <2024-11-21 Thu>
+                         ;; (setq
+                         ;;  ;; "Date         Flgs   List       From                   Subject
+                         ;;  mu4e-headers-fields (quote (
+                         ;;                              (:flags          .  4)
+                         ;;                              (:human-date     . 12)
+                         ;;                              (:from           . 24)
+                         ;;                              (:maildir        . 30)
+                         ;;                              ;;(:thread-subject . nil)
+                         ;;                              (:subject . nil)
+                         ;;                              )))
 
                          (debug-init-message "debug-init MU4E defun compose")
-                         (defun compose-attach-marked-files ()
-                           "Compose mail and attach all the marked files from a dired buffer."
-                           (interactive)
-                           (let ((files (dired-get-marked-files)))
-                             (compose-mail nil nil nil t)
-                             (dolist (file files)
-                               (if (file-regular-p file)
-                                   (mml-attach-file file
-                                                    (mm-default-file-encoding file)
-                                                    nil "attachment")
-                                 (message "skipping non-regular file %s" file)))))
+
+                         ;; removed: <2024-11-21 Thu>
+                         ;; (defun compose-attach-marked-files ()
+                         ;;   "Compose mail and attach all the marked files from a dired buffer."
+                         ;;   (interactive)
+                         ;;   (let ((files (dired-get-marked-files)))
+                         ;;     (compose-mail nil nil nil t)
+                         ;;     (dolist (file files)
+                         ;;       (if (file-regular-p file)
+                         ;;           (mml-attach-file file
+                         ;;                            (mm-default-file-encoding file)
+                         ;;                            nil "attachment")
+                         ;;         (message "skipping non-regular file %s" file)))))
 
                          )
+
                        )
                      )
 
@@ -3826,6 +3804,7 @@ given, offer to edit the search query before executing it."
 
                       ;; capture the search instead of the highlighted message in
                       ;; headers view
+
                       org-mu4e-link-query-in-headers-mode nil
 
 
@@ -3874,19 +3853,17 @@ given, offer to edit the search query before executing it."
                         ("xD" "Vitamin D 50k" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 50ku Vitamin D\nCreated: %U" :immediate-finish t)
                         ("xg" "Glimepiride 4mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE 4mg Glimepiride\nCreated: %U" :immediate-finish t)
+                         "* NOTE 2mg Glimepiride\nCreated: %U" :immediate-finish t)
                         ("xi" "Invokana 300mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 300mg Invokana\nCreated: %U" :immediate-finish t)
                         ("xm" "Metformin 1500mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 1500mg Metformin\nCreated: %U" :immediate-finish t)
                         ("xM" "Morning Pills" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE 300mg Invokana,4mg Glimepiride,40mg Protonix\nCreated: %U" :immediate-finish t)
-                        ("xn" "Nicoderm" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE Nicoderm\nCreated: %U" :immediate-finish t)
+                         "* NOTE 300mg Invokana,2mg Glimepiride,40mg Prilosec\nCreated: %U" :immediate-finish t)
                         ("xo" "Oxycodone 2.5mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 2.5mg Oxycodone\nCreated: %U" :immediate-finish t)
-                        ("xp" "Protonix 40mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-                         "* NOTE 40mg Protonix\nCreated: %U" :immediate-finish t)
+                        ("xp" "Prilosec 40mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+                         "* NOTE 40mg Prilosec\nCreated: %U" :immediate-finish t)
                         ("xs" "Sucralfate 500mg" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
                          "* NOTE 500mg Sucralfate\nCreated: %U" :immediate-finish t)
                         ("xt" "Tylenol dose 325" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
@@ -4143,7 +4120,10 @@ given, offer to edit the search query before executing it."
                     (setq evil-esc-delay 0))
                   ;; Configure some modes to start in different modes.
                   (evil-set-initial-state 'artist-mode 'emacs)
-                  (evil-set-initial-state 'mu4e-compose-mode 'insert)
+
+                  ;; removed: <2024-11-21 Thu>
+                  ;; (evil-set-initial-state 'mu4e-compose-mode 'insert)
+
                   ;; Have to use this to avoid rebox taking it over.
                   ;; (global-set-key (kbd "C-y") 'yank-from-ssh)
                   ;; (evil-global-set-key 'insert (kbd "C-y") 'yank-from-ssh)
@@ -4397,8 +4377,10 @@ given, offer to edit the search query before executing it."
 
     (debug-init-message "list-timers")
 
-    (require 'list-timers)
-    (evil-set-initial-state 'timers-menu-mode 'insert)
+    ;; removed: <2024-11-21 Thu>
+    ;; (require 'list-timers)
+    ;; (evil-set-initial-state 'timers-menu-mode 'insert)
+
 
     ;; left-arrow, right-arrow
     ;; Used to indicate truncated lines.
